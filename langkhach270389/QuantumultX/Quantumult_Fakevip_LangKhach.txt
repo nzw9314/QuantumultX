@@ -1,0 +1,67 @@
+; 20191020_070434
+
+[general]
+server_check_url=http://www.google.com/generate_204
+;geo_location_checker=http://www.example.com/json/, https://www.example.com/script.js
+;dns_exclusion_list=*.qq.com, qq.com, *.cmpassport.com
+;ssid_suspended_list=LINK_22E174, LINK_22E175
+;udp_whitelist=53, 123, 1900, 80-443
+;excluded_routes= 192.168.0.0/16, 172.16.0.0/12, 100.64.0.0/10, 10.0.0.0/8
+;icmp_auto_reply=true
+[dns]
+server=1.1.1.1
+server=1.0.0.1
+
+[policy]
+
+[server_remote]
+;https://raw.githubusercontent.com/crossutility/Quantumult-X/master/server.txt, tag=Sample-01
+
+[filter_remote]
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-rule.conf,force-policy=reject, tag= hostvn, enabled=true
+
+
+[rewrite_remote]
+https://raw.githubusercontent.com/langkhach270389/Scripting/master/QuantumultX/Fake_Vip.txt, tag=Fake_vip_LangKhach, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumultX-rewrite.conf, tag=HostVn, enabled=true
+
+[server_local]
+
+
+;shadowsocks=ss-a.example.com:80, method=chacha20, password=pwd, obfs=http, obfs-host=bing.com, obfs-uri=/resource/file, fast-open=false, udp-relay=false, server_check_url=http://www.apple.com/generate_204, tag=Sample-A
+;shadowsocks=ss-b.example.com:80, method=chacha20, password=pwd, obfs=http, obfs-host=bing.com, obfs-uri=/resource/file, fast-open=false, udp-relay=false, tag=Sample-B
+;shadowsocks=ss-c.example.com:443, method=chacha20, password=pwd, obfs=tls, obfs-host=bing.com, fast-open=false, udp-relay=false, tag=Sample-C
+;shadowsocks=ssr-a.example.com:443, method=chacha20, password=pwd, ssr-protocol=auth_chain_b, ssr-protocol-param=def, obfs=tls1.2_ticket_fastauth, obfs-host=bing.com, tag=Sample-D
+;shadowsocks=ws-a.example.com:80, method=aes-128-gcm, password=pwd, obfs=ws, obfs-uri=/ws, fast-open=false, udp-relay=false, tag=Sample-E
+;shadowsocks=ws-b.example.com:80, method=aes-128-gcm, password=pwd, obfs=ws, fast-open=false, udp-relay=false, tag=Sample-F
+;shadowsocks=ws-tls-a.example.com:443, method=aes-128-gcm, password=pwd, obfs=wss, obfs-uri=/ws, fast-open=false, udp-relay=false, tag=Sample-G
+
+[filter_local]
+host-keyword, mobile-api.adguard.com/api/1.0/status.html, reject
+;user-agent, ?abc*, proxy
+;host, www.google.com, proxy
+;host-keyword, adsite, reject
+;host-suffix, googleapis.com, proxy
+final, direct
+
+
+#
+# The "reject" returns HTTP status code 404 with no content.
+# The "reject-200" returns HTTP status code 200 with no content.
+# The "reject-img" returns HTTP status code 200 with content of 1px gif.
+# The "reject-dict" returns HTTP status code 200 with content of empty json object.
+# The "reject-array" returns HTTP status code 200 with content of empty json array.
+# The "request-header" works for all the http headers not just one single header, so you can match two or more headers including CRLF in one regular expression.
+# The length and encoding related HTTP header fields will be automatically processed by Quantumult if the "rewrite" is body related, so you should not handle them by yourself. The max supported response size is 256kB(decompressed) for response-body and script-response-body.
+# When using javascript in rewrite, you can use those objects: $request, $response, $notify(title, subtitle, message), console.log(message) and Quantumult’s built-in objects all have prefix "$".
+# Supports: $request.scheme, $request.method, $request.url, $request.path, $request.headers, $response.statusCode, $response.headers, $response.body
+# The $notify(title, subtitle, message) will post iOS notifications if Quantumult notification has been enabled.
+# The console.log(message)  will output logs to Quantumult log file if the log level is "debug".
+#
+
+[mitm]
+passphrase = F7E29724
+p12 = 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
+skip_validating_cert = true
+;force_sni_domain_name = true
+

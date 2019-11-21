@@ -1,0 +1,1 @@
+{"products":[{"product_id":"com.adguard.lifetimePurchase","premium_status":"ACTIVE"}]}

@@ -1,5 +1,6 @@
 /*
 README：https://github.com/yichahucha/surge/tree/master
+@supported A9DA732136CB
  */
 
 const path1 = "/groups/timeline";
@@ -19,6 +20,7 @@ const path14 = "/cardlist";
 const path15 = "/statuses/video_timeline";
 const path16 = "/page";
 const path17 = "/statuses/friends_timeline";
+const path18 = "/!/photos/pic_recommend_status";
 
 const url = $request.url;
 var body = $response.body;
@@ -60,7 +62,8 @@ if (url.indexOf(path4) != -1) {
     body = JSON.stringify(obj);
 }
 
-if (url.indexOf(path5) != -1) {
+if (url.indexOf(path5) != -1 ||
+    url.indexOf(path18) != -1) {
     let obj = JSON.parse(body);
     obj.data = {};
     body = JSON.stringify(obj);
