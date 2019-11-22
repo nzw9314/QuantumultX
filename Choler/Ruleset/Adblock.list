@@ -105,7 +105,7 @@ URL-REGEX,"^https?:\/\/cube\.elemecdn\.com\/.*\.mp4\?$"
 URL-REGEX,"^http:\/\/p\d.meituan.net\/movie\/.*\?may_covertWebp$"
 
 # 美团外卖
-URL-REGEX,"^http:\/\/p\d\.meituan\.net\/wmbanner\/"
+URL-REGEX,"^http:\/\/p\d\.meituan\.net\/(wmbanner|bizad)\/"
 
 # 美团
 URL-REGEX,"^https?:\/\/s3plus\.meituan\.net\/v1\/mss_a002"
