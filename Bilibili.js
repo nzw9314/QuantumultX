@@ -1,7 +1,3 @@
-/**
- * @supported B422643B7EE6
- */
-
 const up_blacklist = ['NathanRich火锅大王','大祥哥来了'];
 const title_blackwords = ['乔碧萝','鸡你太美'];
 const region_blacklist = ['宅舞','三次元舞蹈'];
