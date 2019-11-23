@@ -1,7 +1,3 @@
-/**
- * @supported B422643B7EE6
- */
-
 var obj = JSON.parse($response.body);
  obj={
  "data": {

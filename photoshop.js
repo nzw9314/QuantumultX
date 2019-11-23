@@ -1,7 +1,3 @@
-/**
- * @supported B422643B7EE6
- */
-
 /*
 解锁 Photoshop for iPad
 
