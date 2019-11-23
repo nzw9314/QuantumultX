@@ -1,7 +1,3 @@
-/**
- * @supported B422643B7EE6
- */
-
 /*
 [Script]
 http-request ^https://[\s\S]*\.googlevideo\.com/.*&(oad|ctier) script-path=https://Choler.github.io/Surge/Script/YouTube.js

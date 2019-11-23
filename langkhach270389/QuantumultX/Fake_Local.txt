@@ -28,7 +28,7 @@ https:\/\/api\.termius\.com\/api\/v3\/bulk\/account\/ url script-response-body T
 ^https:\/\/origin-prod-phoenix\.jibjab\.com\/v1\/user$ url script-response-body jibjab.vip.js
 
 #buyhack
-^https:\/\/buy\.itunes\.apple\.com\/verifyReceipt$ url script-response-body buy.itunes.apple.com.js
+^https:\/\/buy\.itunes\.apple\.com\/verifyReceipt$ url script-response-body verify_receipt.js
 
 #sync
 ^https:\/\/api\.sync\.me\/api\/purchases\/(report_purchases|get_purchases)  url script-response-body syn.me.js
