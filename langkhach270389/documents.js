@@ -1,6 +1,5 @@
-var obj = JSON.parse($response.body);
 
-obj= {
+var obj= {
   "originalTransactionId" : "20000625420102",
   "subscriptionState" : "trial",
   "isInGracePeriod" : false,

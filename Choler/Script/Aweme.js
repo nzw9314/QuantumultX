@@ -1,6 +1,6 @@
 /*
 [URL Rewrite]
-^https://aweme-eagle(.*)\.snssdk\.com/aweme/v2/ https://aweme-eagle$1.snssdk.com/aweme/v1/ 302
+^https://(.*)\.snssdk\.com/aweme/v2/ https://$1.snssdk.com/aweme/v1/ 302
 
 [Script]
 http-response ^https://[\s\S]*\/aweme/v1/(feed|aweme/post|follow/feed)/ requires-body=1,max-size=-1,script-path=https://Choler.github.io/Surge/Script/Aweme.js
@@ -23,7 +23,7 @@ let body = $response.body.replace(/watermark=1/g, "watermark=0");
 var obj = JSON.parse(body);
 if (obj.aweme_list) {
   for (var i = obj.aweme_list.length - 1; i >= 0; i--) {
-    if (obj.aweme_list[i].raw_ad_data) {
+    if (obj.aweme_list[i].is_ads == true) {
       obj.aweme_list.splice(i, 1);
     }
     if (obj.aweme_list[i].poi_info) {
