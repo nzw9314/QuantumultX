@@ -10,17 +10,11 @@ const body = $response.body;
 
 if (url.indexOf(path1) != -1) {
     let obj = JSON.parse(body);
-<<<<<<< HEAD
-    obj.serverConfig.httpdns = "0";
-    obj.serverConfig.imageDNS = "0";
-    obj.serverConfig.dnsvip = "";
-=======
     delete obj.serverConfig.httpdns;
     delete obj.serverConfig.dnsvip;
     delete obj.serverConfig.dnsvip_v6;
->>>>>>> master
     $done({ body: JSON.stringify(obj) });
-    if (console_log) console.log("httpdns closed");
+    if (console_log) $notify("JD", "", "httpdns closed");
 }
 
 if (url.indexOf(path2) != -1) {
@@ -28,7 +22,7 @@ if (url.indexOf(path2) != -1) {
     const floors = obj.floors;
     const commodity_info = floors[floors.length - 1];
     const shareUrl = commodity_info.data.property.shareUrl;
-    request_hsitory_price(shareUrl, function (data) {
+    request_history_price(shareUrl, function (data) {
         if (data) {
             const lowerword = adword_obj();
             lowerword.data.ad.textColor = "#fe0000";
@@ -68,7 +62,6 @@ if (url.indexOf(path2) != -1) {
 function history_price_msg(data) {
     const rex_match = /\[.*?\]/g;
     const rex_exec = /\[(.*),(.*),"(.*)"\]/;
-    const list = data.jiagequshiyh.match(rex_match);
     const lower = data.lowerPriceyh;
     const lower_date = changeDateFormat(data.lowerDateyh);
     const lower_msg = "‼️ 历史最低到手价:   ¥" + String(lower) + "   " + lower_date
@@ -82,7 +75,9 @@ function history_price_msg(data) {
     let history_price_msg = "";
     let start_date = "";
     let end_date = "";
-    list.reverse().forEach((item, index) => {
+    let list = data.jiagequshiyh.match(rex_match);
+    list = list.reverse().slice(0, 365);
+    list.forEach((item, index) => {
         if (item.length > 0) {
             const result = rex_exec.exec(item);
             const dateUTC = new Date(eval(result[1]));
@@ -103,13 +98,15 @@ function history_price_msg(data) {
             history_price_msg += msg;
         }
     });
-    const date_range_msg = `(${start_date} ~ ${end_date})`;
+    // const date_range_msg = `(${start_date} ~ ${end_date})`;
+    const date_range_msg = `(最近一年)`;
     const price_msg = title_msg + "  " + date_range_msg + "\n\n" + title_table_msg + "\n" + history_price_msg;
     return [lower_price_msg, price_msg];
 }
 
-function request_hsitory_price(share_url, callback) {
+function request_history_price(share_url, callback) {
     const options = {
+        method: "POST",
         url: "https://apapia-history.manmanbuy.com/ChromeWidgetServices/WidgetServices.ashx",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
@@ -117,15 +114,15 @@ function request_hsitory_price(share_url, callback) {
         },
         body: "methodName=getBiJiaInfo_wxsmall&p_url=" + encodeURIComponent(share_url)
     }
-    $httpClient.post(options, function (error, response, data) {
-        if (!error) {
-            callback(JSON.parse(data));
-            if (console_log) console.log("Data:\n" + data);
-        } else {
-            callback(null, null);
-            if (console_log) console.log("Error:\n" + error);
-        }
-    })
+    $task.fetch(options).then(response => {
+        // response.statusCode, response.headers, response.body
+        callback(JSON.parse(response.body));
+        if (console_log) $notify("Body", "", response.body); // Success!
+    }, reason => {
+        // reason.error
+        callback(null, null);
+        if (console_log) $notify("Error", "", reason.error); // Error!
+    });
 }
 
 function changeDateFormat(cellval) {
