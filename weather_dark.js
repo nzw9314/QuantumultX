@@ -1,17 +1,21 @@
+var api = "adff46a828dcf7e9686aa52170a1db8a";
+//dark sky api: https://darksky.net/dev
+var api_aqi = "dc9f948c8d9a8a1f10c2bc5bba60c4dd2e0dec4a"
+//aqi api: http://aqicn.org/data-platform/token/#/
 var lang = "zh"
-var lat_lon = "30.63950650543246,114.8630082941177"
-var api = "adff46a828dcf7e9686aa52170a1db8a"
-//第三行引号内填入申请到的dark sky api
+var lat_lon = "30.63960103422673,114.8629822119679"
+var lat_lon_1 = lat_lon.replace(/,/, ";")
+
 //有问题请通过Telegram反馈 https://t.me/Leped_Bot
 //clear-day, partly-cloudy-day, cloudy, clear-night, rain, snow, sleet, wind, fog, or partly-cloudy-night
 //☀️🌤⛅️🌥☁️🌦🌧⛈🌩🌨❄️💧💦🌫☔️☂️ ☃️⛄️
-var wurl = {
-    //url: "https://free-api.heweather.net/s6/weather/now?&location=" + coordinate + "&key=" + key,
-    url: "https://api.darksky.net/forecast/" + api + "/" + lat_lon + "?lang=" + lang + "&units=si&exclude=currently,minutely",
-};
+function weather() {
+    var wurl = {
+        url: "https://api.darksky.net/forecast/" + api + "/" + lat_lon + "?lang=" + lang + "&units=si&exclude=currently,minutely",
+    };
 
 
-$task.fetch(wurl).then(response => {
+    $task.fetch(wurl).then(response => {
         var obj = JSON.parse(response.body);
         //console.log(obj);
         var hour_summary = obj.hourly.summary;
@@ -30,10 +34,29 @@ $task.fetch(wurl).then(response => {
         var daily_prec_chance = obj.daily.data[0].precipProbability;
         var daily_maxtemp = obj.daily.data[0].temperatureMax;
         var daily_mintemp = obj.daily.data[0].temperatureMin;
-        //$notification.post("Dark Sky", icon + " " + Math.round(daily_mintemp) + " - " + Math.round(daily_maxtemp) + "  ☔️% " + Math.round(Number(daily_prec_chance) * 100), hour_summary);
-        $notify("Dark Sky", icon + " " + Math.round(daily_mintemp) + " - " + Math.round(daily_maxtemp) + "  ☔️ " + (Number(daily_prec_chance) * 100).toFixed(1) + "%", hour_summary);
+        aqi(icon, daily_mintemp, daily_maxtemp, daily_prec_chance, hour_summary);
 
+    }, reason => {
+        $notify("Dark Sky", lat_lon + '信息获取失败', reason.error);
+    });
+}
 
-}, reason => {
-    $notify("Dark Sky", lat_lon + '信息获取失败', reason.error);
-});
+function aqi(icon, daily_mintemp, daily_maxtemp, daily_prec_chance, hour_summary){
+    let aqi = {
+        url: "https://api.waqi.info/feed/geo:" + lat_lon_1 + "/?token=" + api_aqi,
+        headers: {},
+    }
+    $task.fetch(aqi).then(response => {
+        var obj1 = JSON.parse(response.body);
+        //console.log(obj1);
+        var aqi = obj1.data.aqi;
+        var loc = obj1.data.city.name;
+        loc = loc.split(",")[1];
+        $notify(loc, icon + " " + Math.round(daily_mintemp) + " - " + Math.round(daily_maxtemp) + "°C  ☔️ " + (Number(daily_prec_chance) * 100).toFixed(1) + "%" + "  😷 " + aqi, hour_summary);
+    }, reason => {
+    $notify("Aqicn.org", lat_lon + '信息获取失败', reason.error);
+    });
+
+}
+
+weather()
