@@ -1,6 +1,6 @@
 let obj = JSON.parse($response.body)
-obj.mobileProfile.profileStatus = 'PROFILE_AVAILABLE'
-obj.mobileProfile.legacyProfile = '{}'
-obj.mobileProfile.relationshipProfile = '{}'
+let pro= obj["mobileProfile"];
+pro["profileStatus"] = "PROFILE_AVAILABLE";
+pro["legacyProfile"] = "{}";
+pro["relationshipProfile"] = "[]";
 $done({body: JSON.stringify(obj)})
-//@ImSingee

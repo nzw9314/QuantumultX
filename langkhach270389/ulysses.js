@@ -1,3 +1,14 @@
+/*surge: *http-response 
+^https:\/\/sk\.ulysses\.app\/api\/v1\/itunes_receipt_verify$ requires-body=1,max-size=0,script-path=ulysses.js
+
+qx: 
+^https:\/\/sk\.ulysses\.app\/api\/v1\/user_offers$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
+
+^https:\/\/sk\.ulysses\.app\/api\/v1\/itunes_receipt_verify$ url script-response-body ulysses.js
+*/
+
+//mitm: sk.ulysses.app
+
 var body = $response.body;
 var obj = JSON.parse(body);
 var url =  $request.url;

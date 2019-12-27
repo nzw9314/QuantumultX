@@ -1,0 +1,85 @@
+#PXX
+AND,((USER-AGENT,itunesstored*), (DOMAIN-KEYWORD,-buy.itunes.apple.com))
+#VerifyReceipt
+DOMAIN,buy.itunes.apple.com
+# Lich Van Nien 2020 (Lich Viet)
+DOMAIN,api.lichviet.org
+# QIYIVideo
+DOMAIN,intl-i.vip.iqiyi.com
+DOMAIN,intl-passport.iqiyi.com
+# Fing
+DOMAIN,cdn.fing.io
+# vizmato
+DOMAIN,web.vizmato.com
+# SoloLearn
+DOMAIN,api.sololearn.com
+# Vizzywig2020
+DOMAIN,ec2-52-34-190-224.us-west-2.compute.amazonaws.com
+# MusiXmatch
+DOMAIN,apic.musixmatch.com
+#JibJab
+DOMAIN,origin-prod-phoenix.jibjab.com
+# Termius
+DOMAIN,api.termius.com
+# PDF Expert
+DOMAIN,license.pdfexpert.com
+# Gyroscope
+DOMAIN,api.gyrosco.pe
+# Kine Master
+DOMAIN,api-kinemaster-assetstore.nexstreaming.com
+# YouTube Music
+DOMAIN,youtubei.googleapis.com
+# Over
+DOMAIN,api.overhq.com
+# Bright
+DOMAIN,engbright.com
+# Ulike
+DOMAIN,commerce-i18n-api.faceu.mobi
+# Blinkist
+DOMAIN,api.blinkist.com
+# lingokids
+DOMAIN,api.lingokids.com
+# adGuard
+DOMAIN,mobile-api.adguard.com
+# Boom Music
+DOMAIN,apimboom2.globaldelight.net
+# Musicalm
+DOMAIN,www.peacefulsoundsapp.com
+DOMAIN,subscription.aresframework.com
+# Update Nichi
+DOMAIN,mp.bybutter.com
+DOMAIN,pay.wecut.com
+# 1Blocker, Loopsie, Infltr, Yoga Studio
+DOMAIN,api.revenuecat.com
+DOMAIN,api.faceapp.io
+DOMAIN,api.unfold.app
+DOMAIN,asla.joytunes.com
+DOMAIN,accounts.elevateapp.net
+DOMAIN,pixmagicapp.com
+DOMAIN,api.busuu.com
+DOMAIN,bmall.camera360.com
+DOMAIN,entitlements.adobe.io
+DOMAIN,photos.adobe.io
+DOMAIN,api-intl.mr.meitu.com
+DOMAIN-SUFFIX,api.memrise.com
+DOMAIN-SUFFIX,api.picsart.com
+DOMAIN-SUFFIX,api.mondlylanguages.com
+DOMAIN,vsco.co
+DOMAIN-SUFFIX,pool.elsanow.io
+# Calm
+DOMAIN-SUFFIX,api.calm.com
+DOMAIN-SUFFIX,api.indicative.com
+DOMAIN-SUFFIX,lambda.us-east-1.amazonaws.com
+#Instasize
+DOMAIN,api.instasize.com
+DOMAIN,purchases.ws.pho.to
+DOMAIN,nomo.dafork.com
+DOMAIN,cloudapp.aiarlabs.com
+DOMAIN,buy.itunes.apple.com
+#Infltr
+DOMAIN,us-central1-infltr.cloudfunctions.net
+DOMAIN,owa.videoshowiosglobalserver.com
+DOMAIN,app.algoriddim.com
+DOMAIN,viva.v21xy.com
+DOMAIN,viva-asia1.vvbrd.com
+DOMAIN,api.getmimo.com
