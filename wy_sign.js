@@ -4,7 +4,7 @@ var pc = "http://music.163.com/api/point/dailyTask?type=1";
 var mobile = "http://music.163.com/api/point/dailyTask?type=0";
 
 
-$notify(KEY);
+//$notify(KEY);
 
 function sign() {
   var urlmobile = {
