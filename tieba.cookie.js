@@ -1,23 +1,13 @@
-/*
-[rewrite_local]
-^https?:\/\/miao.baidu\.com url script-response-body MyConfig/js/cookie_baidu_tieba.js
+const cookieName = "百度贴吧";
+const cookieKey = "chavy_cookie_tieba";
+const cookieVal = $request.headers["Cookie"];
 
-[mitm]
-hostname = tieba.baidu.com
-*/
-var headerCookie = $request.headers["Cookie"];
-if (headerCookie) {
-  if(headerCookie.indexOf("BDUSS")==-1){
-    $notify("写入贴吧Cookie失败‼️‼️", "未获取到BDUSS", "请重试");
-    return;
+if (cookieVal) {
+  let cookie = $prefs.setValueForKey(cookieVal, cookieKey);
+  if (cookie) {
+    let msg = `Cookie [${cookieName}] 写入成功!`;
+    $notify(msg, "", "详见日志");
   }
-  var cookie = $prefs.setValueForKey(headerCookie, "CookieTB");
-  if (!cookie) {
-    $notify("写入贴吧Cookie失败‼️‼️", "", "请重试");
-  } else {
-    $notify("写入贴吧Cookie成功🎉", "", "您可以手动禁用此脚本");
-  }
-} else {
-  $notify("写入贴吧Cookie失败‼️‼️", "", "请退出账号, 重复步骤");
 }
+
 $done({});

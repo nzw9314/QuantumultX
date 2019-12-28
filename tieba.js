@@ -1,5 +1,5 @@
 var cookieVal = $prefs.valueForKey("CookieTB");
-var singleNotifyCount = 10; //想签到几个汇总到一个通知里,这里就填几个(比如我有13个要签到的,这里填了5,就会分三次消息通知过去)
+var singleNotifyCount = 29; //想签到几个汇总到一个通知里,这里就填几个(比如我有13个要签到的,这里填了5,就会分三次消息通知过去)
 var process = {
     curr: 0,
     total: 0,
