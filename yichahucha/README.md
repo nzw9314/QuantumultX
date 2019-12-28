@@ -37,13 +37,6 @@ cron "0 9,18 * * 1-5" script-path=https://raw.githubusercontent.com/yichahucha/s
 Remove Weibo ads, promotion and recommend
 ```
 [rewrite_local]
-<<<<<<< HEAD
-^https?://m?api\.weibo\.c(n|om)/2/(statuses/(unread|extend|positives/get|(friends|video)(/|_)timeline)|stories/(video_stream|home_list)|(groups|fangle)/timeline|profile/statuses|comments/build_comments|photo/recommend_list|service/picfeed|searchall|cardlist|page|\!/photos/pic_recommend_status) url script-response-body https://raw.githubusercontent.com/yichahucha/surge/master/wb_ad.js
-^https?://(sdk|wb)app\.uve\.weibo\.com(/interface/sdk/sdkad.php|/wbapplua/wbpullad.lua) url script-response-body https://raw.githubusercontent.com/yichahucha/surge/master/wb_launch.js
-[mitm]
-hostname = api.weibo.cn, mapi.weibo.com, *.uve.weibo.com
-```
-=======
 ^https?://m?api\.weibo\.c(n|om)/2/(statuses/(unread|extend|positives/get|(friends|video)(/|_)timeline)|stories/(video_stream|home_list)|(groups|fangle)/timeline|profile/statuses|comments/build_comments|photo/recommend_list|service/picfeed|searchall|cardlist|page|\!/photos/pic_recommend_status) url script-response-body wb_ad.js
 ^https?://(sdk|wb)app\.uve\.weibo\.com(/interface/sdk/sdkad.php|/wbapplua/wbpullad.lua) url script-response-body wb_launch.js
 [mitm]
@@ -57,4 +50,12 @@ Display JD commodity historical price
 [mitm]
 hostname = api.m.jd.com
 ```
->>>>>>> master
+
+Display Netflix TV series and movie's IMDb ratings, Douban ratings, rotten tomato and country/region
+```
+[rewrite_local]
+^https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D url request-header languages=(.+?)&(.+)path=%5B%22videos%22%2C%(\d+)%22%2C%22summary%22%5D request-header languages=en-US&$2path=%5B%22videos%22%2C%$3%22%2C%22summary%22%5D&path=%5B%22videos%22%2C%$3%22%2C%22details%22%5D
+^https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D url script-response-body netflix_ratings_qx.js
+[mitm]
+hostname = ios.prod.ftl.netflix.com
+```
