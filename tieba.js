@@ -3,7 +3,7 @@
 0 9 * * * sign_baidu_tieba_v2.js
  */
 var cookieVal = $prefs.valueForKey("CookieTB");
-var useParallel = true; //是否开启并行签到,如果为true,则开启,签到速度比较快,如果您的贴吧比较少,推荐开启;如果贴吧比较多,就改为false关掉并行吧
+var useParallel = 0; //0自动切换,1串行,2并行(当贴吧数量大于30个以后,并行可能会导致QX崩溃,所以您可以自动切换)
 var singleNotifyCount = 30; //想签到几个汇总到一个通知里,这里就填几个(比如我有13个要签到的,这里填了5,就会分三次消息通知过去)
 var process = {
     total: 0,
@@ -52,12 +52,10 @@ function signTieBa() {
         }
         process.total = body.data.like_forum.length;
         if (body.data.like_forum && body.data.like_forum.length > 0) {
-            if (useParallel) {
-                for (const bar of body.data.like_forum) {
-                    signBar(bar, body.data.tbs);
-                }
+            if (useParallel == 1 || (useParallel == 0 && body.data.like_forum.length >= 30)) {
+                signBars(body.data.like_forum, body.data.tbs, 0);
             } else {
-                signBars(bars, body.data.tbs, 0);
+                signBar(bar, body.data.tbs);
             }
         } else {
             $notify("贴吧签到", "签到失败", "请确认您有关注的贴吧");
@@ -112,7 +110,9 @@ function signBar(bar, tbs) {
 }
 
 function signBars(bars, tbs, index) {
+    $notify("贴吧签到", `进度${index}/${bars.length}`, "");
     if (index >= bars.length) {
+        $notify("贴吧签到", "签到已满", `${process.result.length}`);
         checkIsAllProcessed();
     } else {
         var bar = bars[index];
@@ -124,7 +124,7 @@ function signBars(bars, tbs, index) {
                 errorCode: 9999,
                 errorMsg: "已签到"
             });
-            signBars(bars, tbs, index++);
+            signBars(bars, tbs, ++index);
         } else {
             url_fetch_add.body = `tbs=${tbs}&kw=${bar.forum_name}&ie=utf-8`;
             $task.fetch(url_fetch_add).then(response => {
@@ -146,20 +146,21 @@ function signBars(bars, tbs, index) {
                 } catch (e) {
                     $notify("贴吧签到", "贴吧签到数据处理异常", JSON.stringify(e));
                 }
-                signBars(bars, tbs, index++);
+                signBars(bars, tbs, ++index)
             }, reason => {
                 process.result.push({
                     bar: bar.forum_name,
                     errorCode: 999,
                     errorMsg: '接口错误'
                 });
-                signBars(bars, tbs, index++);
+                signBars(bars, tbs, ++index);
             });
         }
     }
 }
 
 function checkIsAllProcessed() {
+    $notify("贴吧签到", `最终进度${process.result.length}/${process.total}`, "");
     if (process.result.length != process.total) return;
     for (var i = 0; i < Math.ceil(process.total / singleNotifyCount); i++) {
         var notify = "";
