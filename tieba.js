@@ -1,7 +1,10 @@
+/*
+[task_local]
+0 9 * * * sign_baidu_tieba_v2.js
+ */
 var cookieVal = $prefs.valueForKey("CookieTB");
-var singleNotifyCount = 29; //想签到几个汇总到一个通知里,这里就填几个(比如我有13个要签到的,这里填了5,就会分三次消息通知过去)
+var singleNotifyCount = 30; //想签到几个汇总到一个通知里,这里就填几个(比如我有13个要签到的,这里填了5,就会分三次消息通知过去)
 var process = {
-    curr: 0,
     total: 0,
     result: [
         // {
@@ -33,12 +36,13 @@ var url_fetch_add = {
     body: ""
 };
 
-function sign() {
+function signTieBa() {
     if (!cookieVal) {
         $notify("贴吧签到", "签到失败", "未获取到cookie");
         return;
     }
     $task.fetch(url_fetch_sign).then(response => {
+        // $notify("贴吧签到", "贴吧列表", response.body);
         var body = JSON.parse(response.body);
         var isSuccessResponse = body && body.no == 0 && body.error == "success" && body.data.tbs;
         if (!isSuccessResponse) {
@@ -60,66 +64,59 @@ function sign() {
 }
 
 function signBar(bar, tbs) {
-    // $notify("贴吧签到", "signBar_start", JSON.stringify(bar));
     if (bar.is_sign == 1) { //已签到的,直接不请求接口了
         process.result.push({
             bar: `${bar.forum_name}`,
             level: bar.user_level,
             exp: bar.user_exp,
-            errorCode: 998,
+            errorCode: 9999,
             errorMsg: "已签到"
         });
         checkIsAllProcessed();
-        return;
-    }
-    url_fetch_add.body = `tbs=${tbs}&kw=${bar.forum_name}&ie=utf-8`;
-        // JSON.stringify({
-        //     tbs: tbs,
-        //     kw: bar.forum_name,
-        //     ie: "utf-8"
-        // });
-    $task.fetch(url_fetch_add).then(response => {
-        // $notify("贴吧签到", "signBar_fetch", response.body);
-        process.curr++;
-        let result = JSON.parse(response.body);
-        if (result.no == 0) {
+    } else {
+        url_fetch_add.body = `tbs=${tbs}&kw=${bar.forum_name}&ie=utf-8`;
+        $task.fetch(url_fetch_add).then(response => {
+            try{
+                var addResult = JSON.parse(response.body);
+            if (addResult.no == 0) {
+                process.result.push({
+                    bar: bar.forum_name,
+                    errorCode: 0,
+                    errorMsg: `获得${addResult.data.uinfo.cont_sign_num}积分,第${addResult.data.uinfo.user_sign_rank}个签到`
+                });
+            } else {
+                process.result.push({
+                    bar: bar.forum_name,
+                    errorCode: addResult.no,
+                    errorMsg: addResult.error
+                });
+            }
+            }catch(e){
+                $notify("贴吧签到", "贴吧签到数据处理异常", JSON.stringify(e));
+            }
+            checkIsAllProcessed();
+        }, reason => {
             process.result.push({
                 bar: bar.forum_name,
-                errorCode: 0,
-                errorMsg: `签到获得${result.data.uinfo.cont_sign_num}积分,您是第${result.data.current_rank_info.sign_count}个签到的`
+                errorCode: 999,
+                errorMsg: '接口错误'
             });
-            // $notify(`正在签到: ${bar[1]}, "",签到成功`);
-        } else {
-            process.result.push({
-                bar: bar.forum_name,
-                errorCode: result.no,
-                errorMsg: result.error
-            });
-        }
-        checkIsAllProcessed();
-    }, reason => {
-        process.curr++;
-        process.result.push({
-            bar: bar.forum_name,
-            errorCode: 999,
-            errorMsg: '接口错误'
+            checkIsAllProcessed();
         });
-        checkIsAllProcessed();
-    });
+    }
 }
 
 function checkIsAllProcessed() {
     if (process.result.length != process.total) return;
-    // $notify("贴吧签到", "checkResult", `${process.result.length} / ${process.total}`);
     for (var i = 0; i < Math.ceil(process.total / singleNotifyCount); i++) {
         var notify = "";
         var spliceArr = process.result.splice(0, singleNotifyCount);
         var notifySuccessCount = 0;
         for (const res of spliceArr) {
-            if (res.errorCode == 0 || res.errorCode == 998) {
+            if (res.errorCode == 0 || res.errorCode == 9999) {
                 notifySuccessCount++;
             }
-            if (res.errorCode == 998) {
+            if (res.errorCode == 9999) {
                 notify += `【${res.bar}】已经签到，当前等级${res.level},经验${res.exp}
 `;
             } else {
@@ -131,4 +128,4 @@ function checkIsAllProcessed() {
     }
 }
 
-sign();
+signTieBa()
