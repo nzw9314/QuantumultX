@@ -4,7 +4,7 @@
  */
 var cookieVal = $prefs.valueForKey("CookieTB");
 var useParallel = 0; //0自动切换,1串行,2并行(当贴吧数量大于30个以后,并行可能会导致QX崩溃,所以您可以自动切换)
-var singleNotifyCount = 30; //想签到几个汇总到一个通知里,这里就填几个(比如我有13个要签到的,这里填了5,就会分三次消息通知过去)
+var singleNotifyCount = 20; //想签到几个汇总到一个通知里,这里就填几个(比如我有13个要签到的,这里填了5,就会分三次消息通知过去)
 var process = {
     total: 0,
     result: [
@@ -110,9 +110,9 @@ function signBar(bar, tbs) {
 }
 
 function signBars(bars, tbs, index) {
-    $notify("贴吧签到", `进度${index}/${bars.length}`, "");
+    //$notify("贴吧签到", `进度${index}/${bars.length}`, "");
     if (index >= bars.length) {
-        $notify("贴吧签到", "签到已满", `${process.result.length}`);
+        //$notify("贴吧签到", "签到已满", `${process.result.length}`);
         checkIsAllProcessed();
     } else {
         var bar = bars[index];
@@ -160,7 +160,7 @@ function signBars(bars, tbs, index) {
 }
 
 function checkIsAllProcessed() {
-    $notify("贴吧签到", `最终进度${process.result.length}/${process.total}`, "");
+    //$notify("贴吧签到", `最终进度${process.result.length}/${process.total}`, "");
     if (process.result.length != process.total) return;
     for (var i = 0; i < Math.ceil(process.total / singleNotifyCount); i++) {
         var notify = "";
@@ -181,5 +181,3 @@ function checkIsAllProcessed() {
         $notify("贴吧签到", `签到${spliceArr.length}个,成功${notifySuccessCount}个`, notify);
     }
 }
-
-signTieBa()
