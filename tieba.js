@@ -3,6 +3,7 @@
 0 9 * * * sign_baidu_tieba_v2.js
  */
 var cookieVal = $prefs.valueForKey("CookieTB");
+var useParallel = true; //是否开启并行签到,如果为true,则开启,签到速度比较快,如果您的贴吧比较少,推荐开启;如果贴吧比较多,就改为false关掉并行吧
 var singleNotifyCount = 30; //想签到几个汇总到一个通知里,这里就填几个(比如我有13个要签到的,这里填了5,就会分三次消息通知过去)
 var process = {
     total: 0,
@@ -51,8 +52,12 @@ function signTieBa() {
         }
         process.total = body.data.like_forum.length;
         if (body.data.like_forum && body.data.like_forum.length > 0) {
-            for (const bar of body.data.like_forum) {
-                signBar(bar, body.data.tbs);
+            if (useParallel) {
+                for (const bar of body.data.like_forum) {
+                    signBar(bar, body.data.tbs);
+                }
+            } else {
+                signBars(bars, body.data.tbs, 0);
             }
         } else {
             $notify("贴吧签到", "签到失败", "请确认您有关注的贴吧");
@@ -76,22 +81,22 @@ function signBar(bar, tbs) {
     } else {
         url_fetch_add.body = `tbs=${tbs}&kw=${bar.forum_name}&ie=utf-8`;
         $task.fetch(url_fetch_add).then(response => {
-            try{
+            try {
                 var addResult = JSON.parse(response.body);
-            if (addResult.no == 0) {
-                process.result.push({
-                    bar: bar.forum_name,
-                    errorCode: 0,
-                    errorMsg: `获得${addResult.data.uinfo.cont_sign_num}积分,第${addResult.data.uinfo.user_sign_rank}个签到`
-                });
-            } else {
-                process.result.push({
-                    bar: bar.forum_name,
-                    errorCode: addResult.no,
-                    errorMsg: addResult.error
-                });
-            }
-            }catch(e){
+                if (addResult.no == 0) {
+                    process.result.push({
+                        bar: bar.forum_name,
+                        errorCode: 0,
+                        errorMsg: `获得${addResult.data.uinfo.cont_sign_num}积分,第${addResult.data.uinfo.user_sign_rank}个签到`
+                    });
+                } else {
+                    process.result.push({
+                        bar: bar.forum_name,
+                        errorCode: addResult.no,
+                        errorMsg: addResult.error
+                    });
+                }
+            } catch (e) {
                 $notify("贴吧签到", "贴吧签到数据处理异常", JSON.stringify(e));
             }
             checkIsAllProcessed();
@@ -103,6 +108,54 @@ function signBar(bar, tbs) {
             });
             checkIsAllProcessed();
         });
+    }
+}
+
+function signBars(bars, tbs, index) {
+    if (index >= bars.length) {
+        checkIsAllProcessed();
+    } else {
+        var bar = bars[index];
+        if (bar.is_sign == 1) { //已签到的,直接不请求接口了
+            process.result.push({
+                bar: `${bar.forum_name}`,
+                level: bar.user_level,
+                exp: bar.user_exp,
+                errorCode: 9999,
+                errorMsg: "已签到"
+            });
+            signBars(bars, tbs, index++);
+        } else {
+            url_fetch_add.body = `tbs=${tbs}&kw=${bar.forum_name}&ie=utf-8`;
+            $task.fetch(url_fetch_add).then(response => {
+                try {
+                    var addResult = JSON.parse(response.body);
+                    if (addResult.no == 0) {
+                        process.result.push({
+                            bar: bar.forum_name,
+                            errorCode: 0,
+                            errorMsg: `获得${addResult.data.uinfo.cont_sign_num}积分,第${addResult.data.uinfo.user_sign_rank}个签到`
+                        });
+                    } else {
+                        process.result.push({
+                            bar: bar.forum_name,
+                            errorCode: addResult.no,
+                            errorMsg: addResult.error
+                        });
+                    }
+                } catch (e) {
+                    $notify("贴吧签到", "贴吧签到数据处理异常", JSON.stringify(e));
+                }
+                signBars(bars, tbs, index++);
+            }, reason => {
+                process.result.push({
+                    bar: bar.forum_name,
+                    errorCode: 999,
+                    errorMsg: '接口错误'
+                });
+                signBars(bars, tbs, index++);
+            });
+        }
     }
 }
 
