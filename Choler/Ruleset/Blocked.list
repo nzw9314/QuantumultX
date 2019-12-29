@@ -8,6 +8,7 @@ DOMAIN-SUFFIX,uk
 DOMAIN-SUFFIX,co
 DOMAIN-SUFFIX,io
 DOMAIN-SUFFIX,tk
+DOMAIN-SUFFIX,gq
 
 DOMAIN-SUFFIX,imgur.com
 DOMAIN-SUFFIX,droplr.com
@@ -45,6 +46,12 @@ AND,((DOMAIN-KEYWORD,dropbox), (DOMAIN-SUFFIX,com))
 
 # Surge
 USER-AGENT,Surge*
+
+# Spotify
+USER-AGENT,Spotify*
+
+# Apple
+DOMAIN,ocvideo.apple.com
 
 # eBay
 DOMAIN-SUFFIX,ebay.com

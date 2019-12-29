@@ -1,6 +1,7 @@
 
 var obj = JSON.parse($response.body);
-
+if($request.method=="GET")
+{
 obj["subscriptions"] = [
     {
       "expire_at": "21190505",
@@ -10,3 +11,4 @@ obj["subscriptions"] = [
     }
   ];
 $done({body: JSON.stringify(obj)});
+}

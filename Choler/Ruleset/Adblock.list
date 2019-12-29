@@ -5,7 +5,6 @@ USER-AGENT,*Splash*
 DOMAIN,wa.gtimg.com
 DOMAIN,e.crashlytics.com
 DOMAIN,unidesk.alicdn.com
-DOMAIN,mobile-api.adguard.com
 DOMAIN,cdn-adphone.wenhua.com.cn
 
 # 广告联盟
@@ -61,6 +60,7 @@ DOMAIN,ad.12306.cn
 DOMAIN,news.l.qq.com
 
 # QQ音乐
+DOMAIN,ad.tencentmusic.com
 URL-REGEX,"^https?:\/\/y\.gtimg\.cn\/music\/.*_Ad/\d+\.png$"
 
 # 企鹅电竞
@@ -108,7 +108,7 @@ URL-REGEX,"^http:\/\/p\d.meituan.net\/movie\/.*\?may_covertWebp$"
 URL-REGEX,"^http:\/\/p\d\.meituan\.net\/(wmbanner|bizad)\/"
 
 # 美团
-URL-REGEX,"^https?:\/\/s3plus\.meituan\.net\/v1\/mss_a002"
+URL-REGEX,"^https?:\/\/s3plus\.meituan\.net\/v\d\/mss_a002"
 URL-REGEX,"^https?:\/\/img\.meituan\.net\/midas\/.*@\d{4}h"
 URL-REGEX,"^https?:\/\/img\.meituan\.net\/display\/\w+\.jpg\.webp$"
 URL-REGEX,"^https?:\/\/img\.meituan\.net\/adunion\/\w+\.jpg\.webp$"
@@ -136,10 +136,10 @@ URL-REGEX,"^https?:\/\/res\.xiaojukeji\.com\/resapi\/activity\/get(Ruled|Preload
 URL-REGEX,"^http:\/\/rich\.kuwo\.cn\/AdService\/kaiping\/adinfo"
 
 # 字节跳动
-URL-REGEX,"^https?:\/\/[\s\S]*\.snssdk\.com\/api\/ad\/"
+URL-REGEX,"^https?:\/\/[\s\S]*\.(snssdk|amemv)\.com\/api\/ad\/"
 
 # 威锋
-URL-REGEX,"^https?:\/\/api\.feng\.com\/v1\/advertisement\/.*Claunch"
+URL-REGEX,"^https?:\/\/api\.feng\.com\/v\d\/advertisement\/.*Claunch"
 
 # 斗鱼
 URL-REGEX,"^https?:\/\/rtbapi\.douyucdn\.cn\/japi\/sign\/app\/getinfo"
@@ -173,13 +173,13 @@ URL-REGEX,"^https?:\/\/app\.yinxiang\.com\/ads\/getAdsInfo$"
 URL-REGEX,"^https?:\/\/api\.zhihu\.com\/commercial_api\/.*launch"
 
 # 豆瓣
-URL-REGEX,"^https?:\/\/api\.douban\.com\/v2\/app_ads\/splash"
+URL-REGEX,"^https?:\/\/api\.douban\.com\/v\d\/app_ads\/splash"
 
 # 曹操出行
 URL-REGEX,"^https?:\/\/[a-z]*cap\.caocaokeji\.cn\/advert-bss\/pullAdvert\/"
 
 # 哔哩哔哩
-URL-REGEX,"^https?:\/\/app\.bilibili\.com\/x\/v2\/splash\/"
+URL-REGEX,"^https?:\/\/app\.bilibili\.com\/x\/v\d\/splash\/"
 
 # 苏州市民卡
 URL-REGEX,"^https?:\/\/newapp\.szsmk\.com\/app\/config\/.*Ad$"
@@ -244,5 +244,17 @@ URL-REGEX,"^http:\/\/api\.yangkeduo\.com\/api\/cappuccino\/splash"
 # 高铁管家
 URL-REGEX,"^https?:\/\/[a-z]*\.rsscc\.com\/trainact\/adver\/"
 
+# 智行火车票
+URL-REGEX,"^https?:\/\/m\.ctrip\.com\/restapi\/.*\/GetAdsList"
+
 # 虾米音乐
 URL-REGEX,"^http:\/\/pic\.xiami\.net\/images\/common\/uploadpic\/.*\.jpg$"
+
+# 江苏移动
+URL-REGEX,"^http:\/\/wap\.js\.10086\.cn\/jsmccClient\/cd\/market_content\/api\/v\d\/market_content\.page\.query$"
+
+# 看理想
+URL-REGEX,"^https?:\/\/api\.vistopia\.com\.cn\/api\/v\d\/home\/advertisement"
+
+# B612咔叽
+URL-REGEX,"^http:\/\/api\.ssp\.zxrtb\.com\/myad\/"

@@ -1,6 +1,6 @@
 const cookieName = '网易云音乐'
 const cookieKey = 'chavy_cookie_neteasemusic'
-const cookieVal = $prefs.valueForKey(cookieKey)
+const cookieVal = $persistentStore.read(cookieKey)
 
 const pc = `http://music.163.com/api/point/dailyTask?type=1`
 const mobile = `http://music.163.com/api/point/dailyTask?type=0`
@@ -16,8 +16,7 @@ function sign() {
   let signinfo = {}
 
   url.url = pc
-  $task.fetch(url).then((response) => {
-    let data = response.body
+  $httpClient.post(url, (error, response, data) => {
     let result = JSON.parse(data)
     signinfo.pc = {
       title: `网易云音乐(PC)`,
@@ -30,8 +29,7 @@ function sign() {
   })
 
   url.url = mobile
-  $task.fetch(url).then((response) => {
-    let data = response.body
+  $httpClient.post(url, (error, response, data) => {
     let result = JSON.parse(data)
     signinfo.app = {
       title: `网易云音乐(APP)`,
@@ -59,21 +57,21 @@ function check(signinfo, checkms = 0) {
 }
 
 function log(signinfo) {
-  let title = `签到结果: ${cookieName}`
+  let title = `${cookieName}`
   let subTitle = ``
-  let detail = `今日共签: ${signinfo.signedCnt}, 本次成功: ${signinfo.successCnt}, 失败: ${signinfo.failedCnt}, 跳过: ${signinfo.skipedCnt}`
+  let detail = `今日共签: ${signinfo.signedCnt}, 本次成功: ${signinfo.successCnt}, 本次失败: ${signinfo.failedCnt}`
 
   if (signinfo.pc.success && signinfo.app.success) {
-    subTitle = `全部签到成功`
+    subTitle = `签到结果: 全部成功`
     detail = `PC: ${signinfo.pc.success ? '成功' : '失败'}, APP: ${signinfo.app.success ? '成功' : '失败'}`
   } else if (!signinfo.pc.success && !signinfo.app.success) {
-    subTitle = `全部签到失败`
+    subTitle = `签到结果: 全部失败`
     detail = `PC: ${signinfo.pc.success ? '成功' : '失败'}, APP: ${signinfo.app.success ? '成功' : '失败'}, 详见日志!`
   } else {
     subTitle = ``
     detail = `PC: ${signinfo.pc.success ? '成功' : '失败'}, APP: ${signinfo.app.success ? '成功' : '失败'}, 详见日志!`
   }
-  $notify(title, subTitle, detail)
+  $notification.post(title, subTitle, detail)
 }
 
 sign()
