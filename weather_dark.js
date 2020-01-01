@@ -5,7 +5,7 @@ https://github.com/sazs34/TaskConfig#%E5%A4%A9%E6%B0%94
 let config = {
     darksky_api: `adff46a828dcf7e9686aa52170a1db8a`, //从https://darksky.net/dev/ 上申请key填入即可
     aqicn_api: `dc9f948c8d9a8a1f10c2bc5bba60c4dd2e0dec4a`, //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
-    lat_lon: "30.6393910,114.8632089", //请填写经纬度,直接从谷歌地图中获取即可
+    lat_lon: "30.4468603,114.8806895", //请填写经纬度,直接从谷歌地图中获取即可
     lang: 'zh', //语言,请不要修改
     uv: true, //紫外线显示,false则不显示
     apparent: true, //体感温度显示,false则不显示
@@ -22,7 +22,10 @@ function weather() {
 
     $task.fetch(wurl).then(response => {
         let obj = JSON.parse(response.body);
-        // console.log("天气数据获取-1", obj);
+        // console.log(`天气数据获取-1-${JSON.stringify(obj)}`);
+        if (obj.error) {
+            $notify("DarkApi", "出错啦", obj.error);
+        }
         let icon_text = obj.hourly.icon;
         let icon = "❓"
         if (icon_text == "clear-day") icon = "☀️晴";
@@ -72,18 +75,28 @@ function aqi(weatherInfo) {
     }
     $task.fetch(aqi).then(response => {
         var obj1 = JSON.parse(response.body);
+        if (obj1.status == 'error') {
+            $notify("Aqicn", "出错啦", obj1.data);
+        }
         // console.log(`天气数据获取-3-${JSON.stringify(obj1)}`);
         var aqi = obj1.data.aqi;
         var loc = obj1.data.city.name;
         try {
-            loc = loc.split(",")[1].split("(")[0];
+            var locArr = loc.split(/[(),，（）]/)
+            if (locArr.length >= 4) {
+                loc = locArr[2] + " ";
+            } else if (locArr.length >= 2) {
+                loc = locArr[1] + " ";
+            } else {
+                loc = "";//此时会很长,还不如不显示了
+            }
         } catch (e) {
             loc = '';
             console.log(`获取城市名称失败-${JSON.stringify(e)}`);
         }
         var aqiInfo = getAqiInfo(aqi);
         var weather = `${icon} ${Math.round(daily_mintemp)} ~ ${Math.round(daily_maxtemp)}℃  ☔️下雨概率 ${(Number(daily_prec_chance) * 100).toFixed(1)}%`;
-let detail = `😷空气质量 ${aqi}(${aqiInfo.aqiDesc}) 💨风速${daily_windspeed}km/h`;
+        let detail = `😷空气质量 ${aqi}(${aqiInfo.aqiDesc}) 💨风速${daily_windspeed}km/h`;
         if (config.uv) {
             detail += `
 🌚紫外线指数${daily_uvIndex}(${getUVDesc(daily_uvIndex)})`;
@@ -96,7 +109,7 @@ let detail = `😷空气质量 ${aqi}(${aqiInfo.aqiDesc}) 💨风速${daily_wind
             detail += `
 ${aqiInfo.aqiWarning?"Tips:":""}${aqiInfo.aqiWarning}`;
         }
-        $notify(`(${loc})${hour_summary}`, weather, detail);
+        $notify(`${loc}(${hour_summary})`, weather, detail);
     }, reason => {
         $notify("Aqicn.org", '信息获取失败', reason.error);
     });
