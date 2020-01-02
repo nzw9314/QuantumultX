@@ -27,8 +27,6 @@ DOMAIN,license.pdfexpert.com
 DOMAIN,api.gyrosco.pe
 # Kine Master
 DOMAIN,api-kinemaster-assetstore.nexstreaming.com
-# YouTube Music
-DOMAIN,youtubei.googleapis.com
 # Over
 DOMAIN,api.overhq.com
 # Bright

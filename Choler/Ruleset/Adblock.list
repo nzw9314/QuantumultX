@@ -235,8 +235,8 @@ URL-REGEX,"^https?:\/\/app\.58\.com\/api\/home\/appadv\/"
 # 芒果TV
 AND,((DOMAIN-SUFFIX,da.mgtv.com), (DOMAIN-KEYWORD,mobile))
 
-# 毒
-URL-REGEX,"^https?:\/\/du\.hupucdn\.com\/\w+h\d{4}"
+# 得物（毒）
+URL-REGEX,"^https?:\/\/app\.poizon\.com\/api\/v\d\/app\/advertisement\/"
 
 # 拼多多
 URL-REGEX,"^http:\/\/api\.yangkeduo\.com\/api\/cappuccino\/splash"
@@ -245,7 +245,7 @@ URL-REGEX,"^http:\/\/api\.yangkeduo\.com\/api\/cappuccino\/splash"
 URL-REGEX,"^https?:\/\/[a-z]*\.rsscc\.com\/trainact\/adver\/"
 
 # 智行火车票
-URL-REGEX,"^https?:\/\/m\.ctrip\.com\/restapi\/.*\/GetAdsList"
+URL-REGEX,"^https?:\/\/m\.ctrip\.com\/restapi\/.*Ads"
 
 # 虾米音乐
 URL-REGEX,"^http:\/\/pic\.xiami\.net\/images\/common\/uploadpic\/.*\.jpg$"

@@ -2,7 +2,7 @@ var obj = JSON.parse($response.body);
 
 obj["info"]["subscriptions"]= [
       {
-        "status": "trial",
+        "status": "active",
         "product": "unlimited",
         "duration_unit": "months",
         "id": 805063,
@@ -12,7 +12,7 @@ obj["info"]["subscriptions"]= [
         "ends_at": 4099821292,
         "auto_renew_status": true,
         "plan_id": "lk.ios.s1m.t1m.p15.v1",
-        "state": "active_trial"
+        "state": "active"
       }];
 
 $done({body: JSON.stringify(obj)});

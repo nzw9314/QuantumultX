@@ -1,21 +1,27 @@
-const cookieName = '百度贴吧'
-const cookieKey = 'chavy_cookie_tieba'
-const chavy = init()
-const cookieVal = $request.headers['Cookie']
-
-if (cookieVal.indexOf('BDUSS') > 0) {
-  let cookie = chavy.setdata(cookieVal, cookieKey)
-  if (cookie) {
-    let subTitle = '获取Cookie: 成功'
-    chavy.msg(`${cookieName}`, subTitle, '')
-    chavy.log(`[${cookieName}] ${subTitle}, cookie: ${cookieVal}`)
-  }
-} else {
-  let subTitle = '获取Cookie: 失败'
-  let detail = `请确保在已登录状态下获取Cookie`
-  chavy.msg(`${cookieName}`, subTitle, detail)
-  chavy.log(`[${cookieName}] ${subTitle}, cookie: ${cookieVal}`)
-}
+/**
+ * [main.js]
+ * const cookieVal = $persistentStore.read(cookieKey)
+ * =>
+ * const chavy = init()
+ * const cookieVal = chavy.getdata(cookieKey)
+ *
+ * $httpClient.get => chavy.get
+ * $httpClient.post => chavy.post
+ * $notification.post => chavy.msg
+ * console.log => chavy.log
+ * $done({}) => chavy.done()
+ *
+ * [main.cookie.js]
+ * const cookieVal = $request.headers['Cookie']
+ * =>
+ * const chavy = init()
+ * const cookieVal = $request.headers['Cookie']
+ *
+ * $persistentStore.write => chavy.setdata
+ * $notification.post => chavy.msg
+ * console.log => chavy.log
+ * $done({}) => chavy.done()
+ */
 
 function init() {
   isSurge = () => {
@@ -60,5 +66,3 @@ function init() {
   }
   return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
 }
-
-chavy.done()
