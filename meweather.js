@@ -236,8 +236,8 @@ $httpClient.get(lifestyle, function(error, response, data){
 
 
 
-var title = $persistentStore.read("city")+"天气 : "+$persistentStore.read("noweather")+" ` "+$persistentStore.read("tmp")+" °C "+" · "+$persistentStore.read("ssd")+"  AQI: "+$persistentStore.read("aqi")+"("+$persistentStore.read("qlty")+")";
-var subtitle = "Minute_Forecast : "+$persistentStore.read("minute_forecast");
-var mation = "风向 : "+$persistentStore.read("wind_dir")+" · "+$persistentStore.read("wind_sc")+" 级"+"  湿度 : "+$persistentStore.read("hum")+"  PM2.5 : "+$persistentStore.read("pm25")+"\nLifestyle : "+$persistentStore.read("life")+"\n更新于 : "+$persistentStore.read("updatetime")+"\n                                         ---  Meeta小贴士";
+var title = $persistentStore.read("city")+"天气 : "+$persistentStore.read("noweather")+" ` "+$persistentStore.read("tmp")+" °C "+" · "+$persistentStore.read("ssd");
+var subtitle = "降雨 : "+$persistentStore.read("minute_forecast");
+var mation = "风向 : "+$persistentStore.read("wind_dir")+" · "+$persistentStore.read("wind_sc")+" 级"+"  湿度 : "+$persistentStore.read("hum")+"\n生活提示 : "+$persistentStore.read("life")+"\n更新于 : "+$persistentStore.read("updatetime")
 $notification.post(title, subtitle, mation);
 $done();
