@@ -27,17 +27,33 @@ if (isQuantumultX) {
     };
     $httpClient = {
         get: (url, cb) => {
-            $task.fetch(url).then(response => {
-                cb(errorInfo, response, response.body)
+            var urlObj;
+            if (typeof (url) == 'string') {
+                urlObj = {
+                    url: url
+                }
+            } else {
+                urlObj = url;
+            }
+            $task.fetch(urlObj).then(response => {
+                cb(undefined, response, response.body)
             }, reason => {
                 errorInfo.error = reason.error;
                 cb(errorInfo, response, '')
             })
         },
         post: (url, cb) => {
+            var urlObj;
+            if (typeof (url) == 'string') {
+                urlObj = {
+                    url: url
+                }
+            } else {
+                urlObj = url;
+            }
             url.method = 'POST';
-            $task.fetch(url).then(response => {
-                cb(errorInfo, response, response.body)
+            $task.fetch(urlObj).then(response => {
+                cb(undefined, response, response.body)
             }, reason => {
                 errorInfo.error = reason.error;
                 cb(errorInfo, response, '')
