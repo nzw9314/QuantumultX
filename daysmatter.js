@@ -175,11 +175,20 @@ function dateDiff(startDate, endDate) {
 const dayarr = [ 
     [ "元旦  ", "2020-01-01" ],
     [ "春节  ", "2020-01-25" ], 
-    [ "情人节 ", "2020-02-14" ], 
+    [ "情人节", "2020-02-14" ], 
     [ "今年  ", "2020-12-31" ],
 ]
 
 day();
+
+function valcal(days) {
+    if (days == 0)
+        return "就是今天"
+    else if (days > 0)
+        return "剩余 : " + days + "天"
+    else
+        return "已过 : " + Math.abs(days) + "天"
+}
 
 function day() {
     var now = new Date()
@@ -193,15 +202,8 @@ function day() {
         content += dayarr[i][0] + "• " + u + "\n"
     }
     console.log(content);
-    $notification.post('倒数日', "", content)
-    $done()
+    $notification.post('倒数日', "", content)    
 }
 
-function valcal(days) {
-    if (days == 0)
-        return "就是今天"
-    else if (days > 0)
-        return "剩余 : " + days + "天"
-    else
-        return "已过 : " + Math.abs(days) + "天"
-}
+
+$done()
