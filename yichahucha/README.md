@@ -18,12 +18,24 @@ http-response ^https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22vid
 hostname = ios.prod.ftl.netflix.com
 ```
 
-Display JD commodity historical price
+Display commodity historical price
+
+JD
 ```
 [Script]
 http-response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
 [MITM]
 hostname = api.m.jd.com
+```
+
+Taobao (beta)
+```
+[Rule]
+IP-CIDR, 203.119.0.0/16, REJECT, no-resolve
+[Script]
+http-response ^https://trade-acs.m.taobao.com/gw/mtop.taobao.detail.getdetail requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+[MITM]
+hostname = trade-acs.m.taobao.com
 ```
 
 Daily work check-in reminder
@@ -43,14 +55,6 @@ Remove Weibo ads, promotion and recommend
 hostname = api.weibo.cn, mapi.weibo.com, *.uve.weibo.com
 ```
 
-Display JD commodity historical price
-```
-[rewrite_local]
-^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body jd_price_qx.js
-[mitm]
-hostname = api.m.jd.com
-```
-
 Display Netflix TV series and movie's IMDb ratings, Douban ratings, rotten tomato and country/region
 ```
 [rewrite_local]
@@ -58,4 +62,23 @@ Display Netflix TV series and movie's IMDb ratings, Douban ratings, rotten tomat
 ^https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D url script-response-body netflix_ratings_qx.js
 [mitm]
 hostname = ios.prod.ftl.netflix.com
+```
+
+Display commodity historical price
+
+JD
+```
+[rewrite_local]
+^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body jd_price_qx.js
+[mitm]
+hostname = api.m.jd.com
+```
+Taobao (beta)
+```
+[filter_local]
+ip-cidr, 203.119.0.0/16, reject, no-resolve
+[rewrite_local]
+^https://trade-acs.m.taobao.com/gw/mtop.taobao.detail.getdetail url script-response-body tb_price_qx.js
+[mitm]
+hostname = trade-acs.m.taobao.com
 ```
