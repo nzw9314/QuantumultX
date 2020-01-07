@@ -7,8 +7,8 @@ let config = {
     aqicn_api: "dc9f948c8d9a8a1f10c2bc5bba60c4dd2e0dec4a", //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
     huweather_apiKey: "faead3de5f42420098c8132b3924cd09", //和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取
     lat_lon: "30.4468603,114.8806895", //请填写经纬度,直接从谷歌地图中获取即可
-    lang: "zh", //语言,随意切换为您想要的语言哦
-    log: 0, //调试日志,0为不开启,1为开启,2为开启精简日志
+    lang: "zh", //语言,随意切换为您想要的语言哦(zh/zh-tw/ja/en/fr/...)
+    log: 2, //调试日志,0为不开启,1为开启,2为开启精简日志
     timeout: 0, //超时时间,单位毫秒(1000毫秒=1秒),一般不推荐修改[为0则不限制超时时间]
     show: {
         template: {
@@ -23,7 +23,7 @@ $[lifeStyle]`
             drsg: true, //穿衣指数,
             flu: true, //感冒指数,
             comf: true, //舒适度指数,
-            cw: true, //洗车指数,
+            cw: false, //洗车指数,
             sport: false, //运动指数,
             trav: false, //旅游指数,
             uv: false, //紫外线指数,
@@ -73,14 +73,19 @@ const provider = {
         support: ['$[lifeStyle]']
     },
     darksky: {
-        api: `https://api.darksky.net/forecast/${config.darksky_api}/${config.lat_lon.replace(/\s/g, "").replace("，", ",")}?lang=${config.lang}&units=si&exclude=currently,minutely`,
+        api: `https://api.darksky.net/forecast/${config.darksky_api}/${config.lat_lon.replace(/\s/g, "").replace("，", ",")}?lang=${config.lang}&units=si`,
         progress: 0,
         timeoutNumber: 0,
         data: {
-            daily: {},
-            hourly: {}
+            daily: {
+                data: []
+            },
+            hourly: {
+                data: []
+            },
+            currently: {}
         },
-        support: ['$[summary]', '$[weatherIcon]', '$[weather]', '$[temperatureMin]', '$[temperatureMax]', '$[apparentTemperatureMin]', '$[apparentTemperatureMax]', '$[precipProbability]', '$[uv]', '$[uvDesc]']
+        support: ['$[summary]', '$[weeklySummary]', '$[weatherIcon]', '$[weather]', '$[temperatureMin]', '$[temperatureMax]', '$[apparentTemperatureMin]', '$[apparentTemperatureMax]', '$[precipProbability]', '$[uv]', '$[uvDesc]']
     },
     aqicn: {
         api: `https://api.waqi.info/feed/geo:${config.lat_lon.replace(/\s/g, "").replace("，", ",").replace(/,/, ";")}/?token=${config.aqicn_api}`,
@@ -112,8 +117,9 @@ function darksky() {
             if (darkObj.error) {
                 $notify("DarkApi", "出错啦", darkObj.error);
             }
-            provider.darksky.data.daily = darkObj.daily.data[0];
+            provider.darksky.data.daily = darkObj.daily;
             provider.darksky.data.hourly = darkObj.hourly;
+            provider.darksky.data.currently = darkObj.currently;
             record(`天气数据获取-A2`);
             check('darksky', true)
         } catch (e) {
@@ -272,6 +278,7 @@ var lineBreak = `
 `;
 
 function renderTemplate() {
+    execArrayTemplate();
     const map = {
         //省
         province: provider.heweather_now.data.basic.admin_area,
@@ -281,6 +288,8 @@ function renderTemplate() {
         district: provider.heweather_now.data.basic.location || "UNKNOW",
         //全天气候变化概述
         summary: `${provider.darksky.data.hourly.summary||""}`,
+        //一周气候变化概述
+        weeklySummary: `${provider.darksky.data.daily.summary||""}`,
         //天气图标
         weatherIcon: `${getHeweatherIcon(provider.heweather_now.data.now.cond_code)||getDarkskyWeatherIcon(provider.darksky.data.hourly.icon)}`,
         //天气描述(晴/雨/雪等)
@@ -288,15 +297,15 @@ function renderTemplate() {
         //当前温度
         currentTemperature: `${provider.heweather_now.data.now.tmp}`,
         //温度最低值
-        temperatureMin: `${Math.round(provider.heweather_daily.data.tmp_min||provider.darksky.data.daily.temperatureMin)}`,
+        temperatureMin: `${Math.round(provider.heweather_daily.data.tmp_min||provider.darksky.data.daily.data.get(0).temperatureMin)}`,
         //温度最高值
-        temperatureMax: `${Math.round(provider.heweather_daily.data.tmp_max||provider.darksky.data.daily.temperatureMax)}`,
+        temperatureMax: `${Math.round(provider.heweather_daily.data.tmp_max||provider.darksky.data.daily.data.get(0).temperatureMax)}`,
         //体感温度最低值
-        apparentTemperatureMin: `${Math.round(provider.darksky.data.daily.apparentTemperatureLow)}`,
+        apparentTemperatureMin: `${Math.round(provider.darksky.data.daily.data.get(0).apparentTemperatureLow)}`,
         //体感温度最高值
-        apparentTemperatureMax: `${Math.round(provider.darksky.data.daily.apparentTemperatureHigh)}`,
+        apparentTemperatureMax: `${Math.round(provider.darksky.data.daily.data.get(0).apparentTemperatureHigh)}`,
         //降雨概率
-        precipProbability: `${provider.heweather_daily.data.pop||(Number(provider.darksky.data.daily.precipProbability) * 100).toFixed(0)}`,
+        precipProbability: `${provider.heweather_daily.data.pop||(Number(provider.darksky.data.daily.data.get(0).precipProbability) * 100).toFixed(0)}`,
         //空气质量图标
         aqiIcon: `${provider.aqicn.data.aqiIcon||provider.heweather_air.data.aqiIcon}`,
         //空气质量
@@ -330,9 +339,9 @@ function renderTemplate() {
         //当前能见度
         currentVisibility: `${provider.heweather_now.data.now.vis}`,
         //紫外线等级
-        uv: `${provider.heweather_daily.data.uv_index||provider.darksky.data.daily.uvIndex}`,
+        uv: `${provider.heweather_daily.data.uv_index||provider.darksky.data.daily.data.get(0).uvIndex}`,
         //紫外线描述
-        uvDesc: `${getUVDesc(provider.heweather_daily.data.uv_index||provider.darksky.data.daily.uvIndex)}`,
+        uvDesc: `${getUVDesc(provider.heweather_daily.data.uv_index||provider.darksky.data.daily.data.get(0).uvIndex)}`,
         //日出时间
         sunrise: `${provider.heweather_daily.data.sr}`,
         //日落时间
@@ -549,6 +558,10 @@ function getLifeStyle() {
 // #endregion
 
 // #region 模板相关
+/**
+ * 用于标识该接口已执行,如果有使用超时设置则此操作是有意义的
+ * @param {String} type 具体的接口执行类型
+ */
 function start(type) {
     if (config.timeout > 0) {
         provider[type].timeoutNumber = setTimeout(() => {
@@ -556,7 +569,9 @@ function start(type) {
         }, config.timeout);
     }
 }
-
+/**
+ * 判断哪些接口需要进行处理,减少网络请求
+ */
 function support() {
     let regex = /\$\[([a-z,A-Z,0-9]*)\]/g;
     const template = `${config.show.template.title}${config.show.template.subtitle}${config.show.template.detail}`.match(regex);
@@ -572,26 +587,137 @@ function support() {
     provider.heweather_lifestyle.progress = template.filter((item, filter) => {
         return provider.heweather_lifestyle.support.indexOf(item) != -1;
     }).length > 0 ? 0 : 2;
-    provider.darksky.progress = template.filter((item, filter) => {
-        return provider.darksky.support.indexOf(item) != -1;
-    }).length > 0 ? 0 : 2;
     provider.aqicn.progress = template.filter((item, filter) => {
         return provider.aqicn.support.indexOf(item) != -1;
     }).length > 0 ? 0 : 2;
+    provider.darksky.progress = template.filter((item, filter) => {
+        return provider.darksky.support.indexOf(item) != -1;
+    }).length > 0 ? 0 : 2;
+    if (provider.darksky.progress == 2) {
+        //如果
+        let regexDaily = /\$\[(daily\()+([\s\S]+?)(\))+\]/g;
+        let regexHourly = /\$\[(hourly\()+([\s\S]+?)(\))+\]/g;
+        provider.darksky.progress = (regexDaily.test(config.show.template.detail) || regexHourly.test(config.show.template.detail)) ? 0 : 2;
+    }
+    record(`h_n:${provider.heweather_now.progress},h_d:${provider.heweather_daily.progress},h_a:${provider.heweather_air.progress},h_l:${provider.heweather_lifestyle.progress},aq:${provider.aqicn.progress},da:${provider.darksky.progress}`)
 }
-
+/**
+ * 用于普通模板的映射
+ * @param {String} template 模板内容
+ * @param {Object} map 映射内容
+ */
 function execTemplate(template, map) {
     if (!template) return "";
     let regex = /\$\[([a-z,A-Z,0-9]*)\]/g;
-    for (item of template.match(regex)) {
-        item.match(regex);
-        if (RegExp.$1 && map[RegExp.$1]) {
-            template = template.replace(item, map[RegExp.$1]);
-        } else {
-            template = template.replace(item, "");
+    if (regex.test(template)) {
+        for (item of template.match(regex)) {
+            item.match(regex);
+            if (RegExp.$1 && map[RegExp.$1]) {
+                template = template.replace(item, map[RegExp.$1]);
+            } else {
+                template = template.replace(item, "");
+            }
         }
     }
     return template;
+}
+
+function execArrayTemplate() {
+    try {
+        execTemplateDaily();
+        execTemplateHourly();
+    } catch (e) {
+        console.log(`${JSON.stringify(e)}`)
+    }
+
+}
+
+function execTemplateDaily() {
+    let regexDaily = /\$\[(daily\()+([\s\S]+?)(\))+\]/g;
+    if (provider.darksky.data.daily.data.length <= 0) {
+        config.show.template.detail.replace(regexDaily, '')
+    }
+    let result = [];
+    if (regexDaily.test(config.show.template.detail)) {
+        config.show.template.detail.match(regexDaily);
+        var rangeTemplate = RegExp.$2; //此处拿到的是要替换的列表显示部分了
+        let regex = /\$\[([a-z,A-Z,0-9]*)\]/g;
+        var template = rangeTemplate.match(regex);
+        for (daily of provider.darksky.data.daily.data) {
+            var singleInfo = rangeTemplate;
+            for (item of template) {
+                item.match(regex);
+                if (RegExp.$1 == "month") {
+                    singleInfo = singleInfo.replace(item, (`${daily["time"]}`).toDateTime().Format("MM"));
+                } else if (RegExp.$1 == "day") {
+                    singleInfo = singleInfo.replace(item, (`${daily["time"]}`).toDateTime().Format("dd"));
+                } else if (RegExp.$1 == "weatherIcon") {
+                    singleInfo = singleInfo.replace(item, getDarkskyWeatherIcon(daily.icon));
+                } else if (RegExp.$1 == "weather") {
+                    singleInfo = singleInfo.replace(item, getDarkskyWeatherDesc(daily.icon));
+                } else if (RegExp.$1 == "uvDesc") {
+                    singleInfo = singleInfo.replace(item, getUVDesc(daily.uvIndex));
+                } else if (RegExp.$1 == "cloudCover") {
+                    singleInfo = singleInfo.replace(item, daily.cloudCover * 100);
+                } else if (RegExp.$1 == "temperatureHigh") {
+                    singleInfo = singleInfo.replace(item, Math.round(daily.temperatureHigh));
+                } else if (RegExp.$1 == "temperatureLow") {
+                    singleInfo = singleInfo.replace(item, Math.round(daily.temperatureLow));
+                } else if (RegExp.$1 == "apparentTemperatureMax") {
+                    singleInfo = singleInfo.replace(item, Math.round(daily.apparentTemperatureMax));
+                } else if (RegExp.$1 == "apparentTemperatureMin") {
+                    singleInfo = singleInfo.replace(item, Math.round(daily.apparentTemperatureMin));
+                } else if (RegExp.$1 && daily[RegExp.$1] != undefined) {
+                    singleInfo = singleInfo.replace(item, daily[RegExp.$1]);
+                }
+            }
+            result.push(singleInfo);
+        }
+        config.show.template.detail = config.show.template.detail.replace(regexDaily, result.join(lineBreak));
+    }
+}
+
+function execTemplateHourly() {
+    let regexHourly = /\$\[(hourly\()+([\s\S]+?)(\))+\]/g;
+    if (provider.darksky.data.hourly.data.length <= 0) {
+        config.show.template.detail.replace(regexHourly, '')
+    }
+    let result = [];
+    if (regexHourly.test(config.show.template.detail)) {
+        config.show.template.detail.match(regexHourly);
+        var rangeTemplate = RegExp.$2; //此处拿到的是要替换的列表显示部分了
+        let regex = /\$\[([a-z,A-Z,0-9]*)\]/g;
+        var template = rangeTemplate.match(regex);
+        for (hourly of provider.darksky.data.hourly.data) {
+            var singleInfo = rangeTemplate;
+            for (item of template) {
+                item.match(regex);
+                if (RegExp.$1 == "month") {
+                    singleInfo = singleInfo.replace(item, (`${hourly["time"]}`).toDateTime().Format("MM"));
+                } else if (RegExp.$1 == "day") {
+                    singleInfo = singleInfo.replace(item, (`${hourly["time"]}`).toDateTime().Format("dd"));
+                } else if (RegExp.$1 == "hour") {
+                    singleInfo = singleInfo.replace(item, (`${hourly["time"]}`).toDateTime().Format("hh"));
+                } else if (RegExp.$1 == "weatherIcon") {
+                    singleInfo = singleInfo.replace(item, getDarkskyWeatherIcon(hourly.icon));
+                } else if (RegExp.$1 == "weather") {
+                    singleInfo = singleInfo.replace(item, getDarkskyWeatherDesc(hourly.icon));
+                } else if (RegExp.$1 == "uvDesc") {
+                    singleInfo = singleInfo.replace(item, getUVDesc(hourly.uvIndex));
+                } else if (RegExp.$1 == "cloudCover") {
+                    singleInfo = singleInfo.replace(item, hourly.cloudCover * 100);
+                } else if (RegExp.$1 == "temperature") {
+                    singleInfo = singleInfo.replace(item, Math.round(hourly.temperature));
+                } else if (RegExp.$1 == "apparentTemperature") {
+                    singleInfo = singleInfo.replace(item, Math.round(hourly.apparentTemperature));
+                } else if (RegExp.$1 && hourly[RegExp.$1] != undefined) {
+                    singleInfo = singleInfo.replace(item, hourly[RegExp.$1]);
+                }
+            }
+            result.push(singleInfo);
+        }
+        config.show.template.detail = config.show.template.detail.replace(regexHourly, result.join(lineBreak));
+    }
 }
 
 function record(log) {
@@ -603,4 +729,34 @@ function record(log) {
 }
 // #endregion
 
+// #region 扩展方法
+Array.prototype.get = function (index, defaultValue = {}) {
+    if (index >= 0 && this.length > 0 && this.length >= index + 1) {
+        return this[index];
+    } else {
+        return defaultValue;
+    }
+}
+String.prototype.toDateTime = function () {
+    var time = parseInt(this + '000');
+    return new Date(time);
+}
+Date.prototype.Format = function (fmt) {
+    var o = {
+        "M+": this.getMonth() + 1, //月份   
+        "d+": this.getDate(), //日   
+        "h+": this.getHours(), //小时   
+        "m+": this.getMinutes(), //分   
+        "s+": this.getSeconds(), //秒   
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度   
+        "S": this.getMilliseconds() //毫秒   
+    };
+    if (/(y+)/.test(fmt))
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+// #endregion
 weather();
