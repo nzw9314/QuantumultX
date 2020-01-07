@@ -138,6 +138,10 @@ d.由于免费接口限制每日访问量，请不要设置高频天气通知
   有高频通知需求的话建议可以自己注册和风天气，脚本更换key值即可
 
 TG频道:@meetashare
+
+
+     (由nzw9314精简仅保留降雨提醒)
+
 */
 
 
@@ -235,6 +239,6 @@ $httpClient.get(lifestyle, function(error, response, data){
 );
 
 var title = $persistentStore.read("city")+"天气 : "+$persistentStore.read("noweather")+" • "+$persistentStore.read("tmp")+" °C "+" | "+$persistentStore.read("ssd");
-var subtitle = "降雨提醒 : "+$persistentStore.read("minute_forecast");var mation = "生活贴士 : "+$persistentStore.read("life")+"\n更新时间 : "+$persistentStore.read("updatetime")
+var subtitle = "降雨提醒 : "+$persistentStore.read("minute_forecast");var mation = "更新时间 : "+$persistentStore.read("updatetime")
 $notification.post(title, subtitle, mation);
 $done();
