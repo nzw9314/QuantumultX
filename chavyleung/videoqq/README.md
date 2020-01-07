@@ -1,45 +1,48 @@
-# 百度签到 (Surge & QuanX 二合一签到脚本)
+# 腾讯视频 (Surge & QuanX 二合一签到脚本)
+
+**由于获取的 Cookie 只有 2 小时有效期，目前此脚本使用意义不大，先弃坑**
+
+**由于获取的 Cookie 只有 2 小时有效期，目前此脚本使用意义不大，先弃坑**
+
+**由于获取的 Cookie 只有 2 小时有效期，目前此脚本使用意义不大，先弃坑**
 
 > 代码已同时兼容 Surge & QuanX, 使用同一份签到脚本即可
 
-> 目前支持签到: 贴吧、知道 (2 合 1)
-
-> 之前已经获取过贴吧 cookie 的话，不需要再次获取 (通用)
-
-> 2020.1.3: 屏蔽文库签到, 原因: 实际签不上
+> 需要 VIP 会员才能签到 (需要 VIP!需要 VIP!需要 VIP!)
 
 ## 配置 (Surge)
 
 ```properties
 [MITM]
-tieba.baidu.com
+v.qq.com
 
 [Script]
-http-request ^https?:\/\/tieba\.baidu\.com\/?.? script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/tieba/tieba.cookie.js
-cron "10 0 0 * *" script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/tieba/tieba.js
+http-request ^https:\/\/v\.qq\.com\/?.? script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/videoqq/videoqq.cookie.js
+cron "10 0 0 * * *" script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/videoqq/videoqq.js
 ```
 
 ## 配置 (QuanX)
 
 ```properties
 [MITM]
-tieba.baidu.com
+v.qq.com
 
 [rewrite_local]
-^https?:\/\/tieba\.baidu\.com\/?.? url script-response-body tieba.cookie.js
+^https:\/\/v\.qq\.com\/?.? url script-response-body videoqq.cookie.js
 
 [task_local]
-1 0 * * * tieba.js
+1 0 * * * videoqq.js
 ```
 
 ## 说明
 
 1. 先在浏览器登录 `(先登录! 先登录! 先登录!)`
-2. 先把`tieba.baidu.com`加到`[MITM]`
+   - 可以随便找个 vip 视频触发登录: https://m.v.qq.com/x/cover/r/rj8uc45tm8a17wm.html
+2. 先把`v.qq.com`加到`[MITM]`
 3. 再配置重写规则:
    - Surge: 把两条远程脚本放到`[Script]`
-   - QuanX: 把`tieba.cookie.js`和`tieba.js`传到`On My iPhone - Quantumult X - Scripts` (传到 iCloud 相同目录也可, 注意要打开 quanx 的 iCloud 开关)
-4. 再用浏览器访问一下: https://tieba.baidu.com 或者 https://tieba.baidu.com/index/
+   - QuanX: 把`videoqq.cookie.js`和`videoqq.js`传到`On My iPhone - Quantumult X - Scripts` (传到 iCloud 相同目录也可, 注意要打开 quanx 的 iCloud 开关)
+4. 打开浏览器访问: https://v.qq.com
 5. 系统提示: `获取Cookie: 成功`
 6. 最后就可以把第 1 条脚本注释掉了
 

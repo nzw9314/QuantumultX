@@ -2,17 +2,71 @@
 README：https://github.com/yichahucha/surge/tree/master
  */
 
+const $tool = (() => {
+    const isSurge = typeof $httpClient != "undefined"
+    const isQuanX = typeof $task != "undefined"
+    const notify = (title, subtitle, message) => {
+        if (isQuanX) $notify(title, subtitle, message)
+        if (isSurge) $notification.post(title, subtitle, message)
+    }
+    const setCache = (value, key) => {
+        if (isQuanX) return $prefs.setValueForKey(value, key)
+        if (isSurge) return $persistentStore.write(value, key)
+    }
+    const getCache = (key) => {
+        if (isQuanX) return $prefs.valueForKey(key)
+        if (isSurge) return $persistentStore.read(key)
+    }
+    const GET = (options, callback) => {
+        if (isQuanX) {
+            if (typeof options == "string") options = { url: options }
+            options["method"] = "GET"
+            $task.fetch(options).then(response => {
+                response["status"] = response.statusCode
+                callback(null, response, response.body)
+            }, reason => callback(reason.error, null, null))
+        }
+        if (isSurge) $httpClient.get(options, callback)
+    }
+    const POST = (options, callback) => {
+        if (isQuanX) {
+            if (typeof options == "string") options = { url: options }
+            options["method"] = "POST"
+            $task.fetch(options).then(response => {
+                response["status"] = response.statusCode
+                callback(null, response, response.body)
+            }, reason => callback(reason.error, null, null))
+        }
+        if (isSurge) $httpClient.post(options, callback)
+    }
+    return { isQuanX, isSurge, notify, setCache, getCache, GET, POST }
+})();
+
 const consoleLog = false;
 const imdbApikeyCacheKey = "IMDbApikey";
 const netflixTitleCacheKey = "NetflixTitle";
-var IMDbApikeys = IMDbApikeyList();
-var IMDbApikey = $prefs.valueForKey(imdbApikeyCacheKey);
-if (!IMDbApikey) updateIMDbApikey();
 
-modifyBody()
-
-function modifyBody() {
+if ($request.headers && $tool.isSurge) {
+    let url = $request.url;
+    const urlDecode = decodeURIComponent(url);
+    const videos = urlDecode.match(/"videos","(\d+)"/);
+    const videoID = videos[1];
+    const map = getTitleMap();
+    const title = map[videoID];
+    const isEnglish = url.match(/languages=en/) ? true : false;
+    if (!title && !isEnglish) {
+        const currentSummary = urlDecode.match(/\["videos","(\d+)","current","summary"\]/);
+        url = url.replace("&path=" + encodeURIComponent(currentSummary[0]), "");
+        url = url.replace(/&languages=(.*?)&/, "&languages=en-US&");
+    }
+    url += "&path=" + encodeURIComponent(`[${videos[0]},"details"]`);
+    $done({ url });
+} else {
+    var IMDbApikeys = IMDbApikeys();
+    var IMDbApikey = $tool.getCache(imdbApikeyCacheKey);
+    if (!IMDbApikey) updateIMDbApikey();
     let obj = JSON.parse($response.body);
+    if (consoleLog) console.log("Netflix Original Body:\n" + $response.body);
     const videoID = obj.paths[0][1];
     const video = obj.value.videos[videoID];
     const map = getTitleMap();
@@ -52,38 +106,34 @@ function modifyBody() {
 }
 
 function getTitleMap() {
-    const map = $prefs.valueForKey(netflixTitleCacheKey);
+    const map = $tool.getCache(netflixTitleCacheKey);
     return map ? JSON.parse(map) : {};
 }
 
 function setTitleMap(id, title, map) {
     map[id] = title;
-    $prefs.setValueForKey(JSON.stringify(map), netflixTitleCacheKey);
+    $tool.setCache(JSON.stringify(map), netflixTitleCacheKey);
 }
 
 function requestDoubanRating(imdbId) {
     return new Promise(function (resolve, reject) {
         const url = "https://api.douban.com/v2/movie/imdb/" + imdbId + "?apikey=0df993c66c0c636e29ecbb5344252a4a";
         if (consoleLog) console.log("Netflix Douban Rating URL:\n" + url);
-        const options = {
-            method: "GET",
-            url: url,
-        }
-        $task.fetch(options).then(response => {
-            // response.statusCode, response.headers, response.body
-            const data = response.body;
-            if (consoleLog) console.log("Netflix Douban Rating Data:\n" + data);
-            if (response.statusCode == 200) {
-                const obj = JSON.parse(data);
-                const rating = get_douban_rating_message(obj);
-                resolve({ rating });
+        $tool.GET(url, function (error, response, data) {
+            if (!error) {
+                if (consoleLog) console.log("Netflix Douban Rating response:\n" + JSON.stringify(response));
+                if (consoleLog) console.log("Netflix Douban Rating Data:\n" + data);
+                if (response.status == 200) {
+                    const obj = JSON.parse(data);
+                    const rating = get_douban_rating_message(obj);
+                    resolve({ rating });
+                } else {
+                    resolve({ rating: "Douban:  " + errorTip().noData });
+                }
             } else {
-                resolve({ rating: "Douban:  " + errorTip().noData });
+                if (consoleLog) console.log("Netflix Douban Rating Error:\n" + error);
+                resolve({ rating: "Douban:  " + errorTip().error });
             }
-        }, reason => {
-            // reason.error
-            if (consoleLog) console.log("Netflix Douban Rating Error:\n" + error);
-            resolve({ rating: "Douban:  " + errorTip().error });
         });
     });
 }
@@ -94,37 +144,33 @@ function requestIMDbRating(title, year, type) {
         if (year) url += "&y=" + year;
         if (type) url += "&type=" + type;
         if (consoleLog) console.log("Netflix IMDb Rating URL:\n" + url);
-        const options = {
-            method: "GET",
-            url: url,
-        }
-        $task.fetch(options).then(response => {
-            // response.statusCode, response.headers, response.body
-            const data = response.body;
-            if (consoleLog) console.log("Netflix IMDb Rating Data:\n" + data);
-            if (response.statusCode == 200) {
-                const obj = JSON.parse(data);
-                if (obj.Response != "False") {
-                    const id = obj.imdbID;
-                    const msg = get_IMDb_message(obj);
-                    resolve({ id, msg });
-                } else {
-                    reject(errorTip().noData);
-                }
-            } else if (response.statusCode == 401) {
-                if (IMDbApikeys.length > 1) {
-                    updateIMDbApikey();
-                    requestIMDbRating(title, year, type);
+        $tool.GET(url, function (error, response, data) {
+            if (!error) {
+                if (consoleLog) console.log("Netflix IMDb Rating response:\n" + JSON.stringify(response));
+                if (consoleLog) console.log("Netflix IMDb Rating Data:\n" + data);
+                if (response.status == 200) {
+                    const obj = JSON.parse(data);
+                    if (obj.Response != "False") {
+                        const id = obj.imdbID;
+                        const msg = get_IMDb_message(obj);
+                        resolve({ id, msg });
+                    } else {
+                        reject(errorTip().noData);
+                    }
+                } else if (response.status == 401) {
+                    if (IMDbApikeys.length > 1) {
+                        updateIMDbApikey();
+                        requestIMDbRating(title, year, type);
+                    } else {
+                        reject(errorTip().noData);
+                    }
                 } else {
                     reject(errorTip().noData);
                 }
             } else {
-                reject(errorTip().noData);
+                if (consoleLog) console.log("Netflix IMDb Rating Error:\n" + error);
+                reject(errorTip().error);
             }
-        }, reason => {
-            // reason.error
-            if (consoleLog) console.log("Netflix IMDb Rating Error:\n" + error);
-            reject(errorTip().error);
         });
     });
 }
@@ -133,7 +179,7 @@ function updateIMDbApikey() {
     if (IMDbApikey) IMDbApikeys.splice(IMDbApikeys.indexOf(IMDbApikey), 1);
     const index = Math.floor(Math.random() * IMDbApikeys.length);
     IMDbApikey = IMDbApikeys[index];
-    $prefs.setValueForKey(IMDbApikey, imdbApikeyCacheKey);
+    $tool.setCache(IMDbApikey, imdbApikeyCacheKey);
 }
 
 function get_IMDb_message(data) {
@@ -183,7 +229,7 @@ function errorTip() {
     return { noData: "⭐️ N/A", error: "❌ N/A" }
 }
 
-function IMDbApikeyList() {
+function IMDbApikeys() {
     const apikeys = [
         "PlzBanMe", "4e89234e",
         "f75e0253", "d8bb2d6b",

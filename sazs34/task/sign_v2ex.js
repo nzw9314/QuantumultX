@@ -1,5 +1,5 @@
 const cookieName = 'V2EX'
-const cookieKey = 'chavy_cookie_v2ex'
+const cookieKey = 'CookieV2ex'
 const cookieVal = $prefs.valueForKey(cookieKey)
 
 function sign() {
@@ -19,7 +19,10 @@ function sign() {
       console.log(`${title}, ${subTitle}, ${detail}`)
       $notify(title, subTitle, detail)
     } else {
-      signMission(data.match(/<input[^>]*\/mission\/daily\/redeem\?once=(\d+)[^>]*>/)[1])
+      let regex = /<input[^>]*\/mission\/daily\/redeem\?once=(\d+)[^>]*>/g
+      for (const code of data.matchAll(regex)) {
+        signMission(code[1])
+      }
     }
   })
 }
