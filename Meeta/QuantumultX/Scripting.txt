@@ -1,0 +1,16 @@
+;Meeta_script脚本适配Quantumult X ,其他脚本后续添加, 有问题欢迎反馈,TG频道: @meetashare
+
+hostname = *.api.vcinema.cn, api2.gkaorlz.com, *.kuwo.cn, ios.xiaoxiaoapps.com
+
+;南瓜电影
+^https?:\/\/p\.doras\.api\.vcinema\.cn\/v5.0\/user/ url script-response-body https://meetagit.github.io/MeetaRules/Surge/Scripting/cushawmovie.js
+
+;西瓜视频(https://www.xg1.app/)
+^https?:\/\/api2\.gkaorlz\.com\:8080\/api\/user\/ url script-response-body https://meetagit.github.io/MeetaRules/Surge/Scripting/watermelonvideo.js
+
+;酷我音乐SVIP
+^https?:\/\/.*\.kuwo\.cn url script-response-body https://meetagit.github.io/MeetaRules/Surge/Scripting/kuwovip.js
+
+;小小影视(http://tinyurl.com/y4thsp99)
+;^https?:\/\/ios\.xiaoxiaoapps\.com\/ url script-response-body https://meetagit.github.io/MeetaRules/Surge/Scripting/smallvideo.js
+
