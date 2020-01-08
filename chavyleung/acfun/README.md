@@ -1,45 +1,45 @@
-# 腾讯视频 (Surge & QuanX 二合一签到脚本)
-
-**2020.1.6** **~~从 网页 获取 Cookie 只有 2 小时有效期，使用意义不大，先弃坑~~**
-
-**2020.1.7 从 APP 获取 Cookie，目测有效期能撑一段时间 (需要观察)**
+# AcFun (Beta)
 
 > 代码已同时兼容 Surge & QuanX, 使用同一份签到脚本即可
 
-> 需要 VIP 会员才能签到 (需要 VIP!需要 VIP!需要 VIP!)
+> 只支持 APP 端签到 (什么? 你想用 Mac 签? emm...看需求人数吧...)
+
+> 测试版有可能出现任何情况, 如虫子(bug)、cookie(有效期)等各种问题, 希望大家能抱着共同完善的心态来玩
 
 ## 配置 (Surge)
 
 ```properties
 [MITM]
-*.video.qq.com
+*.acfun.cn
 
 [Script]
-http-request ^https:\/\/vip\.video\.qq\.com\/?.? script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/videoqq/videoqq.cookie.js
-cron "10 0 0 * * *" script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/videoqq/videoqq.js
+
+http-request ^https:\/\/api\-new\.app\.acfun\.cn\/rest\/app\/user\/personalInfo script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/acfun/acfun.cookie.js
+cron "10 0 0 * * *" script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/acfun/acfun.js
 ```
 
 ## 配置 (QuanX)
 
 ```properties
 [MITM]
-*.video.qq.com
+*.acfun.cn
 
 [rewrite_local]
-^https:\/\/vip\.video\.qq\.com\/?.? url script-response-body videoqq.cookie.js
+
+^https:\/\/api\-new\.app\.acfun\.cn\/rest\/app\/user\/personalInfo url script-response-body acfun.cookie.js
 
 [task_local]
-1 0 * * * videoqq.js
+1 0 * * * acfun.js
 ```
 
 ## 说明
 
-1. 先把`*.video.qq.com`加到`[MITM]`
+1. 先把`*.acfun.cn`加到`[MITM]`
 2. 再配置重写规则:
    - Surge: 把两条远程脚本放到`[Script]`
-   - QuanX: 把`videoqq.cookie.js`和`videoqq.js`传到`On My iPhone - Quantumult X - Scripts` (传到 iCloud 相同目录也可, 注意要打开 quanx 的 iCloud 开关)
-3. 打开 APP, 访问下`个人中心`
-4. 系统提示: `获取Cookie: 成功` （如果不提示获取成功, 尝试杀进程再进个人中心）
+   - QuanX: 把`acfun.cookie.js`和`acfun.js`传到`On My iPhone - Quantumult X - Scripts` (传到 iCloud 相同目录也可, 注意要打开 quanx 的 iCloud 开关)
+3. 打开 APP, 访问下`我的`
+4. 系统提示: `获取Cookie: 成功` & `获取Token: 成功`（如果不提示获取成功, 尝试杀进程再进我的）
 5. 最后就可以把第 1 条脚本注释掉了
 
 > 第 1 条脚本是用来获取 cookie 的, 用浏览器访问一次获取 cookie 成功后就可以删掉或注释掉了, 但请确保在`登录成功`后再获取 cookie.
