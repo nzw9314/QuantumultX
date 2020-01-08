@@ -19,7 +19,8 @@ if (url.indexOf(path1) != -1) {
             const element = dns[i];
             let host = "trade-acs.m.taobao.com"
             if (element.host == host) {
-                dns.splice(i, 1);
+                element.ips = []
+                if (consoleLog) console.log(JSON.stringify(element))
             }
         }
     }

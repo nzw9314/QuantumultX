@@ -2,6 +2,8 @@
 
 文件地址：https://github.com/sazs34/TaskConfig/blob/master/task/weather_pro.js
 
+**此脚本已兼容Surge和QuantumultX**
+
 为了满足多元化的天气信息查询(其实就是开发者想写着玩而已)
 
 提供了快捷地天气信息查询支持
