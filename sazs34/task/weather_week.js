@@ -12,11 +12,18 @@ let config = {
     timeout: 0, //超时时间,单位毫秒(1000毫秒=1秒),一般不推荐修改[为0则不限制超时时间]
     show: {
         template: {
-            title: `$[city]$[aqiIcon]   $[weather]•$[currentTemperature]°C  |  $[weeklySummary]`,
-    subtitle: ``,
-    detail: `$[daily($[month] / $[day] : $[weather]$[weatherIcon] • $[temperatureLow]~$[temperatureHigh]°C)]`
-},
-        lifestyle: { //此处用于显示各项生活指数，可自行调整顺序，顺序越在前面则显示也会靠前，如果您不想查看某一指数，置为false即可，想看置为true即可
+            title: `[天气日报] • $[summary]`,
+            subtitle: `$[weatherIcon]$[weather] $[temperatureMin] ~ $[temperatureMax]°C ☔️降雨概率 $[precipProbability]%`,
+            detail: `🥵空气质量 $[aqi]($[aqiDesc]) 🌬风速$[windSpeed]km/h $[windDir]
+👀紫外线指数 $[uv]($[uvDesc]) 💦湿度$[currentHumidity]%
+🌡体感温度 $[apparentTemperatureMin] ~ $[apparentTemperatureMax]°C 🏋🏻‍♀️气压$[atmosphere]pa
+$[lifeStyle]
+        
+[天气周报] • $[weeklySummary]
+$[daily($[month] - $[day] : $[weatherIcon]$[weather] • $[temperatureLow]~$[temperatureHigh]°C)]`
+        },
+            
+        lifestyle: { //此处用于显示各项生活指数，可自行调整顺序，顺序越在前面则 显示也会靠前，如果您不想查看某一指数，置为false即可，想看置为true即可
             drsg: true, //穿衣指数,
             flu: true, //感冒指数,
             comf: true, //舒适度指数,
