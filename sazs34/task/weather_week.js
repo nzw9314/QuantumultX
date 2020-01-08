@@ -12,15 +12,16 @@ let config = {
     timeout: 0, //超时时间,单位毫秒(1000毫秒=1秒),一般不推荐修改[为0则不限制超时时间]
     show: {
         template: {
-            title: `[天气日报] • $[summary]`,
-            subtitle: `$[weatherIcon]$[weather] $[temperatureMin] ~ $[temperatureMax]°C ☔️降雨概率 $[precipProbability]%`,
-            detail: `🥵空气质量 $[aqi]($[aqiDesc]) 🌬风速$[windSpeed]km/h $[windDir]
-👀紫外线指数 $[uv]($[uvDesc]) 💦湿度$[currentHumidity]%
-🌡体感温度 $[apparentTemperatureMin] ~ $[apparentTemperatureMax]°C 🏋🏻‍♀️气压$[atmosphere]pa
+            title: `[天气日报]  •  $[summary]`,
+            subtitle: `$[weatherIcon]$[weather] $[temperatureMin] ~ $[temperatureMax]°C   •   ☔️降雨概率 $[precipProbability]%`,
+            detail: `🥵空气质量 $[aqi]($[aqiDesc])   •  🌬风速$[windSpeed]km/h $[windDir]
+👀紫外线指数 $[uv]($[uvDesc])   •  💦湿度$[currentHumidity]%
+🌡体感温度 $[apparentTemperatureMin] ~ $[apparentTemperatureMax]°C   • 🏋🏻‍♀️气压$[atmosphere]pa
+
 $[lifeStyle]
-        
-[天气周报] • $[weeklySummary]
-$[daily($[month] - $[day] : $[weatherIcon]$[weather] • $[temperatureLow]~$[temperatureHigh]°C)]`
+
+[天气周报]  •  $[weeklySummary]
+$[daily($[month] - $[day] : $[weatherIcon]$[weather]  •  $[temperatureLow]~$[temperatureHigh]°C)]`
         },
             
         lifestyle: { //此处用于显示各项生活指数，可自行调整顺序，顺序越在前面则 显示也会靠前，如果您不想查看某一指数，置为false即可，想看置为true即可
@@ -356,6 +357,8 @@ function renderTemplate() {
         moonset: `${provider.heweather_daily.data.ms}`,
         //生活指数
         lifeStyle: getLifeStyle()
+        //降雨提醒
+        //minute_forecast: `${provider.heweather_daily.data.未知❓}`,
     }
     var notifyInfo = {
         title: execTemplate(config.show.template.title, map),
