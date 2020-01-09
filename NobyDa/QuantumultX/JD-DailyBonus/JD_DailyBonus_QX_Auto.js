@@ -8,7 +8,7 @@ Due to the validity of cookie, if the script pops up a notification of cookie in
 Daily bonus script will be performed every day at 9 am. You can modify the execution time.
 If reprinted, please indicate the source. My TG channel @NobyDa
 
-Update 2020.1.9 12:57 Beta v52
+Update 2020.1.9 15:57 v53
 ~~~~~~~~~~~~~~~~
 Surge 4.0 :
 [Script]
@@ -82,14 +82,14 @@ function JingDongBean() {
 
   $nobyda.get(JDBUrl, function(error, response, data) {
     if (error) {
-      $nobyda.notify("京东签到错误‼️‼️", "", error)
       const JDBean = "京东商城-京豆: 签到接口请求失败 ‼️‼️" + "\n"
       JingDongTurn(JDBean)
     } else {
       const cc = JSON.parse(data)
-      if (cc.code != 0) {
-        if (log) console.log("Cookie error response: \n" + data)
-        $nobyda.notify("京东系列签到", "", "Cookie失效 请重新开启Cookie脚本获取 ‼️")
+      if (cc.code == 3) {
+        if (log) console.log("京东商城-京豆Cookie失效response: \n" + data)
+          const JDBean = "京东商城-京豆: 签到失败, 原因: Cookie失效‼️" + "\n"
+          JingDongTurn(JDBean)
       } else {
         if (data.match(/跳转至拼图/)) {
           const JDBean = "京东商城-京豆: 签到失败, 原因: 需要拼图验证 ⚠️" + "\n"
@@ -158,15 +158,15 @@ function JingDongTurn(JDBean) {
       } else {
         const cc = JSON.parse(data)
         if (cc.code == 3) {
-          if (log) console.log("Cookie error response: \n" + data)
-          const JDturn = "京东转盘-失败: Cookie不通用,请重新获取 ⚠️" + "\n"
+          if (log) console.log("京东转盘Cookie失效response: \n" + data)
+          const JDturn = "京东商城-转盘: 签到失败, 原因: Cookie失效‼️" + "\n"
           JingRongBean(JDBean, JDturn)
         } else {
           if (data.match(/(\"T216\"|活动结束)/)) {
             const JDturn = "京东商城-转盘: 签到失败, 原因: 活动结束 ⚠️" + "\n"
             JingRongBean(JDBean, JDturn)
           } else {
-            if (data.match(/京豆/)) {
+            if (data.match(/(京豆|\"910582\")/)) {
               if (log) console.log("京东商城-转盘签到成功response: \n" + data)
               if (cc.data.prizeSendNumber) {
                 const JDturn = "京东商城-转盘: 签到成功, 明细: " + cc.data.prizeSendNumber + "京豆 🐶" + "\n"
@@ -345,7 +345,7 @@ function JingDongShake(JDBean, JDturn, JRBean, JRSteel) {
 
     $nobyda.get(JDSh, function(error, response, data) {
       if (error) {
-        const JDShake = "京东商城-摇摇: 签到接口请求失败 ‼️‼️"
+        const JDShake = "京东商城-摇摇: 签到接口请求失败 ‼️‼️\n" + error
         JRDoubleSign(JDBean, JDturn, JRBean, JRSteel, JDShake)
       } else {
         const cc = JSON.parse(data)
