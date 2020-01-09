@@ -7,7 +7,7 @@ const consoleLog = false;
 const imdbApikeyCacheKey = "IMDbApikey";
 const netflixTitleCacheKey = "NetflixTitle";
 
-if ($request.headers && $tool.isSurge) {
+if (!$tool.isResponse) {
     let url = $request.url;
     const urlDecode = decodeURIComponent(url);
     const videos = urlDecode.match(/"videos","(\d+)"/);
@@ -486,6 +486,7 @@ function countryEmoji(name) {
 }
 
 function tool() {
+    const isResponse = typeof $response != "undefined"
     const isSurge = typeof $httpClient != "undefined"
     const isQuanX = typeof $task != "undefined"
     const node = (() => {
@@ -553,5 +554,5 @@ function tool() {
             })
         }
     }
-    return { isQuanX, isSurge, notify, setCache, getCache, get, post }
+    return { isResponse, isQuanX, isSurge, notify, setCache, getCache, get, post }
 }

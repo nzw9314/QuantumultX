@@ -38,6 +38,7 @@ $tool.post(request, function (error, response, body) {
 function tool() {
     const isSurge = typeof $httpClient != "undefined"
     const isQuanX = typeof $task != "undefined"
+    const isResponse = typeof $response != "undefined"
     const node = (() => {
         if (typeof require == "function") {
             const request = require('request')
@@ -103,5 +104,5 @@ function tool() {
             })
         }
     }
-    return { isQuanX, isSurge, notify, setCache, getCache, get, post }
+    return { isQuanX, isSurge, isResponse, notify, setCache, getCache, get, post }
 }
