@@ -38,7 +38,7 @@ IP-CIDR, 203.119.175.0/24, REJECT, no-resolve
 IP-CIDR, 106.11.162.0/24, REJECT, no-resolve
 IP-CIDR, 47.102.83.0/24, REJECT, no-resolve
 [Script]
-# 使用脚本屏蔽 IP，不生效的需卸载重装，使用脚本就不需要写规则了（beta）
+# 使用脚本屏蔽 IP，不生效的需卸载tb重装，使用这个脚本就不需要写规则了（beta）
 http-response ^https?://amdc\.m\.taobao\.com/amdc/mobileDispatch requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 http-response ^https://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 [MITM]
@@ -90,7 +90,7 @@ ip-cidr, 203.119.175.0/24, reject, no-resolve
 ip-cidr, 106.11.162.0/24, reject, no-resolve
 ip-cidr, 47.102.83.0/24, reject, no-resolve
 [rewrite_local]
-# 使用脚本屏蔽 IP，不生效的需卸载重装，使用脚本就不需要写规则了（beta）
+# 使用脚本屏蔽 IP，不生效的需卸载tb重装，使用这个脚本就不需要写规则了（beta）
 ^https?://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body tb_price.js
 ^https://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body tb_price.js
 [mitm]

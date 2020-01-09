@@ -7,8 +7,7 @@ const path2 = "wareBusiness";
 const console_log = false;
 const url = $request.url;
 const body = $response.body;
-const isSurge = typeof $httpClient != "undefined"
-const isQuanX = typeof $task != "undefined"
+const $tool = tool();
 
 if (url.indexOf(path1) != -1) {
     let obj = JSON.parse(body);
@@ -16,7 +15,7 @@ if (url.indexOf(path1) != -1) {
     delete obj.serverConfig.dnsvip;
     delete obj.serverConfig.dnsvip_v6;
     $done({ body: JSON.stringify(obj) });
-    if (console_log) $notify("JD", "", "httpdns closed");
+    if (console_log) $tool.notify("JD", "", "httpdns closed");
 }
 
 if (url.indexOf(path2) != -1) {
@@ -115,27 +114,15 @@ function request_history_price(share_url, callback) {
         },
         body: "methodName=getBiJiaInfo_wxsmall&p_url=" + encodeURIComponent(share_url)
     }
-    if (isSurge) {
-        $httpClient.post(options, function (error, response, data) {
-            if (!error) {
-                callback(JSON.parse(data));
-                if (console_log) console.log("Data:\n" + data);
-            } else {
-                callback(null, null);
-                if (console_log) console.log("Error:\n" + error);
-            }
-        })
-    }
-    if (isQuanX) {
-        options["method"] = "POST"
-        $task.fetch(options).then(response => {
-            callback(JSON.parse(response.body));
-            if (console_log) console.log("Data:\n" + response.body);
-        }, reason => {
+    $tool.post(options, function (error, response, data) {
+        if (!error) {
+            callback(JSON.parse(data));
+            if (console_log) console.log("Data:\n" + data);
+        } else {
             callback(null, null);
-            if (console_log) console.log("Error:\n" + reason.error);
-        })
-    }
+            if (console_log) console.log("Error:\n" + error);
+        }
+    })
 }
 
 function changeDateFormat(cellval) {
@@ -176,6 +163,77 @@ function adword_obj() {
         "refId": "eAdword_0000000028",
         "sortId": 13
     }
+}
+
+function tool() {
+    const isSurge = typeof $httpClient != "undefined"
+    const isQuanX = typeof $task != "undefined"
+    const node = (() => {
+        if (typeof require == "function") {
+            const request = require('request')
+            return ({ request })
+        } else {
+            return (null)
+        }
+    })()
+    const notify = (title, subtitle, message) => {
+        if (isQuanX) $notify(title, subtitle, message)
+        if (isSurge) $notification.post(title, subtitle, message)
+        if (node) console.log(JSON.stringify({ title, subtitle, message }));
+    }
+    const setCache = (value, key) => {
+        if (isQuanX) return $prefs.setValueForKey(value, key)
+        if (isSurge) return $persistentStore.write(value, key)
+    }
+    const getCache = (key) => {
+        if (isQuanX) return $prefs.valueForKey(key)
+        if (isSurge) return $persistentStore.read(key)
+    }
+    const adapterStatus = (response) => {
+        if (response.status) {
+            response["statusCode"] = response.status
+        } else if (response.statusCode) {
+            response["status"] = response.statusCode
+        }
+        return response
+    }
+    const get = (options, callback) => {
+        if (isQuanX) {
+            if (typeof options == "string") options = { url: options }
+            options["method"] = "GET"
+            $task.fetch(options).then(response => {
+                callback(null, adapterStatus(response), response.body)
+            }, reason => callback(reason.error, null, null))
+        }
+        if (isSurge) $httpClient.get(options, (error, response, body) => {
+            callback(error, adapterStatus(response), body)
+        })
+        if (node) {
+            node.request(options, (error, response, body) => {
+                callback(error, adapterStatus(response), body)
+            })
+        }
+    }
+    const post = (options, callback) => {
+        if (isQuanX) {
+            if (typeof options == "string") options = { url: options }
+            options["method"] = "POST"
+            $task.fetch(options).then(response => {
+                callback(null, adapterStatus(response), response.body)
+            }, reason => callback(reason.error, null, null))
+        }
+        if (isSurge) {
+            $httpClient.post(options, (error, response, body) => {
+                callback(error, adapterStatus(response), body)
+            })
+        }
+        if (node) {
+            node.request.post(options, (error, response, body) => {
+                callback(error, adapterStatus(response), body)
+            })
+        }
+    }
+    return { isQuanX, isSurge, notify, setCache, getCache, get, post }
 }
 
 Array.prototype.insert = function (index, item) {
