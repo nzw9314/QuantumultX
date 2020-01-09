@@ -1,3 +1,4 @@
+//#region 基础配置
 const config = {
     baidu_tieba_h5: {
         cookie: 'CookieTB',
@@ -29,12 +30,13 @@ const config = {
         name: 'V2EX-Cookie',
         Host: 'www.v2ex.com'
     },
-    jd:{
+    jd: {
         cookie: 'CookieJD',
         name: '京东Cookie',
         Host: 'www.v2ex.com'
     }
 }
+//#endregion
 
 //#region smartjs,用于兼容Surge和QuantumultX
 
@@ -206,7 +208,7 @@ let updateCookie = (config, newVal) => {
 
 //#endregion
 
-
+//#region 正式开始写入cookie
 let request = $request;
 var isValidRequest = request && request.header && request.headers.Cookie
 if (!isValidRequest) {
@@ -258,6 +260,7 @@ if (headers.Host == config.jd.Host) {
     var headerCookie = headers.Cookie;
     updateCookie(config.jd, headerCookie);
 }
+//#endregion
 //#endregion
 
 $done({});
