@@ -70,197 +70,186 @@ skip_validating_cert = true
 force_sni_domain_name = true
 ;empty_sni_enabled = true
 
-hostname = raw.githubusercontent.com, *.github.io, avatar-nct.nixcdn.com, spclient.wg.spotify.com, *.googlevideo.com, oa.zalo.me, vsco.co, api.gyrosco.pe, origin-prod-phoenix.jibjab.com, api.termius.com, api.picsart.c*, api.meiease.c*, api.unfold.app, viva-asia1.vvbrd.com, graph.nhaccuatui.com, api.memrise.com , buy.itunes.apple.com, api.sync.me, pool.elsanow.io, lambda.us-east-1.amazonaws.com, api.mondlylanguages.com, api.busuu.com, owa.videoshowiosglobalserver.com:0, accounts.elevateapp.net, purchases.ws.pho.to, api-intl.mr.meitu.com, bmall.camera360.com, api.tv.zing.vn, api.calm.com, www.calm.com, api.global.mp3.zing.vn, apimboom2.globaldelight.net, photos.adobe.io, license.pdfexpert.com, subs.platforms.team, apic.musixmatch.com, api.getmimo.com, api.revenuecat.com, pixmagicapp.com, engbright.com, api.lingokids.com, www.peacefulsoundsapp.com, duolingo-leaderboards-prod.duolingo.com, commerce-i18n-api.faceu.mobi, mobi, mobile-api.adguard.com, api.blinkist.com, api.sololearn.com, receipts.cerebralgardens.com, api-kinemaster-assetstore.nexstreaming.com, api.pushover.net, api-cs.intsig.net, api.overhq.com, api.appsyscode.com, api.freeletics.com, api.shred.app, receipt-validator.herewetest.com, api.deezer.com, iap.aps-sdk.com, education.github.com, backend.getdrafts.com, ssl-api.itranslateapp.com, sk.ulysses.app, dayone.me, license.enpass.io, mp.bybutter.com, *.grammarly.com, splice.oracle.*.com, api.keepkeep.com, planner5d.com, secure.istreamer.com, 
+hostname = avatar-nct.nixcdn.com, spclient.wg.spotify.com, *.googlevideo.com, oa.zalo.me, vsco.co, api.gyrosco.pe, origin-prod-phoenix.jibjab.com, api.termius.com, api.picsart.c*, api.meiease.c*, api.unfold.app, viva-asia1.vvbrd.com, graph.nhaccuatui.com, api.memrise.com , buy.itunes.apple.com, api.sync.me, pool.elsanow.io, lambda.us-east-1.amazonaws.com, api.mondlylanguages.com, api.busuu.com, owa.videoshowiosglobalserver.com:0, accounts.elevateapp.net, purchases.ws.pho.to, api-intl.mr.meitu.com, bmall.camera360.com, api.tv.zing.vn, api.calm.com, www.calm.com, api.global.mp3.zing.vn, apimboom2.globaldelight.net, photos.adobe.io, license.pdfexpert.com, subs.platforms.team, apic.musixmatch.com, api.getmimo.com, api.revenuecat.com, pixmagicapp.com, engbright.com, api.lingokids.com, www.peacefulsoundsapp.com, duolingo-leaderboards-prod.duolingo.com, commerce-i18n-api.faceu.mobi, mobi, mobile-api.adguard.com, api.blinkist.com, api.sololearn.com, receipts.cerebralgardens.com, api-kinemaster-assetstore.nexstreaming.com, api.pushover.net, api-cs.intsig.net, api.overhq.com, api.appsyscode.com, api.freeletics.com, api.shred.app, receipt-validator.herewetest.com, api.deezer.com, iap.aps-sdk.com, education.github.com, backend.getdrafts.com, ssl-api.itranslateapp.com, sk.ulysses.app, dayone.me, license.enpass.io, mp.bybutter.com, *.grammarly.com, splice.oracle.*.com, api.keepkeep.com, planner5d.com, secure.istreamer.com, 
 [rewrite_local]
 
-#quanxremote
-^https:\/\/(raw.githubusercontent|\w+\.github)\.(com|io)\/.*\.js$ url script-response-body quanx.js
-
 # vsco
-^https?:\/\/vsco\.co\/api\/subscriptions\/2.1\/user-subscriptions\/ url script-response-body vsco.js
+^https?:\/\/vsco\.co\/api\/subscriptions\/2.1\/user-subscriptions\/ url script-response-body langkhach/vsco.js
 
 # gyroscope
-^https:\/\/api\.gyrosco\.pe\/v1\/account\/$ url script-response-body Gyroscope.vip.js
+^https:\/\/api\.gyrosco\.pe\/v1\/account\/$ url script-response-body langkhach/Gyroscope.vip.js
 
 # Termius 
-https:\/\/api\.termius\.com\/api\/v3\/bulk\/account\/ url script-response-body Terminus.js
+https:\/\/api\.termius\.com\/api\/v3\/bulk\/account\/ url script-response-body langkhach/Terminus.js
 
 # PicsArt
-^https:\/\/api\.(picsart|meiease)\.c(n|om)\/users\/show\/me\.json url script-response-body picsArt.vip.js
+^https:\/\/api\.(picsart|meiease)\.c(n|om)\/users\/show\/me\.json url script-response-body langkhach/picsArt.vip.js
 
 #Vivavideo
-^https:\/\/viva-asia1\.vvbrd\.com\/api\/rest\/u\/vip* url script-response-body vivavideo.vip.js
+^https:\/\/viva-asia1\.vvbrd\.com\/api\/rest\/u\/vip* url script-response-body langkhach/vivavideo.vip.js
 
 #Undfold
-^https:\/\/api\.unfold\.app\/v1\/ios\/receipts$ url script-response-body Unfold.vip.js
+^https:\/\/api\.unfold\.app\/v1\/ios\/receipts$ url script-response-body langkhach/Unfold.vip.js
 
 #Nhaccuatui
-^https:\/\/graph\.nhaccuatui\.com\/.*\/users\/info* url script-response-body nhaccuatui.js
-
-^https:\/\/graph\.nhaccuatui\.com\/.*\/users\/info* url script-response-body nhaccuatui.js
+^https:\/\/graph\.nhaccuatui\.com\/.*\/users\/info* url script-response-body langkhach/nhaccuatui.js
 
 #Memrise
-^https:\/\/api\.memrise\.com\/v1\.16\/(me\/$|dashboard\/$|leaderboards\/following\/) url script-response-body memrise.vip.js
+^https:\/\/api\.memrise\.com\/v1\.16\/(me\/$|dashboard\/$|leaderboards\/following\/) url script-response-body langkhach/memrise.vip.js
 
 # Jibjab
-^https:\/\/origin-prod-phoenix\.jibjab\.com\/v1\/user$ url script-response-body jibjab.vip.js
+^https:\/\/origin-prod-phoenix\.jibjab\.com\/v1\/user$ url script-response-body langkhach/jibjab.vip.js
 
-#buy.itunes.apple.com
-^https:\/\/buy\.itunes\.apple\.com\/verifyReceipt$ url script-response-body verify_receipt.js
+#buyhack
+^https:\/\/buy\.itunes\.apple\.com\/verifyReceipt$ url script-response-body langkhach/verify_receipt.js
 
 #sync
-^https:\/\/api\.sync\.me\/api\/purchases\/(report_purchases|get_purchases)  url script-response-body syn.me.js
+^https:\/\/api\.sync\.me\/api\/purchases\/(report_purchases|get_purchases)  url script-response-body langkhach/syn.me.js
 
 #elsaresponse
-^https:\/\/pool\.elsanow\.io\/user\/api\/v1\/purchase$ url script-response-body elsa-response.js
+^https:\/\/pool\.elsanow\.io\/user\/api\/v1\/purchase$ url script-response-body langkhach/elsa-response.js
 
 #elsarewrite
 ^https:\/\/pool\.elsanow\.io\/content\/api\/v1\/modules\/download$  url request-header (\r\n)x-session-token:.+(\r\n) request-header $1x-session-token: F3S0w0bysBQFdbjtxpFurrFv2ItBBcBkVQxUddQW+9vjt2JXM751ksqq5GAWpkl+kk9nhig9BGh9JhYHQaokmendY6zLZDscHiRkZD2HrdJclKVCLordAARJhYIrf5C+5OSK6ax2TA45CKi8S09FEtYXN4noXO7gt42NT6WPIv6DKhdIwVxQuIAMLU5abmpMTDlyWeI4ulBWcOQbuZWWZg==
 
 #drops
-^https:\/\/lambda\.us-east-1\.amazonaws\.com/.*/functions\/prod-4-syncPurchases\/invocations$ url script-response-body drops.js
+^https:\/\/lambda\.us-east-1\.amazonaws\.com/.*/functions\/prod-4-syncPurchases\/invocations$ url script-response-body langkhach/drops.js
 
 #mondly
-^https:\/\/api\.mondlylanguages\.com\/v1\/ios\/user\/sync$ url script-response-body mondly.vip.js
+^https:\/\/api\.mondlylanguages\.com\/v1\/ios\/user\/sync$ url script-response-body langkhach/mondly.vip.js
 
 #busuu
-^https:\/\/api\.busuu\.com\/users\/me* url script-response-body busuu.vip.js
+^https:\/\/api\.busuu\.com\/users\/me* url script-response-body langkhach/busuu.vip.js
 
 #Videoshow
-^https:\/\/owa\.videoshowiosglobalserver\.com\/.*\/iosPayClient url script-response-body videoshow.vip.js
+^https:\/\/owa\.videoshowiosglobalserver\.com\/.*\/iosPayClient url script-response-body langkhach/videoshow.vip.js
 
 #elevate
-^https:\/\/accounts\.elevateapp\.net\/api\/users\?user%5Bauthentication_token* url script-response-body elevate.vip.js
+^https:\/\/accounts\.elevateapp\.net\/api\/users\?user%5Bauthentication_token* url script-response-body langkhach/elevate.vip.js
 
 #beautyplus
-^https:\/\/api-intl\.mr\.meitu\.com/.*/subs_offer_elg$ url script-response-body beautyplusvip.js
+^https:\/\/api-intl\.mr\.meitu\.com/.*/subs_offer_elg$ url script-response-body langkhach/beautyplusvip.js
 
-#camera360&mix
-^https:\/\/bmall\.camera360\.com\/api\/(iap\/check-receipt$|mix\/getinfo$) url script-response-body camera360.vip.js
+#camera360
+^https:\/\/bmall\.camera360\.com\/api\/(iap\/check-receipt$|mix\/getinfo$) url script-response-body langkhach/camera360.vip.js
 
 #zingtv
-^https?:\/\/api\.tv\.zing\.vn\/.*/user* url script-response-body zingtvvipv1.js
+^https?:\/\/api\.tv\.zing\.vn\/.*/user* url script-response-body langkhach/zingtvvipv1.js
 
 #calm
-^https:\/\/api\.calm\.com\/me$ url script-response-body calm.vip.js
+^https:\/\/api\.calm\.com\/me$ url script-response-body langkhach/calm.vip.js
 
-#remove_manage_calm
+#remove_manage
 ^https:\/\/www\.calm\.com\/mobile\/manage-subscription\?token=*  url reject-img
 
 #lightroom
-^https:\/\/photos\.adobe\.io\/v2\/accounts* url script-response-body Lightroom.js
+^https:\/\/photos\.adobe\.io\/v2\/accounts* url script-response-body langkhach/Lightroom.js
 
 #Pdfexpert
-^https:\/\/license\.pdfexpert\.com\/api\/1\.0\/pdfexpert6\/subscription\/(refresh$|check$) url script-response-body Pdfexpert.vip.js
+^https:\/\/license\.pdfexpert\.com\/api\/1\.0\/pdfexpert6\/subscription\/(refresh$|check$) url script-response-body langkhach/Pdfexpert.vip.js
 
 #productive&sleepzy
-^https:\/\/subs\.platforms\.team\/apple\/verifyTransaction$ url script-response-body productive.js
+^https:\/\/subs\.platforms\.team\/apple\/verifyTransaction$ url script-response-body langkhach/productive.js
 
 #Musixmatch
-^https:\/\/apic\.musixmatch\.com\/ws\/.*\/config\.get url script-response-body musixmatch.miao.js
+^https:\/\/apic\.musixmatch\.com\/ws\/.*\/config\.get url script-response-body langkhach/musixmatch.miao.js
 
 #boom
 ^https:\/\/apimboom2\.globaldelight\.net\/itunesreceipt_v2\.php$ url 302 https://raw.githubusercontent.com/langkhach270389/Scripting/master/boom.vip.rsp
 
 #mimo
-^https:\/\/api\.getmimo\.com\/v1\/subscriptions$ url script-response-body mimo.vip.js
+^https:\/\/api\.getmimo\.com\/v1\/subscriptions$ url script-response-body langkhach/mimo.vip.js
 
 #mojo&noto
-^https:\/\/api\.revenuecat\.com\/.*\/(receipts$|subscribers) url script-response-body mojo.vip.js
-
-#photolift
-^https:\/\/pixmagicapp\.com\/api\/subscriptions$ url script-response-body photolift.vip.js
+^https:\/\/api\.revenuecat\.com\/.*\/(receipts$|subscribers) url script-response-body langkhach/mojo.vip.js
 
 #Bright
 ^https:\/\/engbright\.com\/app-portal\/apple\/receipt$ url 302 https://raw.githubusercontent.com/langkhach270389/Scripting/master/Bright.rsp
 
 #lingokids
-^https:\/\/api\.lingokids\.com\/v1\/renovate_session$ url script-response-body lingokids.vip.js
+^https:\/\/api\.lingokids\.com\/v1\/renovate_session$ url script-response-body langkhach/lingokids.vip.js
 
 #musicalm
-^https:\/\/www\.peacefulsoundsapp\.com\/api\/v1\/init$ url script-response-body musicalm.js
+^https:\/\/www\.peacefulsoundsapp\.com\/api\/v1\/init$ url script-response-body langkhach/musicalm.js
 
 #duolingo
-^https://duolingo-leaderboards-prod.duolingo.com/leaderboards/* url script-response-body duolingo.js
+^https:\/\/duolingo-leaderboards-prod\.duolingo\.com\/leaderboards* url script-response-body langkhach/duolingo.js
 
 #ulike
-^https:\/\/commerce-i18n-api\.faceu\.mobi\/commerce\/v1\/subscription\/user_info$ url script-response-body ulike.js
+^https:\/\/commerce-i18n-api\.faceu\.mobi\/commerce\/v1\/subscription\/user_info$ url script-response-body langkhach/ulike.js
 
 #adguardpremium
 ^https:\/\/mobile-api\.adguard\.com\/api\/1\.0\/ios_validate_receipt$ url 302 https://raw.githubusercontent.com/langkhach270389/Scripting/master/Adguard.rsp
 
 #zingmp3
-^https:\/\/api\.global\.mp3\.zing\.vn\/1\.0\/(getUserInfo)\?data=* url script-response-body zingmp3.js
+^https:\/\/api\.global\.mp3\.zing\.vn\/1\.0\/getUserInfo\?data=* url script-response-body langkhach/zingmp3.js
 
 #Blinkist
-^https:\/\/api\.blinkist\.com\/v4\/(me$|me.json$|me\/access$) url script-response-body blinkist.js
+^https:\/\/api\.blinkist\.com\/v4\/(me$|me.json$|me\/access$) url script-response-body langkhach/blinkist.js
 
 #sololearn 
-^https:\/\/api\.sololearn\.com\/(Profile\/GetProfile$|authenticateDevice$) url script-response-body sololearn.js
+^https:\/\/api\.sololearn\.com\/(Profile\/GetProfile$|authenticateDevice$) url script-response-body langkhach/sololearn.js
 
-#kinemaster
-^https:\/\/api-kinemaster-assetstore\.nexstreaming\.com\/.*\/product\/verifyReceipt$ url script-response-body kinemaster.js
+ #kinemaster
+^https:\/\/api-kinemaster-assetstore\.nexstreaming\.com\/.*\/product\/verifyReceipt$ url script-response-body langkhach/kinemaster.js
 
 #pushover
-^https:\/\/api\.pushover\.net\/1\/messages\.json* url script-response-body pushover.js
+^https:\/\/api\.pushover\.net\/1\/messages\.json* url script-response-body langkhach/pushover.js
 
 #CamScanner
-^https:\/\/api-cs\.intsig\.net\/purchase\/cs\/query_property\? url script-response-body CamScaner.js
+^https:\/\/(api|api-cs)\.intsig\.net\/purchase\/cs\/query_property\? url script-response-body langkhach/CamScaner.js
 
 #over
-^https:\/\/api\.overhq\.com\/(user\/token\/refresh$|subscription\/verifyReceipt$) url script-response-body over.vip.js
-
-#freeleticgym
-^https:\/\/api\.freeletics\.com\/gym\/users\/\d{1,}\/validate_subscription$ url script-response-body freeleticgym.js
-
-#shred
-^https:\/\/api\.shred\.app\/me$ url script-response-body shred.js
+^https:\/\/api\.overhq\.com\/(user\/token\/refresh$|subscription\/verifyReceipt$) url script-response-body langkhach/over.vip.js
 
 #1blocker
-^https:\/\/api\.revenuecat\.com\/.*\/subscribers\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$ url script-response-body 1blocker.js
+^https:\/\/api\.revenuecat\.com\/.*\/subscribers\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$ url script-response-body langkhach/1blocker.js
 
 #speak&translate
-^https:\/\/receipt-validator\.herewetest\.com\/apple\/verifyTransaction$ url script-response-body speak&translate.js
+^https:\/\/receipt-validator\.herewetest\.com\/apple\/verifyTransaction$ url script-response-body langkhach/speak&translate.js
 
 #document
-^https:\/\/license\.pdfexpert\.com\/api\/.*\/documents\/subscription\/(refresh$|check$) url script-response-body documents.js
+^https:\/\/license\.pdfexpert\.com\/api\/.*\/documents\/subscription\/(refresh$|check$) url script-response-body langkhach/documents.js
 
 #workingcopy
-^https:\/\/education\.github\.com\/api\/user$ url script-response-body workingcopy.js
+^https:\/\/education\.github\.com\/api\/user$ url script-response-body langkhach/workingcopy.js
 
 #draft
-^https:\/\/backend\.getdrafts\.com\/api\/.*\/verification* url script-response-body draft.js
+^https:\/\/backend\.getdrafts\.com\/api\/.*\/verification* url script-response-body langkhach/draft.js
+
+#phothop&PSexpress
+^https:\/\/lcs-mobile-cops\.adobe\.io\/mobile_profile url script-response-body langkhach/photoshop.js
 
 #itranslate&lingo&voice&converse
-^https:\/\/ssl-api\.itranslateapp\.com\/.*\/subscriptions\/.*\/ios$ url script-response-body itranslate.js
+^https:\/\/ssl-api\.itranslateapp\.com\/.*\/subscriptions\/.*\/ios$ url script-response-body langkhach/itranslate.js
 
 #ulysses
-;^https:\/\/sk\.ulysses\.app\/api url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
+^https:\/\/sk\.ulysses\.app\/api\/v1\/user_offers$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
 
-^https:\/\/sk\.ulysses\.app\/api url script-response-body ulysses.js 
+^https:\/\/sk\.ulysses\.app\/api\/v1\/itunes_receipt_verify$ url script-response-body langkhach/ulysses.js
 
 #pre_dayone
 ;^https:\/\/dayone\.me\/api\/users$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
 
 #dayone
-^https:\/\/dayone\.me\/api\/(users|v2\/users\/(account-status|receipt))$ url script-response-body dayone.js
+^https:\/\/dayone\.me\/api\/(users|v2\/users\/account-status)$ url script-response-body langkhach/dayone.js
 
-#keep
-^https:\/\/api\.keepkeep\.com\/(.+\/subject|.+\/dynamic) url script-response-body keep.js
+#endel
+^https:\/\/api-production\.endel\.io\/.*\/user$ url script-response-body langkhach/endel.js
 
 #nichi
-^https?:\/\/mp\.bybutter\.com\/mood\/(official-templates|privileges) url script-response-body nichi.js
+^https?:\/\/mp\.bybutter\.com\/mood\/(official-templates|privileges) url script-response-body langkhach/nichi.js
 
 #grammarly
-^https:\/\/subscription\.grammarly\.com\/api\/v1$ url script-response-body grammarly.js
+^https:\/\/subscription\.grammarly\.com\/api\/v1$ url script-response-body langkhach/grammarly.js
 
 #splice
-^https:\/\/splice\.oracle\.\w+\.com\/devices\/me url script-response-body splice.js
+^https:\/\/splice\.oracle\.\w+\.com\/devices\/me url script-response-body langkhach/splice.js
 
 #planner5d
-^https:\/\/planner5d\.com\/api\/sets url script-response-body planner5d.js
+^https:\/\/planner5d\.com\/api\/sets url script-response-body langkhach/planner5d.js
 
 #playerxtreme
-^https:\/\/secure\.istreamer\.com\/backend$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
+;^https:\/\/secure\.istreamer\.com\/backend$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
 
-^https:\/\/secure\.istreamer\.com\/backend$ url script-response-body playerxtreme.js
+^https:\/\/secure\.istreamer\.com\/backend$ url script-response-body langkhach/playerxtreme.js
