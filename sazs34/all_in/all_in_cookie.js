@@ -33,7 +33,7 @@ const config = {
     jd: {
         cookie: 'CookieJD',
         name: '京东Cookie',
-        Host: 'www.v2ex.com'
+        Host: 'api.m.jd.com'
     }
 }
 //#endregion
@@ -210,57 +210,66 @@ let updateCookie = (config, newVal) => {
 
 //#region 正式开始写入cookie
 let request = $request;
-var isValidRequest = request && request.header && request.headers.Cookie
-if (!isValidRequest) {
-    $done({});
-    return;
+var isValidRequest = request && request.headers && request.headers.Cookie
+if (isValidRequest) {
+    let headers = request.headers;
+    // console.log(`【Cookie触发】${headers.Host}`)
+    //#region 百度贴吧-H5
+    if (headers.Host == config.baidu_tieba_h5.Host) {
+        var regex = /(^|)BDUSS=([^;]*)(;|$)/;
+        var matchInfo = headers.Cookie.match(regex);
+        if (matchInfo) {
+            var headerCookie = headers.Cookie.match(regex)[0];
+            updateCookie(config.baidu_tieba_h5, headerCookie);
+        }
+    }
+    //#endregion
+    //#region 百度贴吧-APP
+    if (headers.Host == config.baidu_tieba_app.Host) {
+        var regex = /(^|)BDUSS=([^;]*)(;|$)/;
+        var matchInfo = headers.Cookie.match(regex);
+        if (matchInfo) {
+            var headerCookie = headers.Cookie.match(regex)[0];
+            updateCookie(config.baidu_tieba_app, headerCookie);
+        }
+    }
+    //#endregion
+    //#region 爱奇艺-APP
+    if (headers.Host == config.iqiyi_app.Host) {
+        var regex = /authcookie=([A-Za-z0-9]+)/;
+        if (regex.test(request.url)) {
+            var headerCookie = regex.exec(request.url)[1];
+            updateCookie(config.iqiyi_app, headerCookie);
+        }
+    }
+    //#endregion
+    //#region 吾爱破解
+    if (headers.Host == config._52pojie.Host) {
+        var headerCookie = headers.Cookie;
+        updateCookie(config._52pojie, headerCookie);
+    }
+    //#endregion
+    //#region 网易云音乐
+    if (headers.Host == config.netease_music.Host) {
+        var headerCookie = headers.Cookie;
+        //这个cookie很调皮,会将WM_TID放置到最前面一次,导致cookie会检测到变化,实际值始终是一样的
+        if (headerCookie.indexOf("WM_TID=") > 0)
+            updateCookie(config.netease_music, headerCookie);
+    }
+    //#endregion
+    //#region V2EX
+    if (headers.Host == config.v2ex.Host) {
+        var headerCookie = headers.Cookie;
+        updateCookie(config.v2ex, headerCookie);
+    }
+    //#endregion
+    //#region 京东
+    if (headers.Host == config.jd.Host) {
+        var headerCookie = headers.Cookie;
+        updateCookie(config.jd, headerCookie);
+    }
+    //#endregion
 }
-let headers = request.headers;
-//#region 百度贴吧-H5
-if (headers.Host == config.baidu_tieba_h5.Host) {
-    var regex = /(^|)BDUSS=([^;]*)(;|$)/;
-    var headerCookie = headers.Cookie.match(regex)[0];
-    updateCookie(config.baidu_tieba_h5, headerCookie);
-}
-//#endregion
-//#region 百度贴吧-APP
-if (headers.Host == config.baidu_tieba_app.Host) {
-    var regex = /(^|)BDUSS=([^;]*)(;|$)/;
-    var headerCookie = headers.Cookie.match(regex)[0];
-    updateCookie(config.baidu_tieba_app, headerCookie);
-}
-//#endregion
-//#region 爱奇艺-APP
-if (headers.Host == config.iqiyi_app.Host) {
-    var regex = /authcookie=([A-Za-z0-9]+)/;
-    var headerCookie = regex.exec($request.url)[1];
-    updateCookie(config.iqiyi_app, headerCookie);
-}
-//#endregion
-//#region 吾爱破解
-if (headers.Host == config._52pojie.Host) {
-    var headerCookie = headers.Cookie;
-    updateCookie(config._52pojie, headerCookie);
-}
-//#endregion
-//#region 网易云音乐
-if (headers.Host == config.netease_music.Host) {
-    var headerCookie = headers.Cookie;
-    updateCookie(config.netease_music, headerCookie);
-}
-//#endregion
-//#region V2EX
-if (headers.Host == config.v2ex.Host) {
-    var headerCookie = headers.Cookie;
-    updateCookie(config.v2ex, headerCookie);
-}
-//#endregion
-//#region 京东
-if (headers.Host == config.jd.Host) {
-    var headerCookie = headers.Cookie;
-    updateCookie(config.jd, headerCookie);
-}
-//#endregion
 //#endregion
 
 $done({});
