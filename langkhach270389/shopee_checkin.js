@@ -14,7 +14,7 @@ MITM = shopee.vn
   }
 $httpClient.post(shopeeUrl, function(error, response, data){
   if (error) {
-$notification.post("Shopee checkin", "", Lỗi kết nối‼️)
+$notification.post("Shopee checkin", "", "Lỗi kết nối‼️")
     $done(); 
   } 
  else{
