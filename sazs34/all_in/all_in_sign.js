@@ -1,11 +1,23 @@
 const global = {
-    log: 1, //日志模式:0不显示 1全部显示 2精简显示
+    log: 1, //日志模式:0不显示 1全部显示 2精简显示,推荐值:1
     sign: { //用于设置哪些需要进行签到,哪些不处理
         baidu_tieba: true,
         iqiyi: true,
         _52pojie: true,
         netease_music: true,
-        v2ex: true
+        v2ex: true,
+        weibo_super: true
+    },
+    data: {
+        weibo_super: [
+     ["IU", "100808d4151ccebfbae55e8f7c0f68f6d18e4d"],
+     ["SWITCH", "1008084239f063a3d4fb9d38a0182be6e39e76"],
+     ["林允儿", "1008080c5fb650788fe5c7577f0b6ec4a34038"],
+     ["泰妍", "100808377e60b6bf5ffc9cdc603cc93b75c663"],
+     ["Apple", "1008089f6290f4436e5a2351f12e03b6433c3c"],
+     ["周杰伦", "1008087a8941058aaf4df5147042ce104568da"],
+     ["Lisa", "1008084b3f3945e087a0dd32f56c3603b7d153"],
+        ]
     }
 }
 //#region 签到配置,请勿修改
@@ -108,6 +120,20 @@ const config = {
         },
         data: {
             notify: ''
+        }
+    },
+    weibo_super: {
+        cookie: 'super_cookie',
+        name: '微博超话',
+        provider: {
+            url: '',
+            headers: {
+                Cookie: ''
+            }
+        },
+        data: {
+            notify: '',
+            result: []
         }
     }
 }
@@ -542,8 +568,9 @@ function sign_v2ex() {
                 finalNotify("v2ex");
             } else {
                 let regex = /<input[^>]*\/mission\/daily\/redeem\?once=(\d+)[^>]*>/g;
-                for (const code of data.matchAll(regex)) {
-                    signMission(code[1]);
+                let code = regex.exec(data);
+                if (code) {
+                    signMission(code[1])
                 }
             }
         }, reason => {
@@ -558,7 +585,12 @@ function sign_v2ex() {
         $task.fetch(config.v2ex.provider.sign).then(response => {
             let data = response.body;
             if (data.indexOf('每日登录奖励已领取') >= 0) {
-                config.v2ex.data.notify = `[${config.v2ex.name}] 签到成功🎉`
+                let days = 0;
+                let daysRegex = /已连续登录 (\d{1,10}) 天/;
+                if (daysRegex.test(data)) {
+                    days = daysRegex.exec(data)[1]
+                }
+                config.v2ex.data.notify = `[${config.v2ex.name}] 签到成功🎉${days>0?`已连续签到${days}天`:''}`
                 record(config.v2ex.data.notify);
                 finalNotify("v2ex");
             } else {
@@ -577,12 +609,86 @@ function sign_v2ex() {
 
 //#endregion
 
+//#region 微博超话
+function sign_weibo_super() {
+    if (!global.sign.weibo_super) {
+        record(`[${config.weibo_super.name}]未开启签到`);
+        return;
+    }
+    if (global.data.weibo_super.length <= 0) {
+        config.weibo_super.data.notify = `[${config.weibo_super.name}] 未配置超话ID`;
+        record(config.weibo_super.data.notify);
+        finalNotify("weibo_super");
+        return;
+    }
+    let cookieVal = $prefs.valueForKey(config.weibo_super.cookie);
+    if (!cookieVal) {
+        config.weibo_super.data.notify = `[${config.weibo_super.name}] 未获取到Cookie⚠️`;
+        record(`${config.weibo_super.data.notify}, 请在文件最上方的glabal-data-weibo_super中配置相应ID, 前往https://nave.work/%E5%BE%AE%E5%8D%9A%E8%B6%85%E8%AF%9D%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC.html 进行查看具体教程`);
+        finalNotify("weibo_super");
+        return;
+    }
+    let sign = index => {
+        if (global.data.weibo_super.length <= index) {
+            combain();
+            finalNotify('weibo_super');
+        }
+        let name = global.data.weibo_super[index][0];
+        let super_id = global.data.weibo_super[index][1];
+        config.weibo_super.provider.url = `https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=${super_id}&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=MacIntel&ua=Mozilla/5.0%20(Macintosh;%20Intel%20Mac%20OS%20X%2010_15)%20AppleWebKit/605.1.15%20(KHTML,%20like%20Gecko)%20Version/13.0.4%20Safari/605.1.15&screen=375*812&__rnd=1576850070506`
+        config.weibo_super.provider.headers.Cookie = cookieVal;
+        let result = {
+            name,
+            success: true,
+            icon: '🎉'
+        };
+        $task.fetch(config.weibo_super.provider).then(response => {
+            var obj = JSON.parse(response.body);
+            var code = obj.code;
+            var msg = obj.msg;
+            if (code == 100003) { // 行为异常，需要重新验证
+                result.success = false;
+                result.icon = '⚠️';
+                config.weibo_super.data.result.push(result);
+                record(`[${config.weibo_super.name}] ${name}  ${msg}, ${obj.data.location}`);
+            } else if (code == 100000) {
+                config.weibo_super.data.result.push(result)
+                record(`[${config.weibo_super.name}] ${name} 签到成功🎉`);
+            } else if (code == 382004) {
+                config.weibo_super.data.result.push(result)
+                record(`[${config.weibo_super.name}] ${name} ${msg.replace("(382004)", "")}🎉`);
+            } else {
+                result.success = false;
+                result.icon = '❕';
+                config.weibo_super.data.result.push(result);
+                record(`[${config.weibo_super.name}] ${name} ${msg}❕`);
+            }
+            sign(++index);
+        }, reason => {
+            result.success = false;
+            result.icon = '❌';
+            config.weibo_super.data.result.push(result);
+            record(`[${config.weibo_super.name}] ${name} 签到错误,${reason.error}`);
+            sign(++index);
+        });
+    }
+    let combain = () => {
+        config.weibo_super.data.notify = `[${config.weibo_super.name}]`;
+        for (item of config.weibo_super.data.result) {
+            config.weibo_super.data.notify += ` 「${item.name}」-${item.icon}`;
+        }
+    }
+    sign(0);
+}
+//#endregion
+
 function startSign() {
     if (global.sign.baidu_tieba) sign_baidu_tieba();
     if (global.sign.iqiyi) sign_iqiyi();
     if (global.sign.netease_music) sign_netease_music();
     if (global.sign._52pojie) sign_52pojie();
     if (global.sign.v2ex) sign_v2ex();
+    if (global.sign.weibo_super) sign_weibo_super();
 }
 
 function finalNotify(type) {
