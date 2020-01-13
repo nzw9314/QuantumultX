@@ -20,7 +20,7 @@ const global = {
      ["Lisa", "1008084b3f3945e087a0dd32f56c3603b7d153"],
 
         ],
-        china_telecom: '17791810545' //此处输入要签到的手机号码
+        china_telecom: '' //此处输入要签到的手机号码
     }
 }
 //#region 签到配置,请勿修改
