@@ -39,6 +39,11 @@ const config = {
         cookie: 'super_cookie',
         name: '微博超话',
         Host: 'weibo.com'
+    },
+    china_telecom: {
+        cookie: 'cookie.10000',
+        name: '电信营业厅',
+        Host: 'wapside.189.cn'
     }
 }
 //#endregion
@@ -278,6 +283,12 @@ if (isValidRequest) {
     if (headers.Host.indexOf(config.weibo_super.Host) >= 0) {
         var headerCookie = headers.Cookie;
         updateCookie(config.weibo_super, headerCookie);
+    }
+    //#endregion
+    //#region 中国电信
+    if (headers.Host.indexOf(config.china_telecom.Host) >= 0) {
+    var headerCookie = headers.Cookie;
+        updateCookie(config.china_telecom, headerCookie);
     }
     //#endregion
 }

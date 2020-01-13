@@ -6,7 +6,8 @@ const global = {
         _52pojie: true,
         netease_music: true,
         v2ex: true,
-        weibo_super: true
+        weibo_super: true,
+        china_telecom: true
     },
     data: {
         weibo_super: [
@@ -18,6 +19,11 @@ const global = {
      ["周杰伦", "1008087a8941058aaf4df5147042ce104568da"],
      ["Lisa", "1008084b3f3945e087a0dd32f56c3603b7d153"],
         ]
+            ["周杰伦", "1008087a8941058aaf4df5147042ce104568da"],
+            // ["IU", "100808d4151ccebfbae55e8f7c0f68f6d18e4d"],
+            // ["SWITCH", "1008084239f063a3d4fb9d38a0182be6e39e76"],
+        ],
+        china_telecom: '' //此处输入要签到的手机号码
     }
 }
 //#region 签到配置,请勿修改
@@ -134,6 +140,28 @@ const config = {
         data: {
             notify: '',
             result: []
+        }
+    },
+    china_telecom: {
+        cookie: 'cookie.10000',
+        name: '中国电信',
+        provider: {
+            url: 'https://wapside.189.cn:9001/api/home/sign',
+            method: 'POST',
+            headers: {
+                "Content-Type": `application/json;charset=utf-8`,
+                "User-Agent": `Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;CtClient;7.6.0;iOS;13.3;iPhone XR`,
+                "Host": `wapside.189.cn:9001`,
+                "Origin": `https://wapside.189.cn:9001`,
+                "Referer": `https://wapside.189.cn:9001/resources/dist/signInActivity.html?cmpid=jt-khd-my-zygn&ticket=0ab000281b4a8139f264620ae1d8b1ce067a6587921f90a6260dca4389a4e01a&version=7.6.0`,
+                Cookie: ''
+            },
+            body: JSON.stringify({
+                phone: global.data.china_telecom
+            })
+        },
+        data: {
+            notify: ''
         }
     }
 }
@@ -675,13 +703,57 @@ function sign_weibo_super() {
     let combain = () => {
         config.weibo_super.data.notify = `[${config.weibo_super.name}]`;
         for (item of config.weibo_super.data.result) {
-            config.weibo_super.data.notify += ` 「${item.name}」-${item.icon}`;
+            config.weibo_super.data.notify += ` 「${item.name}」${item.icon}`;
         }
     }
     sign(0);
 }
 //#endregion
 
+//#region 中国电信营业厅
+function sign_china_telecom() {
+    if (!global.sign.china_telecom) {
+        record(`[${config.china_telecom.name}]未开启签到`);
+        return;
+    }
+    if (!global.data.china_telecom) {
+        config.china_telecom.data.notify = `[${config.china_telecom.name}] 未配置对应的签到手机号`;
+        record(config.china_telecom.data.notify);
+        finalNotify("china_telecom");
+        return;
+    }
+    let cookieVal = $prefs.valueForKey(config.china_telecom.cookie);
+    if (!cookieVal) {
+        config.china_telecom.data.notify = `[${config.china_telecom.name}] 未获取到Cookie⚠️`;
+        record(`${config.china_telecom.data.notify}`);
+        finalNotify("china_telecom");
+        return;
+    }
+    config.china_telecom.provider.headers.Cookie = cookieVal;
+    $task.fetch(config.china_telecom.provider).then(response => {
+        var body = JSON.parse(response.body);
+        if (body.resoultCode == "0") {
+            if (body.data.code == 1) {
+                config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到成功,获得金币${body.data.coin}/金豆${body.data.flow}`
+            } else if (body.data.code == 0) {
+                config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到成功,${body.data.msg}`
+            } else {
+                config.china_telecom.data.notify = `[${config.china_telecom.name}] ${body.data.msg}`
+            }
+        } else {
+            config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到失败, ${body.data.msg}-${body.resoultCode}`
+        }
+        record(config.china_telecom.data.notify)
+        finalNotify("china_telecom");
+    }, reason => {
+        config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到失败,${reason.error}`
+        record(config.china_telecom.data.notify)
+        finalNotify("china_telecom");
+    })
+}
+//#endregion
+
+//#region 签到统一管控
 function startSign() {
     if (global.sign.baidu_tieba) sign_baidu_tieba();
     if (global.sign.iqiyi) sign_iqiyi();
@@ -689,6 +761,7 @@ function startSign() {
     if (global.sign._52pojie) sign_52pojie();
     if (global.sign.v2ex) sign_v2ex();
     if (global.sign.weibo_super) sign_weibo_super();
+    if (global.sign.china_telecom) sign_china_telecom();
 }
 
 function finalNotify(type) {
@@ -726,5 +799,6 @@ ${content}`);
 ${content.splice(0, 60)}`);
     }
 }
+//#endregion
 
 startSign();

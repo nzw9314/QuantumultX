@@ -7,6 +7,7 @@
 目前支持的Cookie获取
 
 - 百度贴吧(感谢...我自己)
+- 电信营业厅(感谢...我自己)
 - 爱奇艺VIP(感谢[@NobyDa](https://github.com/NobyDa))
 - 网易云音乐(感谢[@chavyleung](https://github.com/chavyleung))
 - 京东(感谢[@NobyDa](https://github.com/NobyDa))
@@ -21,6 +22,16 @@
 **Cookie获取脚本:https://github.com/sazs34/TaskConfig/blob/master/all_in/all_in_cookie.js**
 
 **签到脚本:https://github.com/sazs34/TaskConfig/blob/master/all_in/all_in_sign.js**
+
+## 更新记录
+
+> 2020-1-13 
+>
+> 新增中国电信营业厅APP签到,需要增加MITM REWRITE_LOCAL以及脚本配置中添加Cookie对应的手机号
+
+此次更新需要注意的是,获取完Cookie以后,需要在`all_in_sign.js`文件中最开头的配置部分,将手机号输入进去哦
+
+否则会提示**用户不存在**
 
 ## Cookie配置
 
@@ -37,7 +48,7 @@
 ```
 [mitm]
 # cookie获取专用,仅获取cookie时使用
-hostname = tieba.baidu.com, c.tieba.baidu.com, music.163.com, passport.iqiyi.com, www.52pojie.cn, *.v2ex.com, weibo.com
+hostname = tieba.baidu.com, c.tieba.baidu.com, music.163.com, passport.iqiyi.com, www.52pojie.cn, *.v2ex.com, weibo.com, wapside.189.cn
 ```
 ### REWRITE
 
@@ -49,6 +60,8 @@ hostname = tieba.baidu.com, c.tieba.baidu.com, music.163.com, passport.iqiyi.com
 https:\/\/api\.m\.jd\.com\/client\.action.*functionId=signBeanIndex url script-request-header all_in_cookie.js
 # 此处用于百度贴吧cookie获取，当失效时需手动登录https://tieba.baidu.com/index.html贴吧获取cookie，待弹出获取成功即可
 ^https?:\/\/tieba.baidu\.com url script-request-header all_in_cookie.js
+# 此处用于电信营业厅APP cookie获取
+https:\/\/wapside\.189\.cn:9001\/api\/home\/sign url script-request-header all_in_cookie.js
 # APP端直接进去，点击"我的"即可
 https?:\/\/c\.tieba\.baidu\.com\/c\/s\/login url script-request-header all_in_cookie.js
 # 此处用于网易云音乐cookie获取，当失效时需浏览器访问并登录:https://music.163.com/m/login 获取cookie，待弹出获取成功即可
@@ -72,6 +85,7 @@ https:\/\/www\.52pojie\.cn\/home\.php\?mod=space url script-request-header all_i
 | :----------------------------------------------------------: | :----: | :--------------------------------------------------------: |
 |                           百度贴吧                           | 浏览器 |             https://tieba.baidu.com/index.html             |
 |                           百度贴吧                           |  APP   |                   进入APP,点击"我的"即可                   |
+|                          电信营业厅                          |  APP   |               进入APP,点击"我",签到即可获取                |
 |                            网易云                            | 浏览器 |               https://music.163.com/m/login                |
 |                            爱奇艺                            |  APP   |                   进入APP,点击"我的"即可                   |
 |                           吾爱破解                           | 浏览器 |         https://www.52pojie.cn/home.php?mod=space          |
@@ -94,22 +108,24 @@ https:\/\/www\.52pojie\.cn\/home\.php\?mod=space url script-request-header all_i
 ```javascript
 //因为有的人只有其中一个或两个需要进行签到,所以进行了配置化,可以指定签到
 const global = {
-    log: 1, //日志模式:0不显示 1全部显示 2精简显示
+    log: 1, //日志模式:0不显示 1全部显示 2精简显示,推荐值:1
     sign: { //用于设置哪些需要进行签到,哪些不处理
         baidu_tieba: true,
         iqiyi: true,
         _52pojie: true,
         netease_music: true,
         v2ex: true,
-        weibo_super: true
+        weibo_super: true,
+        china_telecom: true
     },
     data: {
-        //此处用于放置微博超话的信息
         weibo_super: [
             ["周杰伦", "1008087a8941058aaf4df5147042ce104568da"],
-            ["IU", "100808d4151ccebfbae55e8f7c0f68f6d18e4d"],
-            ["SWITCH", "1008084239f063a3d4fb9d38a0182be6e39e76"],
-        ]
+            // ["IU", "100808d4151ccebfbae55e8f7c0f68f6d18e4d"],
+            // ["SWITCH", "1008084239f063a3d4fb9d38a0182be6e39e76"],
+        ],
+        //此处输入要签到的手机号码
+        china_telecom: '18851889188'//替换手机号部分即可
     }
 }
 ```
