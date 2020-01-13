@@ -17,9 +17,10 @@
 
 将[smart.js](./smart.js)中的内容拷贝到你想使用的脚本**最前面**,就可以了呢
 
+
 ### 示例
 
-你原本的脚本是这样的
+你原本的脚本，比如叫weather.js，打开后里面的内容是这样的
 
 ```javascript
 //这里是原来的脚本
@@ -28,7 +29,7 @@
 我是surge的脚本
 ```
 
-把[smart.js](./smart.js)拷贝进去
+把[smart.js](./smart.js)文件打开，将里面的文本内容拷贝到weather.js的最前面保存后即可使用
 
 ```
 //这里是smart.js的内容
@@ -211,11 +212,11 @@ $[lifeStyle]`
 [rewrite_local]
 # 如果您有百度贴吧APP，则可以使用此项配置，点击"我的"即可
 #【需配置hostname = c.tieba.baidu.com】
-;https?:\/\/c\.tieba\.baidu\.com\/c\/s\/login url script-response-body cookie/cookie_baidu_tieba_app.js
+;https?:\/\/c\.tieba\.baidu\.com\/c\/s\/login url script-request-header cookie/cookie_baidu_tieba_app.js
 
 # 如果您不想使用APP,则可以直接网页浏览https://tieba.baidu.com ,弹出获取提示即可
 #【需配置hostname = tieba.baidu.com】
-;^https?:\/\/tieba.baidu\.com url script-response-body cookie/cookie_baidu_tieba_h5.js
+;^https?:\/\/tieba.baidu\.com url script-request-header cookie/cookie_baidu_tieba_h5.js
 
 [mitm]
 #贴吧APP专用
@@ -277,7 +278,7 @@ var singleNotifyCount = 20; //想签到几个汇总到一个通知里,这里就�
 ```quanx_config
 [rewrite_local]
 # 此处用于网易云音乐cookie获取，当失效时需浏览器访问并登录:https://music.163.com/m/login 获取cookie
-^https?:\/\/music\.163\.com url script-response-body cookie/cookie_netease_music.js
+^https?:\/\/music\.163\.com url script-request-header cookie/cookie_netease_music.js
 
 [mitm]
 hostname = music.163.com
@@ -306,7 +307,7 @@ hostname = music.163.com
 ```quanx_config
 [rewrite_local]
 # 此处用于爱奇艺cookie获取，加mitm后打开APP，点击“我的”即可
-https:\/\/passport\.iqiyi\.com\/apis\/user\/info\.action.*authcookie url script-response-body js/cookie/cookie_iqiyi.js
+https:\/\/passport\.iqiyi\.com\/apis\/user\/info\.action.*authcookie url script-request-header js/cookie/cookie_iqiyi.js
 
 [mitm]
 hostname = passport.iqiyi.com
@@ -335,7 +336,7 @@ hostname = passport.iqiyi.com
 ```quanx_config
 [rewrite_local]
 # 此处用于京东cookie获取，当失效时需要手动登录京东网页版https://bean.m.jd.com/签到获取Cookie, 待QX弹出获取成功通知即可
-;https:\/\/api\.m\.jd\.com\/client\.action.*functionId=signBeanIndex url script-response-body cookie/cookie_jd_bonus.js
+;https:\/\/api\.m\.jd\.com\/client\.action.*functionId=signBeanIndex url script-request-header cookie/cookie_jd_bonus.js
 
 [mitm]
 hostname = api.m.jd.com
@@ -364,7 +365,7 @@ hostname = api.m.jd.com
 ```quanx_config
 [rewrite_local]
 # 此处用于V2EX cookie获取，浏览器打开https://www.v2ex.com/mission/daily 后提示成功即可
-^https:\/\/www\.v2ex\.com\/mission\/daily url script-response-body cookie/cookie_v2ex.js
+^https:\/\/www\.v2ex\.com\/mission\/daily url script-request-header cookie/cookie_v2ex.js
 
 [mitm]
 hostname = *.v2ex.com

@@ -88,7 +88,7 @@ https:\/\/api\.termius\.com\/api\/v3\/bulk\/account\/ url script-response-body l
 ^https:\/\/api\.getmimo\.com\/v1\/subscriptions$ url script-response-body langkhach/mimo.vip.js
 
 #mojo&noto
-^https:\/\/api\.revenuecat\.com\/.*\/(receipts$|subscribers) url script-response-body langkhach/mojo.vip.js
+^https:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers\/[a-zA-Z0-9_-]*$) url script-response-body langkhach/revenuecat.js
 
 #Bright
 ^https:\/\/engbright\.com\/app-portal\/apple\/receipt$ url 302 https://raw.githubusercontent.com/langkhach270389/Scripting/master/Bright.rsp
@@ -129,8 +129,6 @@ https:\/\/api\.termius\.com\/api\/v3\/bulk\/account\/ url script-response-body l
 #over
 ^https:\/\/api\.overhq\.com\/(user\/token\/refresh$|subscription\/verifyReceipt$) url script-response-body langkhach/over.vip.js
 
-#1blocker
-^https:\/\/api\.revenuecat\.com\/.*\/subscribers\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$ url script-response-body langkhach/1blocker.js
 
 #speak&translate
 ^https:\/\/receipt-validator\.herewetest\.com\/apple\/verifyTransaction$ url script-response-body langkhach/speak&translate.js
