@@ -1,7 +1,11 @@
 # QuantumultX
+本人只是搬运和同步更新
+不负责维护脚本
+只测试自用脚本，其他大部分脚本未测试
+
+
 1.全局配置 
 QuantumultX.conf
-
 
 2.脚本本地化配置:
 
@@ -19,14 +23,16 @@ https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCop
 
 4⃣️Js_local_WorkingCopy.conf包括
 ①.Nobyda 全部脚本,
-②.yichahucha 京东比价，淘宝比价,Netflix评分,
-③.chavyleung 签到脚本,
-④.sazs34 天气脚本,
-⑤.个人收集修改脚本;
+②.langkhach 全部脚本
+③.chavyleung 签到脚本
+④.sazs34 天气脚本
+⑤.yichahucha 京东比价，淘宝比价,Netflix评分
+⑥.Neruogram App价格监控脚本
+⑦.个人收集修改脚本
 
 需要其他的脚本请自行添加路径;
 
-3.同步更新脚本库包括:
+3.WorkingCopy同步更新脚本库包括:
 ① NobyDa,
 ② langkhach270389,
 ③ Choler,
