@@ -2,7 +2,7 @@
 
 > Cookie脚本会自动检测Cookie是否需要更新，因此您无需手动禁用脚本，一直放着就行
 >
-> 不太会写说明,见谅...
+> 支持QuantumultX和Surge
 
 目前支持的Cookie获取
 
