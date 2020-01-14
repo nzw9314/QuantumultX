@@ -1,15 +1,18 @@
 /*
 爱美剧 unlock vip（官网：xmj.app）
 
-hostname = mjapp.anlujia.com
+QX : 
+^https?:\/\/api.bjxkhc.com\/index\.php\/app\/ios\/(vod\/show|(user|vod|topic|type)\/index) url script-response-body https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/File/aimeiju.js
+
+Surge4：
+http-response ^https?:\/\/api.bjxkhc.com\/index\.php\/app\/ios\/(vod\/show|(user|vod|topic|type)\/index) requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/File/aimeiju.js
+
+hostname = api.bjxkhc.com
 
 #启动广告/弹窗
-^http(s)://\w+.\w+.com/index.php/app/ios/ads/index url reject-dict
-^http(s)://\w+.\w+.com/index.php/app/ios/ver/index_ios$ url reject
-^http(s)://\w+.\w+.com/index.php/app/ios/pay/ok$ url reject-dict
-
-#VIP
-^http(s)://\w+.\w+.com/index.php/app/ios/(vod\/show|(user|vod|topic|type)/index) url script-response-body
+^https?://api.bjxkhc.com/index.php/app/ios/ads/index url reject-dict
+^https?://api.bjxkhc.com/index.php/app/ios/ver/index_ios$ url reject
+^https?://api.bjxkhc.com/index.php/app/ios/pay/ok$ url reject-dict
 */
 var body = $response.body;
 var url = $request.url;
@@ -40,8 +43,8 @@ if (url.indexOf(show) != -1) {
     obj.data.CT_App_Show_Vod_Url1 = "";//片头广告链接
     obj.data.CT_App_Show_Vod_Type1 = "2";//片头广告显示类型，0一直显示,1暂停播放显示,2显示后自动播放
     obj.data.CT_App_Show_Vod_must_Time1 = "0";//片头联系客服图片显示时间，前面改VIP这里自动变0
-    obj.data.CT_Pic_url1_pause = "";//暂停播放联系客服图片
-    obj.data.CT_Pic_url1_pause_skip = "";//暂停播放联系客服链接
+    obj.data.CT_Pic_url1_pause = "";//暂停联系客服图片
+    obj.data.CT_Pic_url1_pause_skip = "";//暂停联系客服链接
     body = JSON.stringify(obj);
 }
 
