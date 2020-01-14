@@ -1,11 +1,15 @@
 # QuantumultX
 只是搬运和同步更新大佬脚本
+
 不负责维护脚本
+
 只测试自用脚本，其他大部分脚本未测试可用性
 
 目前使用QuantumultX最新TF版本(TF190)，
+所以优先更新本地脚本
+Js_local_WorkingCopy.conf
 
-之前版本QX配置:Js.conf(远程订阅脚本)不再维护
+之前版本的QX(1.00,1.03)配置:Js.conf(远程订阅脚本)
 
 
 1.全局配置 
