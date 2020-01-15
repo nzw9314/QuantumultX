@@ -190,8 +190,8 @@ $httpClient.get(api1, function(error, response, data){
       var festival = obj.result.result.festival.solar[0];
       var mation = "Meeta 贴心提醒您今天是:"+festival+"\n一言:"+$persistentStore.read("meeta");
       }else{
-          var mation = "一言:"+$persistentStore.read("meeta")
-          //"\n历史上的今天:"+ $persistentStore.read("meeta1")
+          var mation = "一言:"+$persistentStore.read("meeta")+
+          "\n历史上的今天:"+ $persistentStore.read("meeta1")
       
     };
   
