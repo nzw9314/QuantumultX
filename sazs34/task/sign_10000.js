@@ -1,4 +1,4 @@
-let phone = '17791810545';//您的手机号
+let phone = '';//您的手机号
 
 function sign_10000() {
     let cookieVal = $prefs.valueForKey("cookie.10000");
