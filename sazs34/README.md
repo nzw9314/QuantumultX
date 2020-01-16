@@ -198,6 +198,14 @@ $[lifeStyle]`
 
 ## 签到
 
+### 多合一签到脚本
+
+<img src="assets/image-20200116103533642.png" alt="image-20200116103533642" />
+
+轻松集成 轻松配置
+
+具体详见 [all_in_one.md](./all_in_one.md)
+
 ### 百度贴吧
 
 > 此功能来源于此git
@@ -378,3 +386,9 @@ hostname = *.v2ex.com
 # 表示每天07:31分执行一次
 31 7 * * * task/sign_v2ex.js
 ```
+
+### 电信营业厅
+
+目前单独版本的电信营业厅已不再维护,请切换到多合一脚本
+
+具体详见 [all_in_one.md](./all_in_one.md)
