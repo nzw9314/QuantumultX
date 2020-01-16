@@ -5,8 +5,8 @@ const $tool = tool()
 // notify
 $tool.notify("title", "subtitle", "message")
 // cache
-$tool.setCache("value", "key")
-$tool.getCache("key")
+$tool.write("value", "key")
+$tool.read("key")
 // get
 $tool.get("http://www.baidu.com", function (error, response, body) {
     // response.status response.statusCode response.headers
@@ -52,11 +52,11 @@ function tool() {
         if (isSurge) $notification.post(title, subtitle, message)
         if (node) console.log(JSON.stringify({ title, subtitle, message }));
     }
-    const setCache = (value, key) => {
+    const write = (value, key) => {
         if (isQuanX) return $prefs.setValueForKey(value, key)
         if (isSurge) return $persistentStore.write(value, key)
     }
-    const getCache = (key) => {
+    const read = (key) => {
         if (isQuanX) return $prefs.valueForKey(key)
         if (isSurge) return $persistentStore.read(key)
     }
@@ -72,37 +72,19 @@ function tool() {
         if (isQuanX) {
             if (typeof options == "string") options = { url: options }
             options["method"] = "GET"
-            $task.fetch(options).then(response => {
-                callback(null, adapterStatus(response), response.body)
-            }, reason => callback(reason.error, null, null))
+            $task.fetch(options).then(response => { callback(null, adapterStatus(response), response.body) }, reason => callback(reason.error, null, null))
         }
-        if (isSurge) $httpClient.get(options, (error, response, body) => {
-            callback(error, adapterStatus(response), body)
-        })
-        if (node) {
-            node.request(options, (error, response, body) => {
-                callback(error, adapterStatus(response), body)
-            })
-        }
+        if (isSurge) $httpClient.get(options, (error, response, body) => { callback(error, adapterStatus(response), body) })
+        if (node) node.request(options, (error, response, body) => { callback(error, adapterStatus(response), body) })
     }
     const post = (options, callback) => {
         if (isQuanX) {
             if (typeof options == "string") options = { url: options }
             options["method"] = "POST"
-            $task.fetch(options).then(response => {
-                callback(null, adapterStatus(response), response.body)
-            }, reason => callback(reason.error, null, null))
+            $task.fetch(options).then(response => { callback(null, adapterStatus(response), response.body) }, reason => callback(reason.error, null, null))
         }
-        if (isSurge) {
-            $httpClient.post(options, (error, response, body) => {
-                callback(error, adapterStatus(response), body)
-            })
-        }
-        if (node) {
-            node.request.post(options, (error, response, body) => {
-                callback(error, adapterStatus(response), body)
-            })
-        }
+        if (isSurge) $httpClient.post(options, (error, response, body) => { callback(error, adapterStatus(response), body) })
+        if (node) node.request.post(options, (error, response, body) => { callback(error, adapterStatus(response), body) })
     }
-    return { isQuanX, isSurge, isResponse, notify, setCache, getCache, get, post }
+    return { isQuanX, isSurge, isResponse, notify, write, read, get, post }
 }
