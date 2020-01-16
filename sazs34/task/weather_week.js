@@ -3,10 +3,10 @@
 https://github.com/sazs34/TaskConfig/blob/master/assets/weather_pro.md
  */
 let config = {
-    darksky_api: "adff46a828dcf7e9686aa52170a1db8a", //从https://darksky.net/dev/ 上申请key填入即可
-    aqicn_api: "dc9f948c8d9a8a1f10c2bc5bba60c4dd2e0dec4a", //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
-    huweather_apiKey: "faead3de5f42420098c8132b3924cd09", //和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取
-    lat_lon: "30.4468603,114.8806895", //请填写经纬度,直接从谷歌地图中获取即可
+    darksky_api: "填这里", //从https://darksky.net/dev/ 上申请key填入即可
+    aqicn_api: "填这里", //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
+    huweather_apiKey: "填这里", //和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取
+    lat_lon: "填这里", //请填写经纬度,直接从谷歌地图中获取即可
     lang: "zh", //语言,随意切换为您想要的语言哦(zh/zh-tw/ja/en/fr/...)
     log: 2, //调试日志,0为不开启,1为开启,2为开启精简日志
     timeout: 0, //超时时间,单位毫秒(1000毫秒=1秒),一般不推荐修改[为0则不限制超时时间]

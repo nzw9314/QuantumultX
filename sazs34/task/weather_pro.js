@@ -3,28 +3,29 @@
 https://github.com/sazs34/TaskConfig/blob/master/assets/weather_pro.md
  */
 let config = {
-    darksky_api: "adff46a828dcf7e9686aa52170a1db8a", //从https://darksky.net/dev/ 上申请key填入即可
-    aqicn_api: "dc9f948c8d9a8a1f10c2bc5bba60c4dd2e0dec4a", //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
-    huweather_apiKey: "faead3de5f42420098c8132b3924cd09", //和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取
-    lat_lon: "30.4468603,114.8806895", //请填写经纬度,直接从谷歌地图中获取即可
+    darksky_api: "填这里", //从https://darksky.net/dev/ 上申请key填入即可
+    aqicn_api: "填这里", //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
+    huweather_apiKey: "填这里", //和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取
+    lat_lon: "填这里", //请填写经纬度,直接从谷歌地图中获取即可
     lang: "zh", //语言,随意切换为您想要的语言哦(zh/zh-tw/ja/en/fr/...)
-    log: 2, //调试日志,0为不开启,1为开启,2为开启精简日志
+    log: 0, //调试日志,0为不开启,1为开启,2为开启精简日志
     timeout: 0, //超时时间,单位毫秒(1000毫秒=1秒),一般不推荐修改[为0则不限制超时时间]
     show: {
+        //普通每天的
         template: {
-            title: `[天气日报]  •  $[summary]`,
-            subtitle: `$[weatherIcon]$[weather] $[temperatureMin] ~ $[temperatureMax]°C   •   ☔️降雨概率 $[precipProbability]%`,
-            detail: `🥵空气质量 $[aqi]($[aqiDesc])   •  🌬风速$[windSpeed]km/h $[windDir]
-👀紫外线指数 $[uv]($[uvDesc])   •  💦湿度$[currentHumidity]%
-🌡体感温度 $[apparentTemperatureMin] ~ $[apparentTemperatureMax]°C   • 🏋🏻‍♀️气压$[atmosphere]pa
+            title: `[天气日报] $[summary]`,
+            subtitle: `$[weatherIcon]$[weather] $[temperatureMin] ~ $[temperatureMax]°C ☔️降雨概率 $[precipProbability]%`,
+            detail: `🥵空气质量 $[aqi]($[aqiDesc]) 🍃风速$[windSpeed]km/h $[windDir]
+🌞紫外线指数 $[uv]($[uvDesc]) 💧湿度$[currentHumidity]%
+🌡体感温度 $[apparentTemperatureMin] ~ $[apparentTemperatureMax]°C 💨气压$[atmosphere]pa
 
-$[lifeStyle]
+[生活指数]
+$[lifeStyle($[icon][$[brf]]$[txt])]
 
-[天气周报]  •  $[weeklySummary]
-$[daily($[month] - $[day] : $[weatherIcon]$[weather]  •  $[temperatureLow]~$[temperatureHigh]°C)]`
+[天气周报]
+$[daily($[month]月$[day]日  $[temperatureLow]~$[temperatureHigh]°C  $[weatherIcon]$[weather])]`
         },
-            
-        lifestyle: { //此处用于显示各项生活指数，可自行调整顺序，顺序越在前面则 显示也会靠前，如果您不想查看某一指数，置为false即可，想看置为true即可
+        lifestyle: { //此处用于显示各项生活指数，可自行调整顺序，顺序越在前面则显示也会靠前，如果您不想查看某一指数，置为false即可，想看置为true即可
             drsg: true, //穿衣指数,
             flu: true, //感冒指数,
             comf: true, //舒适度指数,
@@ -74,7 +75,7 @@ const provider = {
         api: `https://free-api.heweather.net/s6/weather/lifestyle?location=${config.lat_lon.replace(/\s/g, "").replace("，", ",")}&key=${config.huweather_apiKey}`,
         progress: 0,
         timeoutNumber: 0,
-        data: {},
+        data: [],
         support: ['$[lifeStyle]']
     },
     darksky: {
@@ -355,10 +356,6 @@ function renderTemplate() {
         moonrise: `${provider.heweather_daily.data.mr}`,
         //月落时间
         moonset: `${provider.heweather_daily.data.ms}`,
-        //生活指数
-        lifeStyle: getLifeStyle()
-        //降雨提醒
-        //minute_forecast: `${provider.heweather_daily.data.未知❓}`,
     }
     var notifyInfo = {
         title: execTemplate(config.show.template.title, map),
@@ -546,22 +543,6 @@ function getUVDesc(daily_uvIndex) {
     }
     return uvDesc;
 }
-
-function getLifeStyle() {
-    var lifeStyle = '';
-    if (provider.heweather_lifestyle.data && provider.heweather_lifestyle.data.length > 0) {
-        for (var item in config.show.lifestyle) {
-            if (config.show.lifestyle[item]) {
-                var youAreTheOne = provider.heweather_lifestyle.data.filter(it => it.type == item);
-                if (youAreTheOne && youAreTheOne.length > 0) {
-                    // record("指数信息-choose-" + JSON.stringify(youAreTheOne));
-                    lifeStyle += `${lifeStyle==""?"":lineBreak}${config.show.icon?'💡':''}[${youAreTheOne[0].brf}]${youAreTheOne[0].txt}`;
-                }
-            }
-        }
-    }
-    return lifeStyle;
-}
 // #endregion
 
 // #region 模板相关
@@ -588,11 +569,12 @@ function support() {
     provider.heweather_daily.progress = template.filter((item, filter) => {
         return provider.heweather_daily.support.indexOf(item) != -1;
     }).length > 0 ? 0 : 2;
-    provider.heweather_air.progress = template.filter((item, filter) => {
-        return provider.heweather_air.support.indexOf(item) != -1;
-    }).length > 0 ? 0 : 2;
+    // provider.heweather_air.progress = template.filter((item, filter) => {
+    //     return provider.heweather_air.support.indexOf(item) != -1;
+    // }).length > 0 ? 0 : 2;
     provider.heweather_lifestyle.progress = template.filter((item, filter) => {
-        return provider.heweather_lifestyle.support.indexOf(item) != -1;
+        let regexLifestyle = /\$\[(lifeStyle\()+([\s\S]+?)(\))+\]/g;
+        return regexLifestyle.test(config.show.lifestyle) ? 0 : 2;
     }).length > 0 ? 0 : 2;
     provider.aqicn.progress = template.filter((item, filter) => {
         return provider.aqicn.support.indexOf(item) != -1;
@@ -631,12 +613,109 @@ function execTemplate(template, map) {
 
 function execArrayTemplate() {
     try {
+        execTemplateLifestyle();
         execTemplateDaily();
         execTemplateHourly();
     } catch (e) {
         console.log(`${JSON.stringify(e)}`)
     }
 
+}
+
+function execTemplateLifestyle() {
+    let regexLifestyle = /\$\[(lifeStyle\()+([\s\S]+?)(\))+\]/g;
+    if (provider.heweather_lifestyle.data <= 0) {
+        config.show.template.detail.replace(regexLifestyle, '')
+    }
+    let result = [];
+    if (regexLifestyle.test(config.show.template.detail)) {
+        let lsMap = { //此处用于显示各项生活指数，可自行调整顺序，顺序越在前面则显示也会靠前，如果您不想查看某一指数，置为false即可，想看置为true即可
+            drsg: {
+                icon: '👔',
+                type: '穿衣指数'
+            },
+            flu: {
+                icon: '🤧',
+                type: '感冒指数'
+            },
+            comf: {
+                icon: '😊',
+                type: '舒适度指数'
+            },
+            cw: {
+                icon: '🚗',
+                type: '洗车指数'
+            },
+            sport: {
+                icon: '🏃🏻',
+                type: '运动指数'
+            },
+            trav: {
+                icon: '🌴',
+                type: '旅游指数'
+            },
+            uv: {
+                icon: '☂️',
+                type: '紫外线指数'
+            },
+            air: {
+                icon: '🌫',
+                type: '空气污染扩散条件指数'
+            },
+            ac: {
+                icon: '❄️',
+                type: '空调开启指数'
+            },
+            ag: {
+                icon: '😷',
+                type: '过敏指数'
+            },
+            gl: {
+                icon: '🕶',
+                type: '太阳镜指数'
+            },
+            mu: {
+                icon: '💄',
+                type: '化妆指数'
+            },
+            airc: {
+                icon: '🧺',
+                type: '晾晒指数'
+            },
+            ptfc: {
+                icon: '🚥',
+                type: '交通指数'
+            },
+            fsh: {
+                icon: '🎣',
+                type: '钓鱼指数'
+            },
+            spi: {
+                icon: '🔆',
+                type: '防晒指数'
+            },
+        }
+        config.show.template.detail.match(regexLifestyle);
+        var rangeTemplate = RegExp.$2; //此处拿到的是要替换的列表显示部分了
+        let regex = /\$\[([a-z,A-Z,0-9]*)\]/g;
+        var template = rangeTemplate.match(regex);
+        for (life of provider.heweather_lifestyle.data) {
+            if (!config.show.lifestyle[life.type]) continue;
+            var singleInfo = rangeTemplate;
+            for (item of template) {
+                item.match(regex);
+                if (RegExp.$1 == "icon") {
+                    singleInfo = singleInfo.replace(item, lsMap[life.type].icon)
+                } else if (RegExp.$1 == "type") {
+                    singleInfo = singleInfo.replace(item, lsMap[life.type].type)
+                } else {
+                    singleInfo = singleInfo.replace(item, life[RegExp.$1])
+                }
+            }
+            result.push(singleInfo);
+        }
+        config.show.template.detail = config.show.template.detail.replace(regexLifestyle, result.join(lineBreak));
+    }
 }
 
 function execTemplateDaily() {

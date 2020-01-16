@@ -3,14 +3,14 @@
 https://github.com/sazs34/TaskConfig#%E5%A4%A9%E6%B0%94
  */
 let config = {
-    darksky_api: "adff46a828dcf7e9686aa52170a1db8a", //从https://darksky.net/dev/ 上申请key填入即可
-    aqicn_api: "dc9f948c8d9a8a1f10c2bc5bba60c4dd2e0dec4a", //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
-    huweather_apiKey: "faead3de5f42420098c8132b3924cd09", //和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取
-    lat_lon: "30.4468603,114.8806895", //请填写经纬度,直接从谷歌地图中获取即可
+    darksky_api: "填这里", //从https://darksky.net/dev/ 上申请key填入即可
+    aqicn_api: "填这里", //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
+    huweather_apiKey: "faead3de5f42420098c8132b3924cd09", //和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取(注意key类型选WebApi)
+    lat_lon: "填这里", //请填写经纬度,直接从谷歌地图中获取即可
     lang: "zh", //语言,请不要修改
     show: {
         log: 0, //调试日志,0为不开启,1为开启,2为开启精简日志
-        icon: false, //是否显示图标信息,不显示会比较精简
+        icon: true, //是否显示图标信息,不显示会比较精简
         aqi: true, //空气质量以及风速显示,false则不显示
         uv: true, //紫外线显示,false则不显示
         apparent: true, //体感温度显示,false则不显示
