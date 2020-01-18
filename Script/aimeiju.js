@@ -1,14 +1,18 @@
 /* 
-#爱美剧
-hostname = *.*.com
+爱美剧 unlock vip（官网：xmj.app）
+
+QX : 
+^https?:\/\/mjapp.anlujia.com\/index\.php\/app\/ios\/(vod\/show|(user|vod|topic|type)\/index) url script-response-body https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/aimeiju.js
+
+Surge4：
+http-response ^https?:\/\/mjapp.anlujia.com\/index\.php\/app\/ios\/(vod\/show|(user|vod|topic|type)\/index) requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/File/aimeiju.js
+
+hostname = mjapp.anlujia.com
 
 #启动广告/弹窗
-^http(s)://\w+.\w+.com/index.php/app/ios/ads/index url reject-dict
-^http(s)://\w+.\w+.com/index.php/app/ios/ver/index_ios$ url reject
-^http(s)://\w+.\w+.com/index.php/app/ios/pay/ok$ url reject-dict
-
-#VIP
-^http(s)://\w+.\w+.com/index.php/app/ios/(vod\/show|(user|vod|topic|type)/index) url script-response-body
+^https?://mjapp.anlujia.com/index.php/app/ios/ads/index url reject-dict
+^https?://mjapp.anlujia.com/index.php/app/ios/ver/index_ios$ url reject
+^https?://mjapp.anlujia.com/index.php/app/ios/pay/ok$ url reject-dict
 */
 var body = $response.body;
 var url = $request.url;
