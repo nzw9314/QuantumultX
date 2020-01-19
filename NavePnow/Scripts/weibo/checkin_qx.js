@@ -9,14 +9,13 @@ https:\/\/weibo\.com\/p\/aj\/general\/button\?ajwvr=6&api=http:\/\/i\.huati\.wei
 MITM = weibo.com
 */
 var accounts = [
-     ["IU", "100808d4151ccebfbae55e8f7c0f68f6d18e4d"],
-     ["SWITCH", "1008084239f063a3d4fb9d38a0182be6e39e76"],
-     ["林允儿", "1008080c5fb650788fe5c7577f0b6ec4a34038"],
-     ["泰妍", "100808377e60b6bf5ffc9cdc603cc93b75c663"],
-     ["Apple", "1008089f6290f4436e5a2351f12e03b6433c3c"],
-     ["周杰伦", "1008087a8941058aaf4df5147042ce104568da"],
-     ["Lisa", "1008084b3f3945e087a0dd32f56c3603b7d153"],
-              
+    // ["IU", "100808d4151ccebfbae55e8f7c0f68f6d18e4d"],
+    // ["SWITCH", "1008084239f063a3d4fb9d38a0182be6e39e76"],
+    // ["林允儿", "1008080c5fb650788fe5c7577f0b6ec4a34038"],
+    // ["泰妍", "100808377e60b6bf5ffc9cdc603cc93b75c663"],
+    // ["Apple", "1008089f6290f4436e5a2351f12e03b6433c3c"]
+    ["周杰伦", "1008087a8941058aaf4df5147042ce104568da"],
+
 ]
 function launch() {
     for (var i in accounts) {
