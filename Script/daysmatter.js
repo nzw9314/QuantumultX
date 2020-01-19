@@ -7,8 +7,19 @@
     您也可直接在tg中联系@wechatu
 */
 // #region 固定头部
-let isQuantumultX = $task !== undefined; //判断当前运行环境是否是qx
-let isSurge = $httpClient !== undefined; //判断当前运行环境是否是surge
+let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
+let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
+// 判断request还是respons
+// down方法重写
+var $done = (obj={}) => {
+    var isRequest = typeof $request != "undefined";
+    if (isQuantumultX) {
+        return isRequest ? $done({}) : ""
+    }
+    if (isSurge) {
+        return isRequest ? $done({}) : $done()
+    }
+}
 // http请求
 var $task = isQuantumultX ? $task : {};
 var $httpClient = isSurge ? $httpClient : {};
@@ -68,17 +79,29 @@ if (isSurge) {
             return new Promise((resolve, reject) => {
                 if (url.method == 'POST') {
                     $httpClient.post(url, (error, response, data) => {
-                        response.body = data;
-                        resolve(response, {
-                            error: error
-                        });
+                        if (response) {
+                            response.body = data;
+                            resolve(response, {
+                                error: error
+                            });
+                        } else {
+                            resolve(null, {
+                                error: error
+                            })
+                        }
                     })
                 } else {
                     $httpClient.get(url, (error, response, data) => {
-                        response.body = data;
-                        resolve(response, {
-                            error: error
-                        });
+                        if (response) {
+                            response.body = data;
+                            resolve(response, {
+                                error: error
+                            });
+                        } else {
+                            resolve(null, {
+                                error: error
+                            })
+                        }
                     })
                 }
             })
@@ -125,6 +148,7 @@ if (isSurge) {
     }
 }
 // #endregion
+
 /*
 倒数日
 
