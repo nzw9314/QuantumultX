@@ -5,12 +5,21 @@
 
 只测试自用脚本，其他大部分脚本未测试可用性
 
-目前使用QuantumultX最新TF版本(TF190)，
-所以优先更新本地脚本
-Js_local_WorkingCopy.conf
+目前使用QuantumultX最新1.05版本(TF188+)，
+所以优先更新
+①.Js_local_WorkingCopy.conf
+(本地脚本订阅,⚠️仅限Qx1.05 TF188+使用)
 
-之前版本的QX(1.00,1.03)配置:Js.conf(远程订阅脚本)
+②.Js_local_WorkingCopy_Cookie.conf
+(Cookie获取订阅。Cookie失效时启用，成功后禁用)
 
+
+
+⚠️QX 1.05之前的请使用以下订阅:
+
+(1.00-1.03)使用Js.conf(远程订阅脚本)
+
+Js_local_WorkingCopy_1.04.conf (本地订阅脚本)
 
 1.全局配置 
 QuantumultX.conf
