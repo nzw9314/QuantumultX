@@ -1,18 +1,16 @@
-let obj = JSON.parse($response.body);
-obj ={
-"ret":"0",
-"errmsg":"Success",
-"systime":"",
-"data":{
-"flag":true,
-"start_time":1579094492,
-"end_time":3725012184,
-"is_first_subscribe":false,
-"is_cancel_subscribe":false,
-"uid":"4089778978429341",
-"subscribe_uid":"70851259049"
-}
+var obj = JSON.parse($response.body);
+
+obj= {
+  "data": {
+    "flag": true,
+    "start_time": 1572760027,
+    "end_time": 4097368706
+  },
+  "systime": "",
+  "errmsg": "Success",
+  "ret": "0"
 };
+
 $done({body: JSON.stringify(obj)});
 
 //LK
