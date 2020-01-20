@@ -81,38 +81,51 @@ function launch() {
 }
 
 function calendar(id) {
-    var response = UrlFetchApp.fetch('https://www.googleapis.com/calendar/v3/calendars/' + id + '/events?key=' + key);
-    //Logger.log(response);
+    //var response = UrlFetchApp.fetch('https://www.googleapis.com/calendar/v3/calendars/'+ id +'/events?key='+ key );
+    var optionalArgs = {
+    timeMin: (new Date()).toISOString(),
+    showDeleted: false,
+    singleEvents: true,
+    maxResults: 20,
+    orderBy: 'startTime'
+  };
+      var response = Calendar.Events.list(id,optionalArgs);
+  
+    //Logger.log(test);
     if (!response) {
         originalData("Google Calendar: failed to fetch data!");
     } else {
-        var events = JSON.parse(response.getContentText()).items;
-        var date = new Date().toISOString();
-        //Logger.log(events);
-        for (var i = 0; i < events.length; i++) {
-            Logger.log(events.length);
-            if (events[i].status == "confirmed" && events[i].start.dateTime >= getDateStr(0) && events[i].start.dateTime <= getDateStr(1)) {
-
-                var tmp;
-                var summary = events[i].summary;
-                var description = events[i].description;
-                var location = events[i].location;
-                var start = events[i].start.dateTime.replace(":00+08:00", "").replace("T", " ").replace("2020-", "");
-                var end = events[i].end.dateTime.replace(":00+08:00", "").replace("T", " ").replace("2020-", "");
-                if (description && location) tmp = summary + '\n' + description + '@' + location + '\n' + start + ' - ' + end + '\n\n';
-                else if (description) tmp = summary + '\n' + description + '\n' + start + ' - ' + end + '\n\b';
-                else if (location) tmp = summary + '\n' + location + '\n' + start + ' - ' + end + '\n\n';
-                else tmp = summary + '\n' + start + ' - ' + end + '\n\n';
-                //Logger.log(tmp);
-                notif += tmp;
-            }
+      var today = (new Date()).toISOString();
+      //var events = JSON.parse(response.getContentText()).items;
+      var events = JSON.parse(response).items;
+      var date = new Date().toISOString();
+      //Logger.log(events);
+      for(var i=0; i< events.length;i++)
+      {          
+        //Logger.log(events.length);
+        if(events[i].status == "confirmed"&& events[i].start.dateTime >= getDateStr(0) && events[i].start.dateTime <= getDateStr(1)){
+          
+          Logger.log(events[i]);
+          var tmp;
+          var summary = events[i].summary;
+          var description = events[i].description;
+          var location = events[i].location;
+          var start = events[i].start.dateTime.replace(":00+08:00","").replace("T"," ").replace("2020-","");
+          var end = events[i].end.dateTime.replace(":00+08:00","").replace("T"," ").replace("2020-","");
+          if(description && location) tmp = summary + '\n'+description+ '@'+location+ '\n'+ start+' - '+ end +'\n\n';
+          else if(description) tmp = summary + '\n'+description+ '\n'+ start+' - '+ end+'\n\b';
+          else if(location) tmp = summary + '\n'+location+ '\n'+ start+' - '+ end+'\n\n';
+          else tmp = summary + '\n'+ start+' - '+ end+'\n\n';
+          //Logger.log(tmp);
+          notif+= tmp;
         }
-        //originalData(notif)
-        //if(notif != "\*Calendar*") originalData(notif);
+      }
+      //originalData(notif)
+      //if(notif != "\*Calendar*") originalData(notif);
 
     }
 }
-function notification() {
-    if (notif != "\*Calendar*\n") originalData(notif);
-    else originalData("\*Calendar*\nNothing to plan today!")
+function notification(){
+  if(notif != "\*Calendar*\n") originalData(notif);
+  else originalData("\*Calendar*\nNothing to plan today!")
 }
