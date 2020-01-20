@@ -169,7 +169,7 @@ TG频道:@meetashare
 
 
 
-const address = "&location=30.4468603,114.8806895";
+const address = "&location=填经纬度";
 const k = "&key=faead3de5f42420098c8132b3924cd09";
 
 const wea = "https://free-api.heweather.net/s6/weather/now?"+address+k;
