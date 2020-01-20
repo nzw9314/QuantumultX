@@ -1,6 +1,10 @@
 /*
-参考chavyleung大佬的写法
+参考chavyleung和NobyDa的写法
 
+打开elem APP,进入签到页面，提示获取用户ID成功就可以把rewrite注释掉。只需要获取一次用户ID即可。
+  理论上永不会过期。
+  
+  
 //饿了么
 
 > 代码已同时兼容 Surge & QuanX, 使用同一份签到脚本即可
@@ -51,15 +55,35 @@ h5.ele.me
 > 第 2 条脚本是签到脚本, 每天`00:05:00`执行一次.
 */
 
-const cookieName = '饿了么'
-const cookieKey = 'cookie_elem'
+
+
+const CookieName = '饿了么'
+const CookieKey = 'cookie_elem'
 const sy = init()
-const cookieVal = $response.body;
-sy.log('${cookieVal}')
-if (cookieVal) {
-  if (sy.setdata(cookieVal, cookieKey)) {
-    sy.msg(`${cookieName}`, '获取Cookie: 成功', '')
-    sy.log(`[${cookieName}] 获取Cookie: 成功, cookie: ${cookieVal}`)
+GetCookie();
+
+function GetCookie() {
+  if ($response.body) {
+    var CookieValue = $response.body;
+    if (sy.getdata(CookieKey) != (undefined || null)) {
+      if (sy.getdata(CookieKey) != CookieValue) {
+        var cookie = sy.setdata(CookieValue, CookieKey);
+        if (!cookie) {
+          sy.msg("更新" + CookieName + "UserID失败‼️", "", "");
+        } else {
+          sy.msg("更新" + CookieName + "UserID成功 🎉", "", "");
+        }
+      }
+    } else {
+      var cookie = sy.setdata(CookieValue, CookieKey);
+      if (!cookie) {
+        sy.msg("首次写入" + CookieName + "UserID失败‼️", "", "");
+      } else {
+        sy.msg("首次写入" + CookieName + "UserID成功 🎉", "", "");
+      }
+    }
+  } else {
+    sy.msg("写入" + CookieName + "UserID失败‼️", "", "配置错误, 无法读取响应体, ");
   }
 }
 function init() {
