@@ -29,10 +29,9 @@ cron "0 5 0 * * *" script-path=https://raw.githubusercontent.com/nzw9314/Quantum
 h5.ele.me
 
 [rewrite_local]
-# 189及以前版本
+
 ^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user url script-response-body elemGetCookies.js
-# 190及以后版本
-^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user url script-response-body elemGetCookies.js
+
 
 
 
