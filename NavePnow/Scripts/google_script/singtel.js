@@ -93,7 +93,9 @@ function singtel() {
         Logger.log(local_calls)
         Logger.log(local_sms)
         Logger.log(idd_calls)
-        var info_text = "\*Singtel* 90508390\n" + balance + " " + expiry + " \nLOCAL DATA: " + local_data + "\nLOCAL CALLS: " + local_calls + "\nLOCAL SMS: " + local_sms + "\nIDD CALLS: " + idd_calls;
+        var info_text;
+        if(idd_calls) info_text= "\*Singtel* 90508390\n" + balance + " " + expiry + " \nLOCAL DATA: " + local_data + "\nLOCAL CALLS: " + local_calls + "\nLOCAL SMS: " + local_sms + "\nIDD CALLS: " + idd_calls;
+        else info_text= "\*Singtel* 90508390\n" + balance + " " + expiry + " \nLOCAL DATA: " + local_data + "\nLOCAL CALLS: " + local_calls + "\nLOCAL SMS: " + local_sms;
         originalData(info_text);
 
     }
