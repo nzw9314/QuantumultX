@@ -248,7 +248,7 @@ let getCookie = () => {
     var isValidRequest = request && request.headers && request.headers.Cookie
     if (isValidRequest) {
         let headers = request.headers;
-        console.log(`【Cookie触发】${headers.Host}-${headers.Cookie}`)
+        // console.log(`【Cookie触发】${headers.Host}-${headers.Cookie}`)
         //#region 百度贴吧-H5
         if (headers.Host == config.baidu_tieba_h5.Host) {
             var regex = /(^|)BDUSS=([^;]*)(;|$)/;
@@ -458,6 +458,11 @@ let execute = () => {
                 check: {
                     url: `https://h5.ele.me/restapi/member/v1/users/`,
                     method: 'GET',
+                },
+                prize: {
+                    url: `https://h5.ele.me/restapi/member/v2/users/`,
+                    method: 'POST',
+                    body: ''
                 }
             },
             data: {
@@ -874,7 +879,7 @@ let execute = () => {
             config.eleme.provider.check.url += `${eleUserId}/sign_in/info`;
             $task.fetch(config.eleme.provider.check).then(resp => {
                 let result = JSON.parse(resp.body);
-                record(`${config.eleme.provider.check.url}---${JSON.stringify(resp.body)}`);
+                // record(`${config.eleme.provider.check.url}---${JSON.stringify(resp.body)}`);
                 if (result.has_signed_in_today) {
                     config.eleme.data.notify = `[${config.eleme.name}] 今日已签到🎉`;
                     finalNotify("eleme");
