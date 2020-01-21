@@ -6,7 +6,7 @@
 >
 > 原有的all_in_cookie和all_in_sign合并了起来,并且删除掉他们,请各位老客重新配置一下
 
-<img src="assets/image-20200116103533642.png" alt="image-20200116103533642" style="zoom:50%;" />
+<img src="assets/all_in_one.jpg" style="zoom:60%;" />
 
 **支持列表**
 
@@ -68,7 +68,7 @@ const global = {
 
 此处需要获取Cookie时直接使用即可
 
-使用完注释掉或者直接放着都行，没什么大影响
+使用完注释掉或者直接放着都行，没什么大影响，但是饿了么的最好注释掉,好像会影响部分饿了么接口的加载
 
 ```
 [mitm]
@@ -98,7 +98,7 @@ https:\/\/www\.52pojie\.cn\/home\.php\?mod=space url script-request-header all_i
 # 此处用于V2EX cookie获取，浏览器打开https://www.v2ex.com/mission/daily ，待弹出获取成功即可
 ^https:\/\/www\.v2ex\.com\/mission\/daily url script-request-header all_in_one.js
 # 饿了么Cookie获取, 打开APP,点击我的,点击左上角的签到,进入页面即可
-^https:\/\/h5\.ele\.me\/restapi\/memeber\/v1\/users url script-request-header all_in_one.js
+^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user url script-request-header all_in_one.js
 
 ```
 

@@ -854,38 +854,64 @@ let execute = () => {
             finalNotify("eleme");
             return;
         }
-        var eleUserId = cookieVal;
-        config.eleme.provider.sign.url += `${eleUserId}/sign_in`;
-        $task.fetch(config.eleme.provider.sign).then(response => {
-            if (response.statusCode == 200) {
-                config.eleme.data.notify = `[${config.eleme.name}] 签到成功🎉`;
+        let eleUserId = cookieVal;
+
+        let sign = () => {
+            config.eleme.provider.sign.url += `${eleUserId}/sign_in`;
+            $task.fetch(config.eleme.provider.sign).then(response => {
+                if (response.statusCode == 200) {
+                    prize();
+                } else {
+                    check();
+                }
+            }, reason => {
+                config.eleme.data.notify = `[${config.eleme.name}] 签到失败！网络请求异常⚠️`;
+                finalNotify("eleme");
+                record(`${config.eleme.data.notify} : ${reason.error}`);
+            })
+        }
+        let check = () => {
+            config.eleme.provider.check.url += `${eleUserId}/sign_in/info`;
+            $task.fetch(config.eleme.provider.check).then(resp => {
+                let result = JSON.parse(resp.body);
+                record(`${config.eleme.provider.check.url}---${JSON.stringify(resp.body)}`);
+                if (result.has_signed_in_today) {
+                    config.eleme.data.notify = `[${config.eleme.name}] 今日已签到🎉`;
+                    finalNotify("eleme");
+                    record(config.eleme.data.notify);
+                } else {
+                    config.eleme.data.notify = `[${config.eleme.name}] 签到失败`;
+                    finalNotify("eleme");
+                    record(config.eleme.data.notify);
+                }
+            }, err => {
+                config.eleme.data.notify = `[${config.eleme.name}] 网络请求异常⚠️`;
+                finalNotify("eleme");
+                record(`${config.eleme.data.notify} : ${err.error}`);
+            })
+        }
+        let prize = () => {
+            config.eleme.data.notify = `[${config.eleme.name}] 签到成功🎉`;
+            config.eleme.provider.prize.url += `${eleUserId}/sign_in/deily/prize`;
+            $task.fetch(config.eleme.provider.prize).then(resp => {
+                let result = JSON.parse(resp.body);
+                if (result.message) {
+                    //此时是已经领取过奖励了,不处理
+                } else if (result.length > 0) {
+                    let selectedOne = result.filter(it => it.status == 1);
+                    if (selectedOne.length >= 1 && selectedOne[0].prizes) {
+                        let reward = `${selectedOne[0].prizes.name}${selectedOne[0].prizes.amount}元`
+                        config.eleme.data.notify += ` 翻牌:${reward}`;
+                    }
+                }
                 record(config.eleme.data.notify);
                 finalNotify("eleme");
-            } else {
-                config.eleme.provider.check.url += `${eleUserId}/sign_in/info`;
-                $task.fetch(config.eleme.provider.check).then(resp => {
-                    let result = JSON.parse(resp.body);
-                    record(`${config.eleme.provider.check.url}---${JSON.stringify(resp.body)}`);
-                    if (result.has_signed_in_today) {
-                        config.eleme.data.notify = `[${config.eleme.name}] 今日已签到🎉`;
-                        finalNotify("eleme");
-                        record(config.eleme.data.notify);
-                    } else {
-                        config.eleme.data.notify = `[${config.eleme.name}] 签到失败`;
-                        finalNotify("eleme");
-                        record(config.eleme.data.notify);
-                    }
-                }, err => {
-                    config.eleme.data.notify = `[${config.eleme.name}] 网络请求异常⚠️`;
-                    finalNotify("eleme");
-                    record(`${config.eleme.data.notify} : ${err.error}`);
-                })
-            }
-        }, reason => {
-            config.eleme.data.notify = `[${config.eleme.name}] 签到失败！网络请求异常⚠️`;
-            finalNotify("eleme");
-            record(`${config.eleme.data.notify} : ${reason.error}`);
-        })
+            }, err => {
+                record(`${config.eleme.data.notify},翻牌失败-${err.error}`);
+                finalNotify("eleme");
+            })
+        }
+        sign();
     }
 
     //#endregion

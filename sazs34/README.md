@@ -1,7 +1,7 @@
 # TaskConfig
 > QuantumultX专用的任务执行，作者没有Surge因此无法进行适配，请谅解…
 
-`文中所有获取Cookie的脚本都无需禁用，仅会在cookie变化的时候触发`
+`推荐mitm用完后注释掉,不要常开吧`
 
 ## Surge/QuantumultX兼容脚本
 
