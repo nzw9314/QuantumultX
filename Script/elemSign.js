@@ -80,7 +80,7 @@ function sign() {
       subTitle = '签到结果: 成功'
       // else subTitle = '签到结果: 成功 (重复签到)'
       // detail = `人人钻: ${result.data.userinfo.point}, 登录天数: ${result.data.usercount.cont_login} -> ${result.data.upgrade_day}`
-      // sy.msg(title, subTitle, detail)
+     sy.msg(title, subTitle, detail)
     } else if(response == 400) {
       subTitle = '签到结果: 重复'
       sy.msg(title, subTitle, detail)
