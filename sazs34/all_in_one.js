@@ -6,15 +6,10 @@ const global = {
         _52pojie: true,
         netease_music: true,
         v2ex: true,
-        weibo_super: false,
-        china_telecom: true
+        china_telecom: true,
+        eleme: true
     },
     data: {
-        weibo_super: [
-            ["周杰伦", "1008087a8941058aaf4df5147042ce104568da"],
-            // ["IU", "100808d4151ccebfbae55e8f7c0f68f6d18e4d"],
-            // ["SWITCH", "1008084239f063a3d4fb9d38a0182be6e39e76"],
-        ],
         china_telecom: "" //此处输入要签到的手机号码,半角双引号中间
     }
 }
@@ -162,15 +157,16 @@ if (isSurge) {
 
 //#endregion
 
-if (typeof $request != "undefined") {
-    getCookie();
-    $done({});
-} else {
-    execute();
-    $done({});
+let master = () => {
+    if (typeof $request != "undefined") {
+        getCookie();
+    } else {
+        execute();
+        $done({});
+    }
 }
 
-function getCookie() {
+let getCookie = () => {
     //#region 基础配置
     const config = {
         baidu_tieba_h5: {
@@ -208,15 +204,15 @@ function getCookie() {
             name: '京东Cookie',
             Host: 'api.m.jd.com'
         },
-        weibo_super: {
-            cookie: 'super_cookie',
-            name: '微博超话',
-            Host: 'weibo.com'
-        },
         china_telecom: {
             cookie: 'cookie.10000',
             name: '电信营业厅',
             Host: 'wapside.189.cn'
+        },
+        eleme: {
+            cookie: "CookieELM",
+            name: '饿了么Cookie',
+            Host: 'ele.me'
         }
     }
     //#endregion
@@ -252,7 +248,7 @@ function getCookie() {
     var isValidRequest = request && request.headers && request.headers.Cookie
     if (isValidRequest) {
         let headers = request.headers;
-        // console.log(`【Cookie触发】${headers.Host}`)
+        console.log(`【Cookie触发】${headers.Host}-${headers.Cookie}`)
         //#region 百度贴吧-H5
         if (headers.Host == config.baidu_tieba_h5.Host) {
             var regex = /(^|)BDUSS=([^;]*)(;|$)/;
@@ -308,16 +304,17 @@ function getCookie() {
             updateCookie(config.jd, headerCookie);
         }
         //#endregion
-        //#region 微博超话
-        if (headers.Host.indexOf(config.weibo_super.Host) >= 0) {
-            var headerCookie = headers.Cookie;
-            updateCookie(config.weibo_super, headerCookie);
-        }
-        //#endregion
         //#region 中国电信
         if (headers.Host.indexOf(config.china_telecom.Host) >= 0) {
             var headerCookie = headers.Cookie;
             updateCookie(config.china_telecom, headerCookie);
+        }
+        //#endregion
+        //#region 饿了么
+        if (headers.Host.indexOf(config.eleme.Host) >= 0) {
+            var headerCookie = headers.Cookie;
+            var cookieVal = helper.getCookieByName(headerCookie, "USERID");
+            updateCookie(config.eleme, cookieVal);
         }
         //#endregion
     }
@@ -325,7 +322,7 @@ function getCookie() {
 
 }
 
-function execute() {
+let execute = () => {
     //#region 签到配置,请勿修改
     const config = {
         baidu_tieba: {
@@ -428,20 +425,6 @@ function execute() {
                 notify: ''
             }
         },
-        weibo_super: {
-            cookie: 'super_cookie',
-            name: '微博超话',
-            provider: {
-                url: '',
-                headers: {
-                    Cookie: ''
-                }
-            },
-            data: {
-                notify: '',
-                result: []
-            }
-        },
         china_telecom: {
             cookie: 'cookie.10000',
             name: '中国电信',
@@ -459,6 +442,23 @@ function execute() {
                 body: JSON.stringify({
                     phone: global.data.china_telecom
                 })
+            },
+            data: {
+                notify: ''
+            }
+        },
+        eleme: {
+            cookie: 'CookieELM',
+            name: '饿了么',
+            provider: {
+                sign: {
+                    url: `https://h5.ele.me/restapi/member/v2/users/`,
+                    method: 'POST',
+                },
+                check: {
+                    url: `https://h5.ele.me/restapi/member/v1/users/`,
+                    method: 'GET',
+                }
             },
             data: {
                 notify: ''
@@ -797,87 +797,6 @@ function execute() {
 
     //#endregion
 
-    //#region 微博超话
-    let sign_weibo_super = () => {
-        if (!global.sign.weibo_super) {
-            record(`[${config.weibo_super.name}]未开启签到`);
-            return;
-        }
-        if (global.data.weibo_super.length <= 0) {
-            config.weibo_super.data.notify = `[${config.weibo_super.name}] 未配置超话ID`;
-            record(config.weibo_super.data.notify);
-            finalNotify("weibo_super");
-            return;
-        }
-        let cookieVal = $prefs.valueForKey(config.weibo_super.cookie);
-        if (!cookieVal) {
-            config.weibo_super.data.notify = `[${config.weibo_super.name}] 未获取到Cookie⚠️`;
-            record(`${config.weibo_super.data.notify}, 请在文件最上方的glabal-data-weibo_super中配置相应ID, 前往https://nave.work/%E5%BE%AE%E5%8D%9A%E8%B6%85%E8%AF%9D%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC.html 进行查看具体教程`);
-            finalNotify("weibo_super");
-            return;
-        }
-        let sign = index => {
-            if (global.data.weibo_super.length <= index) {
-                combain();
-                finalNotify('weibo_super');
-            }
-            let name = global.data.weibo_super[index][0];
-            let super_id = global.data.weibo_super[index][1];
-            config.weibo_super.provider.url = `https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=${super_id}&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=MacIntel&ua=Mozilla/5.0%20(Macintosh;%20Intel%20Mac%20OS%20X%2010_15)%20AppleWebKit/605.1.15%20(KHTML,%20like%20Gecko)%20Version/13.0.4%20Safari/605.1.15&screen=375*812&__rnd=1576850070506`
-            config.weibo_super.provider.headers.Cookie = cookieVal;
-            let result = {
-                name,
-                success: true,
-                icon: '🎉'
-            };
-            $task.fetch(config.weibo_super.provider).then(response => {
-                var obj = {};
-                try {
-                    obj = JSON.parse(response.body);
-                    var code = obj.code;
-                    var msg = obj.msg;
-                    if (code == 100003) { // 行为异常，需要重新验证
-                        result.success = false;
-                        result.icon = '⚠️';
-                        config.weibo_super.data.result.push(result);
-                        record(`[${config.weibo_super.name}] ${name}  ${msg}, ${obj.data.location}`);
-                    } else if (code == 100000) {
-                        config.weibo_super.data.result.push(result)
-                        record(`[${config.weibo_super.name}] ${name} 签到成功🎉`);
-                    } else if (code == 382004) {
-                        config.weibo_super.data.result.push(result)
-                        record(`[${config.weibo_super.name}] ${name} ${msg.replace("(382004)", "")}🎉`);
-                    } else {
-                        result.success = false;
-                        result.icon = '❕';
-                        config.weibo_super.data.result.push(result);
-                        record(`[${config.weibo_super.name}] ${name} ${msg}❕`);
-                    }
-                } catch (e) {
-                    result.success = false;
-                    result.icon = '⚠️';
-                    config.weibo_super.data.result.push(result);
-                    record(`[${config.weibo_super.name}] ${name} 出错⚠️`);
-                }
-                sign(++index);
-            }, reason => {
-                result.success = false;
-                result.icon = '❌';
-                config.weibo_super.data.result.push(result);
-                record(`[${config.weibo_super.name}] ${name} 签到错误,${reason.error}`);
-                sign(++index);
-            });
-        }
-        let combain = () => {
-            config.weibo_super.data.notify = `[${config.weibo_super.name}]`;
-            for (item of config.weibo_super.data.result) {
-                config.weibo_super.data.notify += ` 「${item.name}」${item.icon}`;
-            }
-        }
-        sign(0);
-    }
-    //#endregion
-
     //#region 中国电信营业厅
     let sign_china_telecom = () => {
         if (!global.sign.china_telecom) {
@@ -921,6 +840,56 @@ function execute() {
     }
     //#endregion
 
+    //#region 饿了么
+
+    let sign_eleme = () => {
+        if (!global.sign.eleme) {
+            record(`[${config.eleme.name}] 未开启签到`);
+            return;
+        }
+        let cookieVal = $prefs.valueForKey(config.eleme.cookie);
+        if (!cookieVal) {
+            config.eleme.data.notify = `[${config.eleme.name}] 未获取到Cookie⚠️`;
+            record(config.eleme.data.notify);
+            finalNotify("eleme");
+            return;
+        }
+        var eleUserId = cookieVal;
+        config.eleme.provider.sign.url += `${eleUserId}/sign_in`;
+        $task.fetch(config.eleme.provider.sign).then(response => {
+            if (response.statusCode == 200) {
+                config.eleme.data.notify = `[${config.eleme.name}] 签到成功🎉`;
+                record(config.eleme.data.notify);
+                finalNotify("eleme");
+            } else {
+                config.eleme.provider.check.url += `${eleUserId}/sign_in/info`;
+                $task.fetch(config.eleme.provider.check).then(resp => {
+                    let result = JSON.parse(resp.body);
+                    record(`${config.eleme.provider.check.url}---${JSON.stringify(resp.body)}`);
+                    if (result.has_signed_in_today) {
+                        config.eleme.data.notify = `[${config.eleme.name}] 今日已签到🎉`;
+                        finalNotify("eleme");
+                        record(config.eleme.data.notify);
+                    } else {
+                        config.eleme.data.notify = `[${config.eleme.name}] 签到失败`;
+                        finalNotify("eleme");
+                        record(config.eleme.data.notify);
+                    }
+                }, err => {
+                    config.eleme.data.notify = `[${config.eleme.name}] 网络请求异常⚠️`;
+                    finalNotify("eleme");
+                    record(`${config.eleme.data.notify} : ${err.error}`);
+                })
+            }
+        }, reason => {
+            config.eleme.data.notify = `[${config.eleme.name}] 签到失败！网络请求异常⚠️`;
+            finalNotify("eleme");
+            record(`${config.eleme.data.notify} : ${reason.error}`);
+        })
+    }
+
+    //#endregion
+
     //#endregion
 
     //#region 签到统一管控
@@ -930,8 +899,8 @@ function execute() {
         if (global.sign.netease_music) sign_netease_music();
         if (global.sign._52pojie) sign_52pojie();
         if (global.sign.v2ex) sign_v2ex();
-        if (global.sign.weibo_super) sign_weibo_super();
         if (global.sign.china_telecom) sign_china_telecom();
+        if (global.sign.eleme) sign_eleme();
     }
 
     let finalNotify = type => {
@@ -973,3 +942,16 @@ ${content.splice(0, 60)}`);
 
     startSign();
 }
+
+let helper = {
+    getCookieByName: (cookie, name) => {
+        var reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        var arr = cookie.match(reg);
+        if (arr && arr.length >= 3)
+            return arr[2];
+        else
+            return null;
+    }
+}
+
+master();

@@ -10,15 +10,15 @@
 
 **支持列表**
 
-|    名称    | Cookie |                             签到                             |                       感谢                        |     说明     |
-| :--------: | :----: | :----------------------------------------------------------: | :-----------------------------------------------: | :----------: |
-|  百度贴吧  |   ✅    |                              ✅                               |                      我自己                       |              |
-| 电信营业厅 |   ✅    |                              ✅                               |                      我自己                       |              |
-| 网易云音乐 |   ✅    |                              ✅                               |   [@chavyleung](https://github.com/chavyleung)    |              |
-|    京东    |   ✅    | [获取](https://github.com/NobyDa/Script/blob/master/JD-DailyBonus/JD_DailyBonus.js) |       [@NobyDa](https://github.com/NobyDa)        | cookie同原版 |
-|  吾爱破解  |   ✅    |                              ✅                               |       [@NobyDa](https://github.com/NobyDa)        | cookie同原版 |
-|  微博超话  |   ✅    |                              ✅                               | [@NavePnow](https://github.com/NavePnow/Profiles) | cookie同原版 |
-| 爱奇艺VIP  |   ✅    |                              ✅                               |       [@NobyDa](https://github.com/NobyDa)        | cookie同原版 |
+|    名称    | Cookie |                             签到                             |                     感谢                     |     说明     |
+| :--------: | :----: | :----------------------------------------------------------: | :------------------------------------------: | :----------: |
+|  百度贴吧  |   ✅    |                              ✅                               |                    我自己                    |              |
+| 电信营业厅 |   ✅    |                              ✅                               |                    我自己                    |              |
+| 网易云音乐 |   ✅    |                              ✅                               | [@chavyleung](https://github.com/chavyleung) |              |
+|    京东    |   ✅    | [获取](https://github.com/NobyDa/Script/blob/master/JD-DailyBonus/JD_DailyBonus.js) |     [@NobyDa](https://github.com/NobyDa)     | cookie同原版 |
+|  吾爱破解  |   ✅    |                              ✅                               |     [@NobyDa](https://github.com/NobyDa)     | cookie同原版 |
+| 爱奇艺VIP  |   ✅    |                              ✅                               |     [@NobyDa](https://github.com/NobyDa)     | cookie同原版 |
+|   饿了么   |   ✅    |                              ✅                               |                    我自己                    |              |
 
 脚本地址:
 
@@ -39,14 +39,10 @@ const global = {
         netease_music: true,
         v2ex: true,
         weibo_super: true,
-        china_telecom: true
+        china_telecom: true,
+        eleme: true
     },
     data: {
-        weibo_super: [
-            ["周杰伦", "1008087a8941058aaf4df5147042ce104568da"],
-            // ["IU", "100808d4151ccebfbae55e8f7c0f68f6d18e4d"],
-            // ["SWITCH", "1008084239f063a3d4fb9d38a0182be6e39e76"],
-        ],
         //此处输入要签到的手机号码
         china_telecom: '18851889188'//替换手机号部分即可
     }
@@ -61,11 +57,10 @@ const global = {
 
 **额外参数说明**
 
-|     节点      |                             说明                             |
-| :-----------: | :----------------------------------------------------------: |
-|  weibo_super  | [微博超话名字及编号](https://nave.work/%E5%BE%AE%E5%8D%9A%E8%B6%85%E8%AF%9D%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC.html) |
-| china_telecom |    如果要签到电信营业厅,需填写获取cookie时对应的手机号码     |
-|               |                                                              |
+|     节点      |                         说明                          |
+| :-----------: | :---------------------------------------------------: |
+| china_telecom | 如果要签到电信营业厅,需填写获取cookie时对应的手机号码 |
+|               |                                                       |
 
 ## Quantumult配置说明
 
@@ -78,7 +73,7 @@ const global = {
 ```
 [mitm]
 # cookie获取专用,仅获取cookie时使用
-hostname = tieba.baidu.com, c.tieba.baidu.com, music.163.com, passport.iqiyi.com, www.52pojie.cn, *.v2ex.com, weibo.com, wapside.189.cn
+hostname = tieba.baidu.com, c.tieba.baidu.com, music.163.com, passport.iqiyi.com, www.52pojie.cn, *.v2ex.com, weibo.com, wapside.189.cn, h5.ele.me
 ```
 ### REWRITE
 
@@ -102,10 +97,8 @@ https:\/\/passport\.iqiyi\.com\/apis\/user\/info\.action.*authcookie url script-
 https:\/\/www\.52pojie\.cn\/home\.php\?mod=space url script-request-header all_in_one.js
 # 此处用于V2EX cookie获取，浏览器打开https://www.v2ex.com/mission/daily ，待弹出获取成功即可
 ^https:\/\/www\.v2ex\.com\/mission\/daily url script-request-header all_in_one.js
-# 此处用于微博超话 cookie获取,打开超话页,点击'签到'或'已签到',用完后可以注释掉
-;https:\/\/weibo\.com\/p\/aj\/general\/button\?ajwvr=6&api=http:\/\/i\.huati\.weibo\.com\/aj\/super\/checkin url script-request-header all_in_one.js
-# 此处用于强制手机浏览器访问电脑端超话页面,用完后可以注释掉
-;^https?://weibo\.com/p/[0-9] url request-header (\r\n)User-Agent:.+(\r\n) request-header $1User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.2 Safari/605.1.15
+# 饿了么Cookie获取, 打开APP,点击我的,点击左上角的签到,进入页面即可
+^https:\/\/h5\.ele\.me\/restapi\/memeber\/v1\/users url script-request-header all_in_one.js
 
 ```
 
@@ -118,13 +111,13 @@ https:\/\/www\.52pojie\.cn\/home\.php\?mod=space url script-request-header all_i
 
 ## 触发Cookie方式
 
-|                             名称                             |  方式  |                            说明                            |
-| :----------------------------------------------------------: | :----: | :--------------------------------------------------------: |
-|                           百度贴吧                           | 浏览器 |             https://tieba.baidu.com/index.html             |
-|                           百度贴吧                           |  APP   |                   进入APP,点击"我的"即可                   |
-|                          电信营业厅                          |  APP   |               进入APP,点击"我",签到即可获取                |
-|                            网易云                            | 浏览器 |               https://music.163.com/m/login                |
-|                            爱奇艺                            |  APP   |                   进入APP,点击"我的"即可                   |
-|                           吾爱破解                           | 浏览器 |         https://www.52pojie.cn/home.php?mod=space          |
-|                             V2EX                             | 浏览器 |             https://www.v2ex.com/mission/daily             |
-| [微博超话](https://nave.work/%E5%BE%AE%E5%8D%9A%E8%B6%85%E8%AF%9D%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC.html) | 浏览器 | https://weibo.com/p/1008080c5fb650788fe5c7577f0b6ec4a34038 |
+|    名称    |  方式  |                     说明                      |
+| :--------: | :----: | :-------------------------------------------: |
+|  百度贴吧  | 浏览器 |      https://tieba.baidu.com/index.html       |
+|  百度贴吧  |  APP   |            进入APP,点击"我的"即可             |
+| 电信营业厅 |  APP   |         进入APP,点击"我",签到即可获取         |
+|   网易云   | 浏览器 |         https://music.163.com/m/login         |
+|   爱奇艺   |  APP   |            进入APP,点击"我的"即可             |
+|  吾爱破解  | 浏览器 |   https://www.52pojie.cn/home.php?mod=space   |
+|    V2EX    | 浏览器 |      https://www.v2ex.com/mission/daily       |
+|   饿了么   |  APP   | 打开APP,点击"我的",点击左上角签到进入页面即可 |
