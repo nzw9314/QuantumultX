@@ -897,7 +897,7 @@ let execute = () => {
         }
         let prize = () => {
             config.eleme.data.notify = `[${config.eleme.name}] 签到成功🎉`;
-            config.eleme.provider.prize.url += `${eleUserId}/sign_in/deily/prize`;
+            config.eleme.provider.prize.url += `${eleUserId}/sign_in/daily/prize`;
             $task.fetch(config.eleme.provider.prize).then(resp => {
                 let result = JSON.parse(resp.body);
                 if (result.message) {
