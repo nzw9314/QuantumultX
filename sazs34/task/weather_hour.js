@@ -3,18 +3,18 @@
 https://github.com/sazs34/TaskConfig/blob/master/assets/weather_pro.md
  */
 let config = {
-    darksky_api: "填这里", //从https://darksky.net/dev/ 上申请key填入即可
-    aqicn_api: "填这里", //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
-    huweather_apiKey: "填这里", //和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取
-    lat_lon: "填这里", //请填写经纬度,直接从谷歌地图中获取即可
+    darksky_api: "key填这里", //从https://darksky.net/dev/ 上申请key填入即可
+    aqicn_api: "key填这里", //从http://aqicn.org/data-platform/token/#/ 上申请key填入即可
+    huweather_apiKey: "key填这里", //和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取(注意key类型选WebApi)
+    lat_lon: "经纬度填这里", //请填写经纬度,直接从谷歌地图中获取即可
     lang: "zh", //语言,随意切换为您想要的语言哦(zh/zh-tw/ja/en/fr/...)
     log: 2, //调试日志,0为不开启,1为开启,2为开启精简日志
     timeout: 0, //超时时间,单位毫秒(1000毫秒=1秒),一般不推荐修改[为0则不限制超时时间]
     show: {
         template: {
-            title: `$[city] • $[summary]`,
-    subtitle: ``,
-    detail: `$[hourly($[month]/$[day] - $[hour]:00 •  $[weather] | $[apparentTemperatureMin]~$[apparentTemperatureMax]°C • 🌧️$[precipProbability])]`
+            title: `$[city] • 未来48小时天气`,
+    subtitle: `$[weeklySummary]`,
+    detail: `$[hourly($[month]/$[day]  -  $[hour]:00  •  $[weatherIcon]$[weather] | $[apparentTemperatureMin]~$[apparentTemperatureMax]°C)]`
 },
         lifestyle: { //此处用于显示各项生活指数，可自行调整顺序，顺序越在前面则显示也会靠前，如果您不想查看某一指数，置为false即可，想看置为true即可
             drsg: true, //穿衣指数,
