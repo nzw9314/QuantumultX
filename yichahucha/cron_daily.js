@@ -157,8 +157,8 @@ $httpClient.get('https://dict.youdao.com/infoline/style/cardList?mode=publish&cl
     let obj = JSON.parse(data);
     let date = new Date();
     let isAM = date.getHours() < 12 ? true : false
-    let title = '每日' + (isAM ? ' in' : ' 壹句') + (isAM ? ' ☀️' : ' 🌙');
-            let subtitle = '';
+    let title = '每日' + (isAM ? ' 壹句' : ' 壹句') + (isAM ? ' ☀️' : ' 🌙');
+    let subtitle = '';
     let content = 'dingtalk://dingtalkclient/page/link?url=https://attend.dingtalk.com/attend/index.html';
     if (!error) {
         if (obj && obj.length > 1) {
