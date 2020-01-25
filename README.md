@@ -39,7 +39,7 @@ https://github.com/nzw9314/QuantumultX.git
 ①.https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy.conf
 (本地脚本订阅)
 
-②.https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy_Cookie.conf
+②.https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_Local_WorkingCopy_Cookie.conf
 (Cookie获取订阅。Cookie失效时启用，成功后禁用)
 
 4⃣️Js_local_WorkingCopy.conf包括
