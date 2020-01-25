@@ -36,7 +36,8 @@ https://github.com/nzw9314/QuantumultX.git
 (挂载教程: https://www.notion.so/iCloud-Github-948f19e65e1a47b3b468451491a3f34b)
 
 3⃣️订阅我的[rewrite_remote]
-①.https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy.conf(本地脚本订阅)
+①.https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy.conf
+(本地脚本订阅)
 
 ②.https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy_Cookie.conf
 (Cookie获取订阅。Cookie失效时启用，成功后禁用)
