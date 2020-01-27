@@ -13,18 +13,13 @@
 ②.Js_local_WorkingCopy_Cookie.conf
 (Cookie获取订阅。Cookie失效时启用，成功后禁用)
 
-
-
 ⚠️QX 1.05之前的请使用以下订阅:
 
-(1.00-1.03)使用Js.conf(远程订阅脚本)
+Js.conf(远程订阅脚本)
 
-Js_local_WorkingCopy_1.04.conf (本地订阅脚本)
 
-1.全局配置 
-QuantumultX.conf
 
-2.脚本本地化配置:
+1.脚本本地化配置:
 
 1⃣️在本地建立文件夹
 目录 iCloud Drive/QuantumultX/Script/nzw9314
@@ -53,7 +48,7 @@ https://github.com/nzw9314/QuantumultX.git
 
 需要其他的脚本请自行添加路径;
 
-3.WorkingCopy同步更新脚本库包括:
+2.WorkingCopy同步更新脚本库包括:
 ① NobyDa,
 ② langkhach270389,
 ③ Choler,
@@ -64,7 +59,7 @@ https://github.com/nzw9314/QuantumultX.git
 ⑧ Meeta
 ⑨ TG群组(NobyDa Script)个人收集搬运及修改脚本
 
-4.定时脚本task_local.conf
+3.定时脚本task_local.conf
 
 QX目前无法订阅task
 
