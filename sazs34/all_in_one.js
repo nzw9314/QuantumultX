@@ -865,7 +865,10 @@ let execute = () => {
             config.eleme.provider.sign.url += `${eleUserId}/sign_in`;
             $task.fetch(config.eleme.provider.sign).then(response => {
                 if (response.statusCode == 200) {
-                    prize();
+                    config.eleme.data.notify = `[${config.eleme.name}] 签到成功🎉`;
+                    record(config.eleme.data.notify);
+                    finalNotify("eleme");
+                    // prize();
                 } else {
                     check();
                 }
