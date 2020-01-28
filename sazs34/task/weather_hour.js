@@ -12,9 +12,9 @@ let config = {
     timeout: 0, //超时时间,单位毫秒(1000毫秒=1秒),一般不推荐修改[为0则不限制超时时间]
     show: {
         template: {
-            title: `$[city] • 未来48小时天气`,
+            title: `$[city]$[district]  •  未来48小时天气`,
     subtitle: `$[weeklySummary]`,
-    detail: `$[hourly($[month]/$[day]  -  $[hour]:00  •  $[weatherIcon]$[weather] | $[apparentTemperatureMin]~$[apparentTemperatureMax]°C)]`
+    detail: `$[hourly($[month]/$[day]  -  $[hour]:00  •  $[weatherIcon]$[weather] • $[temperature]°C)]`
 },
         lifestyle: { //此处用于显示各项生活指数，可自行调整顺序，顺序越在前面则显示也会靠前，如果您不想查看某一指数，置为false即可，想看置为true即可
             drsg: true, //穿衣指数,

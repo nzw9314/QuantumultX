@@ -13,7 +13,7 @@ let config = {
     show: {
         //普通每天的
         template: {
-            title: `[天气日报] $[summary]`,
+            title: `[天气日报] $[city]$[district]  •  $[summary]`,
             subtitle: `$[weatherIcon]$[weather] $[temperatureMin] ~ $[temperatureMax]°C ☔️降雨概率 $[precipProbability]%`,
             detail: `🥵空气质量 $[aqi]($[aqiDesc]) 🍃风速$[windSpeed]km/h $[windDir]
 🌞紫外线指数 $[uv]($[uvDesc]) 💧湿度$[currentHumidity]%
@@ -24,7 +24,7 @@ $[lifeStyle($[icon][$[brf]]$[txt])]
 
 [未来48小时天气]
 $[weeklySummary]
-$[hourly($[month]/$[day]  -  $[hour]:00  •  $[weatherIcon]$[weather]  |  $[apparentTemperatureMin]~$[apparentTemperatureMax]°C)]`
+$[hourly($[month]/$[day]  -  $[hour]:00  •  $[weatherIcon]$[weather]  •  $[temperature]°C)]`
         },
         lifestyle: { //此处用于显示各项生活指数，可自行调整顺序，顺序越在前面则显示也会靠前，如果您不想查看某一指数，置为false即可，想看置为true即可
             drsg: true, //穿衣指数,
