@@ -4,11 +4,13 @@
 
 > 2020.1.11 QuanX 在`190`版本开始, 获取 Cookie 方式需要从`script-response-body`改为`script-request-header`
 
+> 2020.1.28 适配人人影视新域名`http://www.rrys2019.com`
+
 ## 配置 (Surge)
 
 ```properties
 [MITM]
-*.zmz2019.com
+*.rrys2019.com
 
 [Script]
 http-request ^https?:\/\/(www\.)?rrys2019\.com\/?.? script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/zimuzu/zimuzu.cookie.js
