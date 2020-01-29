@@ -892,14 +892,13 @@ let execute = () => {
                     }
                 } catch (e) {
                     config.eleme.data.notify = `[${config.eleme.name}] 签到失败！数据解析异常⚠️`;
-                    finalNotify("eleme");
                     record(`${config.eleme.data.notify} : ${JSON.stringify(e)}`);
+                    finalNotify("eleme");
                 }
-
             }, reason => {
                 config.eleme.data.notify = `[${config.eleme.name}] 签到失败！网络请求异常⚠️`;
-                finalNotify("eleme");
                 record(`${config.eleme.data.notify} : ${reason.error}`);
+                finalNotify("eleme");
             })
         }
         let check = () => {
@@ -909,22 +908,19 @@ let execute = () => {
                     let result = JSON.parse(resp.body);
                     if (result && result.has_signed_in_today) {
                         config.eleme.data.notify = `[${config.eleme.name}] 今日已签到🎉`;
-                        finalNotify("eleme");
-                        record(config.eleme.data.notify);
                     } else {
                         config.eleme.data.notify = `[${config.eleme.name}] 签到失败`;
-                        finalNotify("eleme");
-                        record(config.eleme.data.notify);
                     }
+                    record(config.eleme.data.notify);
                 } catch (e) {
                     config.eleme.data.notify = `[${config.eleme.name}] 签到异常`;
-                    finalNotify("eleme");
                     record(`${config.eleme.data.notify}-${JSON.stringify(e)}`);
                 }
+                finalNotify("eleme");
             }, err => {
                 config.eleme.data.notify = `[${config.eleme.name}] 网络请求异常⚠️`;
-                finalNotify("eleme");
                 record(`${config.eleme.data.notify} : ${err.error}`);
+                finalNotify("eleme");
             })
         }
         let prize = () => {
@@ -989,7 +985,7 @@ let execute = () => {
             }
         }
         if (notSignItem && !global.parallel) {
-            //record(`准备执行${notSignItem}`);
+            record(`准备执行${notSignItem}`);
             eval(`sign_${notSignItem}()`);
             return;
         }
