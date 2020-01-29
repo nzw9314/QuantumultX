@@ -1,16 +1,17 @@
 const global = {
     log: 1, //日志模式:0不显示 1全部显示 2精简显示,推荐值:1
+    parallel: false, //是否顺序签到(true则同时签到,可能会出现内存占用过高导致执行失败的情况;false则签到速度会慢一些,但是很稳)
     sign: { //用于设置哪些需要进行签到,哪些不处理
         baidu_tieba: true,
         iqiyi: true,
-        _52pojie: true,
+        _52pojie: false,
         netease_music: true,
         v2ex: true,
         china_telecom: true,
         eleme: true
     },
     data: {
-        china_telecom: "" //此处输入要签到的手机号码,半角双引号中间
+        china_telecom: "17791810545" //此处输入要签到的手机号码,半角双引号中间
     }
 }
 
@@ -610,19 +611,24 @@ let execute = () => {
         }
         config.iqiyi.provider.url += cookieVal;
         $task.fetch(config.iqiyi.provider).then(response => {
-            var obj = JSON.parse(response.body);
-            if (obj.msg == "成功") {
-                if (obj.data.signInfo.code == "A00000") {
-                    config.iqiyi.data.notify = `[${config.iqiyi.name}]${obj.data.signInfo.msg}！${obj.data.signInfo.data.acquireGiftList[0]}, 连续签到${obj.data.signInfo.data.continueSignDaysSum}天 🎉`;
-                    record(config.iqiyi.data.notify)
+            try {
+                var obj = JSON.parse(response.body);
+                if (obj && obj.msg == "成功") {
+                    if (obj.data.signInfo.code == "A00000") {
+                        config.iqiyi.data.notify = `[${config.iqiyi.name}]${obj.data.signInfo.msg}！${obj.data.signInfo.data.acquireGiftList[0]}, 连续签到${obj.data.signInfo.data.continueSignDaysSum}天 🎉`;
+                        record(config.iqiyi.data.notify)
+                    } else {
+                        // console.log("failure response: \n" + response.body);
+                        config.iqiyi.data.notify = `[${config.iqiyi.name}]${obj.data.signInfo.msg}⚠️`;
+                        record(`${config.iqiyi.data.notify}${obj.data.signInfo.msg}`);
+                    }
                 } else {
-                    // console.log("failure response: \n" + response.body);
-                    config.iqiyi.data.notify = `[${config.iqiyi.name}]${obj.data.signInfo.msg}⚠️`;
-                    record(`${config.iqiyi.data.notify}${obj.data.signInfo.msg}`);
+                    config.iqiyi.data.notify = `[${config.iqiyi.name}]签到失败⚠️`;
+                    record(`${config.iqiyi.data.notify}${obj.msg}`);
                 }
-            } else {
-                config.iqiyi.data.notify = `[${config.iqiyi.name}]签到失败⚠️`;
-                record(`${config.iqiyi.data.notify}${obj.msg}`);
+            } catch (e) {
+                config.iqiyi.data.notify = `[${config.iqiyi.name}]签到失败,数据解析失败⚠️`;
+                record(`${config.iqiyi.data.notify}-${JSON.stringify(e)}`);
             }
             finalNotify("iqiyi");
         }, reason => {
@@ -677,11 +683,11 @@ let execute = () => {
                     //failed
                     config.netease_music.data[type] = '未知错误⚠️';
                 }
-                checkIsAllProcessed();
             } catch (e) {
+                config.netease_music.data[type] = '未知错误见日志⚠️';
                 record(`网易云报错-${JSON.stringify(e)}`);
             }
-
+            checkIsAllProcessed();
         }
         let checkIsAllProcessed = () => {
             record(`[${config.netease_music.name}]-check-${config.netease_music.data.pc}-${config.netease_music.data.app}`)
@@ -699,7 +705,7 @@ let execute = () => {
 
     //#region 吾爱破解
 
-    let sign_52pojie = () => {
+    let sign__52pojie = () => {
         if (!global.sign._52pojie) {
             record(`[${config._52pojie.name}]未开启签到`);
             return;
@@ -713,20 +719,25 @@ let execute = () => {
         }
         config._52pojie.provider.headers.Cookie = cookieVal;
         $task.fetch(config._52pojie.provider).then(response => {
-            if (response.body.match(/\u606d\u559c\u60a8/)) {
-                //success
-                config._52pojie.data.notify = `[${config._52pojie.name}] 签到成功🎉`;
-            } else if (response.body.match(/\u4e0b\u671f\u518d\u6765/)) {
-                //repeat
-                config._52pojie.data.notify = `[${config._52pojie.name}] 重复签到🎉`;
-            } else if (response.body.match(/\u9700\u8981\u5148\u767b\u5f55/)) {
-                //cookie
-                config._52pojie.data.notify = `[${config._52pojie.name}] 未获取到Cookie⚠️`;
-            } else {
-                //script need update
-                config._52pojie.data.notify = `[${config._52pojie.name}] 脚本需更新⚠️`;
+            try {
+                if (response.body.match(/\u606d\u559c\u60a8/)) {
+                    //success
+                    config._52pojie.data.notify = `[${config._52pojie.name}] 签到成功🎉`;
+                } else if (response.body.match(/\u4e0b\u671f\u518d\u6765/)) {
+                    //repeat
+                    config._52pojie.data.notify = `[${config._52pojie.name}] 重复签到🎉`;
+                } else if (response.body.match(/\u9700\u8981\u5148\u767b\u5f55/)) {
+                    //cookie
+                    config._52pojie.data.notify = `[${config._52pojie.name}] 未获取到Cookie⚠️`;
+                } else {
+                    //script need update
+                    config._52pojie.data.notify = `[${config._52pojie.name}] 脚本需更新⚠️`;
+                }
+                record(config._52pojie.data.notify);
+            } catch (e) {
+                config._52pojie.data.notify = `[${config._52pojie.name}] 脚本数据解析异常⚠️`;
+                record(`${config._52pojie.data.notify}-${JSON.stringify(e)}`)
             }
-            record(config._52pojie.data.notify);
             finalNotify("_52pojie");
         }, reason => {
             config._52pojie.data.notify = `[${config._52pojie.name}] 签到失败！网络请求异常⚠️`;
@@ -754,17 +765,23 @@ let execute = () => {
         let checkSign = () => {
             config.v2ex.provider.check.headers.Cookie = cookieVal;
             $task.fetch(config.v2ex.provider.check).then(response => {
-                let data = response.body;
-                if (data.indexOf('每日登录奖励已领取') >= 0) {
-                    config.v2ex.data.notify = `[${config.v2ex.name}] 重复签到🎉`
-                    record(config.v2ex.data.notify);
-                    finalNotify("v2ex");
-                } else {
-                    let regex = /<input[^>]*\/mission\/daily\/redeem\?once=(\d+)[^>]*>/g;
-                    let code = regex.exec(data);
-                    if (code) {
-                        signMission(code[1])
+                try {
+                    let data = response.body;
+                    if (data.indexOf('每日登录奖励已领取') >= 0) {
+                        config.v2ex.data.notify = `[${config.v2ex.name}] 重复签到🎉`
+                        record(config.v2ex.data.notify);
+                        finalNotify("v2ex");
+                    } else {
+                        let regex = /<input[^>]*\/mission\/daily\/redeem\?once=(\d+)[^>]*>/g;
+                        let code = regex.exec(data);
+                        if (code) {
+                            signMission(code[1])
+                        }
                     }
+                } catch (e) {
+                    config.v2ex.data.notify = `[${config.v2ex.name}] 签到失败！数据处理异常⚠️`;
+                    record(`${config.v2ex.data.notify}-${JSON.stringify(e)}`);
+                    finalNotify("v2ex");
                 }
             }, reason => {
                 config.v2ex.data.notify = `[${config.v2ex.name}] 签到失败！网络请求异常⚠️`;
@@ -776,21 +793,28 @@ let execute = () => {
             config.v2ex.provider.sign.headers.Cookie = cookieVal;
             config.v2ex.provider.sign.url = `https://www.v2ex.com/mission/daily/redeem?once=${code}`;
             $task.fetch(config.v2ex.provider.sign).then(response => {
-                let data = response.body;
-                if (data.indexOf('每日登录奖励已领取') >= 0) {
-                    let days = 0;
-                    let daysRegex = /已连续登录 (\d{1,10}) 天/;
-                    if (daysRegex.test(data)) {
-                        days = daysRegex.exec(data)[1]
+                try {
+                    let data = response.body;
+                    if (data.indexOf('每日登录奖励已领取') >= 0) {
+                        let days = 0;
+                        let daysRegex = /已连续登录 (\d{1,10}) 天/;
+                        if (daysRegex.test(data)) {
+                            days = daysRegex.exec(data)[1]
+                        }
+                        config.v2ex.data.notify = `[${config.v2ex.name}] 签到成功🎉${days>0?`已连续签到${days}天`:''}`
+                        record(config.v2ex.data.notify);
+                        finalNotify("v2ex");
+                    } else {
+                        config.v2ex.data.notify = `[${config.v2ex.name}] 签到失败⚠️`
+                        record(`${config.v2ex.data.notify}-签到响应数据中没有检测到'每日登录奖励已领取'字段,判定为签到失败,可自行访问${config.v2ex.provider.sign.url}进行签到`)
+                        finalNotify("v2ex");
                     }
-                    config.v2ex.data.notify = `[${config.v2ex.name}] 签到成功🎉${days>0?`已连续签到${days}天`:''}`
-                    record(config.v2ex.data.notify);
-                    finalNotify("v2ex");
-                } else {
-                    config.v2ex.data.notify = `[${config.v2ex.name}] 签到失败⚠️`
-                    record(`${config.v2ex.data.notify}-${data}`)
+                } catch (e) {
+                    config.v2ex.data.notify = `[${config.v2ex.name}] 签到失败⚠️详见日志报错`
+                    record(`${config.v2ex.data.notify}-${JSON.stringify(e)}`);
                     finalNotify("v2ex");
                 }
+
             }, reason => {
                 config.v2ex.data.notify = `[${config.v2ex.name}] 签到失败！网络请求异常⚠️⚠️`;
                 record(`${config.v2ex.data.notify}-${reason.error}`);
@@ -823,19 +847,24 @@ let execute = () => {
         }
         config.china_telecom.provider.headers.Cookie = cookieVal;
         $task.fetch(config.china_telecom.provider).then(response => {
-            var body = JSON.parse(response.body);
-            if (body.resoultCode == "0") {
-                if (body.data.code == 1) {
-                    config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到成功,获得金币${body.data.coin}/金豆${body.data.flow}`
-                } else if (body.data.code == 0) {
-                    config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到成功,${body.data.msg}`
+            try {
+                var body = JSON.parse(response.body);
+                if (body.resoultCode == "0") {
+                    if (body.data.code == 1) {
+                        config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到成功,获得金币${body.data.coin}/金豆${body.data.flow}`;
+                    } else if (body.data.code == 0) {
+                        config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到成功,${body.data.msg}`;
+                    } else {
+                        config.china_telecom.data.notify = `[${config.china_telecom.name}] ${body.data.msg}`;
+                    }
                 } else {
-                    config.china_telecom.data.notify = `[${config.china_telecom.name}] ${body.data.msg}`
+                    config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到失败, ${body.data.msg}-${body.resoultCode}`;
                 }
-            } else {
-                config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到失败, ${body.data.msg}-${body.resoultCode}`
+                record(config.china_telecom.data.notify)
+            } catch (e) {
+                config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到失败-e`;
+                record(`${config.china_telecom.data.notify}-error:${JSON.stringify(e)}`);
             }
-            record(config.china_telecom.data.notify)
             finalNotify("china_telecom");
         }, reason => {
             config.china_telecom.data.notify = `[${config.china_telecom.name}] 签到失败,${reason.error}`
@@ -864,14 +893,21 @@ let execute = () => {
         let sign = () => {
             config.eleme.provider.sign.url += `${eleUserId}/sign_in`;
             $task.fetch(config.eleme.provider.sign).then(response => {
-                if (response.statusCode == 200) {
-                    config.eleme.data.notify = `[${config.eleme.name}] 签到成功🎉`;
-                    record(config.eleme.data.notify);
+                try {
+                    if (response.statusCode == 200) {
+                        config.eleme.data.notify = `[${config.eleme.name}] 签到成功🎉`;
+                        record(config.eleme.data.notify);
+                        finalNotify("eleme");
+                        // prize();
+                    } else {
+                        check();
+                    }
+                } catch (e) {
+                    config.eleme.data.notify = `[${config.eleme.name}] 签到失败！数据解析异常⚠️`;
                     finalNotify("eleme");
-                    // prize();
-                } else {
-                    check();
+                    record(`${config.eleme.data.notify} : ${JSON.stringify(e)}`);
                 }
+
             }, reason => {
                 config.eleme.data.notify = `[${config.eleme.name}] 签到失败！网络请求异常⚠️`;
                 finalNotify("eleme");
@@ -881,16 +917,21 @@ let execute = () => {
         let check = () => {
             config.eleme.provider.check.url += `${eleUserId}/sign_in/info`;
             $task.fetch(config.eleme.provider.check).then(resp => {
-                let result = JSON.parse(resp.body);
-                // record(`${config.eleme.provider.check.url}---${JSON.stringify(resp.body)}`);
-                if (result.has_signed_in_today) {
-                    config.eleme.data.notify = `[${config.eleme.name}] 今日已签到🎉`;
+                try {
+                    let result = JSON.parse(resp.body);
+                    if (result && result.has_signed_in_today) {
+                        config.eleme.data.notify = `[${config.eleme.name}] 今日已签到🎉`;
+                        finalNotify("eleme");
+                        record(config.eleme.data.notify);
+                    } else {
+                        config.eleme.data.notify = `[${config.eleme.name}] 签到失败`;
+                        finalNotify("eleme");
+                        record(config.eleme.data.notify);
+                    }
+                } catch (e) {
+                    config.eleme.data.notify = `[${config.eleme.name}] 签到异常`;
                     finalNotify("eleme");
-                    record(config.eleme.data.notify);
-                } else {
-                    config.eleme.data.notify = `[${config.eleme.name}] 签到失败`;
-                    finalNotify("eleme");
-                    record(config.eleme.data.notify);
+                    record(`${config.eleme.data.notify}-${JSON.stringify(e)}`);
                 }
             }, err => {
                 config.eleme.data.notify = `[${config.eleme.name}] 网络请求异常⚠️`;
@@ -928,30 +969,46 @@ let execute = () => {
 
     //#region 签到统一管控
     let startSign = () => {
-        if (global.sign.baidu_tieba) sign_baidu_tieba();
-        if (global.sign.iqiyi) sign_iqiyi();
-        if (global.sign.netease_music) sign_netease_music();
-        if (global.sign._52pojie) sign_52pojie();
-        if (global.sign.v2ex) sign_v2ex();
-        if (global.sign.china_telecom) sign_china_telecom();
-        if (global.sign.eleme) sign_eleme();
+        if (global.parallel) {
+            if (global.sign.baidu_tieba) sign_baidu_tieba();
+            if (global.sign.iqiyi) sign_iqiyi();
+            if (global.sign.netease_music) sign_netease_music();
+            if (global.sign._52pojie) sign__52pojie();
+            if (global.sign.v2ex) sign_v2ex();
+            if (global.sign.china_telecom) sign_china_telecom();
+            if (global.sign.eleme) sign_eleme();
+        } else {
+            if (global.sign.baidu_tieba) sign_baidu_tieba();
+            else if (global.sign.iqiyi) sign_iqiyi();
+            else if (global.sign.netease_music) sign_netease_music();
+            else if (global.sign._52pojie) sign__52pojie();
+            else if (global.sign.v2ex) sign_v2ex();
+            else if (global.sign.china_telecom) sign_china_telecom();
+            else if (global.sign.eleme) sign_eleme();
+            else $notify("All In One", "详细签到信息可见日志", "暂无需签到的项目");
+        }
     }
 
     let finalNotify = type => {
         config[type].executed = true;
-        var isAllProcessed = true;
+        var notSignItem = "";
         for (var item in global.sign) {
             if (global.sign[item]) {
                 if (!config[item].executed) {
-                    isAllProcessed = false;
+                    notSignItem = item;
                     break;
                 }
             }
         }
+        if (notSignItem && !global.parallel) {
+            //record(`准备执行${notSignItem}`);
+            eval(`sign_${notSignItem}()`);
+            return;
+        }
         let sign_detail = '';
         let breakLine = `
 `;
-        if (isAllProcessed) {
+        if (!notSignItem) {
             for (var item in global.sign) {
                 // record(`提醒消息-${item}-${global.sign[item]}`)
                 if (global.sign[item]) {
