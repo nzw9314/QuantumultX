@@ -9,17 +9,6 @@
 // #region 固定头部
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
 let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
-// 判断request还是respons
-// down方法重写
-var $done = (obj={}) => {
-    var isRequest = typeof $request != "undefined";
-    if (isQuantumultX) {
-        return isRequest ? $done({}) : ""
-    }
-    if (isSurge) {
-        return isRequest ? $done({}) : $done()
-    }
-}
 // http请求
 var $task = isQuantumultX ? $task : {};
 var $httpClient = isSurge ? $httpClient : {};
@@ -170,7 +159,7 @@ TG频道:@meetashare
 
 
 const address = "&location=填经纬度";
-const k = "&key=faead3de5f42420098c8132b3924cd09";
+const k = "&key=填入和风天气key";
 
 const wea = "https://free-api.heweather.net/s6/weather/now?"+address+k;
 const forecast = "https://widget-api.heweather.net/s6/plugin/sticker?key=acd0fdcab4b9481a98d0f59145420fac&location="+$persistentStore.read("cid")+"&lang=zh";
