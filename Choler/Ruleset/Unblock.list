@@ -1,3 +1,11 @@
+# Except
+USER-AGENT,SafariSafeBrowsing*
+DOMAIN,cn.bing.com
+DOMAIN,www.microsoft.com
+DOMAIN,www.gstatic.com
+DOMAIN,ssl.gstatic.com
+DOMAIN,cdn.ampproject.org
+
 # Misc
 DOMAIN-SUFFIX,115.com
 DOMAIN-SUFFIX,10010.com
@@ -46,6 +54,8 @@ DOMAIN-SUFFIX,huanqiu.com
 DOMAIN-SUFFIX,oschina.net
 DOMAIN-SUFFIX,cmbchina.com
 DOMAIN-SUFFIX,magi.com
+DOMAIN-SUFFIX,smzdm.com
+DOMAIN-SUFFIX,leiphone.com
 
 DOMAIN-SUFFIX,cn
 DOMAIN-SUFFIX,local
@@ -54,7 +64,7 @@ DOMAIN-SUFFIX,douban.com
 DOMAIN-SUFFIX,doubanio.com
 
 DOMAIN-SUFFIX,36kr.com
-DOMAIN-SUFFIX,36krcnd.com
+DOMAIN-SUFFIX,36krcdn.com
 
 DOMAIN-SUFFIX,weibo.com
 DOMAIN-SUFFIX,miaopai.com
@@ -100,11 +110,17 @@ DOMAIN-SUFFIX,meituan.net
 DOMAIN-SUFFIX,dianping.com
 
 # Apple
+DOMAIN-SUFFIX,aaplimg.com
+DOMAIN-SUFFIX,apple.co
 DOMAIN-SUFFIX,apple.com
-DOMAIN-SUFFIX,icloud.com
-DOMAIN-SUFFIX,cdn-apple.com
+DOMAIN-SUFFIX,apple-cloudkit.com
 DOMAIN-SUFFIX,apple-mapkit.com
+DOMAIN-SUFFIX,appstore.com
+DOMAIN-SUFFIX,cdn-apple.com
+DOMAIN-SUFFIX,icloud.com
 DOMAIN-SUFFIX,icloud-content.com
+DOMAIN-SUFFIX,me.com
+DOMAIN-SUFFIX,mzstatic.com
 
 # Alibaba
 DOMAIN-SUFFIX,1688.com
@@ -118,6 +134,7 @@ DOMAIN-SUFFIX,aliyuncs.com
 DOMAIN-SUFFIX,tmall.com
 DOMAIN-SUFFIX,taobao.com
 DOMAIN-SUFFIX,mmstat.com
+DOMAIN-SUFFIX,alipayobjects.com
 
 # Baidu
 DOMAIN-SUFFIX,baidu.com
@@ -167,6 +184,7 @@ DOMAIN-SUFFIX,smtcdns.com
 DOMAIN-SUFFIX,qcloud.com
 DOMAIN-SUFFIX,myqcloud.com
 DOMAIN-SUFFIX,qcloudimg.com
+DOMAIN-SUFFIX,weixinbridge.com
 
 # Xiaomi
 DOMAIN-SUFFIX,mi.com
@@ -204,14 +222,6 @@ DOMAIN-SUFFIX,irs01.com
 DOMAIN-SUFFIX,tapdb.net
 DOMAIN-SUFFIX,taptap.com
 DOMAIN-SUFFIX,tapimg.com
-
-# Except
-DOMAIN,cn.bing.com
-DOMAIN,www.microsoft.com
-DOMAIN,www.gstatic.com
-DOMAIN,ssl.gstatic.com
-DOMAIN,cdn.ampproject.org
-DOMAIN,safebrowsing.googleapis.com
 
 # Lan
 AND,((IP-CIDR,0.0.0.0/0,no-resolve), (RULE-SET,LAN))

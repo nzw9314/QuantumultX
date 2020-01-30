@@ -8,7 +8,7 @@ DOMAIN-SUFFIX,uk
 DOMAIN-SUFFIX,co
 DOMAIN-SUFFIX,io
 DOMAIN-SUFFIX,tk
-DOMAIN-SUFFIX,gq
+DOMAIN-SUFFIX,ms
 
 DOMAIN-SUFFIX,imgur.com
 DOMAIN-SUFFIX,droplr.com
@@ -61,9 +61,7 @@ DOMAIN-SUFFIX,ebaystatic.com
 
 # OneDrive
 USER-AGENT,OneDrive*
-DOMAIN-SUFFIX,live.com
-DOMAIN-SUFFIX,msauth.net
-DOMAIN-SUFFIX,onedrive.com
+USER-AGENT,OneDriveiOSApp*
 
 # Facebook
 DOMAIN-SUFFIX,fb.me
@@ -93,6 +91,7 @@ DOMAIN-SUFFIX,akamaized.net
 
 # Google
 DOMAIN-KEYWORD,google
+DOMAIN-SUFFIX,abc.xyz
 DOMAIN-SUFFIX,goo.gl
 DOMAIN-SUFFIX,youtu.be
 DOMAIN-SUFFIX,gmail.com
@@ -176,11 +175,11 @@ DOMAIN-SUFFIX,cnn.com
 DOMAIN-SUFFIX,blogger.com
 DOMAIN-SUFFIX,blogspot.com
 
-# PalPal
+# PayPal
 DOMAIN-SUFFIX,paypal.com
 DOMAIN-SUFFIX,paypalobjects.com
 
-# Xvideos
+# Xvideo
 DOMAIN-SUFFIX,xvideos.com
 DOMAIN-SUFFIX,xvideos-cdn.com
 
