@@ -76,9 +76,9 @@ function history_price_msg(data) {
     let history_price_msg = "";
     let start_date = "";
     let end_date = "";
-    let date_range_msg = `(最近一年)`;
+    let date_range_msg = `(最近三个月)`;
     let list = data.jiagequshiyh.match(rex_match);
-    list = list.reverse().slice(0, 365);
+    list = list.reverse().slice(0, 90);
     list.forEach((item, index) => {
         if (item.length > 0) {
             const result = rex_exec.exec(item);
