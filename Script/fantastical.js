@@ -4,7 +4,7 @@ hostname=api.flexibits.com
 */
 
 let url=$request.url;
-let obj=JSON.parse($response.body;);
+let obj=JSON.parse($response.body);
 
 if(url.indexOf('device')!=-1){
 
