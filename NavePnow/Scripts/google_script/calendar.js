@@ -64,7 +64,7 @@ function getDateStr(dayCount) {
     dd.setDate(dd.getDate() + dayCount);//设置日期
     var y = dd.getFullYear();
     var m = PrefixInteger(dd.getMonth() + 1, 2);//获取当前月份的日期
-    var d = dd.getDate();
+	 var d = PrefixInteger(dd.getDate(),2);
     return y + "-" + m + "-" + d;
 }
 function PrefixInteger(num, length) {
