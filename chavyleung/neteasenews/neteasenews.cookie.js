@@ -3,7 +3,7 @@ const cookieKey = 'chavy_cookie_neteasenews'
 const bodyKey = 'chavy_body_neteasenews'
 const chavy = init()
 let cookieVal = null
-let bodyVal = ``
+let bodyVal = `trashId=%7B%22id_ver%22%3A%22IOS_1.2.1%22%2C%22rk%22%3A%2204puJuwt24ZfVun6xM%2FspLSL7uxFhDDgWEAssh%2F8pMDRRcYXCKExX3tcQIUIzoFCRxGE1lROimtFoYdCP4UFOoVMz6VyA2c2RGl6sw1DZ8FSSs%2BeGq1hOofEMN%2BjuUPP%2F5IB8hgXRxPTYs2RDnGf8u1JxLh8aAPmujBIbI88Sr4%3D%22%2C%22rdata%22%3A%228E8htZCY85Va4ezNR1%2B1%2BSR%2FBRxb%2FzkdSSDVetJcEZ2vKf%2BAr4b1Sz9o%2FuBN%2Ft1fZtY%2Fbgp0gBsScrcbLj3KkphOFPgogIcJWyHT5UWc2AOhT6nQORBuJItNVqi3nrZGA%2BJnQXnNOABtrM2FtO6x8YkBC442IaDiPo891EIiyfTeqp3oVnce%2BJNtybdWdZyi0yje0cRp2ZxiQnvTH01SNyueujV9LcgKu6CrECXuObkZoAJALusQZdAb4EyayNlLhx%2FF9X1M9%2BEXlavYrm9yLXZuyRzv1lvbmJZ%2BvqL5sNwWiw5Va6Y9685xm7H9TH0UmtJPMsb643sblIi3UrbCtbxkpydjBIszNl02ZZ7u%2Bpxo8T%2FdmOOcce%2BKJrMqzENK%22%2C%22datatype%22%3A%22aimt_datas%22%7D`
 
 if ($request.body) {
   cookieVal = JSON.stringify($request.headers)
