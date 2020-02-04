@@ -48,6 +48,8 @@ https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_New.conf
 
 
 4⃣️Js_local_WorkingCopy.conf包括
+
+
 ①.Nobyda 全部脚本,
 ②.langkhach 全部脚本
 ③.chavyleung 签到脚本
@@ -59,6 +61,8 @@ https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_New.conf
 需要其他的脚本请自行添加路径;
 
 2.WorkingCopy同步更新脚本库包括:
+
+
 ① NobyDa,
 ② langkhach270389,
 ③ Choler,
