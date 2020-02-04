@@ -81,3 +81,4 @@ DOMAIN,app.algoriddim.com
 DOMAIN,viva.v21xy.com
 DOMAIN,viva-asia1.vvbrd.com
 DOMAIN,api.getmimo.com
+DOMAIN,api.spendee.com
