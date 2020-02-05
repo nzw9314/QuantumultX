@@ -72,19 +72,37 @@ function tool() {
         if (isQuanX) {
             if (typeof options == "string") options = { url: options }
             options["method"] = "GET"
-            $task.fetch(options).then(response => { callback(null, adapterStatus(response), response.body) }, reason => callback(reason.error, null, null))
+            $task.fetch(options).then(response => {
+                callback(null, adapterStatus(response), response.body)
+            }, reason => callback(reason.error, null, null))
         }
-        if (isSurge) $httpClient.get(options, (error, response, body) => { callback(error, adapterStatus(response), body) })
-        if (node) node.request(options, (error, response, body) => { callback(error, adapterStatus(response), body) })
+        if (isSurge) $httpClient.get(options, (error, response, body) => {
+            callback(error, adapterStatus(response), body)
+        })
+        if (node) {
+            node.request(options, (error, response, body) => {
+                callback(error, adapterStatus(response), body)
+            })
+        }
     }
     const post = (options, callback) => {
         if (isQuanX) {
             if (typeof options == "string") options = { url: options }
             options["method"] = "POST"
-            $task.fetch(options).then(response => { callback(null, adapterStatus(response), response.body) }, reason => callback(reason.error, null, null))
+            $task.fetch(options).then(response => {
+                callback(null, adapterStatus(response), response.body)
+            }, reason => callback(reason.error, null, null))
         }
-        if (isSurge) $httpClient.post(options, (error, response, body) => { callback(error, adapterStatus(response), body) })
-        if (node) node.request.post(options, (error, response, body) => { callback(error, adapterStatus(response), body) })
+        if (isSurge) {
+            $httpClient.post(options, (error, response, body) => {
+                callback(error, adapterStatus(response), body)
+            })
+        }
+        if (node) {
+            node.request.post(options, (error, response, body) => {
+                callback(error, adapterStatus(response), body)
+            })
+        }
     }
     return { isQuanX, isSurge, isResponse, notify, write, read, get, post }
 }
