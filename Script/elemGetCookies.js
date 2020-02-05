@@ -17,7 +17,7 @@
 h5.ele.me
 
 [Script]
-http-request ^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/elemGetCookies.js
+http-request ^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user& script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/elemGetCookies.js
 cron "0 5 0 * * *" script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/elemSign.js
 ```
 
@@ -29,7 +29,7 @@ h5.ele.me
 
 [rewrite_local]
 
-^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user url script-request-header elemGetCookies.js
+^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user$ url script-request-header elemGetCookies.js
 
 
 
