@@ -63,9 +63,9 @@ if (-1 != $request.url.indexOf('/x/v2/reply/main') && 0 == body['code']) {
 
 // tab
 if (-1 != $request.url.indexOf('resource/show/tab?') && 0 == body['code']) {
-    // 会员购 动态
+    // 会员购
     body['data']['bottom'] = body['data']['bottom'].filter(function (item) {
-        return item.id != 180 && item.id != 179
+        return item.id != 180
     });
     // 70 直播 影视
     body['data']['tab'] = body['data']['tab'].filter(function (item) {
