@@ -13,7 +13,7 @@
 h5.ele.me
 
 [Script]
-http-response ^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/elemGetCookies.js
+http-request ^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/elemGetCookies.js
 cron "0 5 0 * * *" script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/elemSign.js
 ```
 
@@ -25,7 +25,7 @@ h5.ele.me
 
 [rewrite_local]
 
-^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user url script-response-body elemGetCookies.js
+^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user url script-request-header nzw9314/Script/elemGetCookies.js
 
 
 
@@ -51,10 +51,14 @@ h5.ele.me
 
 const cookieName = '饿了么'
 const cookieKey = 'cookie_elem'
+const UserId='user_id_elem'
 const sy = init()
 var cookieVal =sy.getdata(cookieKey);
-// var regx=/(USERID=)(\d+)(;)/;
-// cookieVal.replace(regx,'$2');
+var regx=/USERID=\d+/;
+
+var userid=cookieVal.match(regx)[0];
+userid=userid.replace('USERID=','');
+console.log(userid);
 var endurl='/sign_in'
 sign()
 
@@ -62,11 +66,11 @@ function sign() {
   const timestamp = Date.parse(new Date())
   let url = { url: `https://h5.ele.me/restapi/member/v2/users/`, headers: { Cookie: cookieVal } }
   if(cookieVal==undefined||cookieVal=="0"||cookieVal==null){
-	   sy.msg(cookieName, "未获取UserID", '');
+	   sy.msg(cookieName, "未获取Cookie", '');
 	   return ;
   }
   url.headers['Origin']='https://tb.ele.me';
-  url.url+=cookieVal;
+  url.url+=userid;
   url.url+=endurl;
   sy.log(url.url);
   sy.post(url, (error, response, data) => {

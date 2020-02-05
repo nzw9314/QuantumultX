@@ -17,7 +17,7 @@
 h5.ele.me
 
 [Script]
-http-response ^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/elemGetCookies.js
+http-request ^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/elemGetCookies.js
 cron "0 5 0 * * *" script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/elemSign.js
 ```
 
@@ -29,7 +29,7 @@ h5.ele.me
 
 [rewrite_local]
 
-^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user url script-response-body elemGetCookies.js
+^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user url script-request-header elemGetCookies.js
 
 
 
@@ -56,32 +56,35 @@ h5.ele.me
 
 
 const CookieName = '饿了么'
-const CookieKey = 'cookie_elem'
+  const CookieKey = 'cookie_elem'
+  const UserId='user_id_elem'
+const matchid=/USERID=(\d+);/
 const sy = init()
 GetCookie();
 
 function GetCookie() {
-  if ($response.body) {
-    var CookieValue = $response.body;
+  if ($request.headers) {
+    var CookieValue = $request.headers['Cookie'];
+    
     if (sy.getdata(CookieKey) != (undefined || null)) {
       if (sy.getdata(CookieKey) != CookieValue) {
         var cookie = sy.setdata(CookieValue, CookieKey);
         if (!cookie) {
-          sy.msg("更新" + CookieName + "UserID失败‼️", "", "");
+          sy.msg("更新" + CookieName + "Cookie失败‼️", "", "");
         } else {
-          sy.msg("更新" + CookieName + "UserID成功 🎉", "", "");
+          sy.msg("更新" + CookieName + "Cookie成功 🎉", "", "");
         }
       }
     } else {
       var cookie = sy.setdata(CookieValue, CookieKey);
       if (!cookie) {
-        sy.msg("首次写入" + CookieName + "UserID失败‼️", "", "");
+        sy.msg("首次写入" + CookieName + "Cookie失败‼️", "", "");
       } else {
-        sy.msg("首次写入" + CookieName + "UserID成功 🎉", "", "");
+        sy.msg("首次写入" + CookieName + "Cookie成功 🎉", "", "");
       }
     }
   } else {
-    sy.msg("写入" + CookieName + "UserID失败‼️", "", "配置错误, 无法读取响应体, ");
+    sy.msg("写入" + CookieName + "Cookie失败‼️", "", "配置错误, 无法读取请求头, ");
   }
 }
 function init() {
