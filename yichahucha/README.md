@@ -45,7 +45,7 @@ hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
 Daily work check-in reminder
 ```
 [Script]
-cron "0 9,18 * * 1-5" script-path=https://raw.githubusercontent.com/yichahucha/surge/master/cron_daily.js
+cron "0 9,18 * * 1-5" script-path=https://raw.githubusercontent.com/yichahucha/surge/master/check_in.js
 ```
 
 # Quan-X
@@ -91,6 +91,12 @@ ip-cidr, 47.102.83.0/24, reject
 ^https://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body tb_price.js
 [mitm]
 hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
+```
+
+Daily work check-in reminder
+```
+[task_local]
+0 9,18 * * 1-5 check_in.js
 ```
 
 [Issue Group](http://t.me/scriptgroup)
