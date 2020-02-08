@@ -56,8 +56,8 @@ h5.ele.me
 
 
 const CookieName = '饿了么'
-  const CookieKey = 'cookie_elem'
-  const UserId='user_id_elem'
+const CookieKey = 'cookie_elem'
+const UserId='user_id_elem'
 const matchid=/USERID=(\d+);/
 const sy = init()
 GetCookie();
