@@ -30,14 +30,14 @@ hostname = api.m.jd.com
 Display taobao historical price
 ```
 [Rule]
-# 注意优先级（建议放在第一条）
+# 注意规则优先级（建议放在第一条）
 # 使用规则屏蔽 IP，有可能误伤其他功能或者应用，可以自己抓包缩小 IP 范围
 IP-CIDR, 203.119.144.0/23, REJECT, no-resolve
 IP-CIDR, 203.119.175.0/24, REJECT, no-resolve
 IP-CIDR, 106.11.162.0/24, REJECT, no-resolve
 IP-CIDR, 47.102.83.0/24, REJECT, no-resolve
 [Script]
-# 使用脚本屏蔽 IP，不生效或者失效需要卸载 tb 重装，使用脚本不需要写规则
+# 使用脚本屏蔽 IP（第一条脚本），不生效或失效的卸载 tb 重装，规则和脚本（第一条脚本）二选一
 http-response ^https?://amdc\.m\.taobao\.com/amdc/mobileDispatch requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 http-response ^https://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 [MITM]
@@ -81,14 +81,14 @@ hostname = api.m.jd.com
 Display taobao historical price
 ```
 [filter_local]
-# 注意优先级（建议放在第一条）
+# 注意规则优先级（建议放在第一条）
 # 使用规则屏蔽 IP，有可能误伤其他功能或者应用，可以自己抓包缩小 IP 范围
 ip-cidr, 203.119.144.0/23, reject
 ip-cidr, 203.119.175.0/24, reject
 ip-cidr, 106.11.162.0/24, reject
 ip-cidr, 47.102.83.0/24, reject
 [rewrite_local]
-# 使用脚本屏蔽 IP，不生效或者失效需要卸载 tb 重装，使用脚本不需要写规则
+# 使用脚本屏蔽 IP（第一条脚本），不生效或失效的卸载 tb 重装，规则和脚本（第一条脚本）二选一
 ^https?://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body tb_price.js
 ^https://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body tb_price.js
 [mitm]
