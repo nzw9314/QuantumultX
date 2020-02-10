@@ -26,7 +26,7 @@ DOMAIN,license.pdfexpert.com
 # Gyroscope
 DOMAIN,api.gyrosco.pe
 # Kine Master
-DOMAIN,api-kinemaster-assetstore.nexstreaming.com
+DOMAIN-KEYWORD,api-kinemaster-assetstore
 # Over
 DOMAIN,api.overhq.com
 # Bright
