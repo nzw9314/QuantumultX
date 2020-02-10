@@ -14,19 +14,25 @@ server=8.8.4.4
 
 
 [policy]
-static=Fake iAP 1, proxy, reject, direct
+round-robin=Fake iAP Policy, Fake iAP Server US 🇺🇸, Fake iAP Server SG 🇸🇬, img-url=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/237/pill_1f48a.png
+static=Fake PXX Policy, direct, Fake iAP Policy, img-url=https://raw.githubusercontent.com/crossutility/Quantumult-X/master/icon-samples/apple.PNG
+#
+# Params "tag" and "enabled" are optional.
+# The default sync interval for all kinds of remote resources is 24*60*60 seconds.
+#
 
 [server_remote]
 https://github.com/tinycarrot/tinycarrot/raw/master/quantumutlx/remote/fakeiap_server.txt, tag=Fake iAP Server 1, enabled=true
 
 [filter_remote]
-https://raw.githubusercontent.com/tinycarrot/tinycarrot/master/Profile/quantumult/fakePXX-itunes.txt, tag=Fake PXX, force-policy=proxy, enabled=false
-https://raw.githubusercontent.com/tinycarrot/tinycarrot/master/Profile/quantumult/fakeiap-filter.txt, tag=Fake iAP 1, force-policy=proxy, enabled=false
-https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-rule.conf, tag=hostvn, force-policy=reject, enabled=true
+https://raw.githubusercontent.com/tinycarrot/tinycarrot/master/Profile/quantumult/fakePXX-itunes.txt, tag=Fake PXX Filter, force-policy=Fake PXX Policy, enabled=true
+https://raw.githubusercontent.com/tinycarrot/tinycarrot/master/Profile/quantumult/fakeiap-filter.txt, tag=Fake iAP Filter, force-policy=Fake iAP Policy, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-exceptions-rule.conf, tag=🇻🇳hostsVN, force-policy=direct, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-rule.conf, tag=🇻🇳hostsVN, force-policy=reject, enabled=true
 
 [rewrite_remote]
 https://raw.githubusercontent.com/langkhach270389/Scripting/master/QuantumultX/Fake_Vip.txt, tag=Fakevip, enabled=false
-https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumultX-rewrite.conf, tag=HostVn, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumultX-rewrite.conf, tag=🇻🇳hostsVN, enabled=true
 
 [server_local]
 
