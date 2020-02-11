@@ -22,8 +22,8 @@ Js.conf(远程订阅脚本)
 1.脚本本地化配置:
 
 1⃣️在本地建立文件夹
-目录 iCloud Drive/QuantumultX/Script/nzw9314
-或者 我的iPhone/QuantumultX/Script/nzw9314
+目录 iCloud Drive/QuantumultX/Scripts/nzw9314
+或者 我的iPhone/QuantumultX/Scripts/nzw9314
 
 2⃣️用working copy挂载我的库:
 https://github.com/nzw9314/QuantumultX.git
