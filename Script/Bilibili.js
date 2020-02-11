@@ -68,9 +68,9 @@ if (-1 != $request.url.indexOf('resource/show/tab?') && 0 == body['code']) {
         return item.id != 180
     });
     // 70 直播 影视
-    body['data']['tab'] = body['data']['tab'].filter(function (item) {
+    /*body['data']['tab'] = body['data']['tab'].filter(function (item) {
         return item.id != 38247 && item.id != 39 && item.id != 151
-    });
+    });*/
     // 游戏中心
     body['data']['top'] = body['data']['top'].filter(function (item) {
         return item.id != 175
