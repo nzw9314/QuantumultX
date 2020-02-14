@@ -106,11 +106,12 @@ function lowerMsgs(data) {
 function historyItems(data) {
     const rexMatch = /\[.*?\]/g;
     const rexExec = /\[(.*),(.*),"(.*)"\]/;
-    const list = data.jiagequshiyh.match(rexMatch);
+    let list = data.jiagequshiyh.match(rexMatch);
     let tbitems = [];
     let startDate = "";
     let endDate = "";
-    list.reverse().forEach((item, index) => {
+    list = list.reverse().slice(0, 365);
+    list.forEach((item, index) => {
         if (item.length > 0) {
             const result = rexExec.exec(item);
             const dateUTC = new Date(eval(result[1]));
@@ -125,7 +126,7 @@ function historyItems(data) {
             price = "¥" + String(parseFloat(price));
             const msg = date + getSpace(50 - date.length) + price;
             tbitem = {
-                icon: "https://s2.ax1x.com/2020/01/03/lU2AYD.png",
+                icon: "https://i.loli.net/2020/02/14/7cDhsIYpgbZL9ln.png",
                 title: msg
             }
             tbitems.push(tbitem);
@@ -152,7 +153,7 @@ function getSpace(length) {
 
 function customItem() {
     return {
-        icon: "https://s2.ax1x.com/2020/01/03/lU2Pw6.png",
+        icon: "https://i.loli.net/2020/02/14/wFb2rheIPnQxS1R.png",
         title: "历史价格",
         desc: ""
     }

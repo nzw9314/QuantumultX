@@ -28,11 +28,10 @@ if (url.indexOf(path1) != -1) {
 }
 
 if (url.indexOf(path2) != -1) {
-    const body = $response.body
+    $done({ body })
     const obj = JSON.parse(body)
     let item = obj.data.item
     let shareUrl = `https://item.taobao.com/item.htm?id=${item.itemId}`
-    $done({ body })
     requestPrice(shareUrl, function (data) {
         if (data) {
             if (data.ok == 1 && data.single) {

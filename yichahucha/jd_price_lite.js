@@ -16,11 +16,11 @@ if (url.indexOf(path1) != -1) {
 }
 
 if (url.indexOf(path2) != -1) {
+    $done({ body });
     let obj = JSON.parse(body);
     const floors = obj.floors;
     const commodity_info = floors[floors.length - 1];
     const shareUrl = commodity_info.data.property.shareUrl;
-    $done({ body });
     request_history_price(shareUrl, function (data) {
         if (data) {
             if (data.ok == 1 && data.single) {
