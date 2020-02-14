@@ -165,6 +165,7 @@ function adword_obj() {
 function tool() {
     const isSurge = typeof $httpClient != "undefined"
     const isQuanX = typeof $task != "undefined"
+    const isResponse = typeof $response != "undefined"
     const node = (() => {
         if (typeof require == "function") {
             const request = require('request')
@@ -178,19 +179,21 @@ function tool() {
         if (isSurge) $notification.post(title, subtitle, message)
         if (node) console.log(JSON.stringify({ title, subtitle, message }));
     }
-    const setCache = (value, key) => {
+    const write = (value, key) => {
         if (isQuanX) return $prefs.setValueForKey(value, key)
         if (isSurge) return $persistentStore.write(value, key)
     }
-    const getCache = (key) => {
+    const read = (key) => {
         if (isQuanX) return $prefs.valueForKey(key)
         if (isSurge) return $persistentStore.read(key)
     }
     const adapterStatus = (response) => {
-        if (response.status) {
-            response["statusCode"] = response.status
-        } else if (response.statusCode) {
-            response["status"] = response.statusCode
+        if (response) {
+            if (response.status) {
+                response["statusCode"] = response.status
+            } else if (response.statusCode) {
+                response["status"] = response.statusCode
+            }
         }
         return response
     }
@@ -230,7 +233,7 @@ function tool() {
             })
         }
     }
-    return { isQuanX, isSurge, notify, setCache, getCache, get, post }
+    return { isQuanX, isSurge, isResponse, notify, write, read, get, post }
 }
 
 Array.prototype.insert = function (index, item) {

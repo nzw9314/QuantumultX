@@ -47,10 +47,12 @@ function tool() {
         if (this.isSurge) return $persistentStore.read(key)
     }
     const adapterStatus = (response) => {
-        if (response.status) {
-            response["statusCode"] = response.status
-        } else if (response.statusCode) {
-            response["status"] = response.statusCode
+        if (response) {
+            if (response.status) {
+                response["statusCode"] = response.status
+            } else if (response.statusCode) {
+                response["status"] = response.statusCode
+            }
         }
         return response
     }
