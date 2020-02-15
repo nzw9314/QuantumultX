@@ -122,7 +122,7 @@ function request_history_price(share_url, callback) {
             "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
             "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_1_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 - mmbWebBrowse - ios"
         },
-        body: "methodName=getHistoryTrend&p_url=" + encodeURIComponent("http://m.manmanbuy.com/redirect.aspx?webid=1&tourl=" + share_url)
+        body: "methodName=getHistoryTrend&p_url=" + encodeURIComponent(share_url)
     }
     $tool.post(options, function (error, response, data) {
         if (!error) {
