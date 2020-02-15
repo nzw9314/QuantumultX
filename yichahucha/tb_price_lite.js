@@ -92,19 +92,19 @@ function historySummary(single) {
                 lowest180 = { Name: "一百八最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
                 lowest360 = { Name: "三百六最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
             }
-            if (index < 60 && price < lowest60.price) {
+            if (index < 60 && price <= lowest60.price) {
                 lowest60.price = price
                 lowest60.Price = `¥${String(price)}`
                 lowest60.Date = date
                 lowest60.Difference = difference(currentPrice, price)
             }
-            if (index < 180 && price < lowest180.price) {
+            if (index < 180 && price <= lowest180.price) {
                 lowest180.price = price
                 lowest180.Price = `¥${String(price)}`
                 lowest180.Date = date
                 lowest180.Difference = difference(currentPrice, price)
             }
-            if (index < 360 && price < lowest360.price) {
+            if (index < 360 && price <= lowest360.price) {
                 lowest360.price = price
                 lowest360.Price = `¥${String(price)}`
                 lowest360.Date = date

@@ -4,7 +4,7 @@ README：https://github.com/yichahucha/surge/tree/master
 
 const path1 = "serverConfig";
 const path2 = "wareBusiness";
-const console_log = false;
+const consolelog = false;
 const url = $request.url;
 const body = $response.body;
 const $tool = tool();
@@ -38,13 +38,11 @@ if (url.indexOf(path2) != -1) {
                 }
             }
             if (data.ok == 1 && data.single) {
-                const price_msgs = history_price_msg(data.single)
-                const historyword = adword_obj();
-                lowerword.data.ad.adword = price_msgs[0];
-                historyword.data.ad.adword = price_msgs[1];
-                historyword.data.ad.textColor = "#FE9900";
+                const lower = lowerMsgs(data.single)
+                const detail = priceSummary(data)
+                const tip = data.PriceRemark.Tip + "（仅供参考）"
+                lowerword.data.ad.adword = `${lower} ${tip}\n${detail}`;
                 floors.insert(bestIndex, lowerword);
-                floors.insert(bestIndex + 1, historyword);
             }
             if (data.ok == 0 && data.msg.length > 0) {
                 lowerword.data.ad.adword = "⚠️ " + data.msg;
@@ -57,49 +55,85 @@ if (url.indexOf(path2) != -1) {
     })
 }
 
-function history_price_msg(data) {
-    const rex_match = /\[.*?\]/g;
-    const rex_exec = /\[(.*),(.*),"(.*)"\]/;
-    const lower = data.lowerPriceyh;
-    const lower_date = changeDateFormat(data.lowerDateyh);
-    const lower_msg = "‼️ 历史最低到手价:   ¥" + String(lower) + "   " + lower_date
-    const curret_msg = (data.currentPriceStatus ? "   当前价格" + data.currentPriceStatus : "") + "   (仅供参考)";
-    const lower_price_msg = lower_msg + curret_msg;
-    const riqi = "日期:  ";
-    const jiage = "价格:  ";
-    const youhui = "活动:  ";
-    const title_msg = "〽️ 历史价格走势";
-    const title_table_msg = riqi + get_blank_space(25 - riqi.length) + jiage + get_blank_space(25 - jiage.length) + youhui;
-    let history_price_msg = "";
-    let start_date = "";
-    let end_date = "";
-    let date_range_msg = `(最近一年)`;
-    let list = data.jiagequshiyh.match(rex_match);
-    list = list.reverse().slice(0, 365);
+function lowerMsgs(data) {
+    const lower = data.lowerPriceyh
+    const lowerDate = dateFormat(data.lowerDateyh)
+    const lowerMsg = "〽️历史最低到手价：¥" + String(lower) + ` (${lowerDate}) `
+    return lowerMsg
+}
+
+function priceSummary(data) {
+    let summary = ""
+    let listPriceDetail = data.PriceRemark.ListPriceDetail
+    listPriceDetail.pop()
+    listPriceDetail.forEach((item, index) => {
+        if (index == 2) {
+            item.Name = "双十一价格"
+        } else if (index == 3) {
+            item.Name = "六一八价格"
+        } else if (index == 4) {
+            item.Name = "三十天最低"
+        }
+        summary += `\n${item.Name}        ${item.Price}        ${item.Date}        ${item.Difference}`
+    })
+    historySummary(data.single).forEach((item) => {
+        summary += `\n${item.Name}        ${item.Price}        ${item.Date}        ${item.Difference}`
+    });
+    return summary
+}
+
+function historySummary(single) {
+    const rexMatch = /\[.*?\]/g;
+    const rexExec = /\[(.*),(.*),"(.*)"\]/;
+    let currentPrice, lowest60, lowest180, lowest360
+    let list = single.jiagequshiyh.match(rexMatch);
+    list = list.reverse().slice(0, 360);
     list.forEach((item, index) => {
         if (item.length > 0) {
-            const result = rex_exec.exec(item);
+            const result = rexExec.exec(item);
             const dateUTC = new Date(eval(result[1]));
             const date = dateUTC.format("yyyy-MM-dd");
+            let price = parseFloat(result[2]);
             if (index == 0) {
-                end_date = date;
+                currentPrice = price
+                lowest60 = { Name: "六十天最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
+                lowest180 = { Name: "一百八最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
+                lowest360 = { Name: "三百六最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
             }
-            if (index == list.length - 1) {
-                start_date = date;
+            if (index < 60 && price <= lowest60.price) {
+                lowest60.price = price
+                lowest60.Price = `¥${String(price)}`
+                lowest60.Date = date
+                lowest60.Difference = difference(currentPrice, price)
             }
-            let price = result[2];
-            price = "¥" + String(parseFloat(price));
-            if (date == lower_date) {
-                price += "❗️"
+            if (index < 180 && price <= lowest180.price) {
+                lowest180.price = price
+                lowest180.Price = `¥${String(price)}`
+                lowest180.Date = date
+                lowest180.Difference = difference(currentPrice, price)
             }
-            const sale = result[3];
-            const msg = date + get_blank_space(20 - date.length) + price + get_blank_space(15 - price.length) + sale + "\n";
-            history_price_msg += msg;
+            if (index < 360 && price <= lowest360.price) {
+                lowest360.price = price
+                lowest360.Price = `¥${String(price)}`
+                lowest360.Date = date
+                lowest360.Difference = difference(currentPrice, price)
+            }
         }
     });
-    // date_range_msg = `(${start_date} ~ ${end_date})`;
-    const price_msg = title_msg + "  " + date_range_msg + "\n\n" + title_table_msg + "\n" + history_price_msg;
-    return [lower_price_msg, price_msg];
+    return [lowest60, lowest180, lowest360];
+}
+
+function difference(currentPrice, price) {
+    let difference = strip(currentPrice - price)
+    if (difference == 0) {
+        return "-"
+    } else {
+        return `${difference > 0 ? "↑" : "↓"}${String(difference)}`
+    }
+}
+
+function strip(num, precision = 12) {
+    return +parseFloat(num.toPrecision(precision));
 }
 
 function request_history_price(share_url, callback) {
@@ -109,32 +143,24 @@ function request_history_price(share_url, callback) {
             "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
             "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_1_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 - mmbWebBrowse - ios"
         },
-        body: "methodName=getBiJiaInfo_wxsmall&p_url=" + encodeURIComponent(share_url)
+        body: "methodName=getHistoryTrend&p_url=" + encodeURIComponent("http://m.manmanbuy.com/redirect.aspx?webid=1&tourl=" + share_url)
     }
     $tool.post(options, function (error, response, data) {
         if (!error) {
             callback(JSON.parse(data));
-            if (console_log) console.log("Data:\n" + data);
+            if (consolelog) console.log("Data:\n" + data);
         } else {
             callback(null, null);
-            if (console_log) console.log("Error:\n" + error);
+            if (consolelog) console.log("Error:\n" + error);
         }
     })
 }
 
-function changeDateFormat(cellval) {
+function dateFormat(cellval) {
     const date = new Date(parseInt(cellval.replace("/Date(", "").replace(")/", ""), 10));
     const month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
     const currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
     return date.getFullYear() + "-" + month + "-" + currentDate;
-}
-
-function get_blank_space(length) {
-    let blank = "";
-    for (let index = 0; index < length; index++) {
-        blank += " ";
-    }
-    return blank;
 }
 
 function adword_obj() {
