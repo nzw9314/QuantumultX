@@ -4,7 +4,7 @@ README：https://github.com/yichahucha/surge/tree/master
 
 const path1 = "serverConfig";
 const path2 = "wareBusiness";
-const log = false;
+const consolelog = false;
 const url = $request.url;
 const body = $response.body;
 const $tool = tool();
@@ -24,8 +24,10 @@ if (url.indexOf(path2) != -1) {
     request_history_price(shareUrl, function (data) {
         if (data) {
             if (data.ok == 1 && data.single) {
-                const lower = history_price_msg(data.single)
-                $tool.notify("", "", `${lower}\n\n👉 查看详情：http://tool.manmanbuy.com/historyLowest.aspx?url=${encodeURI(shareUrl)}`)
+                const lower = lowerMsgs(data.single)
+                const detail = listPriceDetail(data.PriceRemark.ListPriceDetail)
+                const tip = data.PriceRemark.Tip + "（仅供参考）"
+                $tool.notify("", "", `${lower} ${tip}\n${detail}\n\n👉查看详情：http://tool.manmanbuy.com/historyLowest.aspx?url=${encodeURI(shareUrl)}`)
             }
             if (data.ok == 0 && data.msg.length > 0) {
                 $tool.notify("", "", `⚠️ ${data.msg}`)
@@ -34,12 +36,29 @@ if (url.indexOf(path2) != -1) {
     })
 }
 
-function history_price_msg(data) {
-    const lower = data.lowerPriceyh;
-    const lower_date = changeDateFormat(data.lowerDateyh);
-    const lower_msg = "〽️ 历史最低到手价:   ¥" + String(lower) + "   " + lower_date
-    const curret_msg = (data.currentPriceStatus ? "   当前价格" + data.currentPriceStatus : "") + "   (仅供参考)";
-    return lower_msg + curret_msg;
+function lowerMsgs(data) {
+    const lower = data.lowerPriceyh
+    const lowerDate = dateFormat(data.lowerDateyh)
+    const lowerMsg = "〽️历史最低到手价：¥" + String(lower) + ` (${lowerDate}) `
+    return lowerMsg
+}
+
+function listPriceDetail(list) {
+    let listPriceDetail = ""
+    list.forEach((item, index) => {
+        if (index == 2) {
+            item.Name = "双十一价格"
+        } else if (index == 3) {
+            item.Name = "六一八价格"
+        } else if (index == 4) {
+            item.Name = "三十天最低"
+        } else if (index == 5) {
+            item.Name = "三十天平均"
+        }
+        const priceDetail = `${item.Name}   ${item.Price}   ${item.Date}   ${item.Difference}`
+        listPriceDetail += `\n${priceDetail}`
+    })
+    return listPriceDetail
 }
 
 function request_history_price(share_url, callback) {
@@ -49,20 +68,20 @@ function request_history_price(share_url, callback) {
             "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
             "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_1_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 - mmbWebBrowse - ios"
         },
-        body: "methodName=getBiJiaInfo_wxsmall&p_url=" + encodeURIComponent(share_url)
+        body: "methodName=getHistoryTrend&p_url=" + encodeURIComponent("http://m.manmanbuy.com/redirect.aspx?webid=1&tourl=" + share_url)
     }
     $tool.post(options, function (error, response, data) {
         if (!error) {
             callback(JSON.parse(data));
-            if (log) console.log("Data:\n" + data);
+            if (consolelog) console.log("Data:\n" + data);
         } else {
             callback(null, null);
-            if (log) console.log("Error:\n" + error);
+            if (consolelog) console.log("Error:\n" + error);
         }
     })
 }
 
-function changeDateFormat(cellval) {
+function dateFormat(cellval) {
     const date = new Date(parseInt(cellval.replace("/Date(", "").replace(")/", ""), 10));
     const month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
     const currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
