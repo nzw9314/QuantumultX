@@ -78,13 +78,13 @@ function sign() {
     const title = `${cookieName}`
     let subTitle = ''
     let detail = ''
-    sy.log(response);
-    if (response == 200) {
+    sy.log(response.status);
+    if (response.status == 200) {
       subTitle = '签到结果: 成功'
       // else subTitle = '签到结果: 成功 (重复签到)'
       // detail = `人人钻: ${result.data.userinfo.point}, 登录天数: ${result.data.usercount.cont_login} -> ${result.data.upgrade_day}`
      sy.msg(title, subTitle, detail)
-    } else if(response == 400) {
+    } else if(response.status == 400) {
       subTitle = '签到结果: 重复'
       sy.msg(title, subTitle, detail)
     }
@@ -127,15 +127,17 @@ function init() {
       $task.fetch(url).then((resp) => cb(null, {}, resp.body))
     }
   }
-  post = (url, cb) => {
-    if (isSurge()) {
-      $httpClient.post(url, cb)
-    }
+  post = (options, callback) => {
     if (isQuanX()) {
-      url.method = 'POST'
-      $task.fetch(url).then((resp) => cb(null, resp.statusCode, resp.body))
+        if (typeof options == "string") options = { url: options }
+        options["method"] = "POST"
+        $task.fetch(options).then(response => {
+            response["status"] = response.statusCode
+            callback(null, response, response.body)
+        }, reason => callback(reason.error, null, null))
     }
-  }
+    if (isSurge()) $httpClient.post(options, callback)
+}
   done = (value = {}) => {
     $done(value)
   }
