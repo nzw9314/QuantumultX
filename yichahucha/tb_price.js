@@ -49,13 +49,13 @@ if (url.indexOf(path2) != -1) {
                 let historyItem = customItem()
                 if (data.ok == 1 && data.single) {
                     const lower = lowerMsgs(data.single)
-                    const result = historyItems(data.single)
-                    const tbitems = result[1]
+                    const tbitems = priceSummary(data)
+                    const tip = data.PriceRemark.Tip
                     service.items = service.items.concat(nonService.items)
-                    historyItem.desc = lower[0]
+                    historyItem.desc = `${lower[0]} ${tip}` + "（仅供参考）"
                     historyItem.title = lower[1]
                     service.items.unshift(historyItem)
-                    nonService.title = "价格走势"
+                    nonService.title = "价格详情"
                     nonService.items = tbitems
                 }
                 if (data.ok == 0 && data.msg.length > 0) {
@@ -73,67 +73,110 @@ if (url.indexOf(path2) != -1) {
     }
 }
 
-function requestPrice(shareUrl, callback) {
-    let options = {
-        url: "https://apapia-history.manmanbuy.com/ChromeWidgetServices/WidgetServices.ashx",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_1_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 - mmbWebBrowse - ios"
-        },
-        body: "methodName=getBiJiaInfo_wxsmall&p_url=" + encodeURIComponent(shareUrl)
-    }
-    $tool.post(options, function (error, response, data) {
-        if (!error) {
-            callback(JSON.parse(data));
-            if (consoleLog) console.log("Data:\n" + data);
-        } else {
-            callback(null, null);
-            if (consoleLog) console.log("Error:\n" + error);
-        }
-    })
-}
-
 function lowerMsgs(data) {
     const lower = data.lowerPriceyh
     const lowerDate = dateFormat(data.lowerDateyh)
-    const lowerMsg = "历史最低到手价:   ¥" + String(lower) + "   " + lowerDate
-    const curret_msg = (data.currentPriceStatus ? "   当前价格" + data.currentPriceStatus : "") + "   (仅供参考)"
-    const lower1 = lowerMsg + curret_msg
-    const lower2 = "历史最低¥" + String(lower)
-    return [lower1, lower2]
+    const lowerMsg = "最低到手价：¥" + String(lower) + `（${lowerDate}）`
+    const lowerMsg1 = "历史最低¥" + String(lower)
+    return [lowerMsg, lowerMsg1]
 }
 
-function historyItems(data) {
+function priceSummary(data) {
+    let tbitems = []
+    let summary = ""
+    let listPriceDetail = data.PriceRemark.ListPriceDetail
+    listPriceDetail.pop()
+    let list = listPriceDetail.concat(historySummary(data.single))
+    list.forEach((item, index) => {
+        if (index == 2) {
+            item.Name = "双十一价格"
+        } else if (index == 3) {
+            item.Name = "六一八价格"
+        } else if (index == 4) {
+            item.Name = "三十天最低"
+        }
+        summary = `${item.Name}${getSpace(5)}${item.Price}${getSpace(5)}${item.Date}${getSpace(5)}${item.Difference}`
+        tbitem = {
+            icon: "https://i.loli.net/2020/02/14/7cDhsIYpgbZL9ln.png",
+            title: summary
+        }
+        tbitems.push(tbitem)
+    })
+    return tbitems
+}
+
+function historySummary(single) {
     const rexMatch = /\[.*?\]/g;
     const rexExec = /\[(.*),(.*),"(.*)"\]/;
-    let list = data.jiagequshiyh.match(rexMatch);
-    let tbitems = [];
-    let startDate = "";
-    let endDate = "";
-    list = list.reverse().slice(0, 365);
+    let currentPrice, lowest60, lowest180, lowest360
+    let list = single.jiagequshiyh.match(rexMatch);
+    list = list.reverse().slice(0, 360);
     list.forEach((item, index) => {
         if (item.length > 0) {
             const result = rexExec.exec(item);
             const dateUTC = new Date(eval(result[1]));
             const date = dateUTC.format("yyyy-MM-dd");
+            let price = parseFloat(result[2]);
             if (index == 0) {
-                endDate = date;
+                currentPrice = price
+                lowest60 = { Name: "六十天最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
+                lowest180 = { Name: "一百八最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
+                lowest360 = { Name: "三百六最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
             }
-            if (index == list.length - 1) {
-                startDate = date;
+            if (index < 60 && price <= lowest60.price) {
+                lowest60.price = price
+                lowest60.Price = `¥${String(price)}`
+                lowest60.Date = date
+                lowest60.Difference = difference(currentPrice, price)
             }
-            let price = result[2];
-            price = "¥" + String(parseFloat(price));
-            const msg = date + getSpace(50 - date.length) + price;
-            tbitem = {
-                icon: "https://i.loli.net/2020/02/14/7cDhsIYpgbZL9ln.png",
-                title: msg
+            if (index < 180 && price <= lowest180.price) {
+                lowest180.price = price
+                lowest180.Price = `¥${String(price)}`
+                lowest180.Date = date
+                lowest180.Difference = difference(currentPrice, price)
             }
-            tbitems.push(tbitem);
+            if (index < 360 && price <= lowest360.price) {
+                lowest360.price = price
+                lowest360.Price = `¥${String(price)}`
+                lowest360.Date = date
+                lowest360.Difference = difference(currentPrice, price)
+            }
         }
     });
-    const dateMsg = `(${startDate} ~ ${endDate})`;
-    return [dateMsg, tbitems];
+    return [lowest60, lowest180, lowest360];
+}
+
+function difference(currentPrice, price) {
+    let difference = strip(currentPrice - price)
+    if (difference == 0) {
+        return "-"
+    } else {
+        return `${difference > 0 ? "↑" : "↓"}${String(difference)}`
+    }
+}
+
+function strip(num, precision = 12) {
+    return +parseFloat(num.toPrecision(precision));
+}
+
+function requestPrice(share_url, callback) {
+    const options = {
+        url: "https://apapia-history.manmanbuy.com/ChromeWidgetServices/WidgetServices.ashx",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_1_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 - mmbWebBrowse - ios"
+        },
+        body: "methodName=getHistoryTrend&p_url=" + encodeURIComponent("http://m.manmanbuy.com/redirect.aspx?webid=1&tourl=" + share_url)
+    }
+    $tool.post(options, function (error, response, data) {
+        if (!error) {
+            callback(JSON.parse(data));
+            if (consolelog) console.log("Data:\n" + data);
+        } else {
+            callback(null, null);
+            if (consolelog) console.log("Error:\n" + error);
+        }
+    })
 }
 
 function dateFormat(cellval) {
