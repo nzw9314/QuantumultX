@@ -25,7 +25,7 @@ if (url.indexOf(path2) != -1) {
         if (data) {
             if (data.ok == 1 && data.single) {
                 const lower = lowerMsgs(data.single)
-                const detail = listPriceDetail(data.PriceRemark.ListPriceDetail)
+                const detail = priceSummary(data)
                 const tip = data.PriceRemark.Tip + "（仅供参考）"
                 $tool.notify("", "", `${lower} ${tip}\n${detail}\n\n👉查看详情：http://tool.manmanbuy.com/historyLowest.aspx?url=${encodeURI(shareUrl)}`)
             }
@@ -43,22 +43,78 @@ function lowerMsgs(data) {
     return lowerMsg
 }
 
-function listPriceDetail(list) {
-    let listPriceDetail = ""
-    list.forEach((item, index) => {
+function priceSummary(data) {
+    let summary = ""
+    let listPriceDetail = data.PriceRemark.ListPriceDetail
+    listPriceDetail.pop()
+    listPriceDetail.forEach((item, index) => {
         if (index == 2) {
             item.Name = "双十一价格"
         } else if (index == 3) {
             item.Name = "六一八价格"
         } else if (index == 4) {
             item.Name = "三十天最低"
-        } else if (index == 5) {
-            item.Name = "三十天平均"
         }
-        const priceDetail = `${item.Name}   ${item.Price}   ${item.Date}   ${item.Difference}`
-        listPriceDetail += `\n${priceDetail}`
+        summary += `\n${item.Name}   ${item.Price}   ${item.Date}   ${item.Difference}`
     })
-    return listPriceDetail
+    historySummary(data.single).forEach((item) => {
+        summary += `\n${item.Name}   ${item.Price}   ${item.Date}   ${item.Difference}`
+    });
+    return summary
+}
+
+function historySummary(single) {
+    const rexMatch = /\[.*?\]/g;
+    const rexExec = /\[(.*),(.*),"(.*)"\]/;
+    let currentPrice, lowest60, lowest180, lowest360
+    let list = single.jiagequshiyh.match(rexMatch);
+    list = list.reverse().slice(0, 360);
+    list.forEach((item, index) => {
+        if (item.length > 0) {
+            const result = rexExec.exec(item);
+            const dateUTC = new Date(eval(result[1]));
+            const date = dateUTC.format("yyyy-MM-dd");
+            let price = parseFloat(result[2]);
+            if (index == 0) {
+                currentPrice = price
+                lowest60 = { Name: "六十天最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
+                lowest180 = { Name: "一百八最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
+                lowest360 = { Name: "三百六最低", Price: `¥${String(price)}`, Date: date, Difference: difference(currentPrice, price), price }
+            }
+            if (index < 60 && price < lowest60.price) {
+                lowest60.price = price
+                lowest60.Price = `¥${String(price)}`
+                lowest60.Date = date
+                lowest60.Difference = difference(currentPrice, price)
+            }
+            if (index < 180 && price < lowest180.price) {
+                lowest180.price = price
+                lowest180.Price = `¥${String(price)}`
+                lowest180.Date = date
+                lowest180.Difference = difference(currentPrice, price)
+            }
+            if (index < 360 && price < lowest360.price) {
+                lowest360.price = price
+                lowest360.Price = `¥${String(price)}`
+                lowest360.Date = date
+                lowest360.Difference = difference(currentPrice, price)
+            }
+        }
+    });
+    return [lowest60, lowest180, lowest360];
+}
+
+function difference(currentPrice, price) {
+    let difference = strip(currentPrice - price)
+    if (difference == 0) {
+        return "-"
+    } else {
+        return `${difference > 0 ? "↑" : "↓"}${String(difference)}`
+    }
+}
+
+function strip(num, precision = 12) {
+    return +parseFloat(num.toPrecision(precision));
 }
 
 function request_history_price(share_url, callback) {
