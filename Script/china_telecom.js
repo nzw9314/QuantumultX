@@ -1,10 +1,10 @@
 /**
- * 下载安装 天翼账号中心 登陆
+ *#电信流量话费查询  (By uchvk) 下载安装 天翼账号中心 登陆
  [rewrite_local]
 ^https?:\/\/e\.189\.cn\/store\/user\/package_detail\.do url script-request-header Tasks/china_telecom.js
 # MITM = e.189.cn
 [task_local]
-10 8 * * * Tasks/china_telecom.js
+10 8 * * * china_telecom.js
 
  */
 
