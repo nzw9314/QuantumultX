@@ -38,7 +38,7 @@ function GetCookie() {
 function cron() {
     var authToken = $tool.read(config.authTokenKey);
     if (!authToken) {
-        $tool.notify(`${config.name}`, '请获取authToken', '登陆天翼账号中心获取')
+        $tool.notify(`${config.name}`, '请获取authToken', '下载安装APP[天翼账号中心]获取')
         return
     }
     var request = {
@@ -68,7 +68,7 @@ function cron() {
 function balanceMessage(data){
     var authToken = $tool.read(config.authTokenKey);
     if (!authToken) {
-        $tool.notify(`${config.name}`, '请获取authToken', '登陆天翼账号中心获取')
+        $tool.notify(`${config.name}`, '请获取authToken', '下载安装APP[天翼账号中心]获取')
         return
     }
     var request = {
@@ -104,20 +104,20 @@ function balanceMessage(data){
 function parseBody(data, balance) {
     // voiceAmount 总语音 voiceUsage voiceBalance
     // totalCommon usedCommon balanceCommon
-    var subtitle = "[话费] 剩余: " + (balance/100).toFixed(2) + "元";
+    var subtitle = "中国电信套餐查询";
+    var name = data.items[0].productOFFName;
+    if (typeof name != "undefined") {
+        subtitle = "[套餐] " + name;
+    }
 
-    var message = "";
+    var message = "[话费] 剩余: " + (balance/100).toFixed(2) + "元";
     if  (typeof data.voiceAmount != "undefined"){
         var voice = "[通话] 已用: " + data.voiceUsage + "分, 剩余: " + data.voiceBalance + "分,  合计: " + data.voiceAmount + "分";
-        message = voice;
+        message = message + "\n" + voice;
     }
-    if (typeof data.totalCommon != "undefined") {
+    if (typeof data.totalCommon != "undefined" && data.totalCommon > 0) {
         var flow = "[流量] 已用: " + formatFlow(data.usedCommon/1024) + ", 剩余: " + formatFlow(data.balanceCommon/1024) + ", 合计: " + formatFlow(data.totalCommon/1024);
-        if (message) {
-            message = message + "\n" + flow;
-        } else {
-            message = flow;
-        }
+        message = message + "\n" + flow;
     }
 
     $tool.notify(`${config.name}`, subtitle, message);
