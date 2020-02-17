@@ -1,22 +1,27 @@
 /*
 JingDong daily bonus, Multiple in one scripts
+
 Description :
 When using for the first time. Need to manually log in to the https://bean.m.jd.com checkin to get cookie. If notification gets cookie success, you can use the check in script.
 Due to the validity of cookie, if the script pops up a notification of cookie invalidation in the future, you need to repeat the above steps.
+
 Daily bonus script will be performed every day at 0:05 a.m. You can modify the execution time.
 If reprinted, please indicate the source. My TG channel @NobyDa
+
 Update 2020.2.13 21:00 v66 
 Effective number: 22
 ~~~~~~~~~~~~~~~~
 Surge 4.0 :
 [Script]
 cron "5 0 * * *" script-path=https://raw.githubusercontent.com/NobyDa/Script/master/JD-DailyBonus/JD_DailyBonus.js
+
 # Get JingDong cookie.
 http-request https:\/\/api\.m\.jd\.com\/client\.action.*functionId=signBean(Index|GroupStageIndex) max-size=0,script-path=https://raw.githubusercontent.com/NobyDa/Script/master/JD-DailyBonus/JD_DailyBonus.js
 ~~~~~~~~~~~~~~~~
 QX 1.0.5 :
 [task_local]
 5 0 * * * JD_DailyBonus.js
+
 [rewrite_local]
 # Get JingDong cookie. QX 1.0.5(188+):
 https:\/\/api\.m\.jd\.com\/client\.action.*functionId=signBean(Index|GroupStageIndex) url script-request-header JD_DailyBonus.js
@@ -61,7 +66,6 @@ async function all() {//签到模块相互独立,您可注释某一行以禁用�
   await JDPersonalCare(stop); //京东个人护理馆
   await JingDongPrize(stop); //京东抽大奖
   await JingDongShake(stop); //京东摇一摇
-  await JingDongBaitiao(stop);//京东白条签到
 
   await TotalSteel(); //总钢镚查询
   await TotalCash(); //总红包查询
@@ -88,7 +92,6 @@ var merge = {
   JDLive:  {success:0,fail:0,bean:0,steel:0,notify:''},
   JDCare:  {success:0,fail:0,bean:0,steel:0,notify:''},
   JDClean: {success:0,fail:0,bean:0,steel:0,notify:''},
-  JDBaitiao: {success:0,fail:0,bean:0,steel:0,notify:''},
   JDPrize: {success:0,fail:0,bean:0,steel:0,notify:'',key:0},
   JRSteel: {success:0,fail:0,bean:0,steel:0,notify:'',TSteel:0},
   JDCash:  {success:0,fail:0,bean:0,steel:0,notify:'',Cash:0,TCash:0},
@@ -131,8 +134,6 @@ function notify() {
     }
   });
 }
-
-
 
 function JingDongBean(s) {
 
@@ -268,99 +269,7 @@ function JingDongTurn(s) {
     })}, s)
   });
 }
-//京东白条提额
-function JingDongBaitiao(s){
-    const JDBUrl = {
-          url:   'https://ms.jr.jd.com/gw/generic/bt/h5/m/currMaterielFloor',
-        headers: {
-          Cookie: KEY,
-          Referer: 'https://cfm.jd.com/jdbt/manage/pages/result.html',
-          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-        },
-        body:'reqData=%7B%22clientType%22%3A%22ios%22%2C%22clientVersion%22%3A%2213.3.1%22%2C%22floorNameList%22%3A%5B%22init_bt_quota_summary_page_page5%22%5D%7D'
-      };
-      const loginUrl = {
-        url: 'https://ms.jr.jd.com/gw/generic/zc/h5/m/signRecords',
-        headers: {
-          Cookie: KEY,
-          Referer: "https://jddx.jd.com/m/money/index.html?from=sign",
-        },
-        body: "reqData=%7B%22bizLine%22%3A2%7D"
-      };  
-    return new Promise(resolve =>{setTimeout(()=>{
-        $nobyda.post(loginUrl, function(error, response, data) {
-            try {
-                if (error) {
-                  merge.JDBaitiao.notify = "京东金融-京豆: 登录接口请求失败 ‼️‼️"
-                  merge.JDBaitiao.fail = 1
-                  resolve('done')
-                } else {
-                  setTimeout(function() {
-                    if (data.match(/\"login\":true/)) {
-                      if (log) console.log("京东金融-京豆登录成功response: \n" + data)
-                      $nobyda.post(JDBUrl, function(error, response, data) {
-                        try {
-                          if (error) {
-                            merge.JDBaitiao.notify = "京东金融-京豆: 签到接口请求失败 ‼️‼️"
-                            merge.JDBaitiao.fail = 1
-                          } else {
-                            
-                            const c = JSON.parse(data)
-                            if (log) console.log("京东金融-白条提额response: \n" + data)
-                            if (c.resultCode==0) {
-                              if (log) console.log("京东白条提额成功: \n" + data)
-                              if (c.resultData.result.code = "0000") {
-                                merge.JDBaitiao.notify = "京东白条提额成功: 成功 🐶"
-                                merge.JDBaitiao.success = 1
-                                
-                              } else {
-                                merge.JDBaitiao.notify = "今日白条额度已提升, 明细: 无奖励 🐶"
-                                merge.JDBaitiao.success = 1
-                              }
-                            } else {
-                              if (log) console.log("京东金融-白条提额失败: \n" + data)
-                              if (data.match(/(发放失败|70111)/)) {
-                                merge.JDBaitiao.notify = "京东金融-白条提额失败 ⚠️"
-                                merge.JDBaitiao.fail = 1
-                              } else {
-                                if (data.match(/(\"resultCode\":3|请先登录)/)) {
-                                  merge.JDBaitiao.notify = "京东金融-白条提额失败: 失败, 原因: Cookie失效‼️"
-                                  merge.JDBaitiao.fail = 1
-                                } else {
-                                  merge.JDBaitiao.notify = "京东金融-白条提额失败: 失败, 原因: 未知 ⚠️"
-                                  merge.JDBaitiao.fail = 1
-                                }
-                              }
-                            }
-                          }
-                          resolve('done')
-                        } catch (eor) {
-                          $nobyda.notify("京东金融-白条提额" + eor.name + "‼️", JSON.stringify(eor), eor.message)
-                          resolve('done')
-                        }
-                      })
-                    } else {
-                      if (log) console.log("京东金融-白条提额失败登录失败response: \n" + data)
-                      if (data.match(/\"login\":false/)) {
-                        merge.JDBaitiao.notify = "京东金融-白条提额失败: 失败, 原因: Cookie失效‼️"
-                        merge.JDBaitiao.fail = 1
-                      } else {
-                        merge.JDBaitiao.notify = "京东金融-白条提额失败: 登录接口需修正 ‼️‼️"
-                        merge.JDBaitiao.fail = 1
-                      }
-                    }
-                  }, 200)
-                }
-                resolve('done')
-              } catch (eor) {
-                $nobyda.notify("京东金融-白条提额失败登录" + eor.name + "‼️", JSON.stringify(eor), eor.message)
-                resolve('done')
-              }
-        })
-    })},s)
 
-}
-//京东金额签到
 function JingRongBean(s) {
 
   return new Promise(resolve => { setTimeout(() => {
