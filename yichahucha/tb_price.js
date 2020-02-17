@@ -46,21 +46,17 @@ if (url.indexOf(path2) != -1) {
 
         requestPrice(shareUrl, function (data) {
             if (data) {
-                let historyItem = customItem()
                 if (data.ok == 1 && data.single) {
                     const lower = lowerMsgs(data.single)
                     const tbitems = priceSummary(data)
                     const tip = data.PriceRemark.Tip
                     service.items = service.items.concat(nonService.items)
-                    historyItem.desc = `${lower[0]} ${tip}` + "（仅供参考）"
-                    historyItem.title = lower[1]
-                    service.items.unshift(historyItem)
+                    service.items.unshift(customItem(lower[1], `${lower[0]} ${tip}` + "（仅供参考）"))
                     nonService.title = "价格详情"
                     nonService.items = tbitems
                 }
                 if (data.ok == 0 && data.msg.length > 0) {
-                    historyItem.desc = data.msg
-                    service.items.push(historyItem)
+                    service.items.unshift(customItem("历史价格", data.msg))
                 }
                 apiStack.value = JSON.stringify(value)
                 $done({ body: JSON.stringify(obj) })
@@ -95,12 +91,8 @@ function priceSummary(data) {
         } else if (index == 4) {
             item.Name = "三十天最低"
         }
-        summary = `${item.Name}${getSpace(5)}${item.Price}${getSpace(5)}${item.Date}${getSpace(5)}${item.Difference}`
-        tbitem = {
-            icon: "https://i.loli.net/2020/02/14/7cDhsIYpgbZL9ln.png",
-            title: summary
-        }
-        tbitems.push(tbitem)
+        summary = `${item.Name}${getSpace(10)}${item.Price}${getSpace(10)}${item.Date}`
+        tbitems.push(customItem(summary))
     })
     return tbitems
 }
@@ -194,11 +186,11 @@ function getSpace(length) {
     return blank;
 }
 
-function customItem() {
+function customItem(title, desc) {
     return {
-        icon: "https://i.loli.net/2020/02/14/wFb2rheIPnQxS1R.png",
-        title: "历史价格",
-        desc: ""
+        icon: "https://s2.ax1x.com/2020/02/16/3STeIJ.png",
+        title: title,
+        desc: desc
     }
 }
 
