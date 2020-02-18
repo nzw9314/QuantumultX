@@ -24,9 +24,11 @@ DOMAIN-SUFFIX,catch.gift
 DOMAIN-SUFFIX,pubnative.net
 DOMAIN-SUFFIX,flurry.com
 DOMAIN-SUFFIX,igexin.com
+DOMAIN-SUFFIX,appcenter.ms 
 
 //Google&&Youtube
 DOMAIN,mtalk.google.com
+DOMAIN,s.youtube.com
 DOMAIN,suggestqueries.google.com
 DOMAIN,www.googleadservices.com
 DOMAIN-SUFFIX,doubleclick.net
