@@ -1,5 +1,3 @@
-[Issue Group](http://t.me/scriptgroup)
-
 # Surge
 Remove weibo ads
 ```
@@ -115,3 +113,5 @@ Daily work check-in reminder
 [task_local]
 0 9,18 * * 1-5 check_in.js
 ```
+
+[Issue Group](http://t.me/scriptgroup)
