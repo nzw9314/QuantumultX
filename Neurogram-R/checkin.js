@@ -45,6 +45,14 @@ if (isQuantumultX) {
                 }
             } else {
                 urlObj = url;
+                if (urlObj.body && typeof (urlObj.body) != 'string') {
+                    urlObj.body = JSON.stringify(urlObj.body);
+                    if (urlObj.headers) {
+                        urlObj.headers['Content-type'] = 'application/json; charset=utf-8';
+                    } else {
+                        urlObj.headers = {'Content-type' : 'application/json; charset=utf-8'};
+                    }
+                }
             }
             $task.fetch(urlObj).then(response => {
                 cb(undefined, response, response.body)
@@ -61,8 +69,16 @@ if (isQuantumultX) {
                 }
             } else {
                 urlObj = url;
+                if (urlObj.body && typeof (urlObj.body) != 'string') {
+                    urlObj.body = JSON.stringify(urlObj.body);
+                    if (urlObj.headers) {
+                        urlObj.headers['Content-type'] = 'application/json; charset=utf-8';
+                    } else {
+                        urlObj.headers = {'Content-type' : 'application/json; charset=utf-8'};
+                    }
+                }
             }
-            url.method = 'POST';
+            urlObj.method = 'POST';
             $task.fetch(urlObj).then(response => {
                 cb(undefined, response, response.body)
             }, reason => {
@@ -156,7 +172,7 @@ Check in for Surge by Neurogram
  - 流量详情显示
  - 多站签到支持
  - 多类站点支持
- 
+
 使用说明：https://www.notion.so/neurogram/Check-in-0797ec9f9f3f445aae241d7762cf9d8b
 
 关于作者
@@ -201,11 +217,7 @@ function login(url, email, password, title) {
             console.log(error);
             $notification.post(title + '登录失败', error, "");
         } else {
-            if (JSON.parse(data).msg == "邮箱或者密码错误") {
-                $notification.post(title + '邮箱或者密码错误', "", "");
-            } else {
-                await checkin(url, title)
-            }
+            await checkin(url, title)
         }
     }
     );
