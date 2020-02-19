@@ -138,10 +138,10 @@ function requestPrice(share_url, callback) {
     $tool.post(options, function (error, response, data) {
         if (!error) {
             callback(JSON.parse(data));
-            if (consolelog) console.log("Data:\n" + data);
+            if (consoleLog) console.log("Data:\n" + data);
         } else {
             callback(null, null);
-            if (consolelog) console.log("Error:\n" + error);
+            if (consoleLog) console.log("Error:\n" + error);
         }
     })
 }
