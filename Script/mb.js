@@ -3,7 +3,7 @@ var obj = JSON.parse($response.body);
  "code": 0,
  "msg": null,
  "data": {
-  "level": 1,
+  "level": 2    ,
   "phone": null,
   "encryptPassword": null,
   "name": "大雄脚本组",

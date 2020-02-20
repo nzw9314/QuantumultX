@@ -30,41 +30,31 @@ if (url.indexOf(path1) != -1) {
 if (url.indexOf(path2) != -1) {
     const body = $response.body
     let obj = JSON.parse(body)
-    let apiStack = obj.data.apiStack[0]
-    let value = JSON.parse(apiStack.value)
-    let tradeConsumerProtection = null
-    if (value.global) {
-        tradeConsumerProtection = value.global.data.tradeConsumerProtection
-        if (!tradeConsumerProtection) {
-            value.global.data["tradeConsumerProtection"] = customTradeConsumerProtection()
-            tradeConsumerProtection = value.global.data.tradeConsumerProtection
-        }
-    } else {
-        tradeConsumerProtection = value.tradeConsumerProtection
-        if (!tradeConsumerProtection) {
-            value["tradeConsumerProtection"] = customTradeConsumerProtection()
-            tradeConsumerProtection = value.tradeConsumerProtection
-        }
-    }
-    let service = tradeConsumerProtection.tradeConsumerService.service
-    let nonService = tradeConsumerProtection.tradeConsumerService.nonService
-
     let item = obj.data.item
     let shareUrl = `https://item.taobao.com/item.htm?id=${item.itemId}`
-
     requestPrice(shareUrl, function (data) {
         if (data) {
-            if (data.ok == 1 && data.single) {
-                const lower = lowerMsgs(data.single)
-                const tbitems = priceSummary(data)
-                const tip = data.PriceRemark.Tip
-                service.items = service.items.concat(nonService.items)
-                service.items.unshift(customItem(lower[1], `${lower[0]} ${tip}` + "（仅供参考）"))
-                nonService.title = "价格详情"
-                nonService.items = tbitems
+            let apiStack = obj.data.apiStack[0]
+            let value = JSON.parse(apiStack.value)
+            let tradeConsumerProtection = null
+            let consumerProtection = null
+            if (value.global) {
+                tradeConsumerProtection = value.global.data.tradeConsumerProtection
+                consumerProtection = value.global.data.consumerProtection
+            } else {
+                tradeConsumerProtection = value.tradeConsumerProtection
+                consumerProtection = value.consumerProtection
             }
-            if (data.ok == 0 && data.msg.length > 0) {
-                service.items.unshift(customItem("历史价格", data.msg))
+            if (tradeConsumerProtection) {
+                tradeConsumerProtection = setTradeConsumerProtection(data, tradeConsumerProtection)
+            } else {
+                let vertical = value.vertical
+                if (vertical && vertical.hasOwnProperty("tmallhkDirectSale")) {
+                    value["tradeConsumerProtection"] = customTradeConsumerProtection()
+                    value.tradeConsumerProtection = setTradeConsumerProtection(data, value.tradeConsumerProtection)
+                } else {
+                    consumerProtection = setConsumerProtection(data, consumerProtection)
+                }
             }
             apiStack.value = JSON.stringify(value)
             $done({ body: JSON.stringify(obj) })
@@ -72,6 +62,44 @@ if (url.indexOf(path2) != -1) {
             $done({ body })
         }
     })
+}
+
+function setConsumerProtection(data, consumerProtection) {
+    const lower = lowerMsgs(data.single)
+    const tip = data.PriceRemark.Tip
+    const summary = priceSummary(data)[1]
+    let basicService = consumerProtection.serviceProtection.basicService
+    let items = consumerProtection.items
+    if (data.ok == 1 && data.single) {
+        let item = customItem(lower[1], [`${lower[0]} ${tip}（仅供参考）\n${summary}`])
+        basicService.services.unshift(item)
+        items.unshift(item)
+    }
+    if (data.ok == 0 && data.msg.length > 0) {
+        let item = customItem("历史价格", [data.msg])
+        basicService.services.unshift(item)
+        items.unshift(item)
+    }
+    return consumerProtection
+}
+
+function setTradeConsumerProtection(data, tradeConsumerProtection) {
+    const lower = lowerMsgs(data.single)
+    const tip = data.PriceRemark.Tip
+    const tbitems = priceSummary(data)[0]
+    let service = tradeConsumerProtection.tradeConsumerService.service
+    if (data.ok == 1 && data.single) {
+        let item = customItem(lower[1], `${lower[0]} ${tip}（仅供参考）`)
+        let nonService = tradeConsumerProtection.tradeConsumerService.nonService
+        service.items = service.items.concat(nonService.items)
+        nonService.title = "价格详情"
+        nonService.items = tbitems
+        service.items.unshift(item)
+    }
+    if (data.ok == 0 && data.msg.length > 0) {
+        service.items.unshift(customItem("历史价格", data.msg))
+    }
+    return tradeConsumerProtection
 }
 
 function lowerMsgs(data) {
@@ -96,10 +124,11 @@ function priceSummary(data) {
         } else if (index == 4) {
             item.Name = "三十天最低"
         }
-        summary = `${item.Name}${getSpace(4)}${item.Price}${getSpace(4)}${item.Date}${getSpace(4)}${item.Difference}`
-        tbitems.push(customItem(summary))
+        summary += `\n${item.Name}${getSpace(4)}${item.Price}${getSpace(4)}${item.Date}${getSpace(4)}${item.Difference}`
+        let summaryItem = `${item.Name}${getSpace(4)}${item.Price}${getSpace(4)}${item.Date}${getSpace(4)}${item.Difference}`
+        tbitems.push(customItem(summaryItem))
     })
-    return tbitems
+    return [tbitems, summary]
 }
 
 function historySummary(single) {
@@ -195,6 +224,7 @@ function customItem(title, desc) {
     return {
         icon: "https://s2.ax1x.com/2020/02/16/3STeIJ.png",
         title: title,
+        name: title,
         desc: desc
     }
 }
