@@ -19,34 +19,24 @@ hostname = ios.prod.ftl.netflix.com
 
 Display jd historical price
 ```
-# 使用不生效或失效的检查一下配置有没有这两条复写，如果有删除试试
+# 不生效或失效的检查一下配置有没有这两条复写，删除试试
 # ^https?:\/\/api\.m\.jd.com\/client\.action\?functionId=start - reject
 # ^https?:\/\/api\.m\.jd.com\/client\.action\?functionId=(start|queryMaterialAdverts) - reject
 [Script]
 http-response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
+# lite
+# http-response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/jd_price_lite.js
 [MITM]
 hostname = api.m.jd.com
 ```
 
-Display taobao historical price（提供两种方式，根据需求二选一）
+Display taobao historical price
 ```
-# 使用脚本删除对应 IP，不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
+# 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
 [Script]
-http-response ^https?://amdc\.m\.taobao\.com/amdc/mobileDispatch requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
-http-response ^https://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
-[MITM]
-hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
-```
-
-```
-# 使用规则屏蔽指定 IP 段，有可能误伤其他功能或者应用，可以自己抓包缩小 IP 范围，随时生效
-[Rule]
-IP-CIDR, 203.119.144.0/23, REJECT, no-resolve
-IP-CIDR, 203.119.175.0/24, REJECT, no-resolve
-IP-CIDR, 106.11.162.0/24, REJECT, no-resolve
-IP-CIDR, 47.102.83.0/24, REJECT, no-resolve
-[Script]
-http-response ^https://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+http-response ^https?://(trade-acs|amdc)\.m\.taobao\.com/(gw/mtop\.taobao\.detail\.getdetail|amdc/mobileDispatch) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+# lite
+# http-response ^https?://(trade-acs|amdc)\.m\.taobao\.com/(gw/mtop\.taobao\.detail\.getdetail|amdc/mobileDispatch) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price_lite.js
 [MITM]
 hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
 ```
@@ -81,29 +71,19 @@ Display jd historical price
 ```
 [rewrite_local]
 ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body jd_price.js
+# lite
+# ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body jd_price_lite.js
 [mitm]
 hostname = api.m.jd.com
 ```
 
-Display taobao historical price（提供两种方式，根据需求二选一）
+Display taobao historical price
 ```
-# 使用脚本删除对应 IP，不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
+# 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
 [rewrite_local]
-^https?://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body tb_price.js
-^https://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body tb_price.js
-[mitm]
-hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
-```
-
-```
-# 使用规则屏蔽指定 IP 段，有可能误伤其他功能或者应用，可以自己抓包缩小 IP 范围，随时生效
-[filter_local]
-ip-cidr, 203.119.144.0/23, reject
-ip-cidr, 203.119.175.0/24, reject
-ip-cidr, 106.11.162.0/24, reject
-ip-cidr, 47.102.83.0/24, reject
-[rewrite_local]
-^https://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body tb_price.js
+^https?://(trade-acs|amdc)\.m\.taobao\.com/(gw/mtop\.taobao\.detail\.getdetail|amdc/mobileDispatch) url script-response-body tb_price.js
+# lite
+# ^https?://(trade-acs|amdc)\.m\.taobao\.com/(gw/mtop\.taobao\.detail\.getdetail|amdc/mobileDispatch) url script-response-body tb_price_lite.js
 [mitm]
 hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
 ```
