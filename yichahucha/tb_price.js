@@ -34,34 +34,59 @@ if (url.indexOf(path2) != -1) {
     let shareUrl = `https://item.taobao.com/item.htm?id=${item.itemId}`
     requestPrice(shareUrl, function (data) {
         if (data) {
-            let apiStack = obj.data.apiStack[0]
-            let value = JSON.parse(apiStack.value)
-            let tradeConsumerProtection = null
-            let consumerProtection = null
-            if (value.global) {
-                tradeConsumerProtection = value.global.data.tradeConsumerProtection
-                consumerProtection = value.global.data.consumerProtection
-            } else {
-                tradeConsumerProtection = value.tradeConsumerProtection
-                consumerProtection = value.consumerProtection
-            }
-            if (tradeConsumerProtection) {
-                tradeConsumerProtection = setTradeConsumerProtection(data, tradeConsumerProtection)
-            } else {
-                let vertical = value.vertical
-                if (vertical && vertical.hasOwnProperty("tmallhkDirectSale")) {
-                    value["tradeConsumerProtection"] = customTradeConsumerProtection()
-                    value.tradeConsumerProtection = setTradeConsumerProtection(data, value.tradeConsumerProtection)
+            if (obj.data.apiStack) {
+                let apiStack = obj.data.apiStack[0]
+                let value = JSON.parse(apiStack.value)
+                let tradeConsumerProtection = null
+                let consumerProtection = null
+                let trade = null
+                if (value.global) {
+                    tradeConsumerProtection = value.global.data.tradeConsumerProtection
+                    consumerProtection = value.global.data.consumerProtection
+                    trade = value.global.data.trade
                 } else {
-                    consumerProtection = setConsumerProtection(data, consumerProtection)
+                    tradeConsumerProtection = value.tradeConsumerProtection
+                    consumerProtection = value.consumerProtection
+                    trade = value.trade
                 }
+                if (trade && trade.useWap == "true") {
+                    $done({ body })
+                    sendNotify(data, shareUrl)
+                } else {
+                    if (tradeConsumerProtection) {
+                        tradeConsumerProtection = setTradeConsumerProtection(data, tradeConsumerProtection)
+                    } else {
+                        let vertical = value.vertical
+                        if (vertical && vertical.hasOwnProperty("tmallhkDirectSale")) {
+                            value["tradeConsumerProtection"] = customTradeConsumerProtection()
+                            value.tradeConsumerProtection = setTradeConsumerProtection(data, value.tradeConsumerProtection)
+                        } else {
+                            consumerProtection = setConsumerProtection(data, consumerProtection)
+                        }
+                    }
+                    apiStack.value = JSON.stringify(value)
+                    $done({ body: JSON.stringify(obj) })
+                }
+            } else {
+                $done({ body })
+                sendNotify(data, shareUrl)
             }
-            apiStack.value = JSON.stringify(value)
-            $done({ body: JSON.stringify(obj) })
         } else {
             $done({ body })
         }
     })
+}
+
+function sendNotify(data, shareUrl) {
+    if (data.ok == 1 && data.single) {
+        const lower = lowerMsgs(data.single)[0]
+        const detail = priceSummary(data)[1]
+        const tip = data.PriceRemark.Tip + "（仅供参考）"
+        $tool.notify("", "", `〽️历史${lower} ${tip}\n${detail}\n\n👉查看详情：http://tool.manmanbuy.com/historyLowest.aspx?url=${encodeURI(shareUrl)}`)
+    }
+    if (data.ok == 0 && data.msg.length > 0) {
+        $tool.notify("", "", `⚠️ ${data.msg}`)
+    }
 }
 
 function setConsumerProtection(data, consumerProtection) {
