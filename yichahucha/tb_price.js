@@ -3,7 +3,6 @@ README：https://github.com/yichahucha/surge/tree/master
  */
 
 const $tool = new Tool()
-const $base64 = new Base64()
 const consoleLog = false
 const url = $request.url
 const path1 = "/amdc/mobileDispatch"
@@ -11,6 +10,7 @@ const path2 = "/gw/mtop.taobao.detail.getdetail"
 
 if (url.indexOf(path1) != -1) {
     if ($tool.isResponse) {
+        const $base64 = new Base64()
         let body = $response.body
         let obj = JSON.parse($base64.decode(body))
         let dns = obj.dns

@@ -47,10 +47,10 @@ hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
 # IP-CIDR, 47.102.83.0/24, REJECT, no-resolve
 ```
 
-Daily work check-in reminder
+DingDing clock in
 ```
 [Script]
-cron "0 9,18 * * 1-5" script-path=https://raw.githubusercontent.com/yichahucha/surge/master/check_in.js
+cron "0 9,18 * * 1-5" script-path=https://raw.githubusercontent.com/yichahucha/surge/master/clock_in.js
 ```
 
 # Quan-X
@@ -103,10 +103,10 @@ hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
 # ip-cidr, 47.102.83.0/24, reject
 ```
 
-Daily work check-in reminder
+DingDing clock in
 ```
 [task_local]
-0 9,18 * * 1-5 check_in.js
+0 9,18 * * 1-5 clock_in.js
 ```
 
 [Issue Group](http://t.me/scriptgroup)
