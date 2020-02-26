@@ -60,7 +60,15 @@ if (!$tool.isResponse) {
         .catch(error => msg = error + "\n")
         .finally(() => {
             let summary = obj.value.videos[videoID].summary;
-            summary["supplementalMessage"] = `${msg}${summary && summary.supplementalMessage ? "\n" + summary.supplementalMessage : ""}`;
+            if (summary && summary.imageTypeIdentifier && summary.imageTypeIdentifier.match(/^top/)) {
+                const ranking = `#${summary.supplementalMessage ? summary.supplementalMessage.match(/\d/g).join("") : ""}`;
+                const ratings = msg.split("\n")
+                let rating = msg
+                if (ratings.length > 1) rating = `${ratings[1].split("   ")[0].replace(/\s{2}/g, " ")}  ${ratings[2].split("   ")[0].replace(/\s{2}/g, " ")}`
+                summary["supplementalMessage"] = `${ranking}  ${rating}`;
+            } else {
+                summary["supplementalMessage"] = `${msg}${summary && summary.supplementalMessage ? "\n" + summary.supplementalMessage : ""}`;
+            }
             if (consoleLog) console.log("Netflix Modified Body:\n" + JSON.stringify(obj));
             $done({ body: JSON.stringify(obj) });
         });
@@ -151,7 +159,7 @@ function get_IMDb_message(data) {
         if (imdb_source == "Internet Movie Database") {
             const imdb_votes = data.imdbVotes;
             const imdb_rating = ratings[0]["Value"];
-            rating_message = "IMDb:  ⭐️ " + imdb_rating + "    " + "" + imdb_votes;
+            rating_message = "IMDb:  ⭐️ " + imdb_rating + "   " + imdb_votes;
             if (data.Type == "movie") {
                 if (ratings.length > 1) {
                     const source = ratings[1]["Source"];
