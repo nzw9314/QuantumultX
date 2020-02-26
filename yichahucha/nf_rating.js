@@ -38,9 +38,10 @@ if (!$tool.isResponse) {
     }
     let year = null;
     let type = video.summary.type;
-    if (type == "movie") {
-        year = video.details.releaseYear;
-    } else if (type == "show") {
+    // if (type == "movie") {
+    //     year = video.details.releaseYear;
+    // }
+    if (type == "show") {
         type = "series";
     }
     delete video.details;
