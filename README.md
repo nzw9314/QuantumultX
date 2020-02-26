@@ -13,9 +13,9 @@
 ②.Get_Cookie_New.conf
 (Cookie获取订阅。Cookie失效时启用，成功后禁用)
 
-⚠️QX 1.05之前的请使用以下订阅:
 
-Js.conf(远程订阅脚本)
+⚠️外部资源请使用以下订阅:
+Js.conf(远程订阅脚本): https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js.conf
 
 
 
