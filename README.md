@@ -42,6 +42,8 @@ https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_Local_WorkingCop
 ③.⚠️适用于TF版195+
 https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_New.conf    
 
+④.⚠️适用于TF版198+
+https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_Remote.conf
 
 (⚠️Cookie获取订阅,根据版本二选一。Cookie失效时启用，成功后禁用)
 
