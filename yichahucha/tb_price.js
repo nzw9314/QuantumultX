@@ -3,10 +3,10 @@ README：https://github.com/yichahucha/surge/tree/master
  */
 
 const $tool = new Tool()
-const consoleLog = false
-const url = $request.url
 const path1 = "/amdc/mobileDispatch"
 const path2 = "/gw/mtop.taobao.detail.getdetail"
+const consoleLog = false
+const url = $request.url
 
 if (url.indexOf(path1) != -1) {
     if ($tool.isResponse) {
@@ -216,7 +216,7 @@ function historySummary(single) {
 }
 
 function difference(currentPrice, price) {
-    let difference = strip(currentPrice - price)
+    let difference = sub(currentPrice, price)
     if (difference == 0) {
         return "-"
     } else {
@@ -224,8 +224,11 @@ function difference(currentPrice, price) {
     }
 }
 
-function strip(num, precision = 12) {
-    return +parseFloat(num.toPrecision(precision));
+function sub(num1, num2) {
+    const num1Digits = (num1.toString().split('.')[1] || '').length;
+    const num2Digits = (num2.toString().split('.')[1] || '').length;
+    const baseNum = Math.pow(10, Math.max(num1Digits, num2Digits));
+    return (num1 * baseNum - num2 * baseNum) / baseNum;
 }
 
 function requestPrice(share_url, callback) {
