@@ -67,7 +67,11 @@ https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_Remote.c
 ⑧ Meeta
 ⑨ TG群组(NobyDa Script)个人收集搬运及修改脚本
 
-3.定时脚本task_local.conf
+3.定时脚本
+
+Task_Local.conf
+
+Task_Remote.conf
 
 QX目前无法订阅task
 
