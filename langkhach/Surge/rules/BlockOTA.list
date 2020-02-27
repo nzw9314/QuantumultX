@@ -1,6 +1,7 @@
 DOMAIN,mesu.apple.com
 DOMAIN,gdmf.apple.com
 DOMAIN,appldnld.apple.com
+DOMAIN,updates-http.cdn-apple.com
 DOMAIN,xp.apple.com
 DOMAIN,ocsp.int-x3.letsencrypt.org
 DOMAIN,world-gen.g.aaplimg.com
