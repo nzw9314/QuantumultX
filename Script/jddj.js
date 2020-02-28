@@ -1,10 +1,11 @@
 const cookieName ='京东到家'
 const cookieKey = 'chen_cookie_dj'
 const chen = init()
-let cookieVal = chen.getdata(cookieKey)
+
+const cookieVal = 'cookie自己抓'
 sign()
 function sign() {
-    let url = {url: 'url粘贴在这',
+    let url = {url: 'https://daojia.jd.com/client?functionId=signin%2FuserSigninNew&body=%7B%7D',
     headers: { Cookie:cookieVal}}
     url.headers['Connection'] = `keep-alive`
     url.headers['Content-Type'] = `application/x-www-form-urlencoded;charset=UTF-8`
@@ -16,20 +17,21 @@ function sign() {
     url.headers['Referer'] = `https://daojia.jd.com/taroh5/h5dist/`
    
     chen.get(url, (error, response, data) => {
-      const result = JSON.parse(data)
-      chen.log(`${data}`)
+      chen.log(`${cookieName}, data: ${data}`)
+      let result = JSON.parse(data)
+      
       const title = `${cookieName}`
       let subTitle = ``
       let detail = ``
     
       if (result.code == 0) {
-        subTitle = `签到结果: 成功`
-        detail = `签到结果：${result.msg}`
+        subTitle = `签到结果:   成功`
+        detail = `获取鲜豆：${result.result.points}`
       } else if(result.code==201){
         subTitle = `签到结果: 失败`
-        detail = `说明: ${result.msg}`
+        detail = `说明: 未知`
       } else {
-        subTitle = `签到结果: 未知`
+        subTitle = `签到结果: 重复签到`
         detail = `说明: ${result.msg}`
       }
       chen.msg(title, subTitle, detail)
@@ -81,4 +83,3 @@ function sign() {
     }
     return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
   }
-  
