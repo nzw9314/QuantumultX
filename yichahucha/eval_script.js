@@ -5,40 +5,46 @@
  * [task_local]
  * 0 0 * * * eval_script.js
  * 
- * 2.__conf 配置说明：
- * 参考下面 __conf 示例，格式为：远程脚本的链接 url 匹配脚本对应的正则1,匹配脚本对应的正则2
+ * 2.__conf 配置脚本远程链接说明：
  * 
+ * 参考下面 __conf 示例
  * 
- * 3.修改配置文件的本地脚本为此脚本，例如之前京东 jd_price.js 改为 eval_script.js 即可：
+ * [远程配置]
+ * 参考示例：https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
+ * 
+ * [本地配置]
+ * 格式为：远程脚本的链接 url 匹配脚本对应的正则1,匹配脚本对应的正则2
+ * 
+ * 如果是本地配置需要修改配置文件的本地脚本为此脚本，例如之前京东 jd_price.js 改为 eval_script.js 即可：
  * [rewrite_local]
  * # ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body jd_price.js
  * ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body eval_script.js
  * [mitm]
  * hostname = api.m.jd.com
  */
-const __c = String.raw
-const __conf = __c`
 
 
+//配置
+const __conf = String.raw`
+
+
+
+[remote]
+//远程配置
+https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
+
+
+[local]
+//本地配置
 //京东
-https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js url ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig)
-//淘宝
-https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js url ^https?://.+/amdc/mobileDispatch, ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail
-//奈飞
-https://raw.githubusercontent.com/yichahucha/surge/master/nf_rating.js url https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D
-//微博
-https://raw.githubusercontent.com/yichahucha/surge/master/wb_ad.js url ^https?://m?api\.weibo\.c(n|om)/2/(statuses/(unread|extend|positives/get|(friends|video)(/|_)timeline)|stories/(video_stream|home_list)|(groups|fangle)/timeline|profile/statuses|comments/build_comments|photo/recommend_list|service/picfeed|searchall|cardlist|page|!/photos/pic_recommend_status)
-https://raw.githubusercontent.com/yichahucha/surge/master/wb_launch.js url ^https?://(sdk|wb)app\.uve\.weibo\.com(/interface/sdk/sdkad.php|/wbapplua/wbpullad.lua)
+//https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js url ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig)
 
-//添加自定义远程脚本...
 
 
 `
 
 const __tool = new ____Tool()
-const __confObj = ____confObj()
 const __isTask = __tool.isTask
-
 if (__isTask) {
     const downloadScript = (url) => {
         return new Promise((resolve) => {
@@ -47,40 +53,88 @@ if (__isTask) {
                 if (!error) {
                     if (response.statusCode == 200) {
                         __tool.write(body, url)
-                        resolve(`🪓${filename} update success`)
+                        resolve({ body, msg: `🪓${filename} update success` })
                         console.log(`Update success: ${url}`)
                     } else {
-                        resolve(`🪓${filename} update fail`)
+                        resolve({ body, msg: `🪓${filename} update fail` })
                         console.log(`Update fail ${response.statusCode}: ${url}`)
                     }
                 } else {
-                    resolve(`🪓${filename} update fail`)
+                    resolve({ body: null, msg: `🪓${filename} update fail` })
                     console.log(`Update fail ${error}: ${url}`)
                 }
             })
         })
     }
-    const promises = (() => {
-        let all = []
-        Object.keys(__confObj).forEach((url) => {
-            all.push(downloadScript(url))
+
+    const getConf = (() => {
+        return new Promise((resolve) => {
+            const remoteConf = ____removeGarbage(____getConfInfo(__conf, "remote"))
+            const localConf = ____removeGarbage(____getConfInfo(__conf, "local"))
+            if (remoteConf.length > 0) {
+                const promises = (() => {
+                    let all = []
+                    remoteConf.forEach((url) => {
+                        all.push(downloadScript(url))
+                    })
+                    return all
+                })()
+                Promise.all(promises).then(result => {
+                    let allRemoteConf = ""
+                    let allRemoteMSg = ""
+                    result.forEach(data => {
+                        if (data.body) {
+                            allRemoteConf += "\n" + ____parseRemoteConf(data.body)
+                        }
+                        allRemoteMSg += allRemoteMSg.length > 0 ? "\n" + data.msg : data.msg
+                    });
+                    let content = localConf.join("\n")
+                    if (allRemoteConf.length > 0) {
+                        content = `${content}\n${allRemoteConf}`
+                    }
+                    resolve({ content, msg: allRemoteMSg })
+                })
+            } else {
+                const content = localConf.join("\n")
+                resolve({ content: content, msg: "" })
+            }
         })
-        return all
-    })()
-    console.log("Start updating...")
-    Promise.all(promises).then(vals => {
-        console.log("Stop updating.")
-        console.log(vals.join("\n"))
-        let lastDate = __tool.read("ScriptLastUpdateDate")
-        lastDate = lastDate ? lastDate : new Date().Format("yyyy-MM-dd HH:mm:ss")
-        __tool.notify("Update Done.", `${lastDate} last update.`, `${vals.join("\n")}`)
-        __tool.write(new Date().Format("yyyy-MM-dd HH:mm:ss"), "ScriptLastUpdateDate")
-        $done()
     })
+    
+    getConf()
+        .then((conf) => {
+            const parseConf = ____parseConf(conf.content)
+            const promises = (() => {
+                let all = []
+                Object.keys(parseConf).forEach((url) => {
+                    all.push(downloadScript(url))
+                })
+                return all
+            })()
+            console.log("Start updating...")
+            Promise.all(promises).then(result => {
+                console.log("Stop updating.")
+                const notifyMsg = (() => {
+                    let msg = conf.msg
+                    result.forEach(data => {
+                        msg += msg.length > 0 ? "\n" + data.msg : data.msg
+                    });
+                    return msg
+                })()
+                console.log(notifyMsg)
+                let lastDate = __tool.read("ScriptLastUpdateDate")
+                lastDate = lastDate ? lastDate : new Date().Format("yyyy-MM-dd HH:mm:ss")
+                __tool.notify("Update Done.", `${lastDate} last update.`, `${notifyMsg}`)
+                __tool.write(JSON.stringify(parseConf), "ScriptConfObject")
+                __tool.write(new Date().Format("yyyy-MM-dd HH:mm:ss"), "ScriptLastUpdateDate")
+                $done()
+            })
+        })
 }
 
 if (!__isTask) {
     const __url = $request.url
+    const __confObj = JSON.parse(__tool.read("ScriptConfObject"))
     const __script = (() => {
         let s = null
         for (let key in __confObj) {
@@ -109,13 +163,48 @@ if (!__isTask) {
     }
 }
 
-function ____confObj() {
-    const lines = __conf.split("\n")
+function ____getConfInfo(conf, type) {
+    const rex = new RegExp("\\[" + type + "\\](.|\\n)*?($|\\n\\[)", "g")
+    let result = rex.exec(conf)
+    result = result[0].split("\n")
+    if (result[2].length > 0) {
+        result.pop()
+    }
+    result.shift()
+    return result
+}
+
+function ____parseRemoteConf(conf) {
+    const lines = conf.split("\n")
+    let newLines = []
+    lines.forEach((line) => {
+        line = line.replace(/^\s*/, "")
+        if (line.length > 0 && line.substring(0, 3) == "###") {
+            line = line.replace("###", "")
+            line = line.replace(/^\s*/, "")
+            newLines.push(line)
+        }
+    })
+    return newLines.join("\n")
+}
+
+function ____removeGarbage(lines) {
+    let newLines = []
+    lines.forEach((line) => {
+        line = line.replace(/^\s*/, "")
+        if (line.length > 0 && line.substring(0, 2) != "//") {
+            newLines.push(line)
+        }
+    })
+    return newLines
+}
+
+function ____parseConf(conf) {
+    const lines = conf.split("\n")
     let confObj = {}
     lines.forEach((line) => {
         line = line.replace(/^\s*/, "")
         if (line.length > 0 && line.substring(0, 2) != "//") {
-            console.log(line);
             const avaliable = (() => {
                 const format = /^https?:\/\/.*\s+url\s+.*/
                 return format.test(line)
@@ -131,7 +220,7 @@ function ____confObj() {
             }
         }
     })
-    console.log(`Configuration information:  \n${JSON.stringify(confObj)}`)
+    console.log(`Configuration information:  ${JSON.stringify(confObj)}`)
     return confObj
 }
 
