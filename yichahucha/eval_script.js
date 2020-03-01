@@ -1,12 +1,13 @@
 /**
- * 远程脚本管理（QuanX 举例，Surge 同理）
+ * 远程脚本管理（QuanX 举例）
  * 
- * 1.设置定时任务更新添加的远程脚本，第一次运行需要手动执行一下更新脚本（ Qanx 普通调试模式容易更新失败，使用最新 TF 红色按钮调试），例如设置每天凌晨更新脚本：
+ * 1.设置定时任务更新添加的远程脚本，第一次运行需要手动执行一下更新脚本（Qanx 普通调试模式容易更新失败，使用最新 TF 红色按钮调试），例如设置每天凌晨更新脚本：
  * [task_local]
  * 0 0 * * * eval_script.js
  * 
  * 2.__conf 配置说明：
- * 参考下面 __conf 对象，key = 远程脚本的 URL，value = 匹配脚本对应的 URL
+ * 参考下面 __conf 示例，格式为：远程脚本的链接 url 匹配脚本对应的正则1,匹配脚本对应的正则2
+ * 
  * 
  * 3.修改配置文件的本地脚本为此脚本，例如之前京东 jd_price.js 改为 eval_script.js 即可：
  * [rewrite_local]
@@ -15,17 +16,27 @@
  * [mitm]
  * hostname = api.m.jd.com
  */
+const __c = String.raw
+const __conf = __c`
 
-const __conf = {
-    "https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js": "^https?:\/\/api\.m\.jd.com",
-    "https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js": ["^https?://trade-acs\.m\.taobao\.com", "^https?://amdc\.m\.taobao\.com"],
-    "https://raw.githubusercontent.com/yichahucha/surge/master/nf_rating.js": "^https?://ios\.prod\.ftl\.netflix\.com",
-    "https://raw.githubusercontent.com/yichahucha/surge/master/wb_ad.js": "^https?://m?api\.weibo\.c(n|om)",
-    "https://raw.githubusercontent.com/yichahucha/surge/master/wb_launch.js": "^https?://(sdk|wb)app\.uve\.weibo\.com",
-    //添加自定义远程脚本...
-}
 
-const __tool = new __Tool()
+//京东
+https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js url ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig)
+//淘宝
+https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js url ^https?://.+/amdc/mobileDispatch, ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail
+//奈飞
+https://raw.githubusercontent.com/yichahucha/surge/master/nf_rating.js url https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D
+//微博
+https://raw.githubusercontent.com/yichahucha/surge/master/wb_ad.js url ^https?://m?api\.weibo\.c(n|om)/2/(statuses/(unread|extend|positives/get|(friends|video)(/|_)timeline)|stories/(video_stream|home_list)|(groups|fangle)/timeline|profile/statuses|comments/build_comments|photo/recommend_list|service/picfeed|searchall|cardlist|page|!/photos/pic_recommend_status)
+https://raw.githubusercontent.com/yichahucha/surge/master/wb_launch.js url ^https?://(sdk|wb)app\.uve\.weibo\.com(/interface/sdk/sdkad.php|/wbapplua/wbpullad.lua)
+
+//添加自定义远程脚本...
+
+
+`
+
+const __tool = new ____Tool()
+const __confObj = ____confObj()
 const __isTask = __tool.isTask
 
 if (__isTask) {
@@ -51,9 +62,9 @@ if (__isTask) {
     }
     const promises = (() => {
         let all = []
-        Object.keys(__conf).forEach((url) => {
+        Object.keys(__confObj).forEach((url) => {
             all.push(downloadScript(url))
-        });
+        })
         return all
     })()
     console.log("Start updating...")
@@ -61,9 +72,9 @@ if (__isTask) {
         console.log("Stop updating.")
         console.log(vals.join("\n"))
         let lastDate = __tool.read("ScriptLastUpdateDate")
-        lastDate = lastDate ? lastDate : new Date()
-        __tool.notify("Update done.", `${lastDate.Format("yyyy-MM-dd HH:mm:ss")} last update.`, `${vals.join("\n")}`)
-        __tool.write(new Date(), "ScriptLastUpdateDate")
+        lastDate = lastDate ? lastDate : new Date().Format("yyyy-MM-dd HH:mm:ss")
+        __tool.notify("Update Done.", `${lastDate} last update.`, `${vals.join("\n")}`)
+        __tool.write(new Date().Format("yyyy-MM-dd HH:mm:ss"), "ScriptLastUpdateDate")
         $done()
     })
 }
@@ -72,60 +83,59 @@ if (!__isTask) {
     const __url = $request.url
     const __script = (() => {
         let s = null
-        for (let key in __conf) {
-            let value = __conf[key]
-            if (Array.isArray(value)) {
-                value.some((item) => {
-                    if (__url.match(item)) {
-                        s = { url: key, content: __tool.read(key) }
-                        return true
-                    }
-                })
-            } else {
-                if (__url.match(value)) {
-                    s = { url: key, content: __tool.read(key) }
+        for (let key in __confObj) {
+            let value = __confObj[key]
+            if (!Array.isArray(value)) value = value.split(",")
+            value.some((url) => {
+                if (__url.match(url)) {
+                    s = { url: key, content: __tool.read(key), match: url }
+                    return true
                 }
-            }
+            })
         }
         return s
     })()
     if (__script) {
         if (__script.content) {
             eval(__script.content)
-            console.log(`Execute script: ${__script.url}`)
+            console.log(`Request url: ${__url}\nMatch url: ${__script.match}\nExecute script: ${__script.url}`)
         } else {
             $done({})
-            console.log(`Not found script: ${__script.url}`)
+            console.log(`Request url: ${__url}\nMatch url: ${__script.match}\nScript not executed. Script not found: ${__script.url}`)
         }
     } else {
         $done({})
-        console.log(`Not match URL: ${__url}`)
+        console.log(`No match url: ${__url}`)
     }
 }
 
-if (!Array.isArray) {
-    Array.isArray = function (arg) {
-        return Object.prototype.toString.call(arg) === '[object Array]'
-    }
+function ____confObj() {
+    const lines = __conf.split("\n")
+    let confObj = {}
+    lines.forEach((line) => {
+        line = line.replace(/^\s*/, "")
+        if (line.length > 0 && line.substring(0, 2) != "//") {
+            console.log(line);
+            const avaliable = (() => {
+                const format = /^https?:\/\/.*\s+url\s+.*/
+                return format.test(line)
+            })()
+            if (avaliable) {
+                const value = line.split("url")
+                const remote = value[0].replace(/\s/g, "")
+                const match = value[1].replace(/\s/g, "")
+                confObj[remote] = match
+            } else {
+                __tool.notify("Configuration error", "", line)
+                throw "Configuration error:" + line
+            }
+        }
+    })
+    console.log(`Configuration information:  \n${JSON.stringify(confObj)}`)
+    return confObj
 }
 
-Date.prototype.Format = function (fmt) {
-    var o = {
-        "M+": this.getMonth() + 1,
-        "d+": this.getDate(),
-        "H+": this.getHours(),
-        "m+": this.getMinutes(),
-        "s+": this.getSeconds(),
-        "q+": Math.floor((this.getMonth() + 3) / 3),
-        "S": this.getMilliseconds()
-    };
-    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    for (var k in o)
-        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-    return fmt;
-}
-
-function __Tool() {
+function ____Tool() {
     _node = (() => {
         if (typeof require == "function") {
             const request = require('request')
@@ -184,4 +194,26 @@ function __Tool() {
         }
         return response
     }
+}
+
+if (!Array.isArray) {
+    Array.isArray = function (arg) {
+        return Object.prototype.toString.call(arg) === '[object Array]'
+    }
+}
+
+Date.prototype.Format = function (fmt) {
+    var o = {
+        "M+": this.getMonth() + 1,
+        "d+": this.getDate(),
+        "H+": this.getHours(),
+        "m+": this.getMinutes(),
+        "s+": this.getSeconds(),
+        "q+": Math.floor((this.getMonth() + 3) / 3),
+        "S": this.getMilliseconds()
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
 }

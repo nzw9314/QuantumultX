@@ -111,9 +111,7 @@ DingDing clock in
 
 Script management tool
 ```
-# 远程脚本管理
+# 远程脚本管理，脚本内添加配置
 [task_local]
 0 0 * * * eval_script.js
 ```
-
-[Issue Group](http://t.me/scriptgroup)
