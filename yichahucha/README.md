@@ -109,4 +109,8 @@ DingDing clock in
 0 9,18 * * 1-5 clock_in.js
 ```
 
-[Issue Group](http://t.me/scriptgroup)
+Script management tool
+```
+[task_local]
+0 0 * * * eval_script.js
+```

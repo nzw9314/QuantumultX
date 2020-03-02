@@ -1,10 +1,5 @@
 /*
 参考chavyleung和NobyDa的写法
-
-打开elem APP,进入签到页面，提示获取用户ID成功就可以把rewrite注释掉。只需要获取一次用户ID即可。
-  理论上永不会过期。
-  
-  
 //饿了么
 
 > 代码已同时兼容 Surge & QuanX, 使用同一份签到脚本即可
