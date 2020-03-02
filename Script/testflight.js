@@ -133,10 +133,16 @@ if (isSurge) {
 const title = 'testfilght';
 const url = "https://testflight.apple.com/join/";
 
-//填入要监测的appkey。从testfligt地址获取。
-const appkey = "VCIvwk2g,VCIvwk2g,SHQFznkM,oV5HiCSz";
-const fullstr = 'This beta is full';
-const appnamereg = /<span>请在 iPhone 或 iPad 中安装 TestFlight 以加入 Beta 版"(.+)"测试。<\/span>/;
+/**
+ * 填入要监测的appkey。从testfligt地址获取。
+ * 例如"VCIvwk2g,wArXdacJ,2vnRvOTX,LzjySbQx,IdFRwmNy,qDkBu2ur,4Qt2lIm5,ZzqOu8tX,ftCqFe6D,fy7LvHVA,QKqitFwc"
+*/
+const appkey = "VCIvwk2g,LzjySbQx";
+
+//是否在没有tf位置的时候任然弹出通知，默认不弹出,防止过多无用通知。
+var isNOtify = false;
+const fullstr = /(此 Beta 版本的测试员已满)|(此 Beta 版本目前不接受任何新测试员)/;
+const appnamereg = /<title>加入 Beta 版“(.+)” - TestFlight - Apple<\/title>/;
 var proarray = new Array();
 getResult();
 
@@ -144,52 +150,72 @@ function getResult() {
     var upstr = '已有空位，抓紧上车';
     var apps = new Array(); //定义一数组
     apps = appkey.split(","); //字符分割
-    var resultstr = '';
-
-
-    console.log(apps.length);
+    var resultstr = false;
+    var logdata={};
     for (var i = 0; i < apps.length; i++) {
-        var lol = {
-            url: url + apps[i],
-            headers: {
-                'User-Agent': '[{"key":"User-Agent","value":" Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2357.130 Safari/537.36 qblink wegame.exe QBCore/3.70.66.400 QQBrowser/9.0.2524.400","type":"text","enabled":true,"description":""},{"key":"X-Requested-With","value":" XMLHttpRequest","type":"text","enabled":false,"description":""}]',
-            },
-        };
-        console.log(i+'begin');
-        var p = new Promise(function (resolve) {
-        $httpClient.get(lol, function (error, response, data) {
-            console.log(data.indexOf(fullstr));
-            try{
-          
-            if (data.indexOf(fullstr) == -1) {
-                appnamereg.test(data);
-                var appname = appnamereg.exec(data);
-                if (!appname != null) {
-                    var reg = /".+"/
-                    var item = reg.exec(appname[0]);
-                    var name=item[0].replace('"', '').replace('"', '');
-                    resultstr = resultstr + '[' + name + ']' + upstr + '👉:' + lol.url + '\n'
-                }
-            }
-            resolve('done');
-        }
-        catch(errr){
-            resolve('done');
-        }
-         
-        });
-            });
 
-           
+        var p = new Promise(function (resolve) {
+            var lol = {
+                url: url + apps[i],
+                headers: {
+                    'User-Agent': '[{"key":"User-Agent","value":" Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2357.130 Safari/537.36 qblink wegame.exe QBCore/3.70.66.400 QQBrowser/9.0.2524.400","type":"text","enabled":true,"description":""},{"key":"X-Requested-With","value":" XMLHttpRequest","type":"text","enabled":false,"description":""}]',
+                },
+            };
+            $httpClient.get(lol, function (error, response, data) {
+                try {
+                    appnamereg.test(data);
+                    var appname = appnamereg.exec(data);
+                    if (!appname != null) {
+                        var reg = /“.+”/
+                        var item = reg.exec(appname[0]);
+                        var name = item[0].replace('“', '').replace('”', '');
+                        if (!fullstr.test(data)) {
+                            logdata[name]={
+                                'has':true,
+                                'context':upstr + '👉:' + lol.url + '\n'
+                            }
+                            resultstr=true;
+                        }
+                        else{
+                            logdata[name]={
+                                'has':false,
+                                'context':':暂无车位'+'\n'
+                            }
+                        }
+                    }
+                    resolve('done');
+                }
+                catch (errr) {
+                    resolve('done');
+                }
+
+            });
+        });
+
+
         proarray[i] = p;
     }
     Promise.all(proarray).then((result) => {
-        if(resultstr==''){
-            $notification.post(title, '', '暂无车位');
+        var hastr='';
+        var nostr='';
+        for(var name in logdata){
+            if(logdata[name].has){
+                hastr=hastr+'[' + name + ']'+logdata[name].context;
+            }
+            else{
+                nostr=nostr+'[' + name + ']'+logdata[name].context;
+            }
+        }
+        if (resultstr) {
+           
+            $notification.post('', '', hastr+nostr);
         }
         else{
-        $notification.post(title, '', resultstr);
+            if(isNOtify){
+                $notification.post('', '', hastr+nostr);
+            }
         }
+        console.log(hastr+nostr);
     }).catch((error) => {
         console.log(error)
     });
