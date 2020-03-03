@@ -10,14 +10,15 @@
  * 参考下面 __conf 示例
  * 
  * [远程配置]
- * 1.添加注释，格式为：####匹配脚本对应的正则1,匹配脚本对应的正则2 eval 远程脚本的链接
- * 2.修改原脚本路径为 eval_script.js 的脚本路径
- * 参考示例：https://raw.githubusercontent.com/yichahucha/surge/master/sub_script1.conf
+ * 参考示例：https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
  * 
  * [本地配置]
+ * jd 脚本举例
  * 1.添加配置，格式为：匹配脚本对应的正则1,匹配脚本对应的正则2 eval 远程脚本的链接
+ * [local]
+ * ^https?://api\.m\.jd\.com/client\.action\？functionId=(wareBusiness|serverConfig) eval https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
+ *
  * 2.修改配置文件原脚本路径为 eval_script.js 的脚本路径
- * 例如修改配置文件 jd 脚本：
  * [rewrite_local]
  * #^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body jd_price.js
  * ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body eval_script.js
@@ -25,18 +26,17 @@
  * hostname = api.m.jd.com
  */
 
-//conf
 const __conf = String.raw`
 
 
 [remote]
-https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 //custom remote...
+
+https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
+
 
 
 [local]
-//jd
-//^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) eval https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
 //custom local...
 
 
@@ -45,7 +45,7 @@ https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 const __tool = new ____Tool()
 const __isTask = __tool.isTask
 const __log = false
-const __debug = false
+const __debug = true
 
 if (__isTask) {
     const downloadFile = (url) => {
@@ -169,15 +169,16 @@ if (!__isTask) {
 }
 
 function ____getConfInfo(conf, type) {
-    const rex = new RegExp("\\[" + type + "\\](.|\\n)*?($|\\n\\[)", "g")
+    const rex = new RegExp("\\[" + type + "\\](.|\\n)*?(?=\\n($|\\[))", "g")
     let result = rex.exec(conf)
-    result = result[0].split("\n")
-    if (result[2].length > 0) {
-        result.pop()
+    if (result) {
+      result = result[0].split("\n")
+      result.shift()
+    } else {
+      result = []
     }
-    result.shift()
     return result
-}
+  }
 
 function ____parseRemoteConf(conf) {
     const lines = conf.split("\n")
