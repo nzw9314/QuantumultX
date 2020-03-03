@@ -19,6 +19,7 @@
 |  吾爱破解  |   ✅    |                              ✅                               |     [@NobyDa](https://github.com/NobyDa)     | cookie同原版 |
 | 爱奇艺VIP  |   ✅    |                              ✅                               |     [@NobyDa](https://github.com/NobyDa)     | cookie同原版 |
 |   饿了么   |   ✅    |                              ✅                               |                    我自己                    |              |
+|   人人视频  | ✅    |                              ✅                               | [@chavyleung](https://github.com/chavyleung) |  cookie同原版 |           
 
 脚本地址:
 
@@ -40,11 +41,12 @@ const global = {
         v2ex: true,
         weibo_super: true,
         china_telecom: true,
+        rrtv: true,
         eleme: true
     },
     data: {
         //此处输入要签到的手机号码
-        china_telecom: '18851889188'//替换手机号部分即可
+        china_telecom: '18888888888'//替换手机号部分即可
     }
 }
 ```
@@ -73,7 +75,7 @@ const global = {
 ```
 [mitm]
 # cookie获取专用,仅获取cookie时使用
-hostname = tieba.baidu.com, c.tieba.baidu.com, music.163.com, passport.iqiyi.com, www.52pojie.cn, *.v2ex.com, weibo.com, wapside.189.cn, h5.ele.me
+hostname = tieba.baidu.com, c.tieba.baidu.com, music.163.com, passport.iqiyi.com, www.52pojie.cn, *.v2ex.com, weibo.com, wapside.189.cn, h5.ele.me, *.rr.tv
 ```
 ### REWRITE
 
@@ -99,6 +101,8 @@ https:\/\/www\.52pojie\.cn\/home\.php\?mod=space url script-request-header all_i
 ^https:\/\/www\.v2ex\.com\/mission\/daily url script-request-header all_in_one.js
 # 饿了么Cookie获取, 打开APP,点击我的,点击左上角的签到,进入页面即可
 ^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user url script-request-header all_in_one.js
+# 人人视频Cookie获取, 打开APP,访问个人中心即可
+^https:\/\/api\.rr\.tv\/user\/profile url script-request-header all_in_one.js
 
 ```
 
@@ -121,3 +125,4 @@ https:\/\/www\.52pojie\.cn\/home\.php\?mod=space url script-request-header all_i
 |  吾爱破解  | 浏览器 |   https://www.52pojie.cn/home.php?mod=space   |
 |    V2EX    | 浏览器 |      https://www.v2ex.com/mission/daily       |
 |   饿了么   |  APP   | 打开APP,点击"我的",点击左上角签到进入页面即可 |
+|   人人视频   |  APP   | 打开APP,点击"我的",访问个人中心即可 |

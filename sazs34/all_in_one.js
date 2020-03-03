@@ -1,6 +1,6 @@
 const global = {
     log: 1, //日志模式:0不显示 1全部显示 2精简显示,推荐值:1
-    parallel: true, //是否顺序签到(true则同时签到,可能会出现内存占用过高导致执行失败的情况;false则签到速度会慢一些,但是很稳)
+    parallel: false, //是否顺序签到(true则同时签到,可能会出现内存占用过高导致执行失败的情况;false则签到速度会慢一些,但是很稳)
     sign: { //用于设置哪些需要进行签到,哪些不处理
         baidu_tieba: true,
         iqiyi: true,
@@ -8,7 +8,8 @@ const global = {
         netease_music: true,
         v2ex: true,
         china_telecom: true,
-        eleme: true
+        rrtv: true,
+        eleme: false
     },
     data: {
         china_telecom: "" //此处输入要签到的手机号码,半角双引号中间
@@ -26,8 +27,9 @@ const global = {
 您也可直接在tg中联系@wechatu
 */
 // #region 固定头部
-let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
-let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
+let isQuantumultX = typeof $task != 'undefined'; //判断当前运行环境是否是qx
+let isSurge = typeof $httpClient != 'undefined'; //判断当前运行环境是否是surge
+let isRequest = typeof $request != "undefined"; //判断是否是请求
 // http请求
 var $task = isQuantumultX ? $task : {};
 var $httpClient = isSurge ? $httpClient : {};
@@ -37,6 +39,9 @@ var $persistentStore = isSurge ? $persistentStore : {};
 // 消息通知
 var $notify = isQuantumultX ? $notify : {};
 var $notification = isSurge ? $notification : {};
+
+
+var done = (value = {}) => isQuantumultX ? (isRequest ? $done(value) : null) : ((isRequest ? $done(value) : $done()));
 // #endregion 固定头部
 
 // #region 网络请求专用转换
@@ -202,6 +207,11 @@ let getCookie = () => {
             cookie: "CookieELM",
             name: '饿了么Cookie',
             Host: 'ele.me'
+        },
+        rrtv: {
+            cookie: 'chavy_cookie_rrtv',
+            name: '人人视频Cookie',
+            Host: 'rr.tv'
         }
     }
     //#endregion
@@ -306,7 +316,15 @@ let getCookie = () => {
             updateCookie(config.eleme, cookieVal);
         }
         //#endregion
+        //#region 人人视频
+        if (headers.Host.indexOf(config.rrtv.Host) >= 0) {
+            var headerToken = headers.token;
+            updateCookie(config.rrtv, headerToken);
+        }
+        //#endregion
     }
+    $done();
+
     //#endregion
 
 }
@@ -456,6 +474,76 @@ let execute = () => {
             },
             data: {
                 notify: ''
+            }
+        },
+        rrtv: {
+            cookie: 'chavy_cookie_rrtv',
+            name: '人人视频',
+            provider: {
+                daily: {
+                    url: 'https://api.rr.tv/rrtv-activity/sign/sign',
+                    method: 'POST',
+                    headers: {
+                        token: "",
+                        clientType: 'ios_rrsp_jzsp',
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        Connection: 'keep-alive',
+                        clientVersion: '4.3.5',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        Origin: 'https://mobile.rr.tv',
+                        Referer: 'https://mobile.rr.tv/',
+                        Accept: 'application/json, text/plain, */*',
+                        Host: 'api.rr.tv',
+                        'Accept-Language': 'zh-cn',
+                        'Content-Length': '12',
+                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 App/RRSPApp platform/iPhone AppVersion/4.3.5'
+                    }
+                },
+                welfare: {
+                    url: 'https://api.rr.tv/dailyWelfare/getWelfare',
+                    method: 'POST',
+                    headers: {
+                        token: "",
+                        clientType: 'web',
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        Connection: 'keep-alive',
+                        clientVersion: '0.0.1',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        Origin: 'https://mobile.rr.tv',
+                        Referer: 'https://mobile.rr.tv/mission/',
+                        Accept: 'application/json, text/plain, */*',
+                        Host: 'api.rr.tv',
+                        'Accept-Language': 'zh-cn',
+                        'Content-Length': '45',
+                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 App/RRSPApp platform/iPhone AppVersion/4.3.5'
+                    }
+                },
+                info: {
+                    url: 'https://api.rr.tv/user/profile',
+                    method: 'POST',
+                    headers: {
+                        token: "",
+                        clientType: 'ios_rrsp_jzsp',
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        Connection: 'keep-alive',
+                        clientVersion: '4.3.5',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        Origin: 'https://mobile.rr.tv',
+                        Referer: 'https://mobile.rr.tv/mission/',
+                        Accept: 'application/json, text/plain, */*',
+                        Host: 'api.rr.tv',
+                        'Accept-Language': 'zh-cn',
+                        'Content-Length': '0',
+                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 App/RRSPApp platform/iPhone AppVersion/4.3.5'
+                    }
+                }
+            },
+            data: {
+                notify: '',
+                result: {
+                    daily: null,
+                    welfare: null
+                }
             }
         }
     }
@@ -949,6 +1037,88 @@ let execute = () => {
 
     //#endregion
 
+    //#region 人人视频
+    let sign_rrtv = () => {
+        if (!global.sign.rrtv) {
+            record(`[${config.rrtv.name}] 未开启签到`);
+            return;
+        }
+        console.log(`[${config.rrtv.name}]开始签到-${config.rrtv.cookie}`)
+        let cookieVal = $prefs.valueForKey(config.rrtv.cookie);
+        console.log(`[${config.rrtv.name}]cookie-${cookieVal}`)
+        if (!cookieVal) {
+            console.log(`[${config.rrtv.name}]未获取到cookie`)
+            config.rrtv.data.notify = `[${config.rrtv.name}] 未获取到Cookie⚠️`;
+            console.log(`[${config.rrtv.name}]未获取到cookie1`)
+            record(config.rrtv.data.notify);
+            console.log(`[${config.rrtv.name}]未获取到cookie2`)
+            finalNotify("rrtv");
+            console.log(`[${config.rrtv.name}]未获取到cookie3`)
+        }
+    
+        let daily = () => {
+            config.rrtv.provider.daily.headers.token = cookieVal;
+            $task.fetch(config.rrtv.provider.daily).then(resp => {
+                let result = JSON.parse(resp.body);
+                config.rrtv.data.result.daily = result;
+                check();
+            }, err => {
+                config.rrtv.data.result.daily = {
+                    code: '9999'
+                };
+                check();
+            })
+        }
+        let welfare = () => {
+            config.rrtv.provider.welfare.headers.token = cookieVal;
+            $task.fetch(config.rrtv.provider.welfare).then(resp => {
+                let result = JSON.parse(resp.body);
+                config.rrtv.data.result.welfare = result;
+                check();
+            }, err => {
+                config.rrtv.data.result.welfare = {
+                    code: '9999'
+                };
+                check();
+            })
+        }
+        let info = () => {
+            config.rrtv.provider.info.headers.token = cookieVal;
+            $task.fetch(config.rrtv.provider.info).then(resp => {
+                let result = JSON.parse(resp.body);
+                let infoResult = "";
+                let signResult = "失败";
+                let swllfareResult = "失败";
+                if (config.rrtv.data.result.daily.code == "0000") {
+                    signResult = "成功";
+                } else if (config.rrtv.data.result.daily.code == "8750") {
+                    signResult = "重复";
+                }
+                if (config.rrtv.data.result.welfare.code == "0000") {
+                    swllfareResult = "成功";
+                } else if (config.rrtv.data.result.welfare.code == "8623") {
+                    swllfareResult = "重复";
+                }
+                if (result.code == '0000') {
+                    const levelStr = '';//result.data.user.levelStr ? ` (${result.data.user.levelStr})` : ``
+                    infoResult = `, LV: ${result.data.user.level}${levelStr}, 积分: ${result.data.user.score}`
+                }
+                config.rrtv.data.notify = `[${config.rrtv.name}] 签到${signResult}, 福利${swllfareResult}${infoResult}`;
+                record(config.rrtv.data.notify);
+                finalNotify("rrtv");
+            }, err => {
+
+            })
+        }
+        let check = () => {
+            if (!config.rrtv.data.result.daily || !config.rrtv.data.result.welfare) return;
+            info();
+        }
+        daily();
+        welfare();
+    }
+    ////#endregion
+
     //#endregion
 
     //#region 签到统一管控
@@ -961,6 +1131,7 @@ let execute = () => {
             if (global.sign.v2ex) sign_v2ex();
             if (global.sign.china_telecom) sign_china_telecom();
             if (global.sign.eleme) sign_eleme();
+            if (global.sign.rrtv) sign_rrtv();
         } else {
             if (global.sign.baidu_tieba) sign_baidu_tieba();
             else if (global.sign.iqiyi) sign_iqiyi();
@@ -969,6 +1140,7 @@ let execute = () => {
             else if (global.sign.v2ex) sign_v2ex();
             else if (global.sign.china_telecom) sign_china_telecom();
             else if (global.sign.eleme) sign_eleme();
+            else if (global.sign.rrtv) sign_rrtv();
             else $notify("All In One", "详细签到信息可见日志", "暂无需签到的项目");
         }
     }
