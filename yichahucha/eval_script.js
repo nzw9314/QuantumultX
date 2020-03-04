@@ -14,7 +14,7 @@
  * 
  * [本地配置]
  * jd 脚本举例
- * 1.添加配置，格式为：匹配脚本对应的正则1,匹配脚本对应的正则2 eval 远程脚本的链接
+ * 1.添加配置，格式为：匹配脚本对应的正则1 匹配脚本对应的正则2 eval 远程脚本的链接
  * [local]
  * ^https?://api\.m\.jd\.com/client\.action\？functionId=(wareBusiness|serverConfig) eval https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
  *
@@ -35,7 +35,6 @@ const __conf = String.raw`
 https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 
 
-
 [local]
 // custom local...
 
@@ -47,58 +46,35 @@ const __isTask = __tool.isTask
 const __log = false
 const __debug = true
 const __emoji = "🪓"
+const __concurrencyLimit = 5
 
 if (__isTask) {
-    const downloadFile = (url) => {
-        return new Promise((resolve) => {
-            __tool.get(url, (error, response, body) => {
-                let filename = url.match(/.*\/(.*?)$/)[1]
-                if (!error) {
-                    if (response.statusCode == 200) {
-                        __tool.write(body, url)
-                        resolve({ body, msg: `${__emoji}${filename} update success` })
-                        console.log(`Update success: ${url}`)
-                    } else {
-                        resolve({ body, msg: `${__emoji}${filename} update fail` })
-                        console.log(`Update fail ${response.statusCode}: ${url}`)
-                    }
-                } else {
-                    resolve({ body: null, msg: `${__emoji}${filename} update fail` })
-                    console.log(`Update fail ${error}: ${url}`)
-                }
-            })
-        })
-    }
-
     const getConf = (() => {
         return new Promise((resolve) => {
             const remoteConf = ____removeGarbage(____getConfInfo(__conf, "remote"))
             const localConf = ____removeGarbage(____getConfInfo(__conf, "local"))
             if (remoteConf.length > 0) {
-                const confPromises = (() => {
-                    let all = []
-                    remoteConf.forEach((url) => {
-                        all.push(downloadFile(url))
-                    })
-                    return all
-                })()
+                __tool.notify("", "", `Start updating ${remoteConf.length} confs...`)
                 console.log("Start updating conf...")
-                Promise.all(confPromises).then(result => {
-                    console.log("Stop updating conf.")
-                    let allRemoteConf = ""
-                    let allRemoteMSg = ""
-                    result.forEach(data => {
-                        if (data.body) {
-                            allRemoteConf += "\n" + ____parseRemoteConf(data.body)
-                        }
-                        allRemoteMSg += allRemoteMSg.length > 0 ? "\n" + data.msg : data.msg
-                    });
-                    let content = localConf.join("\n")
-                    if (allRemoteConf.length > 0) {
-                        content = `${content}\n${allRemoteConf}`
-                    }
-                    resolve({ content, msg: allRemoteMSg })
+                ____concurrentQueueLimit(remoteConf, __concurrencyLimit, (url) => {
+                    return ____downloadFile(url)
                 })
+                    .then(result => {
+                        console.log("Stop updating conf.")
+                        let allRemoteConf = ""
+                        let allRemoteMSg = ""
+                        result.forEach(data => {
+                            if (data.body) {
+                                allRemoteConf += "\n" + ____parseRemoteConf(data.body)
+                            }
+                            allRemoteMSg += allRemoteMSg.length > 0 ? "\n" + data.msg : data.msg
+                        });
+                        let content = localConf.join("\n")
+                        if (allRemoteConf.length > 0) {
+                            content = `${content}\n${allRemoteConf}`
+                        }
+                        resolve({ content, msg: allRemoteMSg })
+                    })
             } else {
                 const content = localConf.join("\n")
                 resolve({ content: content, msg: "" })
@@ -106,78 +82,48 @@ if (__isTask) {
         })
     })
 
+    let beginDate = new Date()
     getConf()
         .then((conf) => {
             const confObj = ____parseConf(conf.content)
             const scriptUrls = Object.keys(confObj)
-            const scriptPromises = (() => {
-                let all = []
-                scriptUrls.forEach((url) => {
-                    all.push(downloadFile(url))
-                })
-                return all
-            })()
-            const ____sequenceQueue = async (urls) => {
-                let results = []
-                for (let i = 0; i < urls.length; i++) {
-                    let result = await downloadFile(urls[i])
-                    results.push(result)
-                }
-                return results
-            }
-            const ____concurrentQueue = async (promises) => {
-                return new Promise((resolve) => {
-                    Promise.all(promises).then(result => {
-                        resolve(result)
-                    })
-                })
-            }
-            let sliceLength = 20
-            let part1 = scriptPromises.slice(0, sliceLength)
-            let part2 = scriptUrls.slice(sliceLength)
             __tool.notify("", "", `Start updating ${scriptUrls.length} scripts...`)
             console.log("Start updating script...")
-            ____concurrentQueue(part1).then(result1 => {
-                if (part2.length > 0) {
-                    return new Promise((resolve) => {
-                        ____sequenceQueue(part2).then((result2) => {
-                            resolve(result1.concat(result2))
-                        })
-                    })
-                } else {
-                    return result1
-                }
-            }).then((result) => {
-                console.log("Stop updating script.")
-                const resultMsg = (() => {
-                    let msg = conf.msg
-                    result.forEach(data => {
-                        msg += msg.length > 0 ? "\n" + data.msg : data.msg
-                    });
-                    return msg
-                })()
-                console.log(resultMsg);
-                const resultCount = ((msgs) => {
-                    let success = 0
-                    let fail = 0
-                    msgs.forEach(msg => {
-                        if (msg.match("success")) success++
-                        if (msg.match("fail")) fail++
-                    });
-                    return { success, fail }
-                })
-                let resultMsgs = resultMsg.split("\n")
-                let count = resultCount(resultMsgs)
-                let notifyMsg = `${resultMsgs.slice(0, 20).join("\n")}${resultMsgs.length > 20 ? "\n......" : ""}\n${__emoji}success: ${count.success}   fail: ${count.fail}`
-
-                let lastDate = __tool.read("ScriptLastUpdateDate")
-                lastDate = lastDate ? lastDate : new Date().Format("yyyy-MM-dd HH:mm:ss")
-
-                __tool.notify("Update Done.", `${lastDate} last update.`, `${notifyMsg}`)
-                __tool.write(JSON.stringify(confObj), "ScriptConfObject")
-                __tool.write(new Date().Format("yyyy-MM-dd HH:mm:ss"), "ScriptLastUpdateDate")
-                $done()
+            ____concurrentQueueLimit(scriptUrls, __concurrencyLimit, (url) => {
+                return ____downloadFile(url)
             })
+                .then(result => {
+                    console.log("Stop updating script.")
+                    __tool.write(JSON.stringify(confObj), "ScriptConfObject")
+                    const resultMsg = (() => {
+                        let msg = conf.msg
+                        result.forEach(data => {
+                            msg += msg.length > 0 ? "\n" + data.msg : data.msg
+                        });
+                        return msg
+                    })()
+                    return resultMsg
+                })
+                .then((resultMsg) => {
+                    console.log(resultMsg);
+                    const resultCount = ((msgs) => {
+                        let success = 0
+                        let fail = 0
+                        msgs.forEach(msg => {
+                            if (msg.match("success")) success++
+                            if (msg.match("fail")) fail++
+                        });
+                        return { success, fail }
+                    })
+                    let resultMsgs = resultMsg.split("\n")
+                    let count = resultCount(resultMsgs)
+                    let notifyMsg = `${resultMsgs.slice(0, 20).join("\n")}${resultMsgs.length > 20 ? `\n${__emoji}......\n` : ""}`
+                    let lastDate = __tool.read("ScriptLastUpdateDate")
+                    lastDate = lastDate ? lastDate : new Date().Format("yyyy-MM-dd HH:mm:ss")
+                    __tool.notify("Update Done", `Success: ${count.success}   Fail: ${count.fail}   Tasks: ${____timeDiff(beginDate, new Date())}s`, `${notifyMsg}\n${lastDate} last update`)
+                    __tool.write(new Date().Format("yyyy-MM-dd HH:mm:ss"), "ScriptLastUpdateDate")
+                    $done()
+                })
         })
 }
 
@@ -185,18 +131,22 @@ if (!__isTask) {
     const __url = $request.url
     const __confObj = JSON.parse(__tool.read("ScriptConfObject"))
     const __script = (() => {
-        let s = null
+        let script = null
         for (let key in __confObj) {
             let value = __confObj[key]
-            if (!Array.isArray(value)) value = value.split(",")
             value.some((url) => {
-                if (__url.match(url)) {
-                    s = { url: key, content: __tool.read(key), match: url }
-                    return true
+                try {
+                    if (__url.match(url)) {
+                        script = { url: key, content: __tool.read(key), match: url }
+                        return true
+                    }
+                } catch (error) {
+                    __tool.notify("", "", `Regular Error: ${url}\nRequest URL: ${__url}`)
+                    console.log(`${error}\nRegular Error: ${url}\nRequest URL: ${__url}`)
                 }
             })
         }
-        return s
+        return script
     })()
     if (__script) {
         if (__script.content) {
@@ -210,6 +160,61 @@ if (!__isTask) {
         $done({})
         if (__log) console.log(`No match url: ${__url}`)
     }
+}
+
+function ____timeDiff(begin, end) {
+    return Math.ceil((end.getTime() - begin.getTime()) / 1000)
+}
+
+async function ____sequenceQueue(urls) {
+    let results = []
+    for (let i = 0; i < urls.length; i++) {
+        let result = await ____downloadFile(urls[i])
+        results.push(result)
+    }
+    return results
+}
+
+function ____concurrentQueueLimit(list, limit, asyncHandle) {
+    let results = []
+    let recursion = (arr) => {
+        return asyncHandle(arr.shift())
+            .then((result) => {
+                results.push(result)
+                if (arr.length !== 0) return recursion(arr)
+                else return 'finish'
+            })
+    };
+    let listCopy = [].concat(list)
+    let asyncList = []
+    if (list.length < limit) limit = list.length
+    while (limit--) {
+        asyncList.push(recursion(listCopy))
+    }
+    return new Promise((resolve) => {
+        Promise.all(asyncList).then(() => resolve(results))
+    });
+}
+
+function ____downloadFile(url) {
+    return new Promise((resolve) => {
+        __tool.get(url, (error, response, body) => {
+            let filename = url.match(/.*\/(.*?)$/)[1]
+            if (!error) {
+                if (response.statusCode == 200) {
+                    __tool.write(body, url)
+                    resolve({ body, msg: `${__emoji}${filename} update success` })
+                    console.log(`Update success: ${url}`)
+                } else {
+                    resolve({ body, msg: `${__emoji}${filename} update fail` })
+                    console.log(`Update fail ${response.statusCode}: ${url}`)
+                }
+            } else {
+                resolve({ body: null, msg: `${__emoji}${filename} update fail` })
+                console.log(`Update fail ${error}: ${url}`)
+            }
+        })
+    })
 }
 
 function ____getConfInfo(conf, type) {
@@ -264,16 +269,16 @@ function ____parseConf(conf) {
             })()
             if (avaliable) {
                 let remote = ""
-                let match = ""
+                let match = []
                 if (urlRegex.test(line)) {
                     const value = line.split("url")
                     remote = value[0].replace(/\s/g, "")
-                    match = value[1].replace(/\s/g, "")
+                    match = ____parseMatch(value[1])
                 }
                 if (evalRegex.test(line)) {
                     const value = line.split("eval")
                     remote = value[1].replace(/\s/g, "")
-                    match = value[0].replace(/\s/g, "")
+                    match = ____parseMatch(value[0])
                 }
                 if (remote.length > 0 && match.length > 0) {
                     confObj[remote] = match
@@ -285,8 +290,21 @@ function ____parseConf(conf) {
             }
         }
     })
-    console.log(`Conf information:  ${JSON.stringify(confObj)}`)
+    if (__log) console.log(`Conf information:  ${JSON.stringify(confObj)}`)
     return confObj
+}
+
+function ____parseMatch(match) {
+    let matchs = match.split(" ")
+    if (matchs.length > 0) {
+        let i = matchs.length;
+        while (i--) {
+            if (matchs[i].length == 0) {
+                matchs.splice(i, 1)
+            }
+        }
+    }
+    return matchs
 }
 
 function ____throwConfError(line) {
@@ -353,12 +371,6 @@ function ____Tool() {
             }
         }
         return response
-    }
-}
-
-if (!Array.isArray) {
-    Array.isArray = function (arg) {
-        return Object.prototype.toString.call(arg) === '[object Array]'
     }
 }
 
