@@ -139,10 +139,10 @@ const url = "https://testflight.apple.com/join/";
 */
 const appkey = "VCIvwk2g,LzjySbQx";
 
-//是否在没有tf位置的时候任然弹出通知，默认不弹出,防止过多无用通知。
+//是否在没有tf位置的时候仍然弹出通知，默认不弹出,防止过多无用通知。
 var isNOtify = false;
 const fullstr = /(此 Beta 版本的测试员已满)|(此 Beta 版本目前不接受任何新测试员)/;
-const appnamereg = /<title>加入 Beta 版“(.+)” - TestFlight - Apple<\/title>/;
+const appnamereg = /<title>加入 Beta 版"(.+)" - TestFlight - Apple<\/title>/;
 var proarray = new Array();
 getResult();
 
@@ -166,9 +166,9 @@ function getResult() {
                     appnamereg.test(data);
                     var appname = appnamereg.exec(data);
                     if (!appname != null) {
-                        var reg = /“.+”/
+                        var reg = /".+"/
                         var item = reg.exec(appname[0]);
-                        var name = item[0].replace('“', '').replace('”', '');
+                        var name = item[0].replace('"', '').replace('"', '');
                         if (!fullstr.test(data)) {
                             logdata[name]={
                                 'has':true,
