@@ -8,9 +8,15 @@
 
 ⚠️远程外部资源请使用以下订阅(适用于TF版198+)
 
-Js.conf(远程脚本订阅): https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js.conf
+1⃣️Js.conf(远程脚本订阅): 
 
-Get_Cookie_Remote.conf (远程获取Cookie订阅): https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_Remote.conf
+https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js.conf
+
+2⃣️Get_Cookie_Remote.conf (远程获取Cookie订阅): 
+
+https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_Remote.conf
+
+3⃣️Task_Remote.conf(定时任务) 
 
 
 1.脚本本地化配置:
