@@ -84,7 +84,7 @@ if (-1 != $request.url.indexOf('/x/v2/account/mine') && 0 == body['code']) {
     body['data']['sections'] = body['data']['sections'].filter(
         function (item, index) {
             if ('创作中心' == item.title) {
-                return ture;
+                return true;
             }
             item.items = item.items.filter(function (section_items) {
                 console.log(section_items.title);
