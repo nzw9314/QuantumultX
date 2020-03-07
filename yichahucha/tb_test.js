@@ -284,7 +284,6 @@ function customTradeConsumerProtection() {
 }
 
 function Qs2Json(url) {
-    url = url == null ? window.location.href : url;
     var search = url.substring(url.lastIndexOf("?") + 1);
     var obj = {};
     var reg = /([^?&=]+)=([^?&=]*)/g;
