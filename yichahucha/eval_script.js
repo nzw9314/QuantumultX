@@ -31,11 +31,14 @@ const __conf = String.raw`
 
 [eval_remote]
 // custom remote...
+
 https://raw.githubusercontent.com/yichahucha/surge/master/sub_eval.conf
 
 
 [eval_local]
 // custom local...
+
+response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) eval https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
 
 
 `
@@ -155,7 +158,7 @@ if (__isTask) {
         })
         .catch((error) => {
             console.log(error)
-            __tool.notify("eval_script.js", "", error)
+            __tool.notify("[eval_script.js]", "", error)
             $done()
         })
 }
@@ -171,15 +174,15 @@ if (!__isTask) {
             const key = keys[i]
             const value = __confObj[key]
             for (let j = value.length; j--;) {
-                const url = value[j]
+                const match = value[j]
                 try {
-                    if (__url.match(url)) {
-                        script = { url: key, content: __tool.read(key), match: url }
+                    if (__url.match(match.regular)) {
+                        script = { url: key, match, content: __tool.read(key) }
                         break
                     }
                 } catch (error) {
-                    __tool.notify("", "", `Regular Error: ${url}\nRequest URL: ${__url}`)
-                    console.log(`${error}\nRegular Error: ${url}\nRequest URL: ${__url}`)
+                    if (__debug) __tool.notify("[eval_script.js]", "", `Error regular : ${match.regular}\nRequest: ${__url}`)
+                    if (__log) console.log(`${error}\nError regular : ${match.regular}\nRequest: ${__url}`)
                 }
             }
         }
@@ -188,15 +191,35 @@ if (!__isTask) {
 
     if (__script) {
         if (__script.content) {
-            eval(__script.content)
-            if (__log) console.log(`Request URL: ${__url}\nMatch URL: ${__script.match}\nExecute script: ${__script.url}`)
+            try {
+                const type = __script.match.type
+                if (type && type.length > 0) {
+                    if (__tool.scriptType == type) {
+                        if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}==${type}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                        if (__log) console.log(`Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                        eval(__script.content)
+                    } else {
+                        $done({})
+                        if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}!=${type}`, `Script types do not match! Don't execute script.\nScript: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                        if (__log) console.log(`Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                    }
+                } else {
+                    if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType} ${"request&&response"}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                    if (__log) console.log(`Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                    eval(__script.content)
+                }
+            } catch (error) {
+                $done({})
+                if (__debug) __tool.notify("[eval_script.js]", `${__tool.scriptType} ${__tool.method}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match}\nRequest: ${__url}`)
+                if (__log) console.log(`Script execute error : ${error}\nScript: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+            }
         } else {
             $done({})
-            if (__log) console.log(`Request URL: ${__url}\nMatch URL: ${__script.match}\nScript not executed. Script not found: ${__script.url}`)
+            if (__log) console.log(`Script not found: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
         }
     } else {
         $done({})
-        if (__log) console.log(`No match URL: ${__url}`)
+        if (__log) console.log(`Script not matched: ${__url}`)
     }
 }
 
@@ -334,13 +357,21 @@ function ____parseConf(lines) {
 }
 
 function ____parseMatch(match) {
-    let matchs = match.split(" ")
-    if (matchs.length > 0) {
-        let i = matchs.length;
-        while (i--) {
-            if (matchs[i].length == 0) {
-                matchs.splice(i, 1)
-            }
+    let matchs = []
+    const typeRegex = /(request|response)\s+\S+/g
+    const typeItems = match.match(typeRegex)
+    if (typeItems && typeItems.length > 0) {
+        match = match.replace(typeRegex, "")
+    }
+    const normalItems = match.match(/\S+/g)
+    const items = (typeItems ? typeItems : []).concat(normalItems ? normalItems : [])
+    for (let i = 0, len = items.length; i < len; i++) {
+        let item = items[i]
+        item = item.match(/\S+/g)
+        if (item.length > 1) {
+            matchs.push({ type: item[0], regular: item[1] })
+        } else {
+            matchs.push({ type: "", regular: item[0] })
         }
     }
     return matchs
@@ -358,10 +389,25 @@ function ____Tool() {
     _isSurge = typeof $httpClient != "undefined"
     _isQuanX = typeof $task != "undefined"
     _isTask = typeof $request == "undefined"
+    _isResponse = typeof $response != "undefined"
+    _isRequestBody = typeof $request != "undefined" && typeof $request.body != "undefined"
     this.isSurge = _isSurge
     this.isQuanX = _isQuanX
     this.isTask = _isTask
-    this.isResponse = typeof $response != "undefined"
+    this.isResponse = _isResponse
+    this.isRequestBody = _isRequestBody
+    this.method = (() => {
+        if (!_isTask && (_isSurge || _isQuanX)) {
+            return $request.method
+        }
+    })()
+    this.scriptType = (() => {
+        if (_isResponse) {
+            return "response"
+        } else {
+            return "request"
+        }
+    })()
     this.notify = (title, subtitle, message) => {
         if (_isQuanX) $notify(title, subtitle, message)
         if (_isSurge) $notification.post(title, subtitle, message)
