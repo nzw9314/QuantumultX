@@ -195,22 +195,22 @@ if (!__isTask) {
                 const type = __script.match.type
                 if (type && type.length > 0) {
                     if (__tool.scriptType == type) {
+                        eval(__script.content)
                         if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}==${type}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                         if (__log) console.log(`Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
-                        eval(__script.content)
                     } else {
                         $done({})
                         if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}!=${type}`, `Script types do not match! Don't execute script.\nScript: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                         if (__log) console.log(`Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                     }
                 } else {
+                    eval(__script.content)
                     if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType} ${"request&&response"}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                     if (__log) console.log(`Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
-                    eval(__script.content)
                 }
             } catch (error) {
                 $done({})
-                if (__debug) __tool.notify("[eval_script.js]", `${__tool.scriptType} ${__tool.method}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match}\nRequest: ${__url}`)
+                if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match}\nRequest: ${__url}`)
                 if (__log) console.log(`Script execute error : ${error}\nScript: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
             }
         } else {

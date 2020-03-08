@@ -76,8 +76,8 @@ if (url.indexOf(path2) != -1) {
                     } else {
                         let vertical = value.vertical
                         if (vertical && vertical.hasOwnProperty("tmallhkDirectSale")) {
-                            value["tradeConsumerProtection"] = customTradeConsumerProtection()
-                            value.tradeConsumerProtection = setTradeConsumerProtection(data, value.tradeConsumerProtection)
+                            $done({ body })
+                            sendNotify(data, shareUrl)
                         } else {
                             consumerProtection = setConsumerProtection(data, consumerProtection)
                         }
