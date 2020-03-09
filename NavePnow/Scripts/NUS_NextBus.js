@@ -30,7 +30,7 @@ function GetNearestLoc(lat, lng){
         handler: function (resp) {
             let data = resp.data;
             let name = ""
-            let distance = 1000;
+            let distance = 0;
             if (data.errmsg) {
                 alert(data.errmsg);
                 return;
@@ -41,7 +41,6 @@ function GetNearestLoc(lat, lng){
             for( let i = 0; i < count; i++){
                 tmp_lat = data[i].latitude
                 tmp_lng = data[i].longitude
-                // tmp_distance = (Math.sqrt(Math.pow((tmp_lat - lat), 2) + Math.pow((tmp_lng - lng), 2)))*1000;
                 radLat1 = rad(tmp_lat);
                 radLat2 = rad(lat);
                 a = radLat1 - radLat2;
@@ -50,6 +49,7 @@ function GetNearestLoc(lat, lng){
                     Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
                 s = s * EARTH_RADIUS;
                 tmp_distance = Math.round(s * 10000) / 10000;
+                if (i == 0) distance = tmp_distance;
                 if (tmp_distance < distance){
                     distance = tmp_distance;
                     name = data[i].name;
