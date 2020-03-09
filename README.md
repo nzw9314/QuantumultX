@@ -14,11 +14,11 @@
 ### 本地配置：
 
 * 建立本地文件夹
-目录 iCloud Drive/QuantumultX/Scripts/nzw9314 或者 我的iPhone/QuantumultX/Scripts/nzw9314**
+目录 iCloud Drive/QuantumultX/Scripts/nzw9314 或者 我的iPhone/QuantumultX/Scripts/nzw9314
 
-* [挂载我的仓库库](https://github.com/nzw9314/QuantumultX.git)
+* [WoringCopy挂载我的仓库](https://github.com/nzw9314/QuantumultX.git)
 
-* [挂载教程](https://m.youtube.com/watch?t=3s&v=inCQFnDmRLo)
+* [挂载视频教程](https://m.youtube.com/watch?t=3s&v=inCQFnDmRLo)
 
 * [Js_local_WorkingCopy.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy.conf) 脚本订阅,在QuantumultX重写中添加订阅.
 
@@ -32,9 +32,9 @@
 
 ### 远程配置：
 
-* [Js.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js.conf) 脚本远程订阅**
+* [Js.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js.conf) 脚本远程订阅
 
-* [[Get_Cookie_Remote.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_Remote.conf) Cookie获取远程订阅
+* [Get_Cookie_Remote.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_Remote.conf) Cookie获取远程订阅
 
 * [Task_Remote.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task_Remote.conf) 定时任务远程配置,目前无法订阅,请手动根据个人需求复制内容及修改时间
 
