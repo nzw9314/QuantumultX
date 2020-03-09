@@ -52,6 +52,12 @@ DingDing clock in
 cron "0 9,18 * * 1-5" script-path=https://raw.githubusercontent.com/yichahucha/surge/master/clock_in.js
 ```
 
+Script management tool
+```
+[Script]
+cron "0 0 * * *" eval_script.js
+```
+
 # Quan-X
 
 Remove weibo ads
