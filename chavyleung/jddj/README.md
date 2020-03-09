@@ -1,48 +1,46 @@
-# 全民K歌
+# 京东到家
 
 > 代码已同时兼容 Surge & QuanX, 使用同一份签到脚本即可
-
-> QuanX 需要: v1.0.6-build195 及以后版本 (TestFlight)
-
-> 感谢 [@GideonSenku](https://github.com/GideonSenku) Commit
+> 感谢 [@barry](https://t.me/barrymchen) 编写
+> 感谢 [@GideonSenku](https://github.com/GideonSenku) 对代码优化
 
 ## 配置 (Surge)
 
 ```properties
 [MITM]
-node.kg.qq.com
+daojia.jd.com
 
 [Script]
-http-request ^https://node\.kg\.qq\.com/webapp/proxy? script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/qmkg/qmkg.cookie.js, requires-body=true
+http-request ^https:\/\/daojia\.jd\.com\/client? script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/jddj/jddj.cookie.js, requires-body=true
 
-cron "10 0 0 * * *" script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/qmkg/qmkg.js
+cron "10 0 0 * * *" script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/jddj/jddj.js
 ```
 
 ## 配置 (QuanX)
 
 ```properties
 [MITM]
-node.kg.qq.com
+daojia.jd.com
 
 [rewrite_local]
 
 # [商店版] QuanX v1.0.6-build194 及更早版本
-# 不支持
+# ^https:\/\/daojia\.jd\.com\/client? url script-request-header jddj.cookie.js
 
 # [TestFlight] QuanX v1.0.6-build195 及以后版本
-^https://node\.kg\.qq\.com/webapp/proxy? url script-request-body https://raw.githubusercontent.com/chavyleung/scripts/master/qmkg/qmkg.cookie.js
+^https:\/\/daojia\.jd\.com\/client? url script-request-body https://raw.githubusercontent.com/chavyleung/scripts/master/jddj/jddj.cookie.js
 
 [task_local]
-1 0 * * * qmkg.js
+1 0 * * * jddj.js
 ```
 
 ## 说明
 
-1. 先把`node.kg.qq.com`加到`[MITM]`
+1. 先把`daojia.jd.com`加到`[MITM]`
 2. 再配置重写规则:
    - Surge: 把两条远程脚本放到`[Script]`
-   - QuanX: 把`qmkg.cookie.js`和`qmkg.js`传到`On My iPhone - Quantumult X - Scripts` (传到 iCloud 相同目录也可, 注意要打开 quanx 的 iCloud 开关)
-3. 打开 APP 手动签到一次: 访问下右下角 `我的` > `任务中心` > `签到`
+   - QuanX: 把`jddj.cookie.js`和`jddj.js`传到`On My iPhone - Quantumult X - Scripts` (传到 iCloud 相同目录也可, 注意要打开 quanx 的 iCloud 开关)
+3. 打开 APP 手动签到一次: `首页` > `签到`
 4. 系统提示: `获取Cookie: 成功`
 5. 把获取 Cookie 的脚本注释掉
 6. 运行一次脚本, 如果提示重复签到, 那就算成功了!
@@ -100,5 +98,7 @@ node.kg.qq.com
 [@lhie1](https://github.com/lhie1)
 
 [@ConnersHua](https://github.com/ConnersHua)
+
+[@barry](https://t.me/barrymchen)
 
 [@GideonSenku](https://github.com/GideonSenku)
