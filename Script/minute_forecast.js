@@ -138,119 +138,44 @@ if (isSurge) {
 }
 // #endregion
 
+
+const hfapi = "https://free-api.heweather.net/s6/weather/now?&location=auto_ip&key=5594d6910d9947e7a243c9f533a927f4"
+function getwmatioin(data){
+    var obj = JSON.parse(data);
+    //console.log(obj);
+    let city = obj.HeWeather6[0].basic["location"];
+    let updatetime = obj.HeWeather6[0].update["loc"];
+    let wea = obj.HeWeather6[0].now["cond_txt"];
+    let temp = obj.HeWeather6[0].now["fl"];
+    let wind = obj.HeWeather6[0].now["wind_dir"];
+    let hum = obj.HeWeather6[0].now["hum"];
+    let vis = obj.HeWeather6[0].now["vis"];
+    let mm = [city, wea, temp, wind, hum, vis, updatetime];
+    return mm
+
+
+}
+
+$httpClient.get(hfapi, function(error, response, data){
+    if (error){
+        console.log(error);
+        $done();                   
+    } else {
+        var mm = getwmatioin(data);
+        var title = "Meeta与您相伴"+"`"+mm[0];
+        var subtitle = "天气状况："+mm[1]+"  "+mm[3];
+        var mation = "体感温度："+mm[2]+"℃"+"  "+"空气湿度："+mm[4]+"%"+"  "+"能见度："+mm[5]+"㎞"+"\n更新时间："+mm[6];
+        $notification.post(title, subtitle, mation);
+        $done();
+    }
+}
+);
+
 /* Hourly weather(Made by Meeta)
-cron "0 0 8-20/1 * * *" script-path=https://raw.githubusercontent.com/MeetaGit/MeetaRules/master/Surge/Scripting/meweather.js
-PS:
-a.远程脚本是通过ip定位，所以可能定位城市不够精确
-  本地脚本通过经纬度定位比较准，不过比较麻烦，可自行选择
-  本地脚本生成的workflow,请去TG频道获取
-b.Lifestyle 是随机的生活建议包括（穿衣、洗车、感冒、紫外线、运动、舒适度、旅游、空气污染扩散条件 等)
-c.使用此脚本的话个人建议将通知>Surge>横幅风格 改为临时，哈，我是不喜欢把这种通知堆积在通知栏的
-d.由于免费接口限制每日访问量，请不要设置高频天气通知
-  有高频通知需求的话建议可以自己注册和风天气，脚本更换key值即可
-
-TG频道:@meetashare
-
-
-     (由nzw9314精简仅保留降雨提醒)
-
+文本编辑模式下复制粘贴
+cron "0 0 8-20/1 * * *" script-path=https://meetagit.github.io/MeetaRules/Surge/Scripting/meweather.js
+新采用了和风天气api,天气通知比前一个内容更丰富等等（由于免费接口限制每日访问量，请大家不要设置高频天气通知）
+向通知中心发送通知，Surge iOS 上需开启通知总开关；
+欢迎大家使用
+欢迎关注TG频道:@meetashare
 */
-
-
-
-const address = "&location=填经纬度";
-const k = "&key=填入和风天气key";
-
-const wea = "https://free-api.heweather.net/s6/weather/now?"+address+k;
-const forecast = "https://widget-api.heweather.net/s6/plugin/sticker?key=acd0fdcab4b9481a98d0f59145420fac&location="+$persistentStore.read("cid")+"&lang=zh";
-const weaqua = "https://free-api.heweather.net/s6/air/now?"+address+k;
-const lifestyle = "https://free-api.heweather.net/s6/weather/lifestyle?"+address+k;
-
-$httpClient.get(wea, function(error, response, data){
-    if (error){
-        console.log(error);
-        $done();                   
-    } else {
-        var obj = JSON.parse(data);
-        //console.log(obj);
-        let city = obj.HeWeather6[0].basic["parent_city"];
-        let cid = obj.HeWeather6[0].basic["cid"];
-        let noweather = obj.HeWeather6[0].now["cond_txt"];
-        let wind_dir = obj.HeWeather6[0].now["wind_dir"];
-        let wind_sc = obj.HeWeather6[0].now["wind_sc"];
-        let hum = obj.HeWeather6[0].now["hum"];
-        let tmp = obj.HeWeather6[0].now["tmp"];
-        let updatetime = obj.HeWeather6[0].update["loc"];
-        $persistentStore.write(city, "city");
-        $persistentStore.write(noweather, "noweather");
-        $persistentStore.write(updatetime, "updatetime");
-        $persistentStore.write(wind_dir, "wind_dir");
-        $persistentStore.write(wind_sc, "wind_sc");
-        $persistentStore.write(hum, "hum");
-        $persistentStore.write(tmp, "tmp");
-        $persistentStore.write(cid, "cid");
-        $done(); 
-    }
-}
-);
-        
-
-    
-$httpClient.get(forecast, function(error, response, data){
-    if (error){
-        console.log(error);
-        $done();                   
-    } else {
-        var obj = JSON.parse(data);
-        //console.log(obj);
-        var minute_forecast = obj.rain["txt"];
-        $persistentStore.write(minute_forecast, "minute_forecast");
-        $done(); 
-    }
-}
-);
-
-        
-        
-        
-$httpClient.get(weaqua, function(error, response, data){
-    if (error){
-        console.log(error);
-        $done();                   
-    } else {
-        var obj = JSON.parse(data);
-        //console.log(obj);
-        var qlty = obj.HeWeather6[0].air_now_city.qlty;
-        var aqi = obj.HeWeather6[0].air_now_city.aqi;
-        var pm25 = obj.HeWeather6[0].air_now_city.pm25;
-        $persistentStore.write(qlty, "qlty");
-        $persistentStore.write(aqi, "aqi");
-        $persistentStore.write(pm25, "pm25");
-        $done(); 
-    }
-}
-);
-
-
-
-$httpClient.get(lifestyle, function(error, response, data){
-    if (error){
-        console.log(error);
-        $done();                   
-    } else {
-        var obj = JSON.parse(data);
-        //console.log(obj); 
-        var rng = Math.floor((Math.random()*8)+1);
-        var ssd = obj.HeWeather6[0].lifestyle[0].brf;
-        var life =  obj.HeWeather6[0].lifestyle[rng].txt;
-        $persistentStore.write(ssd, "ssd");
-        $persistentStore.write(life, "life");
-        $done(); 
-    }
-}
-);
-
-var title = $persistentStore.read("city")+"天气 : "+$persistentStore.read("noweather")+" • "+$persistentStore.read("tmp")+" °C "+" | "+$persistentStore.read("ssd");
-var subtitle = "降雨提醒 : "+$persistentStore.read("minute_forecast");var mation = "更新时间 : "+$persistentStore.read("updatetime")
-$notification.post(title, subtitle, mation);
-$done();
