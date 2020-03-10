@@ -1,4 +1,6 @@
 # Profiles
+[![](https://img.shields.io/github/stars/NavePnow/Profiles.svg)](https://github.com/NavePnow/Profiles) [![](https://img.shields.io/github/forks/NavePnow/Profiles.svg)](https://github.com/NavePnow/Profiles) [![](https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/chinese.svg)](https://github.com/NavePnow/Profiles/blob/master/README.md)
+
 📖 [文档](https://github.com/NavePnow/Profiles/blob/master/README.md) | 📖 Docs
 
 ## Filter - Ruleset of Surge and QuantumultX

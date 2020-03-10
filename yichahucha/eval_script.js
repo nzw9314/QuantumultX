@@ -99,12 +99,8 @@ if (__isTask) {
                             resolve(data)
                         })
                     } else {
-                        if (__developmentMode) {
-                            __tool.write(url, url)
-                            resolve({ body: url, url, message: `${__emoji}${url} function set success` })
-                        } else {
-                            resolve({ body: "", url, message: `${__emoji}${url} The script url is not available!` })
-                        }
+                        __tool.write(url, url)
+                        resolve({ body: url, url, message: `${__emoji}${url} function set success` })
                     }
                 })
             })
@@ -164,15 +160,16 @@ if (!__isTask) {
                 if (__debug) {
                     try {
                         if (__url.match(match.regular)) {
-                            script = { url: key, match, content: __tool.read(key) }
+                            script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
                             break
                         }
                     } catch (error) {
                         if (__debug) __tool.notify("[eval_script.js]", "", `Error regular : ${match.regular}\nRequest: ${__url}`)
+                        throw error
                     }
                 } else {
                     if (__url.match(match.regular)) {
-                        script = { url: key, match, content: __tool.read(key) }
+                        script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
                         break
                     }
                 }
@@ -191,8 +188,8 @@ if (!__isTask) {
                             eval(__script.content)
                             if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}==${type}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                         } catch (error) {
-                            __tool.done({})
                             if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match}\nRequest: ${__url}`)
+                            throw error
                         }
                     } else {
                         eval(__script.content)
@@ -207,8 +204,8 @@ if (!__isTask) {
                         eval(__script.content)
                         if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType} ${"request&&response"}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                     } catch (error) {
-                        __tool.done({})
                         if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match}\nRequest: ${__url}`)
+                        throw error
                     }
                 } else {
                     eval(__script.content)
@@ -225,7 +222,7 @@ if (!__isTask) {
 }
 
 function ____parseDevelopmentModeConf(conf) {
-    const localConf = ____removeGarbage(____extractConf(__conf, "eval_local"))
+    const localConf = ____removeAnnotation(____extractConf(__conf, "eval_local"))
     const result = ____parseConf(localConf)
     return result.obj
 }
