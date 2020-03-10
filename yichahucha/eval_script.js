@@ -1,20 +1,22 @@
 const __conf = String.raw`
 
+
 [eval_remote]
 // custom remote...
-https://raw.githubusercontent.com/yichahucha/surge/master/sub_eval.conf
+
+https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 
 
 [eval_local]
+
 // custom local...
-response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) eval https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
 
 
 `
 
 const __emoji = "• "
-const __emojiSuccess = "😁"
-const __emojiFail = "😓"
+const __emojiSuccess = "😀"
+const __emojiFail = "🙃"
 const __emojiTasks = "🕐"
 const __emojiDone = "✔️"
 const __showLine = 20
@@ -204,7 +206,7 @@ if (!__isTask) {
                         eval(__script.content)
                         if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType} ${"request&&response"}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                     } catch (error) {
-                        if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match}\nRequest: ${__url}`)
+                        if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                         throw error
                     }
                 } else {
