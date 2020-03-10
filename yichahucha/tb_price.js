@@ -58,29 +58,36 @@ if (url.indexOf(path2) != -1) {
                 let tradeConsumerProtection = null
                 let consumerProtection = null
                 let trade = null
+                let vertical = null
                 if (value.global) {
                     tradeConsumerProtection = value.global.data.tradeConsumerProtection
                     consumerProtection = value.global.data.consumerProtection
                     trade = value.global.data.trade
+                    vertical = value.global.data.vertical
                 } else {
                     tradeConsumerProtection = value.tradeConsumerProtection
                     consumerProtection = value.consumerProtection
                     trade = value.trade
+                    vertical = value.vertical
                 }
                 if (trade && trade.useWap == "true") {
                     $done({ body })
                     sendNotify(data, shareUrl)
                 } else {
-                    if (tradeConsumerProtection) {
+                    if (vertical && vertical.hasOwnProperty("tmallhkDirectSale")) {
+                        // if (value.global) {
+                        //     value.global.data["tradeConsumerProtection"] = customTradeConsumerProtection()
+                        //     value.global.data.tradeConsumerProtection = setTradeConsumerProtection(data, value.global.data.tradeConsumerProtection)
+                        // } else {
+                        //     value["tradeConsumerProtection"] = customTradeConsumerProtection()
+                        //     value.tradeConsumerProtection = setTradeConsumerProtection(data, value.tradeConsumerProtection)
+                        // }
+                        $done({ body })
+                        sendNotify(data, shareUrl)
+                    } else if (tradeConsumerProtection) {
                         tradeConsumerProtection = setTradeConsumerProtection(data, tradeConsumerProtection)
                     } else {
-                        let vertical = value.vertical
-                        if (vertical && vertical.hasOwnProperty("tmallhkDirectSale")) {
-                            $done({ body })
-                            sendNotify(data, shareUrl)
-                        } else {
-                            consumerProtection = setConsumerProtection(data, consumerProtection)
-                        }
+                        consumerProtection = setConsumerProtection(data, consumerProtection)
                     }
                     apiStack.value = JSON.stringify(value)
                     $done({ body: JSON.stringify(obj) })
