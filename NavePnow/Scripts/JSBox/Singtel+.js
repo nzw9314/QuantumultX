@@ -1,6 +1,6 @@
-let Authorization = "eN84D4XvKM0o485pFxbnKe1PzjZSdSI1wvgAUAw1M56rr95Cy5FCcv9MWWS7dy8OE+HzwsM9M7IZiMOHpXVpDjtfffJmXwAKJo5WR7wv+Kcg1EPMGQkQLQXTnu7lVoNZJwRjWNhQyKZ2jj/7VKbXKg0VWgMdpL8xXGxJoqO42wvywZ644i1R2dIyOP0SYwQgW61ulEutZobZWx1MPQp2T+xYyGErqVXoleCDblY501ZRi7/s6rVYdwBjeqw2QVya/wCEo5Wcb6tq8C3MLqy6vPDzXtny6WhYhZFFUpAbN7WKk9OmsK4ksLkmkdCxRYaokuQ2DcCBsz1lM/kpvpDtYA==";
+let Authorization = "";
 
-let Cookie = "dtCookie=1$3C409ACB0FDE7C2C1BECEBAB2F441E0A; AWSALB=+XS0KR4O0Gzix+tEaMX1457QRk19XLrY7tR38HNdkdrUUr5yrr+Zectq6NuSC0FJiDQli4k047P1+P/p33ViGRDZpnxlqIS6H8jNyOgySV2w8FC48NKXk7ruIPhH; _ga=GA1.2.1010783425.1579449685; _gid=GA1.2.637047548.1579449685";
+let Cookie = "";
 
 
 // 1. 利用 thor 进行 hi!App 软件的抓包测试（打开thor-> 打开 hi!App -> 数据加载完成 -> 结束抓包）
@@ -59,7 +59,7 @@ $http.get({
             if (obj.cards[1].items[i].description == "LOCAL SMS") local_sms = obj.cards[1].items[i].amount;
             if (obj.cards[1].items[i].description == "IDD CALLS") idd_calls = obj.cards[1].items[i].amount;
         }
-        miniData[0][1] = balance.replace("$","");
+        miniData[0][1] = balance.replace("$", "");
         miniData[1][1] = local_data;
         miniData[2][1] = local_calls;
         miniData[3][1] = local_sms;
@@ -78,7 +78,7 @@ const updateStatus = () => {
     setupMiniLabel(miniData[1], Gabriel);
     setupMiniLabel(miniData[2], Lucifer);
     setupMiniLabel(miniData[3], Evan);
-    
+
 };
 
 function setupMiniLabel(arr, miniLabel) {
@@ -161,84 +161,84 @@ $ui.render({
         }
     },
     views: [{
-            type: "view",
+        type: "view",
+        props: {
+            id: "banner",
+            bgcolor: $rgba(255, 255, 255, 0.28)
+        },
+        layout: (make, view) => {
+            make.left.right.inset(0);
+            make.bottom.equalTo(view.super.top);
+        },
+        views: [{
+            type: "label",
             props: {
-                id: "banner",
-                bgcolor: $rgba(255, 255, 255, 0.28)
+                text: "Loading…",
+                textColor: $color("darkGray"),
+                font: $font("HiraMinProN-W3", 12)
             },
             layout: (make, view) => {
-                make.left.right.inset(0);
-                make.bottom.equalTo(view.super.top);
+                make.centerX.equalTo(view.super);
+                make.top.inset(0);
+            }
+        },
+        {
+            type: "runtime",
+            props: {
+                view: Micheal,
+                lines: 2,
+                align: $align.center
             },
-            views: [{
-                    type: "label",
-                    props: {
-                        text: "Loading…",
-                        textColor: $color("darkGray"),
-                        font: $font("HiraMinProN-W3", 12)
-                    },
-                    layout: (make, view) => {
-                        make.centerX.equalTo(view.super);
-                        make.top.inset(0);
-                    }
-                },
-                {
-                    type: "runtime",
-                    props: {
-                        view: Micheal,
-                        lines: 2,
-                        align: $align.center
-                    },
-                    layout: (make, view) => {
-                        make.height.equalTo(view.super);
-                        make.width.equalTo(view.super).dividedBy(4);
-                        make.left.top.inset(0);
-                    }
-                },
-                separateLine(),
-                {
-                    type: "runtime",
-                    props: {
-                        view: Gabriel,
-                        lines: 2,
-                        align: $align.center
-                    },
-                    layout: (make, view) => {
-                        make.height.equalTo(view.super);
-                        make.width.equalTo(view.super).dividedBy(4);
-                        make.left.equalTo(90);
-                    }
-                },
-                separateLine(),
-                {
-                    type: "runtime",
-                    props: {
-                        view: Lucifer,
-                        lines: 2,
-                        align: $align.center
-                    },
-                    layout: (make, view) => {
-                        make.height.equalTo(view.super);
-                        make.width.equalTo(view.super).dividedBy(4);
-                        make.left.equalTo(180);
-                    }
-                },
-                separateLine(), 
-                {
-                    type: "runtime",
-                    props: {
-                        view: Evan,
-                        lines: 2,
-                        align: $align.center
-                    },
-                    layout: (make, view) => {
-                        make.height.equalTo(view.super);
-                        make.width.equalTo(view.super).dividedBy(4);
-                        make.right.top.inset(0);
-                    }
-                }
-            ]
+            layout: (make, view) => {
+                make.height.equalTo(view.super);
+                make.width.equalTo(view.super).dividedBy(4);
+                make.left.top.inset(0);
+            }
+        },
+        separateLine(),
+        {
+            type: "runtime",
+            props: {
+                view: Gabriel,
+                lines: 2,
+                align: $align.center
+            },
+            layout: (make, view) => {
+                make.height.equalTo(view.super);
+                make.width.equalTo(view.super).dividedBy(4);
+                make.left.equalTo(90);
+            }
+        },
+        separateLine(),
+        {
+            type: "runtime",
+            props: {
+                view: Lucifer,
+                lines: 2,
+                align: $align.center
+            },
+            layout: (make, view) => {
+                make.height.equalTo(view.super);
+                make.width.equalTo(view.super).dividedBy(4);
+                make.left.equalTo(180);
+            }
+        },
+        separateLine(),
+        {
+            type: "runtime",
+            props: {
+                view: Evan,
+                lines: 2,
+                align: $align.center
+            },
+            layout: (make, view) => {
+                make.height.equalTo(view.super);
+                make.width.equalTo(view.super).dividedBy(4);
+                make.right.top.inset(0);
+            }
         }
+        ]
+    }
     ]
 });
 
