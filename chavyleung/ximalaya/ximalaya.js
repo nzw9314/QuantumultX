@@ -9,7 +9,7 @@ let VAL_signcookie = chavy.getdata(KEY_signcookie)
   chavy.log(`🔔 ${cookieName} 开始签到`)
   await getinfo()
   if (signinfo.info.isTickedToday == false) await signapp()
-  await browseapp()
+  // await browseapp()
   await getacc()
   showmsg()
 })().catch((e) => chavy.log(`❌ ${cookieName} 签到失败: ${e}`))
@@ -128,7 +128,7 @@ function showmsg() {
   }
 
   if (signinfo.browseapp) {
-    if (signinfo.browseapp.ret == 0) {
+    if (signinfo.browseapp.ret == 0 && signinfo.browseapp.data && signinfo.browseapp.data.awards) {
       if (signinfo.browseapp.data.awards) subTitle += `, 每日浏览: 成功 (${signinfo.browseapp.data.awards})`
       else subTitle += ', 每日浏览: 重复'
     } else {
