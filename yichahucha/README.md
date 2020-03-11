@@ -24,19 +24,18 @@ Display jd historical price
 # ^https?:\/\/api\.m\.jd.com\/client\.action\?functionId=(start|queryMaterialAdverts) - reject
 [Script]
 http-response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
-# lite
-# http-response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/jd_price_lite.js
 [MITM]
 hostname = api.m.jd.com
 ```
 
 Display taobao historical price
 ```
-# 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 大概率会失效
+# 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
 [Script]
-http-response ^https?://(trade-acs|amdc)\.m\.taobao\.com/(gw/mtop\.taobao\.detail\.getdetail|amdc/mobileDispatch) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+http-response ^http://amdc\.m\.taobao\.com/amdc/mobileDispatch requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+http-response ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 [MITM]
-hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
+hostname = trade-acs.m.taobao.com
 
 # 以上还不生效或者频繁失效的可以添加以下规则，使用规则有可能误伤其他功能或者应用（一般不需要添加规则就能正常使用）
 # [Rule]
@@ -82,19 +81,18 @@ Display jd historical price
 ```
 [rewrite_local]
 ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body jd_price.js
-# lite
-# ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body jd_price_lite.js
 [mitm]
 hostname = api.m.jd.com
 ```
 
 Display taobao historical price
 ```
-# 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 大概率会失效
+# 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
 [rewrite_local]
-^https?://(trade-acs|amdc)\.m\.taobao\.com/(gw/mtop\.taobao\.detail\.getdetail|amdc/mobileDispatch) url script-response-body tb_price.js
+^http://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body tb_price.js
+^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body tb_price.js
 [mitm]
-hostname = trade-acs.m.taobao.com,amdc.m.taobao.com
+hostname = trade-acs.m.taobao.com
 
 # 以上还不生效或者频繁失效的可以添加以下规则，使用规则有可能误伤其他功能或者应用（一般不需要添加规则就能正常使用）
 # [filter_local]
@@ -123,12 +121,12 @@ Script management tool
 ```
 
 
-2.在 eval_script.js 中配置需要管理的脚本，可以配置远程和配置本地，提供一个远程示例
+2.在 eval_script.js 中配置需要管理的脚本，可以配置远程和配置本地，提供一个复写订阅适配 eval_script 的远程示例
 
 ```
 
-远程格式为: ####匹配正则 eval 脚本连接
-本地格式为: 匹配正则 eval 脚本连接
+远程格式为: ####脚本类型(request/response) 匹配正则 eval 脚本连接
+本地格式为: 脚本类型(request/response) 匹配正则 eval 脚本连接
 
 [eval_remote]
 https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
@@ -144,4 +142,4 @@ https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 [rewrite_remote]
 https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf, tag=eval, enabled=true
 ```
-4.以上都配置好，脚本生效
+4.以上都配置好，示例脚本生效

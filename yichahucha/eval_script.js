@@ -8,7 +8,6 @@ https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 
 
 [eval_local]
-
 // custom local...
 
 
