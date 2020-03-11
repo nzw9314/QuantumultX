@@ -5,7 +5,7 @@
 Author: t.me/makexp
 Modified by zZPiglet
 
-Quantumult X (App Store:1.0.5+, TestFlight 190+):
+Quantumult X (TestFlight 190+):
 [task_local]
 1 0 * * * WeChatLottery.js
 or remote
@@ -13,6 +13,8 @@ or remote
 
 [rewrite_local]
 ^https:\/\/new\.api\.hdcj\.9w9\.com\/api\/sign\/sign url script-request-body WeChatLottery.js
+or remote
+^https:\/\/new\.api\.hdcj\.9w9\.com\/api\/sign\/sign url script-request-body https://raw.githubusercontent.com/zZPiglet/Task/master/WeChatLottery/WeChatLottery.js
 
 Surge 4.0+:
 [Script]
@@ -224,7 +226,11 @@ function GetData() {
         };
         $cmp.post(LotteryData, function (error, response, data) {
             try {
-                datainfo.GetData = JSON.parse(data)
+                const obj2 = JSON.parse(data)
+                datainfo.days = obj2.result.cycle
+                datainfo.luckcoin = obj2.result.sign_lucky[datainfo.days - 1];
+                datainfo.allluckcoin = obj2.result.lucky_count;
+                datainfo.luckmoney = obj2.result.money;
                 resolve ('done')
             } catch (e) {
                 $cmp.notify("活动签到"+e.name+"‼️", JSON.stringify(e), e.message)
@@ -239,16 +245,10 @@ function notify() {
     return new Promise(resolve => {
        try {
            if (datainfo.success == 0) {
-               let days = datainfo.GetData.result.is_sign;
-               let luckcoin = datainfo.GetData.result.sign_lucky[days];
-               let allluckcoin = datainfo.GetData.result.lucky_count;
-               let luckmoney = datainfo.GetData.result.money;
-               let msg1 = "今日获得 " + luckcoin + " 币，共有 " + allluckcoin + " 币及 " + luckmoney + " 元。💰";
+               let msg1 = "签到获得 " + datainfo.luckcoin + " 币，共有 " + datainfo.allluckcoin + " 币及 " + datainfo.luckmoney + " 元。💰";
                $cmp.notify("活动签到 - 签到成功！🎉", "", msg1)
            } else if (datainfo.success == 2) {
-               let allluckcoin = datainfo.GetData.result.lucky_count;
-               let luckmoney = datainfo.GetData.result.money;
-               const msg2 = "账户总额：" + allluckcoin + " 币及 " + luckmoney + " 元。💰"
+               const msg2 = "今日获得 " + datainfo.luckcoin + " 币，共有 " + datainfo.allluckcoin + " 币及 " + datainfo.luckmoney + " 元。💰"
                $cmp.notify("活动签到 - 重复签到！😊", "", msg2)
            } else if (datainfo.error == 0) {
                $cmp.notify("活动签到 - 签到接口请求失败", "", datainfo.errormessage)
