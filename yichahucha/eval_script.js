@@ -27,6 +27,7 @@ const __log = false
 const __debug = false
 const __developmentMode = false
 
+
 if (__isTask) {
     const ____getConf = (() => {
         return new Promise((resolve) => {
@@ -46,7 +47,7 @@ if (__isTask) {
                                 content = content.concat(____parseRemoteConf(data.body))
                             }
                         });
-                        content = content.concat(localConf)
+                        content = localConf.concat(content)
                         resolve({ content, result })
                     })
             } else {
@@ -152,33 +153,49 @@ if (!__isTask) {
     const __script = (() => {
         let script = null
         const keys = Object.keys(__confObj)
-        for (let i = keys.length; i--;) {
+        for (let i = 0, len = keys.length; i < len; i++) {
             if (script) break
             const key = keys[i]
             const value = __confObj[key]
-            for (let j = value.length; j--;) {
+            for (let j = 0, len = value.length; j < len; j++) {
                 const match = value[j]
+                const regular = new RegExp(match.regular)
                 if (__debug) {
                     try {
-                        if (__url.match(match.regular)) {
-                            script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
-                            break
+                        if (regular.test(__url)) {
+                            const type = match.type
+                            if (type && type.length > 0) {
+                                if (__tool.scriptType == type) {
+                                    script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
+                                    break
+                                }
+                            } else {
+                                script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
+                                break
+                            }
                         }
                     } catch (error) {
                         if (__debug) __tool.notify("[eval_script.js]", "", `Error regular : ${match.regular}\nRequest: ${__url}`)
                         throw error
                     }
                 } else {
-                    if (__url.match(match.regular)) {
-                        script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
-                        break
+                    if (regular.test(__url)) {
+                        const type = match.type
+                        if (type && type.length > 0) {
+                            if (__tool.scriptType == type) {
+                                script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
+                                break
+                            }
+                        } else {
+                            script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
+                            break
+                        }
                     }
                 }
             }
         }
         return script
     })()
-
     if (__script) {
         if (__script.content) {
             const type = __script.match.type
@@ -189,7 +206,7 @@ if (!__isTask) {
                             eval(__script.content)
                             if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}==${type}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                         } catch (error) {
-                            if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match}\nRequest: ${__url}`)
+                            if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match}\nRequest: ${__url}\nContent: ${__script.content}`)
                             throw error
                         }
                     } else {
@@ -205,7 +222,7 @@ if (!__isTask) {
                         eval(__script.content)
                         if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType} ${"request&&response"}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
                     } catch (error) {
-                        if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                        if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}\nContent: ${__script.content}`)
                         throw error
                     }
                 } else {
@@ -328,28 +345,28 @@ function ____removeAnnotation(lines) {
 function ____parseConf(lines) {
     let confObj = {}
     for (let i = 0, len = lines.length; i < len; i++) {
-        const line = lines[i].replace(/^\s*/, "")
-        if (line.length > 0) {
-            const urlRegex = /.+\s+url\s+.+/
-            const evalRegex = /.+\s+eval\s+.+/
-            const avaliable = (() => {
-                return urlRegex.test(line) || evalRegex.test(line)
-            })()
-            if (avaliable) {
-                let remote = ""
-                let match = []
-                if (urlRegex.test(line)) {
-                    const value = line.split("url")
-                    remote = value[0].replace(/\s/g, "")
-                    match = ____parseMatch(value[1])
-                }
-                if (evalRegex.test(line)) {
-                    const value = line.split("eval")
-                    remote = value[1].replace(/\s/g, "")
-                    match = ____parseMatch(value[0])
-                }
+        let line = lines[i].trim()
+        if (line.length > 0 && line.substring(0, 2) != "//" && line.substring(0, 1) != "#") {
+            const eval = /^(.+)\s+eval\s+(.+)$/
+            const surge = /^http\s*-\s*(request|response)\s+(\S+)\s+(.+)$/
+            const quanx = /^(\S+)\s+url\s+script\s*-\s*(\S+)\s*-\s*(?:header|body)\s+(\S+)$/
+            if (surge.test(line)) {
+                const result = line.match(surge)
+                line = `${result[1].trim()} ${result[2].trim()} eval ${____surgeScriptPath(result[3].trim())}`
+            } else if (quanx.test(line)) {
+                const result = line.match(quanx)
+                line = `${result[2].trim()} ${result[1].trim()} eval ${result[3].trim()}`
+            }
+            if (eval.test(line)) {
+                const value = line.match(eval)
+                const remote = value[2].trim()
+                const match = ____parseMatch(value[1].trim())
                 if (remote.length > 0 && match.length > 0) {
-                    confObj[remote] = match
+                    if (confObj.hasOwnProperty(remote)) {
+                        confObj[remote] = confObj[remote].concat(match)
+                    } else {
+                        confObj[remote] = match
+                    }
                 } else {
                     return { obj: null, error: line }
                 }
@@ -359,6 +376,20 @@ function ____parseConf(lines) {
         }
     }
     return { obj: confObj, error: null }
+}
+
+function ____surgeScriptPath(arg) {
+    let scriptPath = ""
+    const args = arg.split(",")
+    for (let i = 0, len = args.length; i < len; i++) {
+        const item = args[i].trim()
+        const path = /^script-path\s*=\s*(\S+)$/
+        if (path.test(item)) {
+            scriptPath = item.match(path)[1]
+            break
+        }
+    }
+    return scriptPath
 }
 
 function ____parseMatch(match) {
