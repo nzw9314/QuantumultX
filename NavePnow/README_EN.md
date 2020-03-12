@@ -1,13 +1,39 @@
 # Profiles
-[![](https://img.shields.io/github/stars/NavePnow/Profiles.svg)](https://github.com/NavePnow/Profiles) [![](https://img.shields.io/github/forks/NavePnow/Profiles.svg)](https://github.com/NavePnow/Profiles) [![](https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/chinese.svg)](https://github.com/NavePnow/Profiles/blob/master/README.md)
+[![](https://img.shields.io/github/stars/NavePnow/Profiles.svg)](https://github.com/NavePnow/Profiles) [![](https://img.shields.io/github/forks/NavePnow/Profiles.svg)](https://github.com/NavePnow/Profiles) [![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![Generic badge](https://img.shields.io/badge/Telegram-Channel-blue.svg)](https://t.me/Leped_Channel) [![Generic badge](https://img.shields.io/badge/Telegram-Feedback-blue.svg)](https://t.me/Leped_Bot) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![](https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/chinese.svg)](https://github.com/NavePnow/Profiles/blob/master/README.md)
+
+[![ForTheBadge built-with-love](http://ForTheBadge.com/images/badges/built-with-love.svg)](https://GitHub.com/NavePnow)
 
 📖 [文档](https://github.com/NavePnow/Profiles/blob/master/README.md) | 📖 Docs
+
+Table of Contents
+=================
+
+   * [Profiles](#profiles)
+      * [Filter - Ruleset of Surge and QuantumultX](#filter---ruleset-of-surge-and-quantumultx)
+      * [Scripts](#scripts)
+         * [Surge/QuantumultX](#surgequantumultx)
+            * [filter_conversion.js](#filter_conversionjs)
+            * [checkin.js](#checkinjs)
+            * [checkin_1point.js](#checkin_1pointjs)
+            * [10010 .js/10010 _qx.js](#10010js10010_qxjs)
+            * [weather.js/weather_qx.js](#weatherjsweather_qxjs)
+            * [weibo](#weibo)
+         * [Google Apps Script](#google-apps-script)
+            * [google_script/singtel.js](#google_scriptsingteljs)
+            * [google_script/calendar.js](#google_scriptcalendarjs)
+         * [JSBox](#jsbox)
+            * [JSBox/NUS_NextBus.js](#jsboxnus_nextbusjs)
+            * [JSBox/Singtel .js](#jsboxsingteljs)
+      * [Tip Jar](#tip-jar)
 
 ## Filter - Ruleset of Surge and QuantumultX
 
 ## Scripts
 
-### filter_conversion.js
+### Surge/QuantumultX
+
+#### filter_conversion.js
+**By [NavePnow](https://github.com/NavePnow)**
 **powered by CLOUDFLARE Workers**
 
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/process.jpeg" height="60%" width="60%">
@@ -22,7 +48,7 @@
     4. Save and Deploy
     5. Enjoy ur life
    
-### checkin.js
+#### checkin.js
 **By [Neurogram](https://github.com/Neurogram-R) feat [NavePnow](https://github.com/NavePnow)**
 
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMAGE 2019-11-12 19:57:53.jpg" height="40%" width="40%">
@@ -34,7 +60,7 @@
    1. `https://www.notion.so/Check-in-0797ec9f9f3f445aae241d7762cf9d8b`
    2. Check the data format and modify the regex if something goes wrong
 
-### checkin_1point.js
+#### checkin_1point.js
 **By [NavePnow](https://github.com/NavePnow) feat [wangfei021325](https://t.me/wangfei021325)**
 
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMAGE 2019-11-12 19:58:49.jpg" height="40%" width="40%">
@@ -42,7 +68,7 @@ Auto check-in for 1point3acres.com
 
 [Tutorial](https://nave.work/%E4%B8%80%E4%BA%A9%E4%B8%89%E5%88%86%E5%9C%B0%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC.html)
 
-### 10010+.js/10010+_qx.js
+#### 10010+.js/10010+_qx.js
 **By [NavePnow](https://github.com/NavePnow)**
 Modified according to the Jsbox script from author [coo11](https://t.me/coo11) 
 
@@ -63,7 +89,7 @@ Modified according to the Jsbox script from author [coo11](https://t.me/coo11)
     1. If you want to put the file online, make sure keep it private because the response data of Alipay provide your REAL NAME.
     2. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
 
-### weather.js/weather_qx.js
+#### weather.js/weather_qx.js
 **By [NavePnow](https://github.com/NavePnow)**
 **powered by Dark Sky**
 
@@ -86,7 +112,7 @@ Modified according to the Jsbox script from author [coo11](https://t.me/coo11)
     3. The purpose of this script is to make a daily weather reminder every morning. The script will be modified accordingly to meet my needs because Dark Sky Api has US extreme weather warning
     4. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
 
-### weibo
+#### weibo
 **By [NavePnow](https://github.com/NavePnow)**
 **inspired by [Nobyda](https://t.me/nubida)**
 
@@ -95,7 +121,9 @@ Auto check-in for Weibo Super_Talk
 
 [Tutorial](https://nave.work/微博超话自动签到脚本.html)
 
-### google_script/singtel.js
+### Google Apps Script
+
+#### google_script/singtel.js
 **By [NavePnow](https://github.com/NavePnow)**
 **powered by Google Script**
 
@@ -117,7 +145,7 @@ Auto check-in for Weibo Super_Talk
 3. ⚠️ Something you know know
     1. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
 
-### google_script/calendar.js
+#### google_script/calendar.js
 **By [NavePnow](https://github.com/NavePnow)**
 **powered by Google Script and Google Developers Console**
 
@@ -138,7 +166,42 @@ Auto check-in for Weibo Super_Talk
 3. ⚠️ Something you know know
     1. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
 
-# Tip Jar
+### JSBox
+
+#### JSBox/NUS_NextBus.js
+**By [NavePnow](https://github.com/NavePnow)**
+
+<img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/nus_nextbus.jpg" height="30%" width="30%">
+
+1. Features
+   1. Filter the info of bus station accourding to the user's location
+   2. Show the details of bus station (NUS Shuttle)
+2. Instructions
+   1. Download the script from `Erots` [Link](https://liuguogy.github.io/JSBox-addins/?q=show&objectId=5e64e01e73f4b700096a1fd9)
+   2. Set the height of widget to show the info properly (default: 180)
+3. ⚠️ Something you know know
+    1. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
+
+#### JSBox/Singtel+.js
+**By [NavePnow](https://github.com/NavePnow)**
+**UI inspired by [lchreal6](https://github.com/lchreal6)**
+
+<img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/singtel+.jpg" height="30%" width="30%">
+
+1. Features
+   1. Show Rest time, fee, flow, SMS and Calls.
+2. Instructions
+   1. Download the script from `Erots` [Link](https://liuguogy.github.io/JSBox-addins/?q=show&objectId=5e67326840595e0008b5481f)
+   2. Install http capture app like [HTTP Catcher](https://apps.apple.com/us/app/http-catcher/id1445874902) on your phone
+   3. Install [hi!App](https://apps.apple.com/us/app/singtel-prepaid-hi-app/id1034712778) app from app store and log in by your phone number
+   4. Open the http capture app and refresh the hi!App (reopen)
+   5. Find request `https://hiapp.aws.singtel.com/api/v2/usage/dashboard`
+   6. Write down `Authorization` and `Cookie` and replace them in the script
+   7. Set the height of widget to show the info properly (default: 180)
+3. ⚠️ Something you know know
+    1. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
+
+## Tip Jar
 If you're really, really enjoying the content, you can leave extra tips to support the developer. Thanks for even considering.
 
 | PayPal                                                                                                                                                                       | 微信赞赏 WeChat Pay                                                                                                    |
