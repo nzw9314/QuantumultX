@@ -22,9 +22,9 @@
 
 * [Js_local_WorkingCopy.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy.conf) 脚本订阅.
 
-* [Js_Local_WorkingCopy_Cookie.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_Local_WorkingCopy_Cookie.conf) 获取Cookie订阅,适用于商店版v1.0.5-buil192
+* [Js_Local_WorkingCopy_Cookie.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_Local_WorkingCopy_Cookie.conf) 获取Cookie订阅,适用于商店版v1.0.5-build192
 
-* [Get_Cookie_New.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_New.conf) 获取Cookie,商店版及TFv1.0.6-buil212+
+* [Get_Cookie_New.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_New.conf) 获取Cookie,商店版及TFv1.0.6-build212+
 
 * 获取Cookie根订阅据QuantumultX版本二选一,仅在Cookie获取或失效时启用,不需要时右滑动禁用.
 
