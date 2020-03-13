@@ -21,6 +21,7 @@ Table of Contents
          * [Google Apps Script](#google-apps-script)
             * [google_script/singtel.js](#google_scriptsingteljs)
             * [google_script/calendar.js](#google_scriptcalendarjs)
+            * [google_script/ss-checkin.js](#google_scriptss-checkinjs)
          * [JSBox](#jsbox)
             * [JSBox/NUS_NextBus.js](#jsboxnus_nextbusjs)
             * [JSBox/Singtel .js](#jsboxsingteljs)
@@ -34,6 +35,7 @@ Table of Contents
 
 #### filter_conversion.js
 **By [NavePnow](https://github.com/NavePnow)**
+
 **powered by CLOUDFLARE Workers**
 
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/process.jpeg" height="60%" width="60%">
@@ -91,6 +93,7 @@ Modified according to the Jsbox script from author [coo11](https://t.me/coo11)
 
 #### weather.js/weather_qx.js
 **By [NavePnow](https://github.com/NavePnow)**
+
 **powered by Dark Sky**
 
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMG_0886.jpg" height="40%" width="40%">
@@ -114,6 +117,7 @@ Modified according to the Jsbox script from author [coo11](https://t.me/coo11)
 
 #### weibo
 **By [NavePnow](https://github.com/NavePnow)**
+
 **inspired by [Nobyda](https://t.me/nubida)**
 
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMG_1189.JPG" height="40%" width="40%">
@@ -125,6 +129,7 @@ Auto check-in for Weibo Super_Talk
 
 #### google_script/singtel.js
 **By [NavePnow](https://github.com/NavePnow)**
+
 **powered by Google Script**
 
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMG_1888.jpg" height="40%" width="40%">
@@ -140,13 +145,15 @@ Auto check-in for Weibo Super_Talk
    5. Open the http capture app and refresh the hi!App (reopen)
    6. Find request `https://hiapp.aws.singtel.com/api/v2/usage/dashboard`
    7. Write down `Authorization` and `Cookie` and replace them in the script
-   8. Copy all content to the `Google Script Editor`
+   8. Copy all content to the [Google Script Editor](https://script.google.com/home/my)
    9. Set a proper time to trigger it
+   > Edit -> Current project's triggers -> Add Trigger
 3. ⚠️ Something you know know
     1. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
 
 #### google_script/calendar.js
 **By [NavePnow](https://github.com/NavePnow)**
+
 **powered by Google Script and Google Developers Console**
 
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMG_1925.jpg" height="40%" width="40%">
@@ -161,10 +168,34 @@ Auto check-in for Weibo Super_Talk
    4. Activate the Google Calendar API in the [Google Developers Console](https://console.developers.google.com)
    5. Under Credentials, create a new Public API access key and replace the `API_KEY` with it
    6. Find personal Calendar ID under `[Google Calendar] -> [Setting and Sharing] -> [Calendar Setting]` and add it into `calendar_id` 
-   8. Copy all content to the `Google Script Editor`
-   9. Set a proper time to trigger it
+   7. Copy all content to the [Google Script Editor](https://script.google.com/home/my)
+   8. Set a proper time to trigger it
+   > Edit -> Current project's triggers -> Add Trigger
 3. ⚠️ Something you know know
     1. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
+
+#### [google_script/ss-checkin.js](https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/ss-checkin.js)
+**By [Neurogram](https://github.com/Neurogram-R) feat [NavePnow](https://github.com/NavePnow)**
+
+**powered by Google Script and Google Developers Console**
+
+<img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/ss-checkin.jpg" height="40%" width="40%">
+
+1. Features
+   1. Show Used data, Rest data and Due date
+   2. Run the script remotely. No need to cost local resource
+2. Instructions
+   1. Create a bot from [BotFather](https://telegram.me/BotFather) and replace `BOT_TOKEN` with token received from bot father
+   2. Get your personal chat id from [get_id_bot](https://telegram.me/get_id_bot) and replace `CHAT_ID` with it
+   3. Add your accounts in the `accounts` ，whose orders of content are `Site name`、`Site login URL`、`Mailbox`、`Password`. The content must be enclosed in double quotes "" or single quotes "
+   4. Copy all content to the [Google Script Editor](https://script.google.com/home/my)
+   5. Set a proper time to trigger it
+   > Edit -> Current project's triggers -> Add Trigger -> Choose which function to run(launch)
+3. ⚠️ Something you know know
+    1. Checkin via Surge and Shortcuts [Detailed Instruction](https://www.notion.so/Check-in-0797ec9f9f3f445aae241d7762cf9d8b)
+    2. Check the data format `Logger.log()` and modify the regex if something goes wrong
+    3. Debug in Editor with `Run -> Debug function -> launch` 
+    4. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
 
 ### JSBox
 
@@ -184,6 +215,7 @@ Auto check-in for Weibo Super_Talk
 
 #### JSBox/Singtel+.js
 **By [NavePnow](https://github.com/NavePnow)**
+
 **UI inspired by [lchreal6](https://github.com/lchreal6)**
 
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/singtel+.jpg" height="30%" width="30%">
