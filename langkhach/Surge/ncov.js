@@ -1,6 +1,9 @@
 /*
+Surge V4 ios, Mac
+Api by junookyo
+
 [Script]
-cron " " script-path=ncov.js
+cron "0 0 6-23/3 * * *" script-path=ncov.js
 
 
 MITM = code.junookyo.xyz
@@ -20,7 +23,7 @@ let obj= JSON.parse(data);
 if(obj["success"])
 {
 obj= obj["data"];
-$notification.post("NCOV ","","🇻🇳 VN: Số người nhiễm: " + obj["vietnam"]["cases"] +", Người chết: " + obj["vietnam"]["deaths"] + ", Hồi phục:" + obj["vietnam"]["recovered"] +"\n🌍 Global:  Số người nhiễm: " + obj["global"]["cases"] +", Người chết: " + obj["global"]["deaths"] + ", Hồi phục:" + obj["global"]["recovered"]);
+$notification.post("NCOV ","","🇻🇳 VN: Số người nhiễm: " + obj["vietnam"]["cases"] +", Người chết: " + obj["vietnam"]["deaths"] + ", Hồi phục: " + obj["vietnam"]["recovered"] +"\n🌍 Global:  Số người nhiễm: " + obj["global"]["cases"] +", Người chết: " + obj["global"]["deaths"] + ", Hồi phục: " + obj["global"]["recovered"]);
     $done();
 }
 }

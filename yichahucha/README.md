@@ -1,3 +1,73 @@
+# eval_script.js 使用示例（适用于 Surge 和 QX ）
+
+```
+1.设置定时任务更新脚本，第一次需手动更新，脚本多的情况下有可能更新失败（Surge 和 QX 橙色按钮更新成功率最高），确保脚本更新成功
+
+Surge:
+
+[Script]
+cron "0 0 * * *" debug=1,script-path=eval_script.js
+
+
+QX:
+
+[task_local]
+0 0 * * * eval_script.js
+
+
+2.在 eval_script.js 中配置需要管理的脚本，可以配置远程和配置本地，提供两个配置示例
+
+远程格式为: #### 脚本类型(request/response) 匹配正则 eval 脚本连接
+本地格式为: 脚本类型(request/response) 匹配正则 eval 脚本连接
+
+[eval_local]
+response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) eval https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
+
+[eval_remote]
+https://raw.githubusercontent.com/yichahucha/surge/master/sub_eval.conf
+
+
+3.配置 App
+
+Surge:
+
+[Script]
+
+// http 请求脚本单独配置示例
+http-response ^http://amdc\.m\.taobao\.com/amdc/mobileDispatch requires-body=1,script-path=eval_script.js
+
+http-request ^https://.*(?<!\.(png|jpg|jpeg|gif|bmp))$ requires-body=0,script-path=eval_script.js
+http-response ^https://.*(?<!\.(png|jpg|jpeg|gif|bmp))$ requires-body=1,script-path=eval_script.js
+
+[MITM]
+hostname = api.weibo.cn, mapi.weibo.com, *.uve.weibo.com,  api.m.jd.com, ios.prod.ftl.netflix.com, trade-acs.m.taobao.com
+
+QX:
+
+[rewrite_local]
+
+// http 请求脚本单独配置示例
+^http://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body eval_script.js
+
+^https://.*(?<!\.(png|jpg|jpeg|gif|bmp))$ url script-request-header eval_script.js
+^https://.*(?<!\.(png|jpg|jpeg|gif|bmp))$ url script-response-body eval_script.js
+
+[mitm]
+hostname = api.weibo.cn, mapi.weibo.com, *.uve.weibo.com,  api.m.jd.com, ios.prod.ftl.netflix.com, trade-acs.m.taobao.com
+
+
+4.以上都配置好，示例脚本生效
+
+
+注意：
+
+^https://.*(?<!\.(png|jpg|jpeg|gif|bmp))$
+
+这个正则会对所有配置了 hostname 域名的 https 请求执行 eval_script.js 脚本，请求执行一遍，响应执行一遍，一些本不应该执行脚本的请求，也执行了 eval_script.js 脚本（有点性能影响，个别请求可能还会报错），所以按需配置 hostname，不需要的域名尽量删除掉
+
+另外以上配置默认是不包含 http 请求的脚本 和 修改请求体的脚本，这两类脚本不会走 eval_script.js ，也就是你在 eval_script.js 配置的对应脚本不会生效，需要单独配置这类脚本来命中 eval_script.js，让 eval_script.js 执行目标脚本，参考上边 http 脚本单独配置示例，修改请求体的脚本同理
+```
+
 # Surge
 Remove weibo ads
 ```
