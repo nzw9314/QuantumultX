@@ -6,6 +6,8 @@
 
 * 只测试自用脚本，其他大部分脚本未测试可用性.
 
+* 更新通知[频道](https://t.me/nzw9314News)
+
 ### 全局配置：
 
 * [QuantumultX.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/QuantumultX.conf)
@@ -31,6 +33,7 @@
 * [Task_Local.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task_Local.conf) 定时任务配置,目前无法订阅,请手动根据个人需求复制内容及修改时间.
 
 ### 远程配置：
+* [视频教程](https://youtu.be/tr5aji82Vks)
 
 * [Js.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js.conf) 脚本远程订阅
 
