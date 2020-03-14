@@ -4,8 +4,6 @@ const __conf = String.raw`
 [eval_remote]
 // custom remote...
 
-https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
-
 
 [eval_local]
 // custom local...
@@ -18,13 +16,13 @@ const __emojiDone = "✔️"
 const __emojiTasks = "🕐"
 const __emojiFail = "🙃"
 const __emojiSuccess = "😀"
+const __showLine = 20
+
 const __log = false
 const __debug = false
 const __developmentMode = false
-const __showLine = 20
 const __concurrencyLimit = 5
 const __tool = new ____Tool()
-
 
 if (__tool.isTask) {
     const ____getConf = (() => {
@@ -228,11 +226,11 @@ if (!__tool.isTask) {
             }
         } else {
             __tool.done({})
-            if (__log) console.log(`Script not found: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+            if (__log) console.log(`script not found: ${__script.url}\nregular: ${__script.match.regular}\nrequest: ${__url}`)
         }
     } else {
         __tool.done({})
-        if (__log) console.log(`Script not matched: ${__url}`)
+        if (__log) console.log(`script not matched: ${__url}`)
     }
 }
 
@@ -275,14 +273,14 @@ function ____downloadFile(url) {
             if (!error) {
                 const code = response.statusCode
                 if (code == 200) {
-                    console.log(`Update Success: ${url}`)
+                    console.log(`update Success: ${url}`)
                     resolve({ url, code, body, message: `${__emoji}${filename} update success` })
                 } else {
-                    console.log(`Update Fail ${response.statusCode}: ${url}`)
+                    console.log(`update Fail ${response.statusCode}: ${url}`)
                     resolve({ url, code, body, message: `${__emoji}${filename} update fail` })
                 }
             } else {
-                console.log(`Update Fail ${error}`)
+                console.log(`update Fail ${error}`)
                 resolve({ url, code: null, body: null, message: `${__emoji}${filename} update fail` })
             }
         })
@@ -305,12 +303,24 @@ function ____parseRemoteConf(conf) {
     const lines = conf.split("\n")
     let newLines = []
     for (let i = 0, len = lines.length; i < len; i++) {
-        let line = lines[i].replace(/^\s*/, "")
-        if (line.length > 0 && /^#{3}/.test(line)) {
-            line = line.replace(/^#*/, "")
-            line = line.replace(/^\s*/, "")
-            if (line.length > 0) {
+        const eval = /^(.+)\s+eval\s+(.+)$/
+        const surge = /^http\s*-\s*(request|response)\s+(\S+)\s+(.+)$/
+        const quanx = /^(\S+)\s+url\s+script\s*-\s*(\S+)\s*-\s*(?:header|body)\s+(\S+)$/
+        let line = lines[i].trim()
+        if (line.length > 0) {
+            if (/^#{4}/.test(line)) {
+                line = line.replace(/^#*/, "")
                 newLines.push(line)
+            } else if (/^(?!;|#|\/\/).*/.test(line)) {
+                if (eval.test(line) || surge.test(line)) {
+                    newLines.push(line)
+                }
+                if (quanx.test(line)) {
+                    const path = line.match(quanx)[3].trim()
+                    if (/^https?:\/\/.+/.test(path)) {
+                        newLines.push(line)
+                    }
+                }
             }
         }
     }
@@ -435,7 +445,7 @@ function ____Tool() {
     this.done = (obj) => {
         if (_isQuanX) $done(obj)
         if (_isSurge) $done(obj)
-        if (_node) console.log("Script Done.");
+        if (_node) console.log("script Done.");
     }
     this.notify = (title, subtitle, message) => {
         if (_isQuanX) $notify(title, subtitle, message)
@@ -445,12 +455,12 @@ function ____Tool() {
     this.write = (value, key) => {
         if (_isQuanX) return $prefs.setValueForKey(value, key)
         if (_isSurge) return $persistentStore.write(value, key)
-        if (_node) console.log(`Write Success: ${key}`);
+        if (_node) console.log(`write success: ${key}`);
     }
     this.read = (key) => {
         if (_isQuanX) return $prefs.valueForKey(key)
         if (_isSurge) return $persistentStore.read(key)
-        if (_node) console.log(`Read Success: ${key}`);
+        if (_node) console.log(`read success: ${key}`);
     }
     this.get = (options, callback) => {
         if (_isQuanX) {
