@@ -18,9 +18,9 @@
 * 建立本地文件夹
 目录 iCloud Drive/QuantumultX/Scripts/nzw9314 或者 我的iPhone/QuantumultX/Scripts/nzw9314
 
-* [WoringCopy挂载我的仓库](https://github.com/nzw9314/QuantumultX.git)
+* WoringCopy挂载我的[仓库](https://github.com/nzw9314/QuantumultX.git)
 
-* [挂载视频教程](https://m.youtube.com/watch?t=3s&v=inCQFnDmRLo)
+* 挂载[视频教程](https://m.youtube.com/watch?t=3s&v=inCQFnDmRLo)
 
 * [Js_local_WorkingCopy.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy.conf) 脚本订阅.
 

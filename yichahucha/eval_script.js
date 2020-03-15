@@ -327,19 +327,6 @@ function ____parseRemoteConf(conf) {
     return newLines
 }
 
-function ____removeAnnotation(lines) {
-    if (lines.length > 0) {
-        let i = lines.length;
-        while (i--) {
-            const line = lines[i].replace(/^\s*/, "")
-            if (line.length == 0 || line.substring(0, 2) == "//" || line.substring(0, 1) == "#") {
-                lines.splice(i, 1)
-            }
-        }
-    }
-    return lines
-}
-
 function ____parseConf(lines) {
     let confObj = {}
     for (let i = 0, len = lines.length; i < len; i++) {
@@ -376,20 +363,6 @@ function ____parseConf(lines) {
     return { obj: confObj, error: null }
 }
 
-function ____surgeScriptPath(arg) {
-    let scriptPath = ""
-    const args = arg.split(",")
-    for (let i = 0, len = args.length; i < len; i++) {
-        const item = args[i].trim()
-        const path = /^script-path\s*=\s*(\S+)$/
-        if (path.test(item)) {
-            scriptPath = item.match(path)[1]
-            break
-        }
-    }
-    return scriptPath
-}
-
 function ____parseMatch(match) {
     let matchs = []
     const typeRegex = /(request|response)\s+\S+/g
@@ -409,6 +382,33 @@ function ____parseMatch(match) {
         }
     }
     return matchs
+}
+
+function ____surgeScriptPath(arg) {
+    let scriptPath = ""
+    const args = arg.split(",")
+    for (let i = 0, len = args.length; i < len; i++) {
+        const item = args[i].trim()
+        const path = /^script-path\s*=\s*(\S+)$/
+        if (path.test(item)) {
+            scriptPath = item.match(path)[1]
+            break
+        }
+    }
+    return scriptPath
+}
+
+function ____removeAnnotation(lines) {
+    if (lines.length > 0) {
+        let i = lines.length;
+        while (i--) {
+            const line = lines[i].replace(/^\s*/, "")
+            if (line.length == 0 || line.substring(0, 2) == "//" || line.substring(0, 1) == "#") {
+                lines.splice(i, 1)
+            }
+        }
+    }
+    return lines
 }
 
 function ____Tool() {
