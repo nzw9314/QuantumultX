@@ -1,14 +1,17 @@
 /*
-手机应用或网页网址：“ 签到领积分 🎁 ” 获取 Cookie
+微信喜马拉雅 By @makexp
+
+微信小程序 - 喜马拉雅 - 我的： 签到 " 获取 Cookie
+重复签到不会提醒，，能签，自取
 
 [task_local]
-8 0 * * * xmly_wc.js
+8 0 * * * nzw9314/Script/xmly_wc.js
 
 [rewrite_local]
-https://m.ximalaya.com/wechat/ url script-request-header xmly_wc.js
+https://m.ximalaya.com/wechat/ url script-request-header nzw9314/Script/xmly_wc.js
 
 [mitm]
-hostname = hostname
+hostname = m.ximalaya.com
 */
 
 const userCheckinURL = 'https://m.ximalaya.com/wechat/api/paidAudition/signIn';
