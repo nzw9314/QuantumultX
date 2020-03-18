@@ -141,14 +141,11 @@ QX:
 0 0 * * * eval_script.js
 
 [rewrite_local]
-^https://.*(?<!\.(png|jpg|jpeg|gif|bmp|webp|heic))$ url script-request-header eval_script.js
-^https://.*(?<!\.(png|jpg|jpeg|gif|bmp|webp|heic))$ url script-response-body eval_script.js
+^https?://.*(?<!\.(png|jpg|jpeg|gif|bmp|webp|heic))$ url script-request-header eval_script.js
+^https?://.*(?<!\.(png|jpg|jpeg|gif|bmp|webp|heic))$ url script-response-body eval_script.js
 
 # request body
 # ^https?://.+/amdc/mobileDispatch url script-request-body eval_script.js
-
-# http 
-^http://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body eval_script.js
 
 [mitm]
 hostname = api.weibo.cn, mapi.weibo.com, *.uve.weibo.com,  api.m.jd.com, ios.prod.ftl.netflix.com, trade-acs.m.taobao.com
@@ -170,9 +167,12 @@ https://raw.githubusercontent.com/yichahucha/surge/master/sub_eval.conf
 
 注意：
 
-^https://.*(?<!\.(png|jpg|jpeg|gif|bmp|webp|heic))$
+^https?://.*(?<!\.(png|jpg|jpeg|gif|bmp|webp|heic))$
 
-这个正则会对所有配置了 hostname 的 https 请求执行 eval_script.js 脚本，请求执行一遍，响应执行一遍，一些本不应该执行脚本的请求，也执行了 eval_script.js 脚本（有点资源浪费，个别请求可能还会报错，有问题的需要自己排查），所以按需配置 hostname，不需要的 hostname 尽量删除掉
+!这个正则会对所有 http 请求（目前大部分都是 https 请求） 和 配置了 hostname 的 https 请求执行 eval_script.js 脚本，请求执行一遍，响应执行一遍，一些本不应该执行脚本的请求，也执行了 eval_script.js 脚本（有点资源浪费，个别请求可能还会报错，有问题的需要自己排查），所以按需配置 hostname，不需要的 hostname 尽量删除掉
 
-另外以上配置默认是不包含 http 请求的脚本 和 修改请求体的脚本，这两类脚本不会走 eval_script.js ，也就是你在 eval_script.js 配置的对应脚本不会生效，需要单独配置这类脚本来命中 eval_script.js，让 eval_script.js 执行目标脚本，参考上边 http 脚本配置示例和修改请求体 request body 脚本配置示例
+!另外以上配置不包含修改请求体的脚本 ，也就是你在 eval_script.js 配置的对应脚本不会生效，需要单独配置这类脚本来命中 eval_script.js，让 eval_script.js 执行目标脚本，参考 request body 配置示例
+
+!由于未知原因在 Surge 中部分请求使用脚本会导致请求报错，为了缩小报错范围，在 Surge 配置中排除 http 请求的脚本（^https://.*(?<!\.(png|jpg|jpeg|gif|bmp|webp|heic))$），http 请求的脚本需要在 Surge 中单独配置，参考 Surge 示例
+
 ```
