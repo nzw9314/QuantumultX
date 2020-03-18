@@ -1,15 +1,13 @@
 /*
-[Script]
-# Surge
-http-request ^https:\/\/.*\.amemv\.com\/aweme\/v.*\/(feed|post) script-path=https://Choler.github.io/Surge/Script/Aweme.js
-http-response ^https:\/\/.*\.amemv\.com\/aweme\/v.*\/(feed|post) requires-body=true,script-path=https://Choler.github.io/Surge/Script/Aweme.js
-
-#QuanX
-^https:\/\/.*\.amemv\.com\/aweme\/v.*\/(feed|post) url script-response-header Aweme.js
-^https:\/\/.*\.amemv\.com\/aweme\/v.*\/(feed|post) url script-response-body Aweme.js
-
-[MITM]
 hostname = *.amemv.com
+
+[Script]
+http-request ^https:\/\/.*\.amemv\.com\/aweme\/v.*\/(feed|post) script-path=https://Choler.github.io/Surge/Script/Aweme.js
+http-response ^https:\/\/.*\.amemv\.com\/aweme\/v1.*\/(feed|post) requires-body=true,script-path=https://Choler.github.io/Surge/Script/Aweme.js
+
+[rewrite_local]
+^https://(.*).amemv.com/aweme/v\d/feed/ url 302 https://$1.amemv.com/aweme/v1/feed/
+^https:\/\/.*\.amemv\.com\/aweme\/v1.*\/(feed|post) url script-response-body Aweme.js
 */
  
 if (typeof $response != "undefined") {

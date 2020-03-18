@@ -3,7 +3,8 @@
 获取Cookie方法:
 1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
 下，
-2.微信搜索'来客有礼'小程序,登陆京东账号，点击'领京豆->翻牌',即可获取Cookie.
+2.微信搜索'来客有礼'小程序,登陆京东账号，点击'领京豆->翻牌',即可获取Cookie. 
+3.翻过牌的只有等明天重新获取Cookie
 
 仅测试Quantumult x，Surge 无效
 by Macsuny
@@ -15,14 +16,15 @@ cron "0 9 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/ma
 # 来客有礼 Cookie.
 http-request https:\/\/draw\.jdfcloud\.com\/\/api\/turncard\/sign\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/JDLK_cookie.js
 ~~~~~~~~~~~~~~~~
-QX 1.0.5 :
+QX 1.0.5+ :
 [task_local]
 0 9 * * * JDLK_sign.js
 
 [rewrite_local]
 https:\/\/draw\.jdfcloud\.com\/\/api\/turncard\/sign\? url script-request-header JDLK_cookie.js
 ~~~~~~~~~~~~~~~~
-QX or Surge MITM = draw.jdfcloud.com
+[MITM]
+hostname = draw.jdfcloud.com
 ~~~~~~~~~~~~~~~~
 
 */
@@ -60,7 +62,7 @@ function sign() {
       sy.msg(title, subTitle, detail)
      })
   }
-  sy.done()
+
 
 function init() {
   isSurge = () => {
