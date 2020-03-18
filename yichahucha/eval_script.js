@@ -1,229 +1,414 @@
-/**
- * 脚本管理工具（QuanX 举例）
- * 
- * 一.设置定时任务更新添加的远程脚本，第一次运行需要手动执行一下更新脚本（Qanx 普通调试模式容易更新失败，使用最新 TF 橙色按钮调试），例如设置每天凌晨更新脚本：
- * [task_local]
- * 0 0 * * * eval_script.js
- * 
- * 二.__conf 配置说明：
- * 
- * 参考下面 __conf 示例
- * 
- * [远程配置]
- * 1.添加注释，格式为：###远程脚本的链接 url 匹配脚本对应的正则1,匹配脚本对应的正则2
- * 2.修改原脚本路径为 eval_script.js 的脚本路径
- * 参考示例：https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
- * 
- * [本地配置]
- * 1.添加配置，格式为：远程脚本的链接 url 匹配脚本对应的正则1,匹配脚本对应的正则2
- * 2.修改原脚本路径为 eval_script.js 的脚本路径
- * 例如修改京东脚本：
- * [rewrite_local]
- * #^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body jd_price.js
- * ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body eval_script.js
- * [mitm]
- * hostname = api.m.jd.com
- */
-
-
-//配置
 const __conf = String.raw`
 
 
-
-[remote]
-//远程配置
-https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
+[eval_remote]
+// custom remote...
 
 
-[local]
-//本地配置
-//京东
-//https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js url ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig)
-
+[eval_local]
+// custom local...
 
 
 `
 
-const __tool = new ____Tool()
-const __isTask = __tool.isTask
-if (__isTask) {
-    const downloadFile = (url) => {
-        return new Promise((resolve) => {
-            __tool.get(url, (error, response, body) => {
-                let filename = url.match(/.*\/(.*?)$/)[1]
-                if (!error) {
-                    if (response.statusCode == 200) {
-                        __tool.write(body, url)
-                        resolve({ body, msg: `🪓${filename} update success` })
-                        console.log(`Update success: ${url}`)
-                    } else {
-                        resolve({ body, msg: `🪓${filename} update fail` })
-                        console.log(`Update fail ${response.statusCode}: ${url}`)
-                    }
-                } else {
-                    resolve({ body: null, msg: `🪓${filename} update fail` })
-                    console.log(`Update fail ${error}: ${url}`)
-                }
-            })
-        })
-    }
+const __emoji = "• "
+const __emojiDone = "✔️"
+const __emojiTasks = "🕐"
+const __emojiFail = "🙃"
+const __emojiSuccess = "😀"
+const __showLine = 20
 
-    const getConf = (() => {
+const __log = false
+const __debug = false
+const __developmentMode = false
+const __concurrencyLimit = 5
+const __tool = new ____Tool()
+
+if (__tool.isTask) {
+    const ____getConf = (() => {
         return new Promise((resolve) => {
-            const remoteConf = ____removeGarbage(____getConfInfo(__conf, "remote"))
-            const localConf = ____removeGarbage(____getConfInfo(__conf, "local"))
+            const remoteConf = ____removeAnnotation(____extractConf(__conf, "eval_remote"))
+            const localConf = ____removeAnnotation(____extractConf(__conf, "eval_local"))
             if (remoteConf.length > 0) {
-                const confPromises = (() => {
-                    let all = []
-                    remoteConf.forEach((url) => {
-                        all.push(downloadFile(url))
-                    })
-                    return all
-                })()
-                Promise.all(confPromises).then(result => {
-                    let allRemoteConf = ""
-                    let allRemoteMSg = ""
-                    result.forEach(data => {
-                        if (data.body) {
-                            allRemoteConf += "\n" + ____parseRemoteConf(data.body)
-                        }
-                        allRemoteMSg += allRemoteMSg.length > 0 ? "\n" + data.msg : data.msg
-                    });
-                    let content = localConf.join("\n")
-                    if (allRemoteConf.length > 0) {
-                        content = `${content}\n${allRemoteConf}`
-                    }
-                    resolve({ content, msg: allRemoteMSg })
+                console.log("Start updating conf...")
+                if (__debug) __tool.notify("", "", `Start updating ${remoteConf.length} confs...`)
+                ____concurrentQueueLimit(remoteConf, __concurrencyLimit, (url) => {
+                    return ____downloadFile(url)
                 })
+                    .then(result => {
+                        console.log("Stop updating conf.")
+                        let content = []
+                        result.forEach(data => {
+                            if (data.body) {
+                                content = content.concat(____parseRemoteConf(data.body))
+                            }
+                        });
+                        content = localConf.concat(content)
+                        resolve({ content, result })
+                    })
             } else {
-                const content = localConf.join("\n")
-                resolve({ content: content, msg: "" })
+                resolve({ content: localConf, result: [] })
             }
         })
     })
-    
-    getConf()
+    const begin = new Date()
+    ____getConf()
         .then((conf) => {
-            const parseConf = ____parseConf(conf.content)
-            const scriptPromises = (() => {
-                let all = []
-                Object.keys(parseConf).forEach((url) => {
-                    all.push(downloadFile(url))
-                })
-                return all
-            })()
-            console.log("Start updating...")
-            Promise.all(scriptPromises).then(result => {
-                console.log("Stop updating.")
-                const notifyMsg = (() => {
-                    let msg = conf.msg
-                    result.forEach(data => {
-                        msg += msg.length > 0 ? "\n" + data.msg : data.msg
+            return new Promise((resolve, reject) => {
+                if (conf.content.length > 0) {
+                    if (__log) console.log(conf.content)
+                    resolve(conf)
+                } else {
+                    let message = ""
+                    conf.result.forEach(data => {
+                        message += message.length > 0 ? "\n" + data.message : data.message
                     });
-                    return msg
-                })()
-                console.log(notifyMsg)
-                let lastDate = __tool.read("ScriptLastUpdateDate")
-                lastDate = lastDate ? lastDate : new Date().Format("yyyy-MM-dd HH:mm:ss")
-                __tool.notify("Update Done.", `${lastDate} last update.`, `${notifyMsg}`)
-                __tool.write(JSON.stringify(parseConf), "ScriptConfObject")
-                __tool.write(new Date().Format("yyyy-MM-dd HH:mm:ss"), "ScriptLastUpdateDate")
-                $done()
+                    reject(message.length > 0 ? message : `Unavailable configuration! Please check!`)
+                }
             })
+        })
+        .then((conf) => {
+            return new Promise((resolve, reject) => {
+                const result = ____parseConf(conf.content)
+                if (result.obj) {
+                    conf["obj"] = result.obj
+                    if (__log) console.log(result.obj)
+                    resolve(conf)
+                } else {
+                    reject(`Configuration information error: ${result.error}`)
+                }
+            })
+        })
+        .then((conf) => {
+            const confObj = conf.obj
+            const confResult = conf.result
+            const scriptUrls = Object.keys(confObj)
+            console.log("Start updating script...")
+            __tool.notify("", "", `Start updating ${scriptUrls.length} scripts...`)
+            ____concurrentQueueLimit(scriptUrls, __concurrencyLimit, (url) => {
+                const urlRegex = /^(https?:\/\/(([a-zA-Z0-9]+-?)+[a-zA-Z0-9]+\.)+[a-zA-Z]+)(:\d+)?(\/.*)?(\?.*)?(#.*)?$/
+                return new Promise((resolve) => {
+                    if (urlRegex.test(url)) {
+                        ____downloadFile(url).then((data) => {
+                            if (data.code == 200) {
+                                __tool.write(data.body, data.url)
+                            }
+                            resolve(data)
+                        })
+                    } else {
+                        __tool.write(url, url)
+                        resolve({ body: url, url, message: `${__emoji}${url} function set success` })
+                    }
+                })
+            })
+                .then(result => {
+                    console.log("Stop updating script.")
+                    __tool.write(JSON.stringify(confObj), "ScriptConfObjKey")
+                    const resultInfo = (() => {
+                        let message = ""
+                        let success = 0
+                        let fail = 0
+                        confResult.concat(result).forEach(data => {
+                            if (data.message.match("success")) success++
+                            if (data.message.match("fail")) fail++
+                            message += message.length > 0 ? "\n" + data.message : data.message
+                        });
+                        return { message, count: { success, fail } }
+                    })()
+                    return resultInfo
+                })
+                .then((resultInfo) => {
+                    const messages = resultInfo.message.split("\n")
+                    const detail = `${messages.slice(0, __showLine).join("\n")}${messages.length > 20 ? `\n${__emoji}......` : ""}`
+                    const summary = `${__emojiSuccess}Success: ${resultInfo.count.success}  ${__emojiFail}Fail: ${resultInfo.count.fail}   ${__emojiTasks}Tasks: ${____timeDiff(begin, new Date())}s`
+                    const nowDate = `${new Date().Format("yyyy-MM-dd HH:mm:ss")} last update`
+                    const lastDate = __tool.read("ScriptLastUpdateDateKey")
+                    console.log(`${summary}\n${resultInfo.message}\n${lastDate ? lastDate : nowDate}`)
+                    __tool.notify(`${__emojiDone}Update Done`, summary, `${detail}\n${__emoji}${lastDate ? lastDate : nowDate}`)
+                    __tool.write(nowDate, "ScriptLastUpdateDateKey")
+                    __tool.done({})
+                })
+        })
+        .catch((error) => {
+            __tool.done({})
+            __tool.notify("[eval_script.js]", "", error)
+            console.log(error)
         })
 }
 
-if (!__isTask) {
+if (!__tool.isTask) {
     const __url = $request.url
-    const __confObj = JSON.parse(__tool.read("ScriptConfObject"))
-    const __script = (() => {
-        let s = null
-        for (let key in __confObj) {
-            let value = __confObj[key]
-            if (!Array.isArray(value)) value = value.split(",")
-            value.some((url) => {
-                if (__url.match(url)) {
-                    s = { url: key, content: __tool.read(key), match: url }
-                    return true
-                }
-            })
+    const __confObj = (() => {
+        if (__developmentMode) {
+            return ____parseDevelopmentModeConf(__conf)
+        } else {
+            return JSON.parse(__tool.read("ScriptConfObjKey"))
         }
-        return s
+    })()
+    const __script = (() => {
+        let script = null
+        const keys = Object.keys(__confObj)
+        for (let i = 0, len = keys.length; i < len; i++) {
+            if (script) break
+            const key = keys[i]
+            const value = __confObj[key]
+            for (let j = 0, len = value.length; j < len; j++) {
+                const match = value[j]
+                const regular = new RegExp(match.regular)
+                if (__debug) {
+                    try {
+                        if (regular.test(__url)) {
+                            const type = match.type
+                            if (type && type.length > 0) {
+                                if (__tool.scriptType == type) {
+                                    script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
+                                    break
+                                }
+                            } else {
+                                script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
+                                break
+                            }
+                        }
+                    } catch (error) {
+                        if (__debug) __tool.notify("[eval_script.js]", "", `Error regular : ${match.regular}\nRequest: ${__url}`)
+                        throw error
+                    }
+                } else {
+                    if (regular.test(__url)) {
+                        const type = match.type
+                        if (type && type.length > 0) {
+                            if (__tool.scriptType == type) {
+                                script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
+                                break
+                            }
+                        } else {
+                            script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        return script
     })()
     if (__script) {
         if (__script.content) {
-            eval(__script.content)
-            console.log(`Request url: ${__url}\nMatch url: ${__script.match}\nExecute script: ${__script.url}`)
+            const type = __script.match.type
+            if (type && type.length > 0) {
+                if (__tool.scriptType == type) {
+                    if (__debug) {
+                        try {
+                            eval(__script.content)
+                            if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}==${type}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                        } catch (error) {
+                            if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match}\nRequest: ${__url}\nContent: ${__script.content}`)
+                            throw error
+                        }
+                    } else {
+                        eval(__script.content)
+                    }
+                } else {
+                    __tool.done({})
+                    if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}!=${type}`, `Script types do not match! Don't execute script.\nScript: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                }
+            } else {
+                if (__debug) {
+                    try {
+                        eval(__script.content)
+                        if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType} ${"request&&response"}`, `Execute script: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}`)
+                    } catch (error) {
+                        if (__debug) __tool.notify("[eval_script.js]", `${__tool.method} ${__tool.scriptType}`, `Script execute error: ${error}\nScript: ${__script.url}\nRegular: ${__script.match.regular}\nRequest: ${__url}\nContent: ${__script.content}`)
+                        throw error
+                    }
+                } else {
+                    eval(__script.content)
+                }
+            }
         } else {
-            $done({})
-            console.log(`Request url: ${__url}\nMatch url: ${__script.match}\nScript not executed. Script not found: ${__script.url}`)
+            __tool.done({})
+            if (__log) console.log(`script not found: ${__script.url}\nregular: ${__script.match.regular}\nrequest: ${__url}`)
         }
     } else {
-        $done({})
-        console.log(`No match url: ${__url}`)
+        __tool.done({})
+        if (__log) console.log(`script not matched: ${__url}`)
     }
 }
 
-function ____getConfInfo(conf, type) {
-    const rex = new RegExp("\\[" + type + "\\](.|\\n)*?($|\\n\\[)", "g")
-    let result = rex.exec(conf)
-    result = result[0].split("\n")
-    if (result[2].length > 0) {
-        result.pop()
+function ____parseDevelopmentModeConf(conf) {
+    const localConf = ____removeAnnotation(____extractConf(__conf, "eval_local"))
+    const result = ____parseConf(localConf)
+    return result.obj
+}
+
+function ____timeDiff(begin, end) {
+    return Math.ceil((end.getTime() - begin.getTime()) / 1000)
+}
+
+function ____concurrentQueueLimit(list, limit, asyncHandle) {
+    let results = []
+    const recursion = (arr) => {
+        return asyncHandle(arr.shift())
+            .then((data) => {
+                results.push(data)
+                if (arr.length !== 0) return recursion(arr)
+                else return 'finish'
+            })
+    };
+    const listCopy = [].concat(list)
+    let asyncList = []
+    if (list.length < limit)
+        limit = list.length
+    while (limit--) {
+        asyncList.push(recursion(listCopy))
     }
-    result.shift()
+    return new Promise((resolve) => {
+        Promise.all(asyncList).then(() => resolve(results))
+    });
+}
+
+function ____downloadFile(url) {
+    return new Promise((resolve) => {
+        __tool.get(url, (error, response, body) => {
+            const filename = url.match(/.*\/(.*?)$/)[1]
+            if (!error) {
+                const code = response.statusCode
+                if (code == 200) {
+                    console.log(`update Success: ${url}`)
+                    resolve({ url, code, body, message: `${__emoji}${filename} update success` })
+                } else {
+                    console.log(`update Fail ${response.statusCode}: ${url}`)
+                    resolve({ url, code, body, message: `${__emoji}${filename} update fail` })
+                }
+            } else {
+                console.log(`update Fail ${error}`)
+                resolve({ url, code: null, body: null, message: `${__emoji}${filename} update fail` })
+            }
+        })
+    })
+}
+
+function ____extractConf(conf, type) {
+    const rex = new RegExp("\\[" + type + "\\](.|\\n)*?(?=\\n($|\\[))", "g")
+    let result = rex.exec(conf)
+    if (result) {
+        result = result[0].split("\n")
+        result.shift()
+    } else {
+        result = []
+    }
     return result
 }
 
 function ____parseRemoteConf(conf) {
     const lines = conf.split("\n")
     let newLines = []
-    lines.forEach((line) => {
-        line = line.replace(/^\s*/, "")
-        if (line.length > 0 && line.substring(0, 3) == "###") {
-            line = line.replace("###", "")
-            line = line.replace(/^\s*/, "")
-            newLines.push(line)
+    for (let i = 0, len = lines.length; i < len; i++) {
+        const eval = /^(.+)\s+eval\s+(.+)$/
+        const surge = /^http\s*-\s*(request|response)\s+(\S+)\s+(.+)$/
+        const quanx = /^(\S+)\s+url\s+script\s*-\s*(\S+)\s*-\s*(?:header|body)\s+(\S+)$/
+        let line = lines[i].trim()
+        if (line.length > 0) {
+            if (/^#{4}/.test(line)) {
+                line = line.replace(/^#*/, "")
+                newLines.push(line)
+            } else if (/^(?!;|#|\/\/).*/.test(line)) {
+                if (eval.test(line) || surge.test(line)) {
+                    newLines.push(line)
+                }
+                if (quanx.test(line)) {
+                    const path = line.match(quanx)[3].trim()
+                    if (/^https?:\/\/.+/.test(path)) {
+                        newLines.push(line)
+                    }
+                }
+            }
         }
-    })
-    return newLines.join("\n")
-}
-
-function ____removeGarbage(lines) {
-    let newLines = []
-    lines.forEach((line) => {
-        line = line.replace(/^\s*/, "")
-        if (line.length > 0 && line.substring(0, 2) != "//") {
-            newLines.push(line)
-        }
-    })
+    }
     return newLines
 }
 
-function ____parseConf(conf) {
-    const lines = conf.split("\n")
+function ____parseConf(lines) {
     let confObj = {}
-    lines.forEach((line) => {
-        line = line.replace(/^\s*/, "")
-        if (line.length > 0 && line.substring(0, 2) != "//") {
-            const avaliable = (() => {
-                const format = /^https?:\/\/.*\s+url\s+.*/
-                return format.test(line)
-            })()
-            if (avaliable) {
-                const value = line.split("url")
-                const remote = value[0].replace(/\s/g, "")
-                const match = value[1].replace(/\s/g, "")
-                confObj[remote] = match
+    for (let i = 0, len = lines.length; i < len; i++) {
+        let line = lines[i].trim()
+        if (line.length > 0 && line.substring(0, 2) != "//" && line.substring(0, 1) != "#") {
+            const eval = /^(.+)\s+eval\s+(.+)$/
+            const surge = /^http\s*-\s*(request|response)\s+(\S+)\s+(.+)$/
+            const quanx = /^(\S+)\s+url\s+script\s*-\s*(\S+)\s*-\s*(?:header|body)\s+(\S+)$/
+            if (surge.test(line)) {
+                const result = line.match(surge)
+                line = `${result[1].trim()} ${result[2].trim()} eval ${____surgeScriptPath(result[3].trim())}`
+            } else if (quanx.test(line)) {
+                const result = line.match(quanx)
+                line = `${result[2].trim()} ${result[1].trim()} eval ${result[3].trim()}`
+            }
+            if (eval.test(line)) {
+                const value = line.match(eval)
+                const remote = value[2].trim()
+                const match = ____parseMatch(value[1].trim())
+                if (remote.length > 0 && match.length > 0) {
+                    if (confObj.hasOwnProperty(remote)) {
+                        confObj[remote] = confObj[remote].concat(match)
+                    } else {
+                        confObj[remote] = match
+                    }
+                } else {
+                    return { obj: null, error: line }
+                }
             } else {
-                __tool.notify("Configuration error", "", line)
-                throw "Configuration error:" + line
+                return { obj: null, error: line }
             }
         }
-    })
-    console.log(`Configuration information:  ${JSON.stringify(confObj)}`)
-    return confObj
+    }
+    return { obj: confObj, error: null }
+}
+
+function ____parseMatch(match) {
+    let matchs = []
+    const typeRegex = /(request|response)\s+\S+/g
+    const typeItems = match.match(typeRegex)
+    if (typeItems && typeItems.length > 0) {
+        match = match.replace(typeRegex, "")
+    }
+    const normalItems = match.match(/\S+/g)
+    const items = (typeItems ? typeItems : []).concat(normalItems ? normalItems : [])
+    for (let i = 0, len = items.length; i < len; i++) {
+        let item = items[i]
+        item = item.match(/\S+/g)
+        if (item.length > 1) {
+            matchs.push({ type: item[0], regular: item[1] })
+        } else {
+            matchs.push({ type: "", regular: item[0] })
+        }
+    }
+    return matchs
+}
+
+function ____surgeScriptPath(arg) {
+    let scriptPath = ""
+    const args = arg.split(",")
+    for (let i = 0, len = args.length; i < len; i++) {
+        const item = args[i].trim()
+        const path = /^script-path\s*=\s*(\S+)$/
+        if (path.test(item)) {
+            scriptPath = item.match(path)[1]
+            break
+        }
+    }
+    return scriptPath
+}
+
+function ____removeAnnotation(lines) {
+    if (lines.length > 0) {
+        let i = lines.length;
+        while (i--) {
+            const line = lines[i].replace(/^\s*/, "")
+            if (line.length == 0 || line.substring(0, 2) == "//" || line.substring(0, 1) == "#") {
+                lines.splice(i, 1)
+            }
+        }
+    }
+    return lines
 }
 
 function ____Tool() {
@@ -238,10 +423,30 @@ function ____Tool() {
     _isSurge = typeof $httpClient != "undefined"
     _isQuanX = typeof $task != "undefined"
     _isTask = typeof $request == "undefined"
+    _isResponse = typeof $response != "undefined"
+    _isRequestBody = typeof $request != "undefined" && typeof $request.body != "undefined"
     this.isSurge = _isSurge
     this.isQuanX = _isQuanX
     this.isTask = _isTask
-    this.isResponse = typeof $response != "undefined"
+    this.isResponse = _isResponse
+    this.isRequestBody = _isRequestBody
+    this.method = (() => {
+        if (!_isTask && (_isSurge || _isQuanX)) {
+            return $request.method
+        }
+    })()
+    this.scriptType = (() => {
+        if (_isResponse) {
+            return "response"
+        } else {
+            return "request"
+        }
+    })()
+    this.done = (obj) => {
+        if (_isQuanX) $done(obj)
+        if (_isSurge) $done(obj)
+        if (_node) console.log("script Done.");
+    }
     this.notify = (title, subtitle, message) => {
         if (_isQuanX) $notify(title, subtitle, message)
         if (_isSurge) $notification.post(title, subtitle, message)
@@ -250,12 +455,12 @@ function ____Tool() {
     this.write = (value, key) => {
         if (_isQuanX) return $prefs.setValueForKey(value, key)
         if (_isSurge) return $persistentStore.write(value, key)
-        if (_node) console.log(`${key} write success`);
+        if (_node) console.log(`write success: ${key}`);
     }
     this.read = (key) => {
         if (_isQuanX) return $prefs.valueForKey(key)
         if (_isSurge) return $persistentStore.read(key)
-        if (_node) console.log(`${key} read success`);
+        if (_node) console.log(`read success: ${key}`);
     }
     this.get = (options, callback) => {
         if (_isQuanX) {
@@ -284,12 +489,6 @@ function ____Tool() {
             }
         }
         return response
-    }
-}
-
-if (!Array.isArray) {
-    Array.isArray = function (arg) {
-        return Object.prototype.toString.call(arg) === '[object Array]'
     }
 }
 

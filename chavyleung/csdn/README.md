@@ -2,6 +2,12 @@
 
 > 代码已同时兼容 Surge & QuanX, 使用同一份签到脚本即可
 
+> 2020.3.11 更新获取刷新链接正则 (更新后打开 App 即可获取刷新链接, 无需重新获取 Cookie)
+
+> 2020.3.12 增加自动抽奖 (如果有抽奖机会的话) (无需重新获取 Cookie)
+
+> 2020.3.12 如果发现无法签到 (后台日志报错), 注销一下 csdn 账号重新登录, 再重新获取下刷新链接
+
 ## 配置 (Surge)
 
 ```properties
@@ -10,7 +16,7 @@
 
 [Script]
 # 注意获取Cookie有两条脚本
-http-request ^https:\/\/passport.csdn.net\/v1\/api\/app\/login\/checkToken script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/csdn/csdn.cookie.js
+http-request ^https:\/\/passport.csdn.net\/v2\/api\/app\/login\/checkAndRefreshToken script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/csdn/csdn.cookie.js
 http-request ^https:\/\/gw.csdn.net\/mini-app\/v2\/lucky_draw\/login\/sign_in\? script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/csdn/csdn.cookie.js
 cron "10 0 0 * * *" script-path=https://raw.githubusercontent.com/chavyleung/scripts/master/csdn/csdn.js
 ```
@@ -23,7 +29,7 @@ cron "10 0 0 * * *" script-path=https://raw.githubusercontent.com/chavyleung/scr
 
 [rewrite_local]
 # 注意获取Cookie有两条脚本
-^https:\/\/passport.csdn.net\/v1\/api\/app\/login\/checkToken url script-request-header csdn.cookie.js
+^https:\/\/passport.csdn.net\/v2\/api\/app\/login\/checkAndRefreshToken url script-request-header csdn.cookie.js
 ^https:\/\/gw.csdn.net\/mini-app\/v2\/lucky_draw\/login\/sign_in\? url script-request-header csdn.cookie.js
 
 [task_local]

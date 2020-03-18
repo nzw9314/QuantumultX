@@ -1,40 +1,72 @@
 /*
-mimt: daojia.jd.com
-rewrite_local
-^https:\/\/daojia\.jd\.com\/client? url script-request-header jddj_cookie.js
+
+> 感谢 [@barry](https://t.me/barrymchen) 编写
+> 
+> 感谢 [@GideonSenku](https://github.com/GideonSenku) 对代码优化
+本脚本是在以上两位的基础上进行的小小修改
+本脚本仅适用于京东到家签到及获取鲜豆
+获取Cookie方法:
+1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
+下，
+2.APP登陆账号后，点击主页'签到',即可获取Cookie.
+
+仅测试Quantumult x，Surge、Loon自行测试
+by Macsuny
+
+~~~~~~~~~~~~~~~~
+Surge 4.0 :
+[Script]
+cron "0 9 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js
+# 获取京东到家 Cookie.
+http-request https:\/\/daojia\.jd\.com\/client\?_jdrandom=\d{13}&functionId=%2Fsignin,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj_cookie.js
+~~~~~~~~~~~~~~~~
+QX 1.0.5 :
+[task_local]
+0 9 * * * jddj.js
+
+[rewrite_local]
+# Get jddj cookie. QX 1.0.5(188+):
+https:\/\/daojia\.jd\.com\/client\?_jdrandom=\d{13}&functionId=%2Fsignin url script-request-header jddj_cookie.js
+~~~~~~~~~~~~~~~~
+QX or Surge MITM = daojia.jd.com
+~~~~~~~~~~~~~~~~
 
 task
 0 0 * * * jddj.js
 
-注意：需要抓包调试
-手动挡
-cookie失效时间未知
-
-将签到的链接粘贴到签到脚本的url后面，数据包是：/client，在锤子里面是GET>.json
-响应内容为
-{
- "code": "0",
- "msg": "成功",
- "result": {
-  "userInfoResponse": {
-   "points": 86,
-   "hasSign": true,
-   "rule": "<p>一、签到规则</p><p>\n    1.每天签到都可获得鲜豆奖励，鲜豆值为1—100个随机发放。鲜豆可以在下单结算的时候抵扣现金，1000个鲜豆=1元，满100鲜豆可用。你可在我的>鲜豆>鲜豆说明中查看详细规则。</p><p>\n    2.签到好礼送不停，连续签到以7天为一个周期，每个周期的第2、4、7天都可获得神秘惊喜大礼。</p><p>\n    3.如果中途断签，记录会自动清零。</p>\n    4.京东到家签到功能处于测试阶段，活动规则可能会出现调整。</p>\n<p>二、鲜豆使用说明</p><p>\n       1.鲜豆抵扣不得超过每笔订单商品优惠后金额的50%</p><p>\n       2.鲜豆不可用于抵扣配送费、包装费、餐盒费、自提服务费</p><p>\n       3.单个账号使用鲜豆下单的订单量 >=3单，则不允许使用鲜豆抵扣下单；</p><p>\n       4.每笔订单使用鲜豆的数量>=40000（40元）,则不允许使用鲜豆抵扣下单；</p>\n",
-这就是了
-@chavy
-@nobyda
 */
-const cookieName = '京东到家'
-const cookieKey = 'chen_cookie_dj'
-const chen = init()
-const cookieVal = $request.headers['Cookie']
-if (cookieVal) {
-  if (chen.setdata(cookieVal, cookieKey)) {
-    chen.msg(`${cookieName}`, '获取Cookie: 成功', '')
-    chen.log(`[${cookieName}] 获取Cookie: 成功, cookie: ${cookieVal}`)
+const CookieName = '京东到家'
+const CookieKey = 'chen_cookie_dj'
+const sy = init()
+GetCookie();
+
+function GetCookie() {
+  if ($request.headers) {
+    var CookieValue = $request.headers['Cookie'];
+    
+    if (sy.getdata(CookieKey) != (undefined || null)) {
+      if (sy.getdata(CookieKey) != CookieValue) {
+        var cookie = sy.setdata(CookieValue, CookieKey);
+        if (!cookie) {
+          sy.msg("更新" + CookieName + "Cookie失败‼️", "", "");
+          sy.log(`[${CookieName}] 获取Cookie: 失败`);
+        } else {
+          sy.msg("更新" + CookieName + "Cookie成功 🎉", "", "");
+      sy.log(`[${CookieName}] 获取Cookie: 成功, Cookie: ${CookieValue}`)
+        }
+      }
+    } else {
+      var cookie = sy.setdata(CookieValue, CookieKey);
+      if (!cookie) {
+        sy.msg("首次写入" + CookieName + "Cookie失败‼️", "", "");
+      } else {
+        sy.msg("首次写入" + CookieName + "Cookie成功 🎉", "", "");
+      }
+    }
+  } else {
+    sy.msg("写入" + CookieName + "Cookie失败‼️", "", "配置错误, 无法读取请求头, ");
   }
 }
-
 function init() {
   isSurge = () => {
     return undefined === this.$httpClient ? false : true
@@ -78,4 +110,4 @@ function init() {
   }
   return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
 }
-chen.done()
+sy.done()

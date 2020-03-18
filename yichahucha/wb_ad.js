@@ -20,6 +20,7 @@ const path15 = "/statuses/video_timeline";
 const path16 = "/page";
 const path17 = "/statuses/friends_timeline";
 const path18 = "/!/photos/pic_recommend_status";
+const path19 = "/statuses/video_mixtimeline";
 
 const url = $request.url;
 var body = $response.body;
@@ -110,6 +111,10 @@ if (
     let obj = JSON.parse(body);
     if (obj.cards) obj.cards = filter_timeline_cards(obj.cards);
     body = JSON.stringify(obj);
+}
+
+if (url.indexOf(path19) != -1) {
+  delete body.expandable_view;
 }
 
 $done({ body });

@@ -52,10 +52,16 @@ DOMAIN-SUFFIX,guokr.com
 DOMAIN-SUFFIX,adguard.com
 DOMAIN-SUFFIX,huanqiu.com
 DOMAIN-SUFFIX,oschina.net
-DOMAIN-SUFFIX,cmbchina.com
 DOMAIN-SUFFIX,magi.com
 DOMAIN-SUFFIX,smzdm.com
 DOMAIN-SUFFIX,leiphone.com
+DOMAIN-SUFFIX,chinamobile.com
+DOMAIN-SUFFIX,manmanbuy.com
+DOMAIN-SUFFIX,dxycdn.com
+DOMAIN-SUFFIX,lapin365.com
+DOMAIN-SUFFIX,csdn.net
+DOMAIN-SUFFIX,ipip.net
+DOMAIN-SUFFIX,douyu.com
 
 DOMAIN-SUFFIX,cn
 DOMAIN-SUFFIX,local
@@ -67,6 +73,7 @@ DOMAIN-SUFFIX,36kr.com
 DOMAIN-SUFFIX,36krcdn.com
 
 DOMAIN-SUFFIX,weibo.com
+DOMAIN-SUFFIX,weibocdn.com
 DOMAIN-SUFFIX,miaopai.com
 
 DOMAIN-SUFFIX,ifeng.com
@@ -74,10 +81,6 @@ DOMAIN-SUFFIX,ifengimg.com
 
 DOMAIN-SUFFIX,ctrip.com
 DOMAIN-SUFFIX,c-ctrip.com
-
-DOMAIN-SUFFIX,csdn.net
-DOMAIN-SUFFIX,ipip.net
-DOMAIN-SUFFIX,douyu.com
 
 DOMAIN-SUFFIX,jianshu.io
 DOMAIN-SUFFIX,jianshu.com
@@ -106,35 +109,32 @@ DOMAIN-SUFFIX,lncldglobal.com
 DOMAIN-SUFFIX,tuchong.net
 DOMAIN-SUFFIX,tuchong.com
 
+DOMAIN-SUFFIX,cmbimg.com
+DOMAIN-SUFFIX,cmbchina.com
+
 DOMAIN-SUFFIX,meituan.net
+DOMAIN-SUFFIX,meituan.com
 DOMAIN-SUFFIX,dianping.com
 
+DOMAIN-SUFFIX,meitu.com
+DOMAIN-SUFFIX,meitustat.com
+DOMAIN-SUFFIX,meitudata.com
+
 # Apple
-DOMAIN-SUFFIX,aaplimg.com
-DOMAIN-SUFFIX,apple.co
-DOMAIN-SUFFIX,apple.com
-DOMAIN-SUFFIX,apple-cloudkit.com
-DOMAIN-SUFFIX,apple-mapkit.com
-DOMAIN-SUFFIX,appstore.com
-DOMAIN-SUFFIX,cdn-apple.com
-DOMAIN-SUFFIX,icloud.com
-DOMAIN-SUFFIX,icloud-content.com
-DOMAIN-SUFFIX,me.com
-DOMAIN-SUFFIX,mzstatic.com
+USER-AGENT,cloudd*
+USER-AGENT,CloudKit*
 
 # Alibaba
+DOMAIN-KEYWORD,alipay
+DOMAIN-KEYWORD,aliyun
 DOMAIN-SUFFIX,1688.com
 DOMAIN-SUFFIX,amap.com
 DOMAIN-SUFFIX,aliapp.org
 DOMAIN-SUFFIX,alibaba.com
 DOMAIN-SUFFIX,alicdn.com
-DOMAIN-SUFFIX,alipay.com
-DOMAIN-SUFFIX,aliyun.com
-DOMAIN-SUFFIX,aliyuncs.com
 DOMAIN-SUFFIX,tmall.com
 DOMAIN-SUFFIX,taobao.com
 DOMAIN-SUFFIX,mmstat.com
-DOMAIN-SUFFIX,alipayobjects.com
 
 # Baidu
 DOMAIN-SUFFIX,baidu.com
@@ -155,6 +155,8 @@ DOMAIN-SUFFIX,pstatp.com
 DOMAIN-SUFFIX,toutiao.com
 DOMAIN-SUFFIX,ixigua.com
 DOMAIN-SUFFIX,snssdk.com
+DOMAIN-SUFFIX,byteimg.com
+DOMAIN-SUFFIX,bytedance.com
 
 # JD
 DOMAIN-SUFFIX,jd.com
@@ -168,6 +170,7 @@ DOMAIN-SUFFIX,126.net
 DOMAIN-SUFFIX,127.net
 DOMAIN-SUFFIX,163.com
 DOMAIN-SUFFIX,163yun.com
+DOMAIN-SUFFIX,netease.im
 DOMAIN-SUFFIX,netease.com
 DOMAIN-SUFFIX,youdao.com
 DOMAIN-SUFFIX,ydstatic.com

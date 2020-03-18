@@ -138,6 +138,8 @@ if (isSurge) {
 }
 // #endregion
 
+
+
 /* Hourly weather(Made by Meeta)
 cron "0 0 8-20/1 * * *" script-path=https://raw.githubusercontent.com/MeetaGit/MeetaRules/master/Surge/Scripting/meweather.js
 PS:
@@ -150,16 +152,12 @@ d.由于免费接口限制每日访问量，请不要设置高频天气通知
   有高频通知需求的话建议可以自己注册和风天气，脚本更换key值即可
 
 TG频道:@meetashare
-
-
-     (由nzw9314精简仅保留降雨提醒)
-
 */
 
 
 
-const address = "&location=填经纬度";
-const k = "&key=填入和风天气key";
+const address = "&location=auto_ip";//自动定位填 auto_ip , 精确定位填入 经纬度.
+const k = "&key=填这里";//和风天气APIkey,可自行前往 https://dev.heweather.com/ 进行获取(注意key类型选WebApi)
 
 const wea = "https://free-api.heweather.net/s6/weather/now?"+address+k;
 const forecast = "https://widget-api.heweather.net/s6/plugin/sticker?key=acd0fdcab4b9481a98d0f59145420fac&location="+$persistentStore.read("cid")+"&lang=zh";
@@ -250,7 +248,10 @@ $httpClient.get(lifestyle, function(error, response, data){
 }
 );
 
+
+
 var title = $persistentStore.read("city")+"天气 : "+$persistentStore.read("noweather")+" • "+$persistentStore.read("tmp")+" °C "+" | "+$persistentStore.read("ssd");
-var subtitle = "降雨提醒 : "+$persistentStore.read("minute_forecast");var mation = "更新时间 : "+$persistentStore.read("updatetime")
+var subtitle = "风向 : "+$persistentStore.read("wind_dir")+" · "+$persistentStore.read("wind_sc")+" 级"+"  湿度 : "+$persistentStore.read("hum")+"  PM2.5 : "+$persistentStore.read("pm25");
+var mation = "Lifestyle : "+$persistentStore.read("life")+"\n更新于 : "+$persistentStore.read("updatetime");
 $notification.post(title, subtitle, mation);
 $done();
