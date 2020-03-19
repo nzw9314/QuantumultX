@@ -61,15 +61,7 @@ if (!$tool.isResponse) {
         .catch(error => msg = error + "\n")
         .finally(() => {
             let summary = obj.value.videos[videoID].summary;
-            if (summary && summary.imageTypeIdentifier && summary.imageTypeIdentifier.match(/^top/)) {
-                const ranking = `#${summary.supplementalMessage ? summary.supplementalMessage.match(/\d/g).join("") : ""}`;
-                const ratings = msg.split("\n")
-                let rating = msg
-                if (ratings.length > 1) rating = `${ratings[1].split("   ")[0].replace(/\s{2}/g, " ")}  ${ratings[2].split("   ")[0].replace(/\s{2}/g, " ")}`
-                summary["supplementalMessage"] = `${ranking}  ${rating}`;
-            } else {
-                summary["supplementalMessage"] = `${msg}${summary && summary.supplementalMessage ? "\n" + summary.supplementalMessage : ""}`;
-            }
+            summary["supplementalMessage"] = `${msg}${summary && summary.supplementalMessage ? "\n" + summary.supplementalMessage : ""}`;
             if (consoleLog) console.log("Netflix Modified Body:\n" + JSON.stringify(obj));
             $done({ body: JSON.stringify(obj) });
         });
