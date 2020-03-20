@@ -1,8 +1,8 @@
 /*
 京东多合一签到脚本
 
-更新于: 2020.3.19 20:50 v84
-有效接口: 22
+更新于: 2020.3.20 19:00 v84.1
+有效接口: 23
 
 该脚本同时兼容: QuantumultX, Surge, Loon, JSBox, Node.js
 如使用JSBox 或 Nodejs, 请自行抓取Cookie填入脚本Key处.
@@ -1447,10 +1447,10 @@ function JingRSeeAds(s) {
                 if (data.match(/(\"resultCode\":3|先登录)/)) {
                   merge.JRSeeAds.notify = "京东金融-广告: 失败, 原因: Cookie失效‼️"
                   merge.JRSeeAds.fail = 1
-                } else {
-                  merge.JRSeeAds.notify = "京东金融-广告: 失败, 原因: 未知 ⚠️"
-                  merge.JRSeeAds.fail = 1
-                }
+                } //else {
+                  //merge.JRSeeAds.notify = "京东金融-广告: 失败, 原因: 未知 ⚠️"
+                  //merge.JRSeeAds.fail = 1
+                //}
               }
             }
           }
