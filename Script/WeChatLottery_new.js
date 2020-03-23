@@ -7,6 +7,7 @@
 新增自动参与首页抽奖、进行参与 3 个首页抽奖后的随即兑换、领取参与 5 个首页抽奖后的每日任务奖励。
 
 咕咕咕：
+每周任务
 参与幸运大礼
 自动开奖
 
@@ -277,10 +278,11 @@ function notify() {
         try {
             let subTitle = ''
             let detail = ''
+            let em = ''
             if (datainfo.error == 0) {
                 $cmp.log("wclcheckin failed response: \n" + datainfo.errormessage)
                 subTitle += '签到失败 '
-                detail += '签到接口请求失败，详情请看日志。'
+                em += '\n签到接口请求失败,详情请看日志。'
             } else if (datainfo.checkin) {
                 if (datainfo.checkin.success == true) {
                     subTitle += '签到成功 '
@@ -289,43 +291,40 @@ function notify() {
                     subTitle += '签到重复 '
                 } else if (datainfo.checkin.message.code == 30001) {
                     subTitle += '签到失败 '
-                    detail += '签到 Token 失效，请重新获取。'
+                    em += '\n签到 Token 失效，请重新获取。'
                 } else {
                     $cmp.log("wclcheckin failed response: \n" + datainfo.checkin)
                     subTitle += '签到失败 '
-                    detail += datainfo.checkin.message.error + '，详情请看日志。'
+                    em += '\n签到失败：' + datainfo.checkin.message.error + '，详情请看日志。'
                 }
             }
             if (datainfo.exchangeerror == 0) {
                 $cmp.log("wclcheckin failed response: \n" + datainfo.exchangeerrormessage)
                 subTitle += '兑换失败 '
-                detail += '兑换接口请求失败，详情请看日志。'
+                em += '\n兑换接口请求失败，详情请看日志。'
             } else if (datainfo.exchange) {
                 if (datainfo.exchange.success == true) {
                     subTitle += '兑换成功 '
-                    detail += '成功参与抽奖 3 次，花费 20 币兑换获得 ' + datainfo.exchange.data.money + ' 元,'
+                    detail += '花费 20 币兑换获得 ' + datainfo.exchange.data.money + ' 元,'
                 } else if (datainfo.exchange.message.code == 1) {
                     subTitle += '兑换重复 '
                 } else {
                     $cmp.log("wclexchange failed response: \n" + datainfo.checkin)
                     subTitle += '兑换失败 '
-                    detail += datainfo.checkin.message.error + '，详情请看日志。'
+                    em += '\n兑换失败：' + datainfo.checkin.message.error + '，详情请看日志。'
                 }
             }
             if (datainfo.dailyerror == 0) {
                 $cmp.log("wcldaily failed response: \n" + datainfo.exchangeerrormessage)
-                subTitle += '每日失败 '
-                detail += '每日任务接口请求失败，详情请看日志。'
+                em += '\n每日任务接口请求失败，详情请看日志。'
             } else if (datainfo.daily) {
-                if (datainfo.daily.success ==true && datainfo.daily.data) {
-                    subTitle += '每日成功 '
+                if (datainfo.daily.success == true && datainfo.daily.data) {
                     detail += '每日任务获得 ' + datainfo.daily.data.lucky_count + ' 币。'
-                } else if (datainfo.daily.success ==true && !datainfo.daily.data) {
-                    subTitle += '每日重复 '
+                } else if (datainfo.daily.success == true && !datainfo.daily.data) {
+
                 } else {
-                    $cmp.log("wclexchange failed response: \n" + datainfo.daily)
-                    subTitle += '每日失败 '
-                    detail += datainfo.daily.message.error + '，详情请看日志。'
+                    $cmp.log("wcldail failed response: \n" + datainfo.daily)
+                    em += '\n每日任务失败：' + datainfo.daily.message.error + '，详情请看日志。'
                 }
             }
             detail += '账户共有 ' + datainfo.allluckcoin + " 币及 " + datainfo.luckmoney + " 元。💰"
@@ -333,12 +332,12 @@ function notify() {
                 subTitle += '参与抽奖 ' + datainfo.joinCnt + ' 个 '
             }
             if (datainfo.failCnt > 0 ) {
-                detail += '\n抽奖失败共' + datainfo.failCnt + ' 个，详情请看日志。'
+                em += '\n抽奖失败共' + datainfo.failCnt + ' 个，详情请看日志。'
             }
             if (datainfo.skipedCnt > 0) {
                 detail += '\n跳过 ' + datainfo.skipedCnt +' 个已参与的抽奖。'
             }
-            $cmp.notify(TokenName, subTitle, detail)
+            $cmp.notify(TokenName, subTitle, detail+em)
             resolve('done')
         } catch (e) {
             $cmp.notify("通知模块 " + e.name + "‼️", JSON.stringify(e), e.message)
