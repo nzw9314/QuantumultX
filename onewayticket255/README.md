@@ -12,7 +12,7 @@ AND,((USER-AGENT,osee2*), (NOT,((DOMAIN-SUFFIX,zhihu.com))), (NOT,((DOMAIN-SUFFI
 
 //BiliBili
 URL-REGEX,https://app.bilibili.com/x/v2/(splash|search/(defaultword|square)),REJECT-TINYGIF
-URL-REGEX,https://api.bilibili.com/x/v2/dm/advert,REJECT-TINYGIF
+URL-REGEX,https://api.bilibili.com/x/v2/dm/ad,REJECT-TINYGIF
 AND,((USER-AGENT,bili*), (NOT,((DOMAIN-SUFFIX,bilibili.com))),(NOT,((DOMAIN-SUFFIX,hdslb.com)))),REJECT-TINYGIF
 
 
