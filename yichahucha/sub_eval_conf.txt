@@ -1,0 +1,2 @@
+http-request ^https://.*(?<!\.(png|jpg|jpeg|gif|bmp|webp|heic))$ requires-body=0,script-path=eval_script.js
+http-response ^https://.*(?<!\.(png|jpg|jpeg|gif|bmp|webp|heic))$ requires-body=1,script-path=eval_script.js
