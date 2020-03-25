@@ -1,15 +1,40 @@
 const __conf = String.raw`
 
 
-[eval_remote]
+[Remote]
 // custom remote...
+https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 
 
-[eval_local]
+[Local]
 // custom local...
 
 
+[Hostname]
+// custom hostname...
+// www.baidu.com, www.google.com
+
+
 `
+
+// 是否开启 GitHub 更新
+const __isUpdateGithub = true
+// GitHub Token（ Token 优先级高，如果不使用 Token 请设置为空 ""）
+const __token = ""
+// GitHub 账号
+const __username = "xxx"
+// GitHub 密码
+const __password = "xxx"
+// GitHub 用户名
+const __owner = "yichahucha"
+// GitHub 仓库名
+const __repo = "surge"
+// GitHub 文件路径（没有文件新生成，已有文件覆盖，路径为空 "" 不更新）
+const __quanxPath = "eval_script/quanx.txt"
+const __surgePath = "eval_script/surge.txt"
+// GitHub 提交日志
+const __quanxCommit = "update"
+const __surgeCommit = "update"
 
 const __emoji = "• "
 const __emojiDone = "✔️"
@@ -22,70 +47,85 @@ const __log = false
 const __debug = false
 const __developmentMode = false
 const __concurrencyLimit = 5
+
 const __tool = new ____Tool()
+const __base64 = new ____Base64()
 
 if (__tool.isTask) {
     const ____getConf = (() => {
         return new Promise((resolve) => {
-            const remoteConf = ____removeAnnotation(____extractConf(__conf, "eval_remote"))
-            const localConf = ____removeAnnotation(____extractConf(__conf, "eval_local"))
+            const remoteConf = ____removeAnnotation(____extractConf(__conf, "Remote"))
+            const localConf = ____removeAnnotation(____extractConf(__conf, "Local"))
+            const hostnameConf = ____parseHostname(____removeAnnotation(____extractConf(__conf, "Hostname")))
             if (remoteConf.length > 0) {
                 console.log("Start updating conf...")
                 if (__debug) __tool.notify("", "", `Start updating ${remoteConf.length} confs...`)
                 ____concurrentQueueLimit(remoteConf, __concurrencyLimit, (url) => {
                     return ____downloadFile(url)
                 })
-                    .then(result => {
+                    .then(results => {
                         console.log("Stop updating conf.")
-                        let content = []
-                        result.forEach(data => {
+                        let contents = []
+                        let hostnames = []
+                        results.forEach(data => {
+                            const parseRemoteResult = ____parseRemoteConf(data.body)
                             if (data.body) {
-                                content = content.concat(____parseRemoteConf(data.body))
+                                contents = contents.concat(parseRemoteResult.contents)
+                                hostnames = hostnames.concat(parseRemoteResult.hostnames)
                             }
                         });
-                        content = localConf.concat(content)
-                        resolve({ content, result })
+                        contents = localConf.concat(contents)
+                        hostnames = hostnameConf.concat(hostnames)
+                        resolve({ contents, hostnames, results })
                     })
             } else {
-                resolve({ content: localConf, result: [] })
+                resolve({ contents: localConf, hostnames: hostnameConf, results: [] })
             }
         })
     })
     const begin = new Date()
+    const storeObj = {}
     ____getConf()
+        //check
         .then((conf) => {
             return new Promise((resolve, reject) => {
-                if (conf.content.length > 0) {
-                    if (__log) console.log(conf.content)
-                    resolve(conf)
+                if (conf.contents.length > 0) {
+                    storeObj["confResults"] = conf.results
+                    storeObj["confHostnames"] = conf.hostnames
+                    if (__log) console.log(conf.contents)
+                    resolve(conf.contents)
                 } else {
                     let message = ""
-                    conf.result.forEach(data => {
+                    conf.results.forEach(data => {
                         message += message.length > 0 ? "\n" + data.message : data.message
                     });
                     reject(message.length > 0 ? message : `Unavailable configuration! Please check!`)
                 }
             })
         })
-        .then((conf) => {
+        //parse
+        .then((contents) => {
             return new Promise((resolve, reject) => {
-                const result = ____parseConf(conf.content)
-                if (result.obj) {
-                    conf["obj"] = result.obj
-                    if (__log) console.log(result.obj)
-                    resolve(conf)
+                const parseResult = ____parseConf(contents)
+                if (parseResult.confMap) {
+                    storeObj["confMap"] = parseResult.confMap
+                    storeObj["quanxConfContents"] = parseResult.quanxConfContents
+                    storeObj["surgeConfContents"] = parseResult.surgeConfContents
+                    if (__log) console.log(parseResult.confMap)
+                    if (__log) console.log("quanx\n" + parseResult.quanxConfContents.join("\n"));
+                    if (__log) console.log("surge\n" + parseResult.surgeConfContents.join("\n"));
+                    resolve(parseResult.confMap)
                 } else {
-                    reject(`Configuration information error: ${result.error}`)
+                    reject(`Configuration information error: ${parseResult.error}`)
                 }
             })
         })
-        .then((conf) => {
-            const confObj = conf.obj
-            const confResult = conf.result
-            const scriptUrls = Object.keys(confObj)
-            console.log("Start updating script...")
+        //download
+        .then((confMap) => {
+            const scriptUrls = Object.keys(confMap)
             __tool.notify("", "", `Start updating ${scriptUrls.length} scripts...`)
-            ____concurrentQueueLimit(scriptUrls, __concurrencyLimit, (url) => {
+            console.log("Start updating script...")
+            return ____concurrentQueueLimit(scriptUrls, __concurrencyLimit, (url) => {
                 const urlRegex = /^(https?:\/\/(([a-zA-Z0-9]+-?)+[a-zA-Z0-9]+\.)+[a-zA-Z]+)(:\d+)?(\/.*)?(\?.*)?(#.*)?$/
                 return new Promise((resolve) => {
                     if (urlRegex.test(url)) {
@@ -101,38 +141,75 @@ if (__tool.isTask) {
                     }
                 })
             })
-                .then(result => {
-                    console.log("Stop updating script.")
-                    __tool.write(JSON.stringify(confObj), "ScriptConfObjKey")
-                    const resultInfo = (() => {
-                        let message = ""
-                        let success = 0
-                        let fail = 0
-                        confResult.concat(result).forEach(data => {
-                            if (data.message.match("success")) success++
-                            if (data.message.match("fail")) fail++
-                            message += message.length > 0 ? "\n" + data.message : data.message
-                        });
-                        return { message, count: { success, fail } }
-                    })()
-                    return resultInfo
-                })
-                .then((resultInfo) => {
-                    const messages = resultInfo.message.split("\n")
-                    const detail = `${messages.slice(0, __showLine).join("\n")}${messages.length > 20 ? `\n${__emoji}......` : ""}`
-                    const summary = `${__emojiSuccess}Success: ${resultInfo.count.success}  ${__emojiFail}Fail: ${resultInfo.count.fail}   ${__emojiTasks}Tasks: ${____timeDiff(begin, new Date())}s`
-                    const nowDate = `${new Date().Format("yyyy-MM-dd HH:mm:ss")} last update`
-                    const lastDate = __tool.read("ScriptLastUpdateDateKey")
-                    console.log(`${summary}\n${resultInfo.message}\n${lastDate ? lastDate : nowDate}`)
-                    __tool.notify(`${__emojiDone}Update Done`, summary, `${detail}\n${__emoji}${lastDate ? lastDate : nowDate}`)
-                    __tool.write(nowDate, "ScriptLastUpdateDateKey")
-                    __tool.done({})
-                })
+        })
+        //write map
+        .then((scriptResults) => {
+            console.log("Stop updating script.")
+            storeObj["scriptResults"] = scriptResults
+            return __tool.write(JSON.stringify(storeObj.confMap), "ScriptConfObjKey")
+        })
+        //update github
+        .then(() => {
+            if (__isUpdateGithub) {
+                const hostname = `${storeObj.confHostnames.length > 0 ? `hostname=${Array.from(new Set(storeObj.confHostnames)).join(",")}` : ""}`
+                const quanxUpdateContent = `${hostname}\n\n${Array.from(new Set(storeObj.quanxConfContents)).join("\n\n")}`
+                const surgeUpdateContent = `${hostname}\n\n${Array.from(new Set(storeObj.surgeConfContents)).join("\n\n")}`
+                const args = [{ path: __quanxPath, content: quanxUpdateContent, commit: __quanxCommit }, { path: __surgePath, content: surgeUpdateContent, commit: __surgeCommit }]
+                const update = async () => {
+                    let results = []
+                    for (let i = 0, len = args.length; i < len; i++) {
+                        const arg = args[i]
+                        if (arg.path.length > 0) {
+                            const result = await ____updateGitHub(arg.path, arg.content, arg.commit)
+                            results.push(result)
+                        }
+                    }
+                    return results
+                }
+                return update()
+            } else {
+                return null
+            }
+        })
+        //notify
+        .then((githubResults) => {
+            const github = (() => {
+                let message = ""
+                if (githubResults && githubResults.length > 0) {
+                    githubResults.forEach((result, index) => {
+                        if (index == 0) message = "🟢" + result.message
+                        message += message.length > 0 ? "\n" + result.url : result.url
+                    });
+                }
+                return message
+            })()
+            const confResults = storeObj.confResults
+            const scriptResults = storeObj.scriptResults
+            const resultInfo = (() => {
+                let message = ""
+                let success = 0
+                let fail = 0
+                confResults.concat(scriptResults).forEach(data => {
+                    if (data.message.match("success")) success++
+                    if (data.message.match("fail")) fail++
+                    message += message.length > 0 ? "\n" + data.message : data.message
+                });
+                return { message, count: { success, fail } }
+            })()
+            const messages = resultInfo.message.split("\n")
+            const detail = `${messages.slice(0, __showLine).join("\n")}${messages.length > 20 ? `\n${__emoji}......` : ""}`
+            const summary = `${__emojiSuccess}Success: ${resultInfo.count.success}  ${__emojiFail}Fail: ${resultInfo.count.fail}   ${__emojiTasks}Tasks: ${____timeDiff(begin, new Date())}s`
+            const nowDate = `${new Date().Format("yyyy-MM-dd HH:mm:ss")} last update`
+            const lastDate = __tool.read("ScriptLastUpdateDateKey")
+            console.log(`${summary}\n${resultInfo.message}\n${lastDate ? lastDate : nowDate}`)
+            __tool.notify(`${__emojiDone}Update Done`, summary, `${detail}\n${__emoji}${lastDate ? lastDate : nowDate}${github.length > 0 ? `\n\n${github}` : ""}`)
+            __tool.write(nowDate, "ScriptLastUpdateDateKey")
+            __tool.done({})
         })
         .catch((error) => {
-            __tool.done({})
-            __tool.notify("[eval_script.js]", "", error)
             console.log(error)
+            __tool.notify("[eval_script.js]", "", error)
+            __tool.done({})
         })
 }
 
@@ -234,6 +311,68 @@ if (!__tool.isTask) {
     }
 }
 
+async function ____updateGitHub(path, content, message) {
+    const url = `https://api.github.com/repos/${__owner}/${__repo}/contents/${path}`
+    const options = {
+        url: url,
+        headers: { "Content-Type": "application/json; charset=utf-8", "User-Agent": "eval_script" }
+    }
+    if (__token.length > 0) {
+        options.headers["Authorization"] = `Token ${__token}`
+    } else {
+        options.headers["Authorization"] = `Basic ${__base64.encode(`${__username}:${__password}`)}`
+    }
+    const body = {
+        message: message,
+        content: __base64.encode(content)
+    }
+    const getContent = () => {
+        return new Promise(function (resolve, reject) {
+            options["method"] = "GET"
+            __tool.get(options, (error, response, body) => {
+                if (!error) {
+                    if (__log) console.log(`getContent: ${response.status}\n${body}`)
+                    body = JSON.parse(body)
+                    if (response.status == 200) {
+                        resolve(body.sha)
+                    } else if (response.status == 404) {
+                        resolve(null)
+                    } else {
+                        reject("GitHub update file failed: " + body.message)
+                    }
+                } else {
+                    reject("GitHub update file failed: " + error)
+                }
+            })
+        })
+    }
+    const updateContent = (sha) => {
+        return new Promise(function (resolve, reject) {
+            if (sha) body["sha"] = sha
+            options["body"] = JSON.stringify(body)
+            options["method"] = "PUT"
+            __tool.put(options, (error, response, body) => {
+                if (!error) {
+                    if (__log) console.log(`updateContent: ${response.status}\n${body}`)
+                    body = JSON.parse(body)
+                    if (response.status == 200) {
+                        resolve({ url: body.content.download_url, message: "GitHub update file successfully" })
+                    } else if (response.status == 201) {
+                        resolve({ url: body.content.download_url, message: "GitHub creat file successfully" })
+                    } else {
+                        reject("GitHub update file failed: " + body.message)
+                    }
+                } else {
+                    reject("GitHub update file failed: " + error)
+                }
+            })
+        })
+    }
+    const sha = await getContent()
+    const result = await updateContent(sha)
+    return result
+}
+
 function ____parseDevelopmentModeConf(conf) {
     const localConf = ____removeAnnotation(____extractConf(__conf, "eval_local"))
     const result = ____parseConf(localConf)
@@ -287,6 +426,13 @@ function ____downloadFile(url) {
     })
 }
 
+function ____parseHostname(hostnames) {
+    if (hostnames.length > 0 && hostnames[0].length > 0) {
+        hostnames = hostnames[0].replace(/\s/g, "").split(",")
+    }
+    return hostnames
+}
+
 function ____extractConf(conf, type) {
     const rex = new RegExp("\\[" + type + "\\](.|\\n)*?(?=\\n($|\\[))", "g")
     let result = rex.exec(conf)
@@ -302,6 +448,7 @@ function ____extractConf(conf, type) {
 function ____parseRemoteConf(conf) {
     const lines = conf.split("\n")
     let newLines = []
+    let hostnames = []
     for (let i = 0, len = lines.length; i < len; i++) {
         const eval = /^(.+)\s+eval\s+(.+)$/
         const surge = /^http\s*-\s*(request|response)\s+(\S+)\s+(.+)$/
@@ -321,46 +468,70 @@ function ____parseRemoteConf(conf) {
                         newLines.push(line)
                     }
                 }
+                if (/^hostname\s*=\s*.+/.test(line)) {
+                    hostnames = line.replace(/\s/g, "").replace(/hostname=/, "").split(",")
+                }
             }
         }
     }
-    return newLines
+    return { contents: newLines, hostnames }
 }
 
 function ____parseConf(lines) {
-    let confObj = {}
+    let confMap = {}
+    let quanxConfContents = []
+    let surgeConfContents = []
     for (let i = 0, len = lines.length; i < len; i++) {
         let line = lines[i].trim()
         if (line.length > 0 && line.substring(0, 2) != "//" && line.substring(0, 1) != "#") {
             const eval = /^(.+)\s+eval\s+(.+)$/
             const surge = /^http\s*-\s*(request|response)\s+(\S+)\s+(.+)$/
-            const quanx = /^(\S+)\s+url\s+script\s*-\s*(\S+)\s*-\s*(?:header|body)\s+(\S+)$/
+            const quanx = /^(\S+)\s+url\s+script\s*-\s*(\S+)\s+(\S+\.js)$/
             if (surge.test(line)) {
                 const result = line.match(surge)
-                line = `${result[1].trim()} ${result[2].trim()} eval ${____surgeScriptPath(result[3].trim())}`
+                // content
+                const requiresBody = ____surgeArg(result[3].trim()).requiresBody
+                surgeConfContents.push(`${line.replace(____surgeArg(result[3].trim()).scriptPath, "eval_script.js")}`)
+                quanxConfContents.push(`${result[2].trim()} url script-${result[1].trim()}-${requiresBody == "1" ? "body" : "header"} eval_script.js`)
+                //eval
+                line = `${result[1].trim()} ${result[2].trim()} eval ${____surgeArg(result[3].trim()).scriptPath}`
             } else if (quanx.test(line)) {
                 const result = line.match(quanx)
-                line = `${result[2].trim()} ${result[1].trim()} eval ${result[3].trim()}`
+                const type = result[2].split("-")
+                //content
+                let requires = 0
+                if (type[0].trim() == "response") {
+                    requires = 1
+                } else {
+                    if (type[1].trim() == "body") {
+                        requires = 1
+                    }
+                }
+                surgeConfContents.push(`http-${type[0].trim()} ${result[1].trim()} ${requires == 0 ? "" : `requires-body=${requires},`}script-path=eval_script.js`)
+                quanxConfContents.push(`${line.replace(result[3].trim(), "eval_script.js")}`)
+                //eval
+                line = `${type[0].trim()} ${result[1].trim()} eval ${result[3].trim()}`
+
             }
             if (eval.test(line)) {
                 const value = line.match(eval)
                 const remote = value[2].trim()
                 const match = ____parseMatch(value[1].trim())
                 if (remote.length > 0 && match.length > 0) {
-                    if (confObj.hasOwnProperty(remote)) {
-                        confObj[remote] = confObj[remote].concat(match)
+                    if (confMap.hasOwnProperty(remote)) {
+                        confMap[remote] = confMap[remote].concat(match)
                     } else {
-                        confObj[remote] = match
+                        confMap[remote] = match
                     }
                 } else {
-                    return { obj: null, error: line }
+                    return { confMap: null, quanxConfContents, surgeConfContents, error: line }
                 }
             } else {
-                return { obj: null, error: line }
+                return { confMap: null, quanxConfContents, surgeConfContents, error: line }
             }
         }
     }
-    return { obj: confObj, error: null }
+    return { confMap, quanxConfContents, surgeConfContents, error: null }
 }
 
 function ____parseMatch(match) {
@@ -384,18 +555,21 @@ function ____parseMatch(match) {
     return matchs
 }
 
-function ____surgeScriptPath(arg) {
-    let scriptPath = ""
+function ____surgeArg(arg) {
+    let surgeArg = {}
     const args = arg.split(",")
     for (let i = 0, len = args.length; i < len; i++) {
         const item = args[i].trim()
         const path = /^script-path\s*=\s*(\S+)$/
+        const requires = /^requires-body\s*=\s*(\S+)$/
         if (path.test(item)) {
-            scriptPath = item.match(path)[1]
-            break
+            surgeArg["scriptPath"] = item.match(path)[1]
+        }
+        if (requires.test(item)) {
+            surgeArg["requiresBody"] = item.match(requires)[1]
         }
     }
-    return scriptPath
+    return surgeArg
 }
 
 function ____removeAnnotation(lines) {
@@ -471,6 +645,11 @@ function ____Tool() {
         if (_isSurge) $httpClient.get(options, (error, response, body) => { callback(error, _status(response), body) })
         if (_node) _node.request(options, (error, response, body) => { callback(error, _status(response), body) })
     }
+    this.put = (options, callback) => {
+        if (_isQuanX) $task.fetch(options).then(response => { callback(null, _status(response), response.body) }, reason => callback(reason.error, null, null))
+        if (_isSurge) $httpClient.put(options, (error, response, body) => { callback(error, _status(response), body) })
+        if (_node) _node.request(options, (error, response, body) => { callback(error, _status(response), body) })
+    }
     this.post = (options, callback) => {
         if (_isQuanX) {
             if (typeof options == "string") options = { url: options }
@@ -489,6 +668,105 @@ function ____Tool() {
             }
         }
         return response
+    }
+}
+
+function ____Base64() {
+    // private property
+    _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    // public method for encoding
+    this.encode = function (input) {
+        var output = "";
+        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+        var i = 0;
+        input = _utf8_encode(input);
+        while (i < input.length) {
+            chr1 = input.charCodeAt(i++);
+            chr2 = input.charCodeAt(i++);
+            chr3 = input.charCodeAt(i++);
+            enc1 = chr1 >> 2;
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+            enc4 = chr3 & 63;
+            if (isNaN(chr2)) {
+                enc3 = enc4 = 64;
+            } else if (isNaN(chr3)) {
+                enc4 = 64;
+            }
+            output = output +
+                _keyStr.charAt(enc1) + _keyStr.charAt(enc2) +
+                _keyStr.charAt(enc3) + _keyStr.charAt(enc4);
+        }
+        return output;
+    }
+    // public method for decoding
+    this.decode = function (input) {
+        var output = "";
+        var chr1, chr2, chr3;
+        var enc1, enc2, enc3, enc4;
+        var i = 0;
+        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+        while (i < input.length) {
+            enc1 = _keyStr.indexOf(input.charAt(i++));
+            enc2 = _keyStr.indexOf(input.charAt(i++));
+            enc3 = _keyStr.indexOf(input.charAt(i++));
+            enc4 = _keyStr.indexOf(input.charAt(i++));
+            chr1 = (enc1 << 2) | (enc2 >> 4);
+            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+            chr3 = ((enc3 & 3) << 6) | enc4;
+            output = output + String.fromCharCode(chr1);
+            if (enc3 != 64) {
+                output = output + String.fromCharCode(chr2);
+            }
+            if (enc4 != 64) {
+                output = output + String.fromCharCode(chr3);
+            }
+        }
+        output = _utf8_decode(output);
+        return output;
+    }
+    // private method for UTF-8 encoding
+    _utf8_encode = function (string) {
+        string = string.replace(/\r\n/g, "\n");
+        var utftext = "";
+        for (var n = 0; n < string.length; n++) {
+            var c = string.charCodeAt(n);
+            if (c < 128) {
+                utftext += String.fromCharCode(c);
+            } else if ((c > 127) && (c < 2048)) {
+                utftext += String.fromCharCode((c >> 6) | 192);
+                utftext += String.fromCharCode((c & 63) | 128);
+            } else {
+                utftext += String.fromCharCode((c >> 12) | 224);
+                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+
+        }
+        return utftext;
+    }
+    // private method for UTF-8 decoding
+    _utf8_decode = function (utftext) {
+        var string = "";
+        var i = 0;
+        var c = c1 = c2 = 0;
+        while (i < utftext.length) {
+            c = utftext.charCodeAt(i);
+            if (c < 128) {
+                string += String.fromCharCode(c);
+                i++;
+            } else if ((c > 191) && (c < 224)) {
+                c2 = utftext.charCodeAt(i + 1);
+                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                i += 2;
+            } else {
+                c2 = utftext.charCodeAt(i + 1);
+                c3 = utftext.charCodeAt(i + 2);
+                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                i += 3;
+            }
+        }
+        return string;
     }
 }
 
