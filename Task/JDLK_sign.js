@@ -4,7 +4,7 @@
 1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
 下，
 2.微信搜索'来客有礼'小程序,登陆京东账号，点击'领京豆->翻牌',即可获取Cookie. 
-3.翻过牌的只有等明天重新获取Cookie
+3.当日签过到需次日获取Cookie.
 
 仅测试Quantumult x，Surge 无效
 by Macsuny

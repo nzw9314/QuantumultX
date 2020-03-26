@@ -1,4 +1,4 @@
-const cookieName = '京东来客有礼'
+const cookieName = '微信小程序来客有礼'
 const signurlKey = 'sy_signurl_lkyl'
 const signheaderKey = 'sy_signheader_lkyl'
 const sy = init()

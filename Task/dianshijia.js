@@ -21,12 +21,11 @@ QX 1.0.6+ :
 0 9 * * * dianshijia.js
 
 [rewrite_local]
-# Get dianshijia cookie. QX 1.0.5(188+):
+
 http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\?accelerate=0&ext=0&ticket= url script-request-header dianshijia.js
 ~~~~~~~~~~~~~~~~
 
 */
-
 const cookieName = '电视家'
 const signurlKey = 'sy_signurl_dsj'
 const signheaderKey = 'sy_signheader_dsj'
@@ -40,7 +39,6 @@ if (isGetCookie) {
   } else {
    sign()
   }
-
 function GetCookie() {
 const requrl = $request.url
 if ($request && $request.method != 'OPTIONS') {
@@ -55,35 +53,35 @@ if ($request && $request.method != 'OPTIONS') {
  }
 }
 function sign() {
-return new Promise((resolve, reject) => {
-    const url = { url: signurlVal, headers: JSON.parse(signheaderVal)}
-    sy.get(url, (error, response, data) => {
-    sy.log(`${cookieName}, data: ${data}`)
-    const result = JSON.parse(data)
     const title = `${cookieName}`
     let subTitle = ``
     let detail = ``
+return new Promise((resolve, reject) => {
+    const url = { url: signurlVal, headers: JSON.parse(signheaderVal)}
+    sy.get(url, (error, response, data) => {
+    //sy.log(`${cookieName}, data: ${data}`)
+    const result = JSON.parse(data)
     if (result.errCode == 0) {
       subTitle = `签到结果: 成功🎉`
       detail = `已签到 ${result.data.conDay}天，获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name}`
-      sy.msg(title, subTitle, detail)
-      sy.done()
+      sy.msg(title, subTitle, detail)    
       } else if  (result.errCode == 6){
        subTitle = `签到结果: 失败`
        detail = `原因: ${result.msg}`
        sy.msg(title, subTitle, detail)
-       sy.done()
       }     
-    let url = { url: `http://api.gaoqingdianshi.com/api/coin/info`, headers: JSON.parse(signheaderVal)}
-    sy.get(url, (error, response, data) => {
+    })    
+   sy.done()
+    let url1 = { url: `http://api.gaoqingdianshi.com/api/coin/info`, headers: JSON.parse(signheaderVal)}
+    sy.get(url1, (error, response, data) => {
     sy.log(`${cookieName}, data: ${data}`)
     const result = JSON.parse(data)
     if (result.errCode == 0) {
       subTitle = `签到结果: 重复`
-      detail += `金币收益: 💰${result.data.coin}`
+      detail = `金币收益: 💰${result.data.coin}`
       }
-     let url = { url: `http://api.gaoqingdianshi.com/api/cash/info`, headers: JSON.parse(signheaderVal)}
-    sy.get(url, (error, response, data) => {
+    let url2 = { url: `http://api.gaoqingdianshi.com/api/cash/info`, headers: JSON.parse(signheaderVal)}
+    sy.get(url2, (error, response, data) => {
     sy.log(`${cookieName}, data: ${data}`)
     const result = JSON.parse(data)
     if (result.errCode == 0) {
@@ -92,12 +90,11 @@ return new Promise((resolve, reject) => {
       subTitle = `签到结果: 失败`
       detail = `状态: ${result.msg}`
       }
-      sy.msg(title, subTitle, detail)
-      sy.done()
-      })
+     sy.msg(title, subTitle, detail)
      })
+    })     
    })
- })
+ sy.done() 
 }
 function init() {
   isSurge = () => {

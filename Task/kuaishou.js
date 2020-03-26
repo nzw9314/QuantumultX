@@ -4,11 +4,13 @@
 1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
 下，
 2.APP登陆账号后，点击'红包',即可获取Cookie.
+
 仅测试Quantumult x，Surge、Loon自行测试
 by Macsuny
 感谢
 @Chavy
 @Nobyda
+
 ~~~~~~~~~~~~~~~~
 Surge 4.0 :
 [Script]
@@ -19,12 +21,14 @@ http-request https:\/\/nebula\.kuaishou\.com\/rest\/n\/nebula\/activity\/earn\/o
 QX 1.0.5 :
 [task_local]
 0 9 * * * kuaishou_sign.js
+
 [rewrite_local]
 # Get bilibili cookie. QX 1.0.5(188+):
 https:\/\/nebula\.kuaishou\.com\/rest\/n\/nebula\/activity\/earn\/overview url script-request-header kuaishou_sign.js
 ~~~~~~~~~~~~~~~~
 QX or Surge MITM = nebula.kuaishou.com
 ~~~~~~~~~~~~~~~~
+
 */
 const CookieName = '快手极速版'
 const cookieKey = 'cookie_ks'
