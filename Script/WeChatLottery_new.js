@@ -280,7 +280,7 @@ function notify() {
             let detail = ''
             let em = ''
             if (datainfo.error == 0) {
-                $cmp.log("wclcheckin failed response: \n" + datainfo.errormessage)
+                $cmp.log("wclcheckin failed response: \n", datainfo.errormessage)
                 subTitle += '签到失败 '
                 em += '\n签到接口请求失败,详情请看日志。'
             } else if (datainfo.checkin) {
@@ -293,29 +293,29 @@ function notify() {
                     subTitle += '签到失败 '
                     em += '\n签到 Token 失效，请重新获取。'
                 } else {
-                    $cmp.log("wclcheckin failed response: \n" + datainfo.checkin)
+                    $cmp.log("wclcheckin failed response: \n", datainfo.checkin)
                     subTitle += '签到失败 '
                     em += '\n签到失败：' + datainfo.checkin.message.error + '，详情请看日志。'
                 }
             }
             if (datainfo.exchangeerror == 0) {
-                $cmp.log("wclcheckin failed response: \n" + datainfo.exchangeerrormessage)
+                $cmp.log("wclcheckin failed response: \n", datainfo.exchangeerrormessage)
                 subTitle += '兑换失败 '
                 em += '\n兑换接口请求失败，详情请看日志。'
             } else if (datainfo.exchange) {
                 if (datainfo.exchange.success == true) {
                     subTitle += '兑换成功 '
-                    detail += '花费 20 币兑换获得 ' + datainfo.exchange.data.money + ' 元,'
+                    detail += '花费 20 币兑换获得 ' + datainfo.exchange.data.money + ' 元，'
                 } else if (datainfo.exchange.message.code == 1) {
                     subTitle += '兑换重复 '
                 } else {
-                    $cmp.log("wclexchange failed response: \n" + datainfo.checkin)
+                    $cmp.log("wclexchange failed response: \n", datainfo.checkin)
                     subTitle += '兑换失败 '
                     em += '\n兑换失败：' + datainfo.checkin.message.error + '，详情请看日志。'
                 }
             }
             if (datainfo.dailyerror == 0) {
-                $cmp.log("wcldaily failed response: \n" + datainfo.exchangeerrormessage)
+                $cmp.log("wcldaily failed response: \n", datainfo.exchangeerrormessage)
                 em += '\n每日任务接口请求失败，详情请看日志。'
             } else if (datainfo.daily) {
                 if (datainfo.daily.success == true && datainfo.daily.data) {
@@ -323,7 +323,7 @@ function notify() {
                 } else if (datainfo.daily.success == true && !datainfo.daily.data) {
 
                 } else {
-                    $cmp.log("wcldail failed response: \n" + datainfo.daily)
+                    $cmp.log("wcldaily failed response: \n", datainfo.daily)
                     em += '\n每日任务失败：' + datainfo.daily.message.error + '，详情请看日志。'
                 }
             }
