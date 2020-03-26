@@ -86,7 +86,18 @@ return new Promise((resolve, reject) => {
     const result = JSON.parse(data)
     if (result.errCode == 0) {
       detail += `  现金收益: 💴${result.data.amount/100}元`
-      } else { 
+      } 
+   })      
+      let url3 = { url: `http://act.gaoqingdianshi.com/api/v4/sign/get`, headers: JSON.parse(signheaderVal)}
+    sy.get(url3, (error, response, data) => {
+    sy.log(`${cookieName}, data: ${data}`)
+    const result = JSON.parse(data)
+    if (result.errCode == 0) {
+     var d = `${result.data.currentDay}`
+     subTitle += `已连续签到${d}天`
+      detail += `\n今日获取奖励: ${result.data.recentDays[`${d}`-1].rewards[1].name}  明日奖励: ${result.data.recentDays[`${d}`].rewards[1].name}`
+      
+      }else { 
       subTitle = `签到结果: 失败`
       detail = `状态: ${result.msg}`
       }
