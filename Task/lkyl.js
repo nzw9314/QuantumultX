@@ -1,41 +1,58 @@
 /*
-本脚本仅适用于京东来客有礼每日获取京豆，测试版!!!
+本脚本仅适用于京东来客有礼每日获取京豆
 获取Cookie方法:
 1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
 下，
 2.微信搜索'来客有礼'小程序,登陆京东账号，点击'领京豆->翻牌',即可获取Cookie. 
 3.当日签过到需次日获取Cookie.
 
-仅测试Quantumult x，Surge 无效
+仅测试Quantumult X
 by Macsuny
 
 ~~~~~~~~~~~~~~~~
-Surge 4.0 :❌❌
+Surge 4.0 :
 [Script]
-cron "0 9 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/JDLK_sign.js
+cron "0 9 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/lkyl.js
 # 来客有礼 Cookie.
-http-request https:\/\/draw\.jdfcloud\.com\/\/api\/turncard\/sign\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/JDLK_cookie.js
+http-request https:\/\/draw\.jdfcloud\.com\/\/api\/turncard\/sign\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/lkyl.js
 ~~~~~~~~~~~~~~~~
 QX 1.0.5+ :
 [task_local]
-0 9 * * * JDLK_sign.js
+0 9 * * * lkyl.js
 
 [rewrite_local]
-https:\/\/draw\.jdfcloud\.com\/\/api\/turncard\/sign\? url script-request-header JDLK_cookie.js
+https:\/\/draw\.jdfcloud\.com\/\/api\/turncard\/sign\? url script-request-header lkyl.js
 ~~~~~~~~~~~~~~~~
 [MITM]
 hostname = draw.jdfcloud.com
 ~~~~~~~~~~~~~~~~
 
 */
-const cookieName = '京东来客有礼'
+const cookieName = '来客有礼'
 const signurlKey = 'sy_signurl_lkyl'
 const signheaderKey = 'sy_signheader_lkyl'
 const sy = init()
 const signurlVal = sy.getdata(signurlKey)
 const signheaderVal = sy.getdata(signheaderKey)
 
-sign()
+let isGetCookie = typeof $request !== 'undefined'
+if (isGetCookie) {
+   GetCookie()
+} else {
+   sign()
+}
+function GetCookie() {
+const requrl = $request.url
+if ($request && $request.method != 'OPTIONS') {
+  const signurlVal = requrl
+  const signheaderVal = JSON.stringify($request.headers)
+  sy.log(`signurlVal:${signurlVal}`)
+  sy.log(`signheaderVal:${signheaderVal}`)
+  if (signurlVal) sy.setdata(signurlVal, signurlKey)
+  if (signheaderVal) sy.setdata(signheaderVal, signheaderKey)
+  sy.msg(cookieName, `获取Cookie: 成功🎉`, ``)
+  }
+ }
 
 function sign() {
 	  let signurl = {
