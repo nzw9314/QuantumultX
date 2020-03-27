@@ -38,12 +38,14 @@ const __surgePath = "eval_sub/surge.txt"
 const __quanxCommit = "update"
 const __surgeCommit = "update"
 
-const __emoji = "• "
-const __emojiDone = "✔️"
-const __emojiTasks = "🕐"
+const __emojiDone = ""
 const __emojiFail = "🙃"
 const __emojiSuccess = "😀"
-const __showLine = 20
+const __emojiTasks = "🕐"
+const __emojiUpdateSuccess = "🟢"
+const __emojiUpdateFail = "🟠"
+const __emojiGitHub = "🔵"
+const __showLine = 15
 
 const __log = false
 const __debug = false
@@ -139,7 +141,7 @@ if (__tool.isTask) {
                         })
                     } else {
                         __tool.write(url, url)
-                        resolve({ body: url, url, message: `${__emoji}${url} function set success` })
+                        resolve({ body: url, url, message: `${__emojiUpdateSuccess}${url} function set successfully` })
                     }
                 })
             })
@@ -181,8 +183,8 @@ if (__tool.isTask) {
                 let message = ""
                 if (githubResults && githubResults.length > 0) {
                     githubResults.forEach((result, index) => {
-                        if (index == 0) message = "🟢" + result.message
-                        message += message.length > 0 ? "\n" + result.url : result.url
+                        if (index == 0) message = result.message
+                        message += message.length > 0 ? "\n" + __emojiGitHub + result.url : __emojiGitHub + result.url
                     });
                 }
                 return message
@@ -201,12 +203,13 @@ if (__tool.isTask) {
                 return { message, count: { success, fail } }
             })()
             const messages = resultInfo.message.split("\n")
-            const detail = `${messages.slice(0, __showLine).join("\n")}${messages.length > 20 ? `\n${__emoji}......` : ""}`
-            const summary = `${__emojiSuccess}Success: ${resultInfo.count.success}  ${__emojiFail}Fail: ${resultInfo.count.fail}   ${__emojiTasks}Tasks: ${____timeDiff(begin, new Date())}s`
-            const nowDate = `${new Date().Format("yyyy-MM-dd HH:mm:ss")} last update`
+            const detail = `${messages.slice(0, __showLine).join("\n")}${messages.length > 20 ? `\n${__emojiUpdateSuccess}......` : ""}`
+            const summary = `${__emojiSuccess}success: ${resultInfo.count.success}  ${__emojiFail}fail: ${resultInfo.count.fail}   ${__emojiTasks}tasks: ${____timeDiff(begin, new Date())}s`
+            const nowDate = `${new Date().Format("yyyy-MM-dd HH:mm:ss")} last updated`
             const lastDate = __tool.read("ScriptLastUpdateDateKey")
-            console.log(`\n${summary}\n${resultInfo.message}\n${lastDate ? lastDate : nowDate}${github.length > 0 ? `\n\n${github}` : ""}`)
-            __tool.notify(`${__emojiDone}Update Done`, summary, `${detail}\n${__emoji}${lastDate ? lastDate : nowDate}${github.length > 0 ? `\n\n${github}` : ""}`)
+            const date = `${__emojiTasks}${lastDate ? lastDate : nowDate}`
+            console.log(`\n${summary}\n${resultInfo.message}${github.length > 0 ? `\n${github}` : ""}\n${date}`)
+            __tool.notify(`${__emojiDone}Update Done`, summary, `${detail}${github.length > 0 ? `\n${github}` : ""}\n${date}`)
             __tool.write(nowDate, "ScriptLastUpdateDateKey")
             __tool.done({})
         })
@@ -339,10 +342,10 @@ async function ____updateGitHub(path, content, message) {
                     } else if (response.status == 404) {
                         resolve(null)
                     } else {
-                        reject("GitHub update file failed: " + body.message)
+                        reject("GitHub update failed: " + body.message)
                     }
                 } else {
-                    reject("GitHub update file failed: " + error)
+                    reject("GitHub update failed: " + error)
                 }
             })
         })
@@ -363,14 +366,14 @@ async function ____updateGitHub(path, content, message) {
                     if (__log) console.log(`updateContent: ${response.status}\n${body}`)
                     body = JSON.parse(body)
                     if (response.status == 200) {
-                        resolve({ url: body.content.download_url, message: "GitHub update file successfully" })
+                        resolve({ url: body.content.download_url, message: `${__emojiGitHub}GitHub updated successfully` })
                     } else if (response.status == 201) {
-                        resolve({ url: body.content.download_url, message: "GitHub creat file successfully" })
+                        resolve({ url: body.content.download_url, message: `${__emojiGitHub}GitHub file created successfully` })
                     } else {
-                        reject("GitHub update file failed: " + body.message)
+                        reject("GitHub update failed: " + body.message)
                     }
                 } else {
-                    reject("GitHub update file failed: " + error)
+                    reject("GitHub update failed: " + error)
                 }
             })
         })
@@ -419,15 +422,15 @@ function ____downloadFile(url) {
             if (!error) {
                 const code = response.statusCode
                 if (code == 200) {
-                    console.log(`update success: ${url}`)
-                    resolve({ url, code, body, message: `${__emoji}${filename} update success` })
+                    console.log(`updated successfully: ${url}`)
+                    resolve({ url, code, body, message: `${__emojiUpdateSuccess}${filename} updated successfully` })
                 } else {
-                    console.log(`update fail ${response.statusCode}: ${url}`)
-                    resolve({ url, code, body, message: `${__emoji}${filename} update fail` })
+                    console.log(`update failed ${response.statusCode}: ${url}`)
+                    resolve({ url, code, body, message: `${__emojiUpdateFail}${filename} update failed` })
                 }
             } else {
-                console.log(`update fail ${error}`)
-                resolve({ url, code: null, body: null, message: `${__emoji}${filename} update fail` })
+                console.log(`updated faile ${error}`)
+                resolve({ url, code: null, body: null, message: `${__emojiUpdateFail}${filename} update failed` })
             }
         })
     })
@@ -626,7 +629,7 @@ function ____Tool() {
     this.done = (obj) => {
         if (_isQuanX) $done(obj)
         if (_isSurge) $done(obj)
-        if (_node) console.log("script Done.");
+        if (_node) console.log("script done.");
     }
     this.notify = (title, subtitle, message) => {
         if (_isQuanX) $notify(title, subtitle, message)
