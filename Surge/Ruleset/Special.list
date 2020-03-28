@@ -1,0 +1,42 @@
+# Special
+# > General
+USER-AGENT,coffeecorp*
+USER-AGENT,restaurant-mobile*
+DOMAIN,app.adjust.com
+# > Google
+DOMAIN-SUFFIX,googletraveladservices.com
+DOMAIN,dl.google.com
+DOMAIN,mtalk.google.com
+# > Tencent
+DOMAIN,livew.l.qq.com
+DOMAIN,vd.l.qq.com
+# > Strava
+DOMAIN,analytics.strava.com
+# > Umeng
+DOMAIN,msg.umeng.com
+DOMAIN,msg.umengcloud.com
+
+# > Download
+PROCESS-NAME,aria2c,DIRECT
+PROCESS-NAME,fdm,DIRECT
+PROCESS-NAME,Folx,DIRECT
+PROCESS-NAME,NetTransport,DIRECT
+PROCESS-NAME,Thunder,DIRECT
+PROCESS-NAME,Transmission,DIRECT
+PROCESS-NAME,uTorrent,DIRECT
+PROCESS-NAME,WebTorrent,DIRECT
+PROCESS-NAME,WebTorrent Helper,DIRECT
+# > bt
+DOMAIN-KEYWORD,announce
+DOMAIN-KEYWORD,torrent
+DOMAIN-KEYWORD,tracker
+DOMAIN-SUFFIX,smtp
+DOMAIN-KEYWORD,aria2
+URL-REGEX,(Subject|HELO|SMTP)
+URL-REGEX,(api|ps|sv|offnavi|newvector|ulog.imap|newloc)(.map|).(baidu|n.shifen).com
+URL-REGEX,(.+.|^)(360|so|qihoo|360safe|qhimg|360totalsecurity|yunpan).(cn|com)
+URL-REGEX,(.+.)?(torrent|announce.php?passkey=|tracker|BitTorrent|bt_key|ed2k|find_node|get_peers|info_hash|magnet:|peer_id=|sandai|Thunder|XLLiveUD|xunlei)(..+)?
+# > 迅雷
+URL-REGEX,(.?)(xunlei|sandai|Thunder|XLLiveUD)(.)
+# > 360
+URL-REGEX,(.+\.|^)(360|so)\.(cn|com)
