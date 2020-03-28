@@ -1,3 +1,4 @@
+
 /*
 本脚本仅适用于电视家签到
 获取Cookie方法:
@@ -90,7 +91,7 @@ return new Promise((resolve, reject) =>
   //  sy.log(`${cookieName}, data: ${data}`)
     const result = JSON.parse(data)
     if (result.errCode == 0) {
-      detail += `    现金收益: 💴${result.data.amount/100}元`
+      detail += `\n现金收益: 💴${result.data.amount/100}元`
       } 
    })      
       let url3 = { url: `http://act.gaoqingdianshi.com/api/v4/sign/get`, headers: JSON.parse(signheaderVal)}
@@ -106,28 +107,22 @@ return new Promise((resolve, reject) =>
        {  
        
         for (r=0; r < result.data.recentDays[i].rewards.length;r++)
-          {      //sy.msg(r)
-           if (r == 1 )
+          {      
+           if (r > 0 )
                  {
             subTitle += `     已连续签到${d}天`
-            detail += `\n今日获取奖励: ${result.data.recentDays[i].rewards[s].name} `
+            detail += `\n今日获取奖励: ${result.data.recentDays[i].rewards[1].name} `
                  }  
-      else  if (r == 0) {
-          subTitle += `   已连续签到${d}天`
-             detail += `\n今日无奖励`
-                 }
+         
            }   //  今日奖励情况
 
        for ( s = 0; s < result.data.recentDays[i+1].rewards.length;s++)
-          { 
-               if ( s > 0)
+          {  
+            if ( s > 0)
                  {
-                 detail += `  明日奖励: ${result.data.recentDays[i+1].rewards[1].name}`
+              detail += `\n明日奖励: ${result.data.recentDays[i+1].rewards[1].name}`
                  }  
-                 else if (s == 0) 
-                 {
-                 detail += `  明日无奖励`
-                 }   // 明日奖励情况
+                    // 明日奖励情况
                 }
               sy.msg(title, subTitle, detail)
              }                  
