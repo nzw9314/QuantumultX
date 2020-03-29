@@ -37,16 +37,19 @@ var wurl = {
      try{ 
       let result = JSON.parse(response.body)
       var i = 0                          
-      const title = `现在是`+ M +'月'+ D +'日' + n + h +':'+ m 
-      subTitle = `${result[`${c}`].channelName}频道 节目预告  ` 
+      const title = `${result[`${c}`].channelName}频道节目预告  ` + M +'月'+ D +'日' + n + h +':'+ m
       detail = `正在播出: ${result[`${c}`].isLive}\n${result[`${c}`].program[i].showTime} ${result[`${c}`].program[i].t}`
       
       for (i = 1; i < result[`${c}`].program.length; i++){
+     
+      if (result[`${c}`].isLive == result[`${c}`].program[i].t){
+      subTitle = `即将播出: ${result[`${c}`].program[i+1].t}`
+}
       detail += `\n${result[`${c}`].program[i].showTime} ${result[`${c}`].program[i].t}`
        }
       $notify(title, subTitle, detail)
-    } catch { 
-        $notify("无此频道或者台号错误❌", "请检查后重试", "" )
-       }
+  } catch { 
+      $notify("无此频道或者台号错误❌", "请检查后重试", "")}
  });
 $done()
+

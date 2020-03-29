@@ -40,6 +40,7 @@ const CookieName ='京东到家'
 const CookieKey = 'sy_cookie_dj'
 const sy = init()
 const cookieVal = sy.getdata(CookieKey);
+
 let isGetCookie = typeof $request !== 'undefined'
 
 if (isGetCookie) {
@@ -59,7 +60,7 @@ function GetCookie() {
           sy.log(`[${CookieName}] 获取Cookie: 失败`);
         } else {
           sy.msg("更新" + CookieName + "Cookie成功 🎉", "", "");
-      sy.log(`[${CookieName}] 获取Cookie: 成功, Cookie: ${CookieValue}`)
+          sy.log(`[${CookieName}] 获取Cookie: 成功, Cookie: ${CookieValue}`)
         }
       }
     } else {
