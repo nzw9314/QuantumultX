@@ -16,7 +16,7 @@ Surge 4.0 :
 [Script]
 cron "0 9 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/kuaishou_sign.js
 # 获取快手极速版 Cookie.
-http-request https:\/\/nebula\.kuaishou\.com\/rest\/n\/nebula\/activity\/earn\/overview,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/kuaishou_sign.js
+http-request https:\/\/nebula\.kuaishou\.com\/rest\/n\/nebula\/activity\/earn\/overview script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/kuaishou_sign.js
 ~~~~~~~~~~~~~~~~
 QX 1.0.5 :
 [task_local]
@@ -102,7 +102,7 @@ function sign() {
      if (result.data.nebulaSignInPopup.button == '立即签到'){ 
        subTitle = `签到成功: ${result.data.nebulaSignInPopup.subTitle}, ${result.data.nebulaSignInPopup.title}`
       } else if (result.data.nebulaSignInPopup.button == '好的'){ 
-       subTitle = `重复签到: ${result.data.nebulaSignInPopup.subTitle}, ${result.data.nebulaSignInPopup.title}`
+       detail = `重复签到: ${result.data.nebulaSignInPopup.subTitle}, ${result.data.nebulaSignInPopup.title}`
       }
     })
     let reurl = {url:'https://nebula.kuaishou.com/rest/n/nebula/activity/earn/overview',
@@ -112,7 +112,7 @@ function sign() {
 	sy.log(`${CookieName}, data: ${data}`)
 	let result = JSON.parse(data) 
 	if (result.result == 1) {
-	        detail = `现金收益: 💵${result.data.allCash}元    金币收益: 💰${result.data.totalCoin}`
+	        subTitle = `现金收益: 💵${result.data.allCash}元    金币收益: 💰${result.data.totalCoin}`
 			sy.msg(CookieName,subTitle,detail)	
 			} 
           sy.log(`错误代码: ${result.result}, 返回信息: ${result.error_msg}`)

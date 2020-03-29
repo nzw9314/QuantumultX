@@ -18,7 +18,7 @@ Surge 4.0 :
 [Script]
 cron "0 9 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js
 # 获取京东到家 Cookie.
-http-request https:\/\/daojia\.jd\.com\/client\?_jdrandom=\d{13}&functionId=%2Fsignin,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js
+http-request https:\/\/daojia\.jd\.com\/client\?_jdrandom=\d{13}&functionId=%2Fsignin script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js
 ~~~~~~~~~~~~~~~~
 QX 1.0.5 :
 [task_local]
@@ -85,11 +85,9 @@ function sign() {
       //sy.log(`${CookieName}, data: ${data}`)
       let result = JSON.parse(data)
        if (result.code == 0) {
-       subTitle = `签到结果:  成功`
-       detail = `获取鲜豆：${result.result.points}`
-       sy.msg(title, subTitle, detail)
+       //subTitle = `签到结果:  成功`
+       //detail = `获取鲜豆：${result.result.points}`      
       }
-     sy.done()
     })
       let url2 = {url: `https://daojia.jd.com/client?functionId=signin%2FshowSignInMsgNew&body=%7B%7D`, headers: { Cookie:cookieVal}}   
       sy.get(url2, (error, response, data) => {
@@ -102,16 +100,22 @@ function sign() {
     } else if (result.result.userInfoResponse.hasSign == true) {    
     for (let i = 0; i < result.result.sevenDaysRewardResponse.items.length; i++){
     if (result.result.sevenDaysRewardResponse.items[i].day == result.result.sevenDaysRewardResponse.alreadySignInDays){
-        subTitle = `签到结果: 重复`
+        subTitle = `签到结果: 重复 ‼️`
         detail = `鲜豆总计：${result.result.userInfoResponse.points}   今日获取鲜豆:  ${result.result.sevenDaysRewardResponse.items[i].points}\n已签到${result.result.sevenDaysRewardResponse.alreadySignInDays}天，${result.result.sevenDaysRewardResponse.tomorrowSingInRewardText}`
-        }else{
         }
-       }
-      sy.msg(title, subTitle, detail)
+      }
+     } else if (result.result.userInfoResponse.hasSign == false)   {    
+       for (let i = 0; i < result.result.sevenDaysRewardResponse.items.length; i++){
+          if (result.result.sevenDaysRewardResponse.items[i].day == result.result.sevenDaysRewardResponse.alreadySignInDays){  
+        subTitle = `签到结果: 成功🎉`
+        detail = `鲜豆总计：${result.result.userInfoResponse.points}   今日获取鲜豆:  ${result.result.sevenDaysRewardResponse.items[i].points}\n已签到${result.result.sevenDaysRewardResponse.alreadySignInDays}天，${result.result.sevenDaysRewardResponse.tomorrowSingInRewardText}`
+        }
+       } 
      }       
-      sy.log(`返回结果代码:${result.code}，返回信息:${result.msg}`)
-  })
-}
+     sy.msg(title, subTitle, detail)
+     sy.log(`返回结果代码:${result.code}，返回信息:${result.msg}`)
+   })
+ }
 
  function init() {
     isSurge = () => {
