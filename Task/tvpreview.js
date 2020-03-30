@@ -40,16 +40,26 @@ var wurl = {
       const title = `${result[`${c}`].channelName}频道节目预告  ` + M +'月'+ D +'日' + n + h +':'+ m
       detail = `正在播出: ${result[`${c}`].isLive}\n${result[`${c}`].program[i].showTime} ${result[`${c}`].program[i].t}`
       
-      for (i = 1; i < result[`${c}`].program.length; i++){
-     
-      if (result[`${c}`].isLive == result[`${c}`].program[i].t){
-      subTitle = `即将播出: ${result[`${c}`].program[i+1].t}`
-}
-      detail += `\n${result[`${c}`].program[i].showTime} ${result[`${c}`].program[i].t}`
+      for (i = 1; i < result[`${c}`].program.length; i++)
+       {      
+        detail += `\n${result[`${c}`].program[i].showTime} ${result[`${c}`].program[i].t}`
        }
+      for (a = 1; a < result[`${c}`].program.length; a++)  {
+      let r = result[`${c}`].program[a].showTime.split(':')
+      var x = r[0]
+      var y = r[1]
+      var o = result[`${c}`].program[a+1].showTime.split(':')
+      var j = o[0]
+      var k = o[1]
+    if (h+m >= x+y && j+k >h+m)
+       {   
+        subTitle = `即将播出: ${result[`${c}`].program[a+1].t}`
       $notify(title, subTitle, detail)
+       } 
+     }
   } catch { 
-      $notify("无此频道或者台号错误❌", "请检查后重试", "")}
+      $notify("无此频道节目信息或者台号错误❌", "请检查后重试", "")
+    }
  });
 $done()
 
