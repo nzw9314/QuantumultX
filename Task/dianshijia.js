@@ -77,7 +77,7 @@ function sign() {
     else   { 
              info()
            }         
-      })
+       })
    })
   sy.done()
 }
@@ -89,14 +89,15 @@ function info()
       {
       //sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
-    if (result.errCode == 0)
+      if (result.errCode == 0)
          {
           subTitle = `签到结果: 重复`
           detail = `金币收益: 💰${result.data.coin} `
          }
+       })
     let url2 = { url: `http://api.gaoqingdianshi.com/api/cash/info`, headers: JSON.parse(signheaderVal)}
       sy.get(url2, (error, response, data) => 
-         {
+       {
     //sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
     if (result.errCode == 0)  
@@ -105,78 +106,70 @@ function info()
          } 
       })            
     let url3 = { url: `http://act.gaoqingdianshi.com/api/v4/sign/get`, headers: JSON.parse(signheaderVal)}
-    sy.get(url3, (error, response, data) => {
+    sy.get(url3, (error, response, data) => 
+  {
     //sy.log(`${cookieName}, data: ${data}`)
     const result = JSON.parse(data)
     if (result.errCode == 0) 
-      {
+    {
      var d = `${result.data.currentDay}`
      for (i=0; i < result.data.recentDays.length;i++)      
         {
        if (d == result.data.recentDays[i].day)
           {  subTitle += `     已连续签到${d}天`
-        for (r=0; r < result.data.recentDays[i].rewards.length;r++)
-            {      
-             
-             if (r > 0)
-                 
-               detail += `\n今日奖励: ${result.data.recentDays[i].rewards[1].name} `
+       var j = result.data.recentDays[i].rewards.length
+       if (j > 1){
+                detail += `\n今日奖励: ${result.data.recentDays[i].rewards[1].name} `
                  } 
-              
-        for (s=0; s < result.data.recentDays[i+1].rewards.length;s++)
-            { 
-             if (s > 0)
-            {
-              if (r != 1)
-                 {
-              detail += `  明日奖励: ${result.data.recentDays[i+1].rewards[1].name} `
+          else   if (j == 1) 
+                 { 
+              detail += `\n今日无奖励`
+                 }
+        var k = result.data.recentDays[i+1].rewards.length
+        if ( k > 1 ) {
+                 detail += `明日奖励: ${result.data.recentDays[i+1].rewards[1].name}`
+
                  }  
            else  { 
-              detail += `\n今日无奖励  明日奖励: ${result.data.recentDays[i+1].rewards[1].name}`
-                  }
-                }
-             }
-              
+              detail += `明日无奖励`
+                 }
+               }               
+           }  
+        sy.msg(title, subTitle, detail)
+       }
+  })              
     let url4 = { url: `http://api.gaoqingdianshi.com/api/v4/task/complete?code=1M005`, headers: JSON.parse(signheaderVal)}
       sy.get(url4, (error, response, data) => 
          {
       //sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
-    if (result.errCode == 0)  
+      if (result.errCode == 0)  
               {
       //detail += `   分享成功，获得金币: 💰${result.data.getCoin}\n`
               } 
-           })    
+         })    
     let url5 = { url: `http://api.gaoqingdianshi.com/api/user/newUserReward`, headers: JSON.parse(signheaderVal)}
          sy.get(url5, (error, response, data) =>
          { sy.log(`${cookieName}, data: ${data}`)
            })    
     let url6 = { url: `http://api.gaoqingdianshi.com/api/coin/detail`, headers: JSON.parse(signheaderVal)}
        sy.get(url6, (error, response, data) => 
-         {
+     {
        //sy.log(`${cookieName}, data: ${data}`)
        const result = JSON.parse(data)
     if (result.errCode == 0)
          {
         for (t=0; t< result.data.length;t++)
           {  
-             var j = Math.min(t)
+             let j = Math.min(t)
           if (result.data[j].from== "手机分享")
-           {
-            detail += `\n今日分享获得: ${result.data[j].amount}金币` } 
-           }   
-          }
-        sy.msg(title, subTitle, detail)  
-        })  
-        
-       }
-      }
-     }
-    })
-   })
-}
-
-
+            { 
+            //  detail += `\n今日分享获得: ${result.data[j].amount}金币` 
+            } 
+          }   
+         }
+       })
+    }      
 function init() {
   isSurge = () => {
     return undefined === this.$httpClient ? false : true
