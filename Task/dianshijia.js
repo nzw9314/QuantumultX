@@ -49,19 +49,19 @@ if ($request && $request.method != 'OPTIONS') {
   if (signurlVal) sy.setdata(signurlVal, signurlKey)
   if (signheaderVal) sy.setdata(signheaderVal, signheaderKey)
   sy.msg(cookieName, `获取Cookie: 成功`, ``)
-  sy.done
+  sy.done()
  }
 }
 const title = `${cookieName}`
         let subTitle = ``
         let detail = ``
 function sign() {      
-    return new Promise((resolve, reject) =>
-    {
+     return new Promise((resolve, reject) =>
+     {
       const url = { url: signurlVal, headers: JSON.parse(signheaderVal)}
       sy.get(url, (error, response, data) =>
        {
-      //sy.log(`${cookieName}, data: ${data}`)
+      sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
       if  (result.errCode == 0) 
           { subTitle = `签到结果: 成功🎉`
@@ -75,42 +75,66 @@ function sign() {
             sy.msg(title, subTitle, detail)
            }
     else   { 
-             info()
+             all()
            }         
        })
-   })
+    })
   sy.done()
 }
-   
-function info()
- {
-    let url1 = { url: `http://api.gaoqingdianshi.com/api/coin/info`, headers: JSON.parse(signheaderVal)}
-      sy.get(url1, (error, response, data) => 
+var stop = 0;
+async function all() 
+{
+await total(stop);
+await cash(stop);
+//await award(stop);
+await share(stop);
+//await notify();
+}
+function total() {
+  return new Promise((resolve, reject) => {
+    subTitle = `签到结果: 重复签到`
+    let url = { url: `http://api.gaoqingdianshi.com/api/coin/info`, headers: JSON.parse(signheaderVal)}
+    sy.get(url, (error, response, data) => 
       {
-      //sy.log(`${cookieName}, data: ${data}`)
+      sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
-      if (result.errCode == 0)
-         {
-          subTitle = `签到结果: 重复`
-          detail = `金币收益: 💰${result.data.coin} `
-         }
-       })
-    let url2 = { url: `http://api.gaoqingdianshi.com/api/cash/info`, headers: JSON.parse(signheaderVal)}
-      sy.get(url2, (error, response, data) => 
-       {
-    //sy.log(`${cookieName}, data: ${data}`)
+      detail = `金币收益: 💰${result.data.coin}   `
+      for(tempCoin in data){
+      coinid = result.data.tempCoin[0].id
+      url5 = { url: `http://api.gaoqingdianshi.com/api/coin/temp/exchange?id=`+coinid, headers: JSON.parse(signheaderVal)}
+      sy.get(url5, (error, response, data) =>
+         { 
+         sy.log(`${cookieName}, data: ${data}`)
+         })    
+      continue
+      }
+     })
+    resolve()
+   })
+}
+function cash() {
+return new Promise((resolve, reject) => {
+      let url = { url: `http://api.gaoqingdianshi.com/api/cash/info`, headers: JSON.parse(signheaderVal)}
+      sy.get(url, (error, response, data) => 
+      {
+      sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
-    if (result.errCode == 0)  
-         {
-         detail += `   现金收益: 💴${result.data.amount/100}元`
-         } 
-      })            
+      detail += '现金收益: 💰'+ result.data.amount/100+'元 '
+      sy.msg(title, subTitle, detail)
+      })
+    resolve()
+   })
+ 
+}
+function award() {
+  return new Promise((resolve, reject) => {
+    {
     let url3 = { url: `http://act.gaoqingdianshi.com/api/v4/sign/get`, headers: JSON.parse(signheaderVal)}
-    sy.get(url3, (error, response, data) => 
+     sy.get(url3, (error, response, data) => 
   {
-    //sy.log(`${cookieName}, data: ${data}`)
-    const result = JSON.parse(data)
-    if (result.errCode == 0) 
+     sy.log(`${cookieName}, data: ${data}`)
+     const result = JSON.parse(data)
+     if (result.errCode == 0) 
     {
      var d = `${result.data.currentDay}`
      for (i=0; i < result.data.recentDays.length;i++)      
@@ -123,11 +147,11 @@ function info()
                  } 
           else   if (j == 1) 
                  { 
-              detail += `\n今日无奖励`
+                detail += `\n今日无奖励  `
                  }
         var k = result.data.recentDays[i+1].rewards.length
         if ( k > 1 ) {
-                 detail += `明日奖励: ${result.data.recentDays[i+1].rewards[1].name}`
+                detail += `明日奖励: ${result.data.recentDays[i+1].rewards[1].name}`
 
                  }  
            else  { 
@@ -137,39 +161,26 @@ function info()
            }  
         sy.msg(title, subTitle, detail)
        }
-  })              
-    let url4 = { url: `http://api.gaoqingdianshi.com/api/v4/task/complete?code=1M005`, headers: JSON.parse(signheaderVal)}
+     })
+    }
+  })
+resolve()
+}             
+function share() {    
+  return new Promise((resolve, reject) => {
+   let url4 = { url: `http://api.gaoqingdianshi.com/api/v4/task/complete?code=1M005`, headers: JSON.parse(signheaderVal)}
       sy.get(url4, (error, response, data) => 
          {
-      //sy.log(`${cookieName}, data: ${data}`)
+      sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
       if (result.errCode == 0)  
               {
-      //detail += `   分享成功，获得金币: 💰${result.data.getCoin}\n`
+      detail += `\n分享成功，获得金币: 💰${result.data.getCoin}`
               } 
          })    
-    let url5 = { url: `http://api.gaoqingdianshi.com/api/user/newUserReward`, headers: JSON.parse(signheaderVal)}
-         sy.get(url5, (error, response, data) =>
-         { sy.log(`${cookieName}, data: ${data}`)
-           })    
-    let url6 = { url: `http://api.gaoqingdianshi.com/api/coin/detail`, headers: JSON.parse(signheaderVal)}
-       sy.get(url6, (error, response, data) => 
-     {
-       //sy.log(`${cookieName}, data: ${data}`)
-       const result = JSON.parse(data)
-    if (result.errCode == 0)
-         {
-        for (t=0; t< result.data.length;t++)
-          {  
-             let j = Math.min(t)
-          if (result.data[j].from== "手机分享")
-            { 
-            //  detail += `\n今日分享获得: ${result.data[j].amount}金币` 
-            } 
-          }   
-         }
        })
-    }      
+     resolve()  
+   }      
 function init() {
   isSurge = () => {
     return undefined === this.$httpClient ? false : true
