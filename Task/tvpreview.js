@@ -18,11 +18,10 @@ var c = "cctv1"  // 可更改电视台，从电视家网络活动中获取，央
 var wurl = {
     url: "http://api.cntv.cn/epg/epginfo?serviceId=cbox&c="+c,
 };
-  var d = new Date()
-  var M = d.getMonth()+1
-  var D = d.getDate()
-  var h = ("0" + (d.getHours())).slice(-2)            
-  var m = ("0" + (d.getMinutes())).slice(-2)
+  var d = new Date();
+  var M = d.getMonth()+1, D = d.getDate();
+  var h = ("0" + (d.getHours())).slice(-2);            
+  var m = ("0" + (d.getMinutes())).slice(-2);
   var weekday=new Array(7);
       weekday[0]="星期日";
       weekday[1]="星期一";
@@ -34,31 +33,32 @@ var wurl = {
  var n = weekday[d.getDay()]
 
    $task.fetch(wurl).then(response => {    
-     try{ 
-      let result = JSON.parse(response.body)
-      var i = 0                          
+try { 
+
+      let result = JSON.parse(response.body)                              
       const title = `${result[`${c}`].channelName}频道节目预告  ` + M +'月'+ D +'日' + n + h +':'+ m
-      detail = `正在播出: ${result[`${c}`].isLive}\n${result[`${c}`].program[i].showTime} ${result[`${c}`].program[i].t}`
-      
+
+      detail = `正在播出: ${result[`${c}`].isLive}\n${result[`${c}`].program[0].showTime} ${result[`${c}`].program[0].t}`
       for (i = 1; i < result[`${c}`].program.length; i++)
        {      
-        detail += `\n${result[`${c}`].program[i].showTime} ${result[`${c}`].program[i].t}`
+         detail += `\n${result[`${c}`].program[i].showTime} ${result[`${c}`].program[i].t}`
        }
-      for (a = 1; a < result[`${c}`].program.length; a++)  {
-      let r = result[`${c}`].program[a].showTime.split(':')
-      var x = r[0]
-      var y = r[1]
-      var o = result[`${c}`].program[a+1].showTime.split(':')
-      var j = o[0]
-      var k = o[1]
-    if (h+m >= x+y && j+k >h+m)
-       {   
-        subTitle = `即将播出: ${result[`${c}`].program[a+1].t}`
-      $notify(title, subTitle, detail)
-       } 
-     }
-  } catch { 
-      //$notify("无此频道节目信息或者台号错误❌", "请检查后重试", "")
+
+       for (i = 0; i < result[`${c}`].program.length && result[`${c}`].program[i].showTime.split(':')[0] < 22; i++)
+       { 
+        let r = result[`${c}`].program[i].showTime.split(':')
+        var x = r[0], y = r[1]
+        var o = result[`${c}`].program[i+1].showTime.split(':')
+        var j = o[0], k = o[1]
+      if (h+m >= x+y && j+k >h+m)
+          {   
+          subTitle = `即将播出: ${result[`${c}`].program[i+1].t}`
+          } 
+       }      
+     $notify(title, subTitle, detail)
+  } catch(err) { 
+      $notify("无此频道节目信息或者台号错误❌", "请检查后重试", err)
+     console.log(err)
     }
  });
 $done()
