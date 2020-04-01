@@ -14,7 +14,7 @@
 
 By Macsuny                   
 */
-var c = "cctv1"  // 可更改电视台，从电视家网络活动中获取，央视可以直接改后缀数字
+var c = "hunan"  // 可更改电视台，从电视家网络活动中获取，央视可以直接改后缀数字
 var wurl = {
     url: "http://api.cntv.cn/epg/epginfo?serviceId=cbox&c="+c,
 };
