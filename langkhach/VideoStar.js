@@ -1,3 +1,4 @@
+/*
 [rewrite_local]
 ^https:\/\/.*\.videostarapp\.com\/scripts\/subsNew\.php url script-response-body langkhach/VideoStar.js
 
