@@ -42,9 +42,9 @@ const __emojiDone = ""
 const __emojiFail = "🙃"
 const __emojiSuccess = "😀"
 const __emojiTasks = "🕐"
-const __emojiUpdateSuccess = "- "
-const __emojiUpdateFail = "- "
-const __emojiGitHub = "- "
+const __emojiUpdateSuccess = "🟢"
+const __emojiUpdateFail = "🟠 "
+const __emojiGitHub = "🔵"
 const __showLine = 15
 
 const __log = false
