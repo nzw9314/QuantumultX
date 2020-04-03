@@ -8,7 +8,7 @@ const global = {
         netease_music: true,
         v2ex: false,
         china_telecom: false,
-        rrtv: true,
+        rrtv: false,
         eleme: false
     },
     data: {
