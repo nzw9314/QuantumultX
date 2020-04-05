@@ -2,15 +2,15 @@
 本脚本仅适用于快手极速版签到
 获取Cookie方法:
 1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
-下，
+下
 2.APP登陆账号后，点击'红包',即可获取Cookie.
+3.非专业人士制作，欢迎各位大佬提出宝贵意见和指导
 
 仅测试Quantumult x，Surge、Loon自行测试
 by Macsuny
 感谢
 @Chavy
 @Nobyda
-
 ~~~~~~~~~~~~~~~~
 Surge 4.0 :
 [Script]
@@ -48,7 +48,7 @@ function GetCookie() {
     var CookieValue = $request.headers['Cookie'];
     
     if (sy.getdata(cookieKey) != (undefined || null)) {
-      if (sy.getdata(cookieKey) != cookieValue) {
+      if (sy.getdata(cookieKey) != CookieValue) {
         var cookie = sy.setdata(CookieValue, cookieKey);
         if (!cookie) {
           sy.msg("更新" + CookieName + "Cookie失败‼️", "", "");
@@ -59,7 +59,7 @@ function GetCookie() {
         }
       }
     } else {
-      var cookie = sy.setdata(CookieValue, CookieKey);
+      var cookie = sy.setdata(CookieValue, cookieKey);
       if (!cookie) {
         sy.msg("首次写入" + CookieName + "Cookie失败‼️", "", "");
       } else {

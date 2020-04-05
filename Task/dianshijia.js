@@ -3,15 +3,15 @@
 本脚本仅适用于电视家签到 测试版，可能有bug
 获取Cookie方法:
 1.将下方[rewrite_local]和[Task]地址复制的相应的区域
-下，
+下
 2.APP登陆账号后，点击首页'每日签到',即可获取Cookie.
+3.非专业人士制作，欢迎各位大佬提出宝贵意见和指导
 
-3.鄙人非专业人士，代码不规范，请大佬请多多指教，多提出错误，鄙人一定修改
-
-4. 2020年4月1日1 14:30更新
+4. 2020年4月4日 14:30更新
 
 仅测试Quantumult x，Surge、Loon自行测试
 By Macsuny
+感谢 chavyleung
 ~~~~~~~~~~~~~~~~
 Surge 4.0 :
 [Script]
@@ -36,8 +36,6 @@ const signheaderKey = 'sy_signheader_dsj'
 const sy = init()
 const signurlVal = sy.getdata(signurlKey)
 const signheaderVal = sy.getdata(signheaderKey)
-const coinurl = { url: 'http://api.gaoqingdianshi.com/api/coin/info', headers: JSON.parse(signheaderVal)}
-
 
 let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
@@ -58,7 +56,10 @@ if ($request && $request.method != 'OPTIONS') {
   sy.done()
  }
 }
+
 const title = `${cookieName}`
+const coinurl = { url: `http://api.gaoqingdianshi.com/api/coin/info`, headers: JSON.parse(signheaderVal)}
+
 function sign() {      
      return new Promise((resolve, reject) =>
      {
