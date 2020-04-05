@@ -32,7 +32,7 @@ Display taobao historical price
 ```properties
 # 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
 [Script]
-http-response ^http://amdc\.m\.taobao\.com/amdc/mobileDispatch requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+http-request ^https?://.+/amdc/mobileDispatch requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 http-response ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 [MITM]
 hostname = trade-acs.m.taobao.com
@@ -89,7 +89,7 @@ Display taobao historical price
 ```properties
 # 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
 [rewrite_local]
-^http://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body tb_price.js
+^https?://.+/amdc/mobileDispatch url script-request-body tb_price.js
 ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body tb_price.js
 [mitm]
 hostname = trade-acs.m.taobao.com
@@ -170,3 +170,5 @@ const __surgePath = "eval_sub/surge.txt"
 
 5.在 QuanX 订阅 GitHub 生成的文件
 ```
+
+[Issue Group](https://t.me/joinchat/GNhmPg1pixfpvKyD0h-8YA)

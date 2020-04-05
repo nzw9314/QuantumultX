@@ -2,7 +2,7 @@ hostname=api.weibo.cn,mapi.weibo.com,*.uve.weibo.com,trade-acs.m.taobao.com,api.
 
 ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body eval_script.js
 
-^http://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body eval_script.js
+^https?://.+/amdc/mobileDispatch url script-request-body eval_script.js
 
 ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body eval_script.js
 
