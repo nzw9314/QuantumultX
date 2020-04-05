@@ -114,7 +114,9 @@ if (
 }
 
 if (url.indexOf(path19) != -1) {
-  delete body.expandable_view;
+    let obj = JSON.parse(body);
+    delete obj.expandable_view;
+    body = JSON.stringify(obj);
 }
 
 $done({ body });
