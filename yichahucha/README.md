@@ -32,17 +32,10 @@ Display taobao historical price
 ```properties
 # 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
 [Script]
-http-request ^https?://.+/amdc/mobileDispatch requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+http-request ^http://.+/amdc/mobileDispatch requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 http-response ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 [MITM]
 hostname = trade-acs.m.taobao.com
-
-# 以上还不生效或者频繁失效的可以添加以下规则，使用规则有可能误伤其他功能或者应用（一般不需要添加规则就能正常使用）
-# [Rule]
-# IP-CIDR, 203.119.144.0/23, REJECT, no-resolve
-# IP-CIDR, 203.119.175.0/24, REJECT, no-resolve
-# IP-CIDR, 106.11.162.0/24, REJECT, no-resolve
-# IP-CIDR, 47.102.83.0/24, REJECT, no-resolve
 ```
 
 DingDing clock in
@@ -89,17 +82,10 @@ Display taobao historical price
 ```properties
 # 不生效或失效的需要卸载 tb 重装，注意不开脚本进 tb 会失效
 [rewrite_local]
-^https?://.+/amdc/mobileDispatch url script-request-body tb_price.js
+^http://.+/amdc/mobileDispatch url script-request-body tb_price.js
 ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body tb_price.js
 [mitm]
 hostname = trade-acs.m.taobao.com
-
-# 以上还不生效或者频繁失效的可以添加以下规则，使用规则有可能误伤其他功能或者应用（一般不需要添加规则就能正常使用）
-# [filter_local]
-# ip-cidr, 203.119.144.0/23, reject
-# ip-cidr, 203.119.175.0/24, reject
-# ip-cidr, 106.11.162.0/24, reject
-# ip-cidr, 47.102.83.0/24, reject
 ```
 
 DingDing clock in
@@ -126,7 +112,7 @@ Script management tool
 2.配置脚本
 
 [Remote]
-# 可以使用 QuanX  远程复写（如果订阅不包含 hostname，需配置 [Hostname] ）
+# 可以使用 QuanX 远程重写（如果远程重写不包含 hostname，需配置 [Hostname] ）
 
 https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 
@@ -168,7 +154,7 @@ const __surgePath = "eval_sub/surge.txt"
 4.执行任务更新脚本
 
 
-5.在 QuanX 订阅 GitHub 生成的文件
+5.使用 GitHub 生成的文件链接，在 QuanX 添加远程重写
 ```
 
 [Issue Group](https://t.me/joinchat/GNhmPg1pixfpvKyD0h-8YA)
