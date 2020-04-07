@@ -21,11 +21,10 @@ URL-REGEX,"^https?+:\/\/gw\.aihuishou\.com\/app-portal\/home\/getadvertisement"
 # > 爱思助手
 URL-REGEX,"^https?+:\/\/list-app-m\.i4\.cn\/getopfstadinfo\.xhtml"
 # > 阿里
+URL-REGEX,"^https?+:\/\/amdc\.m\.taobao\.com\/amdc\/mobileDispatch"
 URL-REGEX,"^https?+:\/\/guide-acs\.m\.taobao\.com\/gw\/mtop\.tmall\.wireless"
 # >> 1688
 URL-REGEX,"^https?+:\/\/acs\.m\.taobao\.com\/gw\/mtop\.alibaba\.advertisementservice\.getadv"
-# >> 阿里妈妈
-URL-REGEX,"^https?+:\/\/acs\.m\.taobao\.com\/gw\/mtop\.alimama\.etao\.config\.query"
 # >> 飞猪
 URL-REGEX,"^https?+:\/\/acs\.m\.taobao\.com\/gw\/mtop\.trip\.activity\.querytmsresources\/"
 # >> 高德地图
@@ -354,6 +353,8 @@ URL-REGEX,"^https?+:\/\/3gimg\.qq\.com\/tencentMapTouch\/app\/activity\/"
 URL-REGEX,"^https?+:\/\/3gimg\.qq\.com\/tencentMapTouch\/splash\/"
 URL-REGEX,"^https?+:\/\/4gimg\.map\.qq\.com\/mwaSplash\/"
 # >> 腾讯视频
+IP-CIDR,111.30.159.168/32,no-resolve
+IP-CIDR,111.30.176.111/32,no-resolve
 URL-REGEX,"^https?+:\/\/vv\.video\.qq\.com\/getvmind\?"
 URL-REGEX,"^https?+:\/\/(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\/.+?\.tc\.qq\.com\/.+?p201\.1\.mp4\?"
 # >> 腾讯新闻
@@ -365,7 +366,6 @@ URL-REGEX,"^https?+:\/\/hk\.app\.joox\.com\/retrieval\/getAd"
 URL-REGEX,"^https?+:\/\/hk\.app\.joox\.com\/billsrv\/clientBatchAdReport"
 IP-CIDR,203.205.239.44/32,no-resolve
 IP-CIDR,203.205.255.16/32,no-resolve
-URL-REGEX,"^https?+:\/\/203\.205\.255\.16\/retrieval\/getAd"
 URL-REGEX,"^https?+:\/\/smusic\.app\.wechat\.com\/commonCgi\/advertisement\/get_orint_egg$"
 URL-REGEX,"^https?+:\/\/smusic\.app\.wechat\.com\/fcgi-bin\/get_(?>a|i)"
 URL-REGEX,"^https?+:\/\/tiasdk\.app\.wechat\.com\/retrieval\/getAdInfo$"
