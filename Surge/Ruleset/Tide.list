@@ -21,7 +21,6 @@ URL-REGEX,"^https?+:\/\/gw\.aihuishou\.com\/app-portal\/home\/getadvertisement"
 # > 爱思助手
 URL-REGEX,"^https?+:\/\/list-app-m\.i4\.cn\/getopfstadinfo\.xhtml"
 # > 阿里
-URL-REGEX,"^https?+:\/\/amdc\.m\.taobao\.com\/amdc\/mobileDispatch"
 URL-REGEX,"^https?+:\/\/guide-acs\.m\.taobao\.com\/gw\/mtop\.tmall\.wireless"
 # >> 1688
 URL-REGEX,"^https?+:\/\/acs\.m\.taobao\.com\/gw\/mtop\.alibaba\.advertisementservice\.getadv"
@@ -40,8 +39,6 @@ URL-REGEX,"^https?+:\/\/gw\.alicdn\.com\/tfs\/.+?\d{4}-\d{4}\/[a-z]{3}$"
 URL-REGEX,"^https?+:\/\/acs\.m\.taobao\.com\/gw\/mtop\.film\.mtopadvertiseapi\.queryadvertise\/"
 # >> 天猫
 URL-REGEX,"^https?+:\/\/gw\.alicdn\.com\/tfs\/TB1.+?750-\d{4}"
-# >> 闲鱼
-URL-REGEX,"^https?+:\/\/acs\.m\.taobao\.com\/gw\/mtop\.taobao\.idle\.home\.welcome\/"
 # >> 优酷
 URL-REGEX,"^https?+:\/\/.+?\.mp4\?ccode=0902"
 URL-REGEX,"^https?+:\/\/.+?\.mp4\?sid="
@@ -345,6 +342,8 @@ URL-REGEX,"^https?+:\/\/business-cdn\.shouji\.sogou\.com\/wapdl\/hole\/.+?\.jpg"
 # > 腾讯
 # >> 富途牛牛
 URL-REGEX,"^https?+:\/\/api\d\.futunn\.com\/ad\/"
+# >> 全民K歌
+URL-REGEX,"^https?+:\/\/y\.gtimg\.cn\/music\/common\/\/upload\/kg_ad\/.+?\d{3,4}+x\d{4}"
 # >> 腾讯游戏
 URL-REGEX,"^https?+:\/\/ssl\.kohsocialapp\.qq\.com:10001\/game\/buttons"
 URL-REGEX,"^https?+:\/\/qt\.qq\.com\/lua\/mengyou\/get_splash_screen_info"
