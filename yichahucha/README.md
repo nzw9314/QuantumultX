@@ -120,15 +120,15 @@ https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 # 可以使用 Surge 或者 QuanX 格式脚本（需配置 [Hostname]）
 
 # jd（Surge）
-http-response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
+# http-response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
 
 # tb（QuanX）
-^http://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
-^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+# ^http://amdc\.m\.taobao\.com/amdc/mobileDispatch url script-response-body https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+# ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail url script-response-body https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 
 [Hostname]
 
-api.m.jd.com, trade-acs.m.taobao.com
+# api.m.jd.com, trade-acs.m.taobao.com
 
 
 3.配置 GitHub
@@ -155,6 +155,7 @@ const __surgePath = "eval_sub/surge.txt"
 
 
 5.使用 GitHub 生成的文件链接，在 QuanX 添加远程重写
+
 ```
 
 [Issue Group](https://t.me/joinchat/GNhmPg1pixfpvKyD0h-8YA)
