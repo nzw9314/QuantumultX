@@ -95,7 +95,7 @@ function earn() {
 		url: 'https://nebula.kuaishou.com/rest/n/nebula/sign/query',
 		headers: {Cookie: cookieVal}}
     sy.get(earnurl, (error, response, data) => {
-      //sy.log(`${CookieName}, data: ${data}`)
+      sy.log(`${CookieName}, data: ${data}`)
       let result = JSON.parse(data)
      if (result.data.nebulaSignInPopup.button == '立即签到'){ 
        subTitle = `签到成功: ${result.data.nebulaSignInPopup.subTitle}, ${result.data.nebulaSignInPopup.title}`

@@ -1,6 +1,6 @@
 /**
  1.根据原版脚本修改，增加上月账单信息，需重新获取Cookie
- 2.适合流量畅享套餐使用，如非畅享套餐，可将186行和187行前加//注释，并取消189和190行注释，此项仅供测试
+ 2.适合流量畅享套餐使用，如非畅享套餐，可将187行前加//注释，并取消188行注释，此项仅供测试
  3.因地区不同可能获取不到Cookie,可自行复制cookie至65行下覆盖"COOKIE"，
  By Macsuny 修改
  
@@ -21,7 +21,7 @@
 
 // 配置信息
 let config = {
-    name: "中国电信套餐",
+    name: "中国电信 世界触手可及🤝",
     authTokenKey: "china_telecom_authToken_10000",
     CookieKey: "china_telecom_cookie",
     delay: 0,//自定义延迟签到,单位毫秒,(如填200则每个接口延迟0.2秒执行),默认无延迟
@@ -183,15 +183,13 @@ function notify(data, balance, exdata, bldata) {
         var voice = "[通话] 已用: " + data.voiceUsage + "分, 剩余: " + data.voiceBalance + "分,  合计: " + data.voiceAmount + "分"
         message = message + "\n" + voice
     }
-    if (typeof data.totalCommon != "undefined" && data.totalCommon >= 0) {
-        var flow =  "[流量套餐] " + Resourcename + "  已用: " + formatFlow(data.usageCommon/1024) 
-
-  //   if (typeof data.totalCommon != "undefined" && data.totalCommon > 0) {
-  //    var flow = "[流量] 已用: " + formatFlow(data.usedCommon/1024) + ", 剩余: " + formatFlow(data.balanceCommon/1024) + ", 合计: " + formatFlow(data.totalCommon/1024)
+    if (typeof data.totalCommon != "undefined" ) {
+      var flow =  '[流量套餐] ' + Resourcename + '  已用: ' + formatFlow(data.usageCommon/1024) 
+    //  var flow = "[流量] 已用: " + formatFlow(data.usedCommon/1024) + ", 剩余: " + formatFlow(data.balanceCommon/1024) + ", 合计: " + formatFlow(data.totalCommon/1024)
     message = message + "\n" + flow
     }
    if (typeof bldata.items[0].acctName != "undefined" && bldata.serviceResultCode == 0) {
-  var bills = '[上月账单]' + "\n"+ bldata.items[0].items[0].chargetypeName + ':      '+
+  var bills = '[上月话费账单]' + "\n"+ bldata.items[0].items[0].chargetypeName + ':      '+
 bldata.items[0].items[0].charge/100+'元'+ "\n"+ bldata.items[0].items[1].chargetypeName + ':    '+
 bldata.items[0].items[1].charge/100+'元'+ "\n"+ bldata.items[0].items[2].chargetypeName + ':  '+
 bldata.items[0].items[2].charge/100+'元'
@@ -204,7 +202,7 @@ bldata.items[0].items[2].charge/100+'元'
 // MB 和 GB 自动转换
 function formatFlow(number) {
     if (number < 1024) {
-        return number.toFixed(0) + " MB"
+        return number.toFixed(2) + "MB"
     }
     return (number / 1024).toFixed(2) + "GB"
 }
