@@ -21,6 +21,7 @@ const path16 = "/page";
 const path17 = "/statuses/friends_timeline";
 const path18 = "/!/photos/pic_recommend_status";
 const path19 = "/statuses/video_mixtimeline";
+const path20 = "/video/tiny_stream_video_list";
 
 const url = $request.url;
 var body = $response.body;
@@ -30,7 +31,8 @@ if (
     url.indexOf(path2) != -1 ||
     url.indexOf(path10) != -1 ||
     url.indexOf(path15) != -1 ||
-    url.indexOf(path17) != -1
+    url.indexOf(path17) != -1 ||
+    url.indexOf(path20) != -1
 ) {
     let obj = JSON.parse(body);
     if (obj.statuses) obj.statuses = filter_timeline_statuses(obj.statuses);
@@ -126,8 +128,11 @@ function filter_timeline_statuses(statuses) {
         let i = statuses.length;
         while (i--) {
             let element = statuses[i];
-            if (is_timeline_likerecommend(element.title)) statuses.splice(i, 1);
-            if (is_timeline_ad(element)) statuses.splice(i, 1);
+            if (is_timeline_likerecommend(element.title) ||
+                is_timeline_ad(element) ||
+                is_stream_video_ad(element)) {
+                statuses.splice(i, 1);
+            }
         }
     }
     return statuses;
@@ -189,4 +194,8 @@ function is_timeline_ad(mblog) {
 
 function is_timeline_likerecommend(title) {
     return title && title.type && title.type == "likerecommend" ? true : false;
+}
+
+function is_stream_video_ad(item) {
+    return item.ad_state && item.ad_state == 1
 }
