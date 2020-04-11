@@ -366,7 +366,7 @@ async function ____updateGitHub(path, content, message) {
                     if (__log) console.log(`updateContent: ${response.status}\n${body}`)
                     body = JSON.parse(body)
                     if (response.status == 200) {
-                        resolve({ url: body.content.download_url, message: `${__emojiGitHub}GitHub updated successfully` })
+                        resolve({ url: body.content.download_url, message: `${__emojiGitHub}GitHub updated successfully${sha != body.content.sha ? " (file changes)" : ""}` })
                     } else if (response.status == 201) {
                         resolve({ url: body.content.download_url, message: `${__emojiGitHub}GitHub file created successfully` })
                     } else {
