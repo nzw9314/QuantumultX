@@ -17,9 +17,9 @@ https://raw.githubusercontent.com/yichahucha/surge/master/sub_script.conf
 
 `
 
-// 是否开启 GitHub 更新
+// 是否更新 GitHub（如果开启 true，需配置 token 或 账号密码）
 const __isUpdateGithub = true
-// GitHub Token（如果使用账号密码 Token 请设置为空 ""）
+// GitHub Token（如果使用账号密码 token 请设置为空 ""）
 const __token = ""
 // GitHub 账号
 const __username = "xxx"
@@ -155,7 +155,7 @@ if (__tool.isTask) {
         //update github
         .then(() => {
             if (__isUpdateGithub) {
-                const hostname = `${storeObj.confHostnames.length > 0 ? `hostname=${Array.from(new Set(storeObj.confHostnames)).join(",")}` : ""}`
+                const hostname = `${storeObj.confHostnames.length > 0 ? `hostname = ${Array.from(new Set(storeObj.confHostnames)).join(",")}` : ""}`
                 const quanxUpdateContent = `${hostname}\n\n${Array.from(new Set(storeObj.quanxConfContents)).join("\n\n")}`
                 const surgeUpdateContent = `${hostname}\n\n${Array.from(new Set(storeObj.surgeConfContents)).join("\n\n")}`
                 const args = [{ path: __quanxPath, content: quanxUpdateContent, commit: __quanxCommit }, { path: __surgePath, content: surgeUpdateContent, commit: __surgeCommit }]
@@ -462,6 +462,7 @@ function ____parseRemoteConf(conf) {
     for (let i = 0, len = lines.length; i < len; i++) {
         const eval = /^(.+)\s+eval\s+(.+)$/
         const surge = /^http\s*-\s*(request|response)\s+(\S+)\s+(.+)$/
+        const newSurge = /^\S+.js\s+=\s(.+)$/
         const quanx = /^(\S+)\s+url\s+script\s*-\s*(\S+)\s*-\s*(?:header|body)\s+(\S+)$/
         let line = lines[i].trim()
         if (line.length > 0) {
@@ -469,7 +470,7 @@ function ____parseRemoteConf(conf) {
                 line = line.replace(/^#*/, "")
                 newLines.push(line)
             } else if (/^(?!;|#|\/\/).*/.test(line)) {
-                if (eval.test(line) || surge.test(line)) {
+                if (eval.test(line) || surge.test(line) || newSurge.test(line)) {
                     newLines.push(line)
                 }
                 if (quanx.test(line)) {
@@ -496,16 +497,19 @@ function ____parseConf(lines) {
         if (line.length > 0 && line.substring(0, 2) != "//" && line.substring(0, 1) != "#") {
             const eval = /^(.+)\s+eval\s+(.+)$/
             const surge = /^http\s*-\s*(request|response)\s+(\S+)\s+(.+)$/
+            const newSurge = /^\S+.js\s+=\s(.+)$/
             const quanx = /^(\S+)\s+url\s+script\s*-\s*(\S+)\s+(\S+\.js)$/
             if (surge.test(line)) {
                 const result = line.match(surge)
                 // content
                 const requiresBody = ____surgeArg(result[3].trim()).requiresBody
-                surgeConfContents.push(`${line.replace(____surgeArg(result[3].trim()).scriptPath, "eval_script.js")}`)
+                surgeConfContents.splice(i, 0, `${line.replace(____surgeArg(result[3].trim()).scriptPath, "eval_script.js")}`);
+                surgeConfContents.push(`eval_script.js = type=http-${result[1].trim()},${requiresBody ? `requires-body=${requiresBody},` : ""}pattern=${result[2].trim()},script-path=eval_script.js`)
                 quanxConfContents.push(`${result[2].trim()} url script-${result[1].trim()}-${requiresBody == "1" ? "body" : "header"} eval_script.js`)
                 // eval
                 line = `${result[1].trim()} ${result[2].trim()} eval ${____surgeArg(result[3].trim()).scriptPath}`
-            } else if (quanx.test(line)) {
+            }
+            else if (quanx.test(line)) {
                 const result = line.match(quanx)
                 const type = result[2].split("-")
                 // content
@@ -517,11 +521,21 @@ function ____parseConf(lines) {
                         requires = 1
                     }
                 }
-                surgeConfContents.push(`http-${type[0].trim()} ${result[1].trim()} ${requires == 0 ? "" : `requires-body=${requires},`}script-path=eval_script.js`)
+                surgeConfContents.splice(i, 0, `http-${type[0].trim()} ${result[1].trim()} ${requires == 0 ? "" : `requires-body=${requires},`}script-path=eval_script.js`)
+                surgeConfContents.push(`eval_script.js = type=http-${type[0].trim()},${requires == 0 ? "" : `requires-body=${requires},`}pattern=${result[1].trim()},script-path=eval_script.js`)
                 quanxConfContents.push(`${line.replace(result[3].trim(), "eval_script.js")}`)
                 // eval
                 line = `${type[0].trim()} ${result[1].trim()} eval ${result[3].trim()}`
-
+            }
+            else if (newSurge.test(line)) {
+                //content
+                const result = line.match(newSurge)
+                const surgeArg = ____surgeArg(result[1].trim())
+                surgeConfContents.splice(i, 0, `${surgeArg.type} ${surgeArg.pattern} ${surgeArg.requiresBody ? `requires-body=${surgeArg.requiresBody},` : ""}script-path=eval_script.js`)
+                surgeConfContents.push(`eval_script.js = ${result[1].replace(surgeArg.scriptPath, "eval_script.js")}`)
+                quanxConfContents.push(`${surgeArg.pattern} url script-${surgeArg.type.replace("http-", "")}-${(surgeArg.requiresBody && surgeArg.requiresBody == "1") ? "body" : "header"} eval_script.js`)
+                // eval
+                line = `${surgeArg.type.replace("http-", "")} ${surgeArg.pattern} eval ${surgeArg.scriptPath}`
             }
             if (eval.test(line)) {
                 const value = line.match(eval)
@@ -572,11 +586,19 @@ function ____surgeArg(arg) {
         const item = args[i].trim()
         const path = /^script-path\s*=\s*(\S+)$/
         const requires = /^requires-body\s*=\s*(\S+)$/
+        const pattern = /^pattern\s*=\s*(\S+)$/
+        const type = /^type\s*=\s*(\S+)$/
         if (path.test(item)) {
             surgeArg["scriptPath"] = item.match(path)[1]
         }
         if (requires.test(item)) {
             surgeArg["requiresBody"] = item.match(requires)[1]
+        }
+        if (pattern.test(item)) {
+            surgeArg["pattern"] = item.match(pattern)[1]
+        }
+        if (type.test(item)) {
+            surgeArg["type"] = item.match(type)[1]
         }
     }
     return surgeArg
