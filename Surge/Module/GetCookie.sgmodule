@@ -1,5 +1,5 @@
-#!name=Get cookie. By NobyDa
-#!desc=该模块适用于定时签到脚本的Cookie获取. 集成: NobyDa、Chavy以及个人收集签到脚本. 您可以在使用后手动将其禁用，以免产生不必要的MITM.
+#!name=Get cookie. By nzw9314
+#!desc=该模块适用于定时签到脚本的Cookie获取. 集成: NobyDa、Chavy以及个人收集常用签到脚本,其他签到脚本会陆续添加. 您可以在使用后手动将其禁用，以免产生不必要的MITM.
 #!system=ios
 
 [Script]
