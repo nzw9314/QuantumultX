@@ -47,10 +47,9 @@ DOMAIN,sdk.e.qq.com
 DOMAIN-SUFFIX,gdt.qq.com
 
 //Apple
-USER-AGENT,com.apple.AppStore.ProductPageExtension*
 DOMAIN,iadsdk.apple.com
 
 //Ali
-DOMAIN-KEYWORD,adashx
+DOMAIN-KEYWORD,adash
 
 
