@@ -1,4 +1,4 @@
-// Todo: 待添加多账号签到
+// Todo: 待添加多账号签到测试
 
 const cookieName = '趣头条'
 const signKey = 'senku_signKey_qtt'
