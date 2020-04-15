@@ -1,78 +1,84 @@
-# QuantumultX
-只是搬运和同步更新大佬脚本
+### 说明 :
 
-不负责维护脚本
+* 只是搬运和同步更新大佬脚本.
 
-只测试自用脚本，其他大部分脚本未测试可用性
+* 不负责维护脚本.
 
+* 只测试自用脚本，其他大部分脚本未测试可用性.
 
-⚠️远程外部资源请使用以下订阅(适用于TF版198+)
+* 更新通知[频道](https://t.me/nzw9314News)
 
-Js.conf(远程脚本订阅): https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js.conf
+### 全局配置：
 
-Get_Cookie_Remote.conf (远程获取Cookie订阅): https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_Remote.conf
-
-
-1.脚本本地化配置:
-
-1⃣️在本地建立文件夹
-目录 iCloud Drive/QuantumultX/Scripts/nzw9314
-或者 我的iPhone/QuantumultX/Scripts/nzw9314
-
-2⃣️用working copy挂载我的库:
-https://github.com/nzw9314/QuantumultX.git
-将脚本同步到本地
-(挂载教程: https://www.notion.so/iCloud-Github-948f19e65e1a47b3b468451491a3f34b)
-
-3⃣️订阅我的[rewrite_remote]
-①.Js_local_WorkingCopy.conf(本地脚本订阅) : https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy.conf
+* [QuantumultX.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/QuantumultX.conf)
 
 
-②.⚠️适用于商店版1.05
-https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_Local_WorkingCopy_Cookie.conf   
+### 本地配置：
 
-③.⚠️适用于TF版195+
-https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_New.conf    
+* 建立本地文件夹
+目录 iCloud Drive/QuantumultX/Scripts/nzw9314 或者 我的iPhone/QuantumultX/Scripts/nzw9314
 
-④.⚠️适用于TF版198+
-https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_Remote.conf
+* WoringCopy挂载我的[仓库](https://github.com/nzw9314/QuantumultX.git)
 
-(⚠️Cookie获取订阅,根据版本三选一。Cookie失效时启用，成功后禁用)
+* 挂载[视频教程](https://m.youtube.com/watch?t=3s&v=inCQFnDmRLo)
+
+* [Js_local_WorkingCopy.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy.conf) 脚本订阅.
+
+* [Js_Local_WorkingCopy_Cookie.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_Local_WorkingCopy_Cookie.conf) 获取Cookie订阅,适用于商店版v1.0.5-build192
+
+* [Get_Cookie_New.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_New.conf) 获取Cookie,商店版及TFv1.0.6-build212+
+
+* 获取Cookie订阅根据QuantumultX版本二选一,仅在Cookie获取或失效时启用,不需要时右滑动禁用.
+
+* [Task_Local.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task_Local.conf) 定时任务配置,目前无法订阅,请手动根据个人需求复制内容及修改时间.
+
+### 远程配置：
+* [视频教程](https://youtu.be/tr5aji82Vks)
+
+* [Js.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js.conf) 脚本远程订阅
+
+* [Get_Cookie_Remote.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_Remote.conf) 获取Cookie远程订阅,仅在Cookie获取或失效时启用,不需要时右滑动禁用.
+
+* [Task_Remote.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task_Remote.conf) 定时任务远程配置,目前无法订阅,请手动根据个人需求复制内容及修改时间
 
 
+## 免责声明：
 
-4⃣️Js_local_WorkingCopy.conf包括
+* nzw9314发布的Script项目中涉及的任何解锁和解密分析脚本仅用于资源共享和学习研究，不能保证其合法性，准确性，完整性和有效性，请根据情况自行判断.
 
+* 间接使用脚本的任何用户，包括但不限于建立VPS或在某些行为违反国家/地区法律或相关法规的情况下进行传播, nzw9314 对于由此引起的任何隐私泄漏或其他后果概不负责.
 
-①.Nobyda 全部脚本,
-②.langkhach 全部脚本
-③.chavyleung 签到脚本
-④.sazs34 天气脚本
-⑤.yichahucha 京东比价，淘宝比价,Netflix评分
-⑥.Neruogram App价格监控脚本
-⑦.个人收集修改脚本
+* 请勿将Script项目的任何内容用于商业或非法目的，否则后果自负.
 
-需要其他的脚本请自行添加路径;
+* 如果任何单位或个人认为该项目的脚本可能涉嫌侵犯其权利，则应及时通知并提供身份证明，所有权证明，我们将在收到认证文件后删除相关脚本.
 
-2.WorkingCopy同步更新脚本库包括:
+* nzw9314对任何脚本问题概不负责，包括但不限于由任何脚本错误导致的任何损失或损害.
 
+* 您必须在下载后的24小时内从计算机或手机中完全删除以上内容.
 
-① NobyDa,
-② langkhach270389,
-③ Choler,
-④ yichahucha,
-⑤ onewayticket255,
-⑥ chavyleung,
-⑦ sazs34
-⑧ Meeta
-⑨ TG群组(NobyDa Script)个人收集搬运及修改脚本
+* 任何以任何方式查看此项目的人或直接或间接使用该Script项目的任何脚本的使用者都应仔细阅读此声明。nzw9314保留随时更改或补充此免责声明的权利。一旦使用并复制了任何相关脚本或Script项目的规则，则视为您已接受此免责声明.
 
-3.定时脚本
+### 特别感谢：
+* [@NobyDa](https://github.com/NobyDa)
 
-Task_Local.conf
+* [@lhie1](https://github.com/lhie1)
 
-Task_Remote.conf
+* [@ConnersHua](https://github.com/ConnersHua)
 
-QX目前无法订阅task
+* [@chavyleung](https://github.com/chavyleung)
 
-(按需求自己复制和修改时间)
+* [@yichahucha](https://github.com/yichahucha)
+
+* [@langkhach270389](https://github.com/langkhach270389)
+
+* [@Choler](https://github.com/Choler)
+
+* [@onewayticket255](https://github.com/onewayticket255)
+
+* [@NavePnow](https://github.com/NavePnow)
+
+* [@Meeta](https://github.com/MeetaGit)
+
+* [@Neurogram-R](https://github.com/Neurogram-R)
+
+* [@sazs34](https://github.com/sazs34)

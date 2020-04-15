@@ -3,7 +3,7 @@ server_check_url=http://www.google.com/generate_204
 ;geo_location_checker=http://www.example.com/json/, https://www.example.com/script.js
 ;dns_exclusion_list=*.qq.com, qq.com, *.cmpassport.com
 ;ssid_suspended_list=LINK_22E174, LINK_22E175
-;udp_whitelist=53, 123, 1900, 80-443
+udp_whitelist=53, 1024-49151
 ;excluded_routes= 192.168.0.0/16, 172.16.0.0/12, 100.64.0.0/10, 10.0.0.0/8
 ;icmp_auto_reply=true
 [dns]
@@ -12,33 +12,31 @@ server=1.0.0.1
 server=8.8.8.8
 server=8.8.4.4
 
-
 [policy]
-available=Fake iAP Policy, Fake iAP Server 01, Fake iAP Server 02, Fake iAP Server 03, img-url=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/237/pill_1f48a.png
-static=Fake PXX Policy, direct, Fake iAP Policy, img-url=https://raw.githubusercontent.com/crossutility/Quantumult-X/master/icon-samples/apple.PNG
-
-#
-# Params "tag" and "enabled" are optional.
-# The default sync interval for all kinds of remote resources is 24*60*60 seconds.
-#
+static=BẬT, reject, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Direct.png
+static=TẮT, direct, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Reject.png
+static=Chặn OTA, TẮT, BẬT, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Apple_Update.png
+static=Chặn Ads, BẬT, TẮT, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Advertising.png
+static=Chặn FB, TẮT, BẬT, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Facebook.png
+available=Fake iAP Policy, Fake iAP Server 01, Fake iAP Server 02, Fake iAP Server 03, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Quantumult_X.png
+static=Fake PXX Policy, TẮT, Fake iAP Policy, img-url=https://raw.githubusercontent.com/crossutility/Quantumult-X/master/icon-samples/apple.PNG
 
 [server_remote]
 https://github.com/tinycarrot/tinycarrot/raw/master/quantumutlx/remote/fakeiap_server.txt, tag=Fake iAP Server, enabled=true
 
 [filter_remote]
-https://raw.githubusercontent.com/tinycarrot/tinycarrot/master/Profile/quantumult/fakePXX-itunes.txt, tag=Fake PXX Filter, force-policy=Fake PXX Policy, enabled=true
-https://raw.githubusercontent.com/tinycarrot/tinycarrot/master/Profile/quantumult/fakeiap-filter.txt, tag=Fake iAP Filter, force-policy=Fake iAP Policy, enabled=true
+https://raw.githubusercontent.com/tinycarrot/tinycarrot/master/Profile/quantumult/fakeiap-filter.txt, tag=Fake iAP Filter, enabled=false
 https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-exceptions-rule.conf, tag=🇻🇳hostsVN, force-policy=direct, enabled=true
-https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-rule.conf, tag=🇻🇳hostsVN, force-policy=reject, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-rule.conf, tag=🇻🇳hostsVN, force-policy=Chặn Ads, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-OTA.conf, tag=🇻🇳hostsVN-OTA, force-policy=Chặn OTA, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-FB.conf, tag=🇻🇳hostsVN-FB, force-policy=Chặn FB, enabled=true
 
 [rewrite_remote]
-https://raw.githubusercontent.com/langkhach270389/Scripting/master/QuantumultX/Fake_Vip.txt, tag=Fakevip, enabled=false
+https://raw.githubusercontent.com/langkhach270389/Scripting/master/QuantumultX/Fake_Local-workingcopy.txt, tag=Fake iAP Local Lãng Khách, enabled=true
 https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumultX-rewrite.conf, tag=🇻🇳hostsVN, enabled=true
 
 [server_local]
-
-;http=127.0.0.1:8001, username=, password=, fast-open=false, udp-relay=false, certificate=1 ,tag=LOCAL DEBUG Server
-
+;http=192.168.1.234:8888, username=, password=, fast-open=false, udp-relay=false, certificate=1 ,tag=DEBUG(Charles Fiddler)
 ;shadowsocks=ss-a.example.com:80, method=chacha20, password=pwd, obfs=http, obfs-host=bing.com, obfs-uri=/resource/file, fast-open=false, udp-relay=false, server_check_url=http://www.apple.com/generate_204, tag=Sample-A
 ;shadowsocks=ss-b.example.com:80, method=chacha20, password=pwd, obfs=http, obfs-host=bing.com, obfs-uri=/resource/file, fast-open=false, udp-relay=false, tag=Sample-B
 ;shadowsocks=ss-c.example.com:443, method=chacha20, password=pwd, obfs=tls, obfs-host=bing.com, fast-open=false, udp-relay=false, tag=Sample-C
@@ -48,26 +46,12 @@ https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantu
 ;shadowsocks=ws-tls-a.example.com:443, method=aes-128-gcm, password=pwd, obfs=wss, obfs-uri=/ws, fast-open=false, udp-relay=false, tag=Sample-G
 
 [filter_local]
-;host, *, LOCAL DEBUG Server
+;host, *, DEBUG(Charles Fiddler)
 ;user-agent, ?abc*, proxy
 ;host, www.google.com, proxy
 ;host-keyword, adsite, reject
 ;host-suffix, googleapis.com, proxy
 final, direct
-
-#
-# The "reject" returns HTTP status code 404 with no content.
-# The "reject-200" returns HTTP status code 200 with no content.
-# The "reject-img" returns HTTP status code 200 with content of 1px gif.
-# The "reject-dict" returns HTTP status code 200 with content of empty json object.
-# The "reject-array" returns HTTP status code 200 with content of empty json array.
-# The "request-header" works for all the http headers not just one single header, so you can match two or more headers including CRLF in one regular expression.
-# The length and encoding related HTTP header fields will be automatically processed by Quantumult if the "rewrite" is body related, so you should not handle them by yourself. The max supported response size is 256kB(decompressed) for response-body and script-response-body.
-# When using javascript in rewrite, you can use those objects: $request, $response, $notify(title, subtitle, message), console.log(message) and Quantumult’s built-in objects all have prefix "$".
-# Supports: $request.scheme, $request.method, $request.url, $request.path, $request.headers, $response.statusCode, $response.headers, $response.body
-# The $notify(title, subtitle, message) will post iOS notifications if Quantumult notification has been enabled.
-# The console.log(message)  will output logs to Quantumult log file if the log level is "debug".
-#
 
 [mitm]
 passphrase = 3FDCC70A
@@ -77,187 +61,9 @@ skip_validating_cert = true
 force_sni_domain_name = true
 ;empty_sni_enabled = true
 
-hostname = avatar-nct.nixcdn.com, spclient.wg.spotify.com, *.googlevideo.com, oa.zalo.me, vsco.co, api.gyrosco.pe, origin-prod-phoenix.jibjab.com, api.termius.com, api.picsart.c*, api.meiease.c*, api.unfold.app, viva-asia1.vvbrd.com, graph.nhaccuatui.com, api.memrise.com , buy.itunes.apple.com, api.sync.me, pool.elsanow.io, lambda.us-east-1.amazonaws.com, api.mondlylanguages.com, api.busuu.com, owa.videoshowiosglobalserver.com:0, accounts.elevateapp.net, purchases.ws.pho.to, api-intl.mr.meitu.com, bmall.camera360.com, api.tv.zing.vn, api.calm.com, www.calm.com, api.global.mp3.zing.vn, apimboom2.globaldelight.net, photos.adobe.io, license.pdfexpert.com, subs.platforms.team, apic.musixmatch.com, api.getmimo.com, api.revenuecat.com, pixmagicapp.com, engbright.com, api.lingokids.com, www.peacefulsoundsapp.com, duolingo-leaderboards-prod.duolingo.com, commerce-i18n-api.faceu.mobi, mobi, mobile-api.adguard.com, api.blinkist.com, api.sololearn.com, receipts.cerebralgardens.com, api-kinemaster-assetstore.*, api.pushover.net, api-cs.intsig.net, api.overhq.com, api.appsyscode.com, api.freeletics.com, api.shred.app, receipt-validator.herewetest.com, api.deezer.com, iap.aps-sdk.com, education.github.com, backend.getdrafts.com, ssl-api.itranslateapp.com, sk.ulysses.app, dayone.me, license.enpass.io, mp.bybutter.com, *.grammarly.com, splice.oracle.*.com, api.keepkeep.com, planner5d.com, secure.istreamer.com, www.api.monkeyuni.net,
 [rewrite_local]
 
-# vsco
-^https?:\/\/vsco\.co\/api\/subscriptions\/2.1\/user-subscriptions\/ url script-response-body langkhach/vsco.js
-
-# gyroscope
-^https:\/\/api\.gyrosco\.pe\/v1\/account\/$ url script-response-body langkhach/Gyroscope.vip.js
-
-# Termius 
-https:\/\/api\.termius\.com\/api\/v3\/bulk\/account\/ url script-response-body langkhach/Terminus.js
-
-# PicsArt
-^https:\/\/api\.(picsart|meiease)\.c(n|om)\/users\/show\/me\.json url script-response-body langkhach/picsArt.vip.js
-
-#Vivavideo
-^https:\/\/viva-asia1\.vvbrd\.com\/api\/rest\/u\/vip* url script-response-body langkhach/vivavideo.vip.js
-
-#Undfold
-^https:\/\/api\.unfold\.app\/v1\/ios\/receipts$ url script-response-body langkhach/Unfold.vip.js
-
-#Nhaccuatui
-^https:\/\/graph\.nhaccuatui\.com\/.*\/users\/info* url script-response-body langkhach/nhaccuatui.js
-
-#Memrise
-^https:\/\/api\.memrise\.com\/.+\/(me\/$|dashboard\/$|leaderboards\/following\/) url script-response-body langkhach/memrise.vip.js
-
-# Jibjab
-^https:\/\/origin-prod-phoenix\.jibjab\.com\/v1\/user$ url script-response-body langkhach/jibjab.vip.js
-
-#buyhack
-^https:\/\/buy\.itunes\.apple\.com\/verifyReceipt$ url script-response-body langkhach/verify_receipt.js
-
-#sync
-^https:\/\/api\.sync\.me\/api\/purchases\/(report_purchases|get_purchases)  url script-response-body langkhach/syn.me.js
-
-#elsaresponse
-^https:\/\/pool\.elsanow\.io\/user\/api\/v1\/purchase$ url script-response-body langkhach/elsa-response.js
-
-#elsarewrite
-^https:\/\/pool\.elsanow\.io\/content\/api\/v1\/modules\/download$  url request-header (\r\n)x-session-token:.+(\r\n) request-header $1x-session-token: F3S0w0bysBQFdbjtxpFurrFv2ItBBcBkVQxUddQW+9vjt2JXM751ksqq5GAWpkl+kk9nhig9BGh9JhYHQaokmendY6zLZDscHiRkZD2HrdJclKVCLordAARJhYIrf5C+5OSK6ax2TA45CKi8S09FEtYXN4noXO7gt42NT6WPIv6DKhdIwVxQuIAMLU5abmpMTDlyWeI4ulBWcOQbuZWWZg==
-
-#drops
-^https:\/\/lambda\.us-east-1\.amazonaws\.com/.*/functions\/prod-4-syncPurchases\/invocations$ url script-response-body langkhach/drops.js
-
-#mondly
-^https:\/\/api\.mondlylanguages\.com\/v1\/ios\/user\/sync$ url script-response-body langkhach/mondly.vip.js
-
-#busuu
-^https:\/\/api\.busuu\.com\/users\/me* url script-response-body langkhach/busuu.vip.js
-
-#Videoshow
-^https:\/\/owa\.videoshowiosglobalserver\.com\/.*\/iosPayClient url script-response-body langkhach/videoshow.vip.js
-
-#elevate
-^https:\/\/accounts\.elevateapp\.net\/api\/users\?user%5Bauthentication_token* url script-response-body langkhach/elevate.vip.js
-
-#beautyplus
-^https:\/\/api-intl\.mr\.meitu\.com/.*/subs_offer_elg$ url script-response-body langkhach/beautyplusvip.js
-
-#camera360
-^https:\/\/bmall\.camera360\.com\/api\/(iap\/check-receipt$|mix\/getinfo$) url script-response-body langkhach/camera360.vip.js
-
-#zingtv
-^https?:\/\/api\.tv\.zing\.vn\/.*/user* url script-response-body langkhach/zingtvvipv1.js
-
-#calm
-^https:\/\/api\.calm\.com\/me$ url script-response-body langkhach/calm.vip.js
-
-#remove_manage
-^https:\/\/www\.calm\.com\/mobile\/manage-subscription\?token=*  url reject-img
-
-#lightroom
-^https:\/\/photos\.adobe\.io\/v2\/accounts* url script-response-body langkhach/Lightroom.js
-
-#Pdfexpert
-^https:\/\/license\.pdfexpert\.com\/api\/1\.0\/pdfexpert6\/subscription\/(refresh$|check$) url script-response-body langkhach/Pdfexpert.vip.js
-
-#productive&sleepzy
-^https:\/\/subs\.platforms\.team\/apple\/verifyTransaction$ url script-response-body langkhach/productive.js
-
-#Musixmatch
-^https:\/\/apic\.musixmatch\.com\/ws\/.*\/config\.get url script-response-body langkhach/musixmatch.miao.js
-
-#boom
-^https:\/\/apimboom2\.globaldelight\.net\/itunesreceipt_v2\.php$ url 302 https://raw.githubusercontent.com/langkhach270389/Scripting/master/boom.vip.rsp
-
-#mimo
-^https:\/\/api\.getmimo\.com\/v1\/subscriptions$ url script-response-body langkhach/mimo.vip.js
-
-#mojo&noto
-^https:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers\/[a-zA-Z0-9_-]*$) url script-response-body langkhach/revenuecat.js
-
-#Bright
-^https:\/\/engbright\.com\/app-portal\/apple\/receipt$ url 302 https://raw.githubusercontent.com/langkhach270389/Scripting/master/Bright.rsp
-
-#lingokids
-^https:\/\/api\.lingokids\.com\/v1\/renovate_session$ url script-response-body langkhach/lingokids.vip.js
-
-#musicalm
-^https:\/\/www\.peacefulsoundsapp\.com\/api\/v1\/init$ url script-response-body langkhach/musicalm.js
-
-#duolingo
-^https:\/\/duolingo-leaderboards-prod\.duolingo\.com\/leaderboards* url script-response-body langkhach/duolingo.js
-
-#ulike
-^https:\/\/commerce-i18n-api\.faceu\.mobi\/commerce\/v1\/subscription\/user_info$ url script-response-body langkhach/ulike.js
-
-#adguardpremium
-^https:\/\/mobile-api\.adguard\.com\/api\/1\.0\/ios_validate_receipt$ url 302 https://raw.githubusercontent.com/langkhach270389/Scripting/master/Adguard.rsp
-
-#zingmp3
-^https:\/\/api\.global\.mp3\.zing\.vn\/1\.0\/getUserInfo\?data=* url script-response-body langkhach/zingmp3.js
-
-#Blinkist
-^https:\/\/api\.blinkist\.com\/v4\/(me$|me.json$|me\/access$) url script-response-body langkhach/blinkist.js
-
-#sololearn 
-^https:\/\/api\.sololearn\.com\/(authenticateDevice|challenge\/GetContestFeed|Profile\/GetProfile)$ url script-response-body langkhach/sololearn.js
-
- #kinemaster
-^https:\/\/api-kinemaster-assetstore\.(nexstreaming|kinemasters)\.com\/.*\/product\/verifyReceipt$ url script-response-body langkhach/kinemaster.js
-
-#pushover
-^https:\/\/api\.pushover\.net\/1\/messages\.json* url script-response-body langkhach/pushover.js
-
-#CamScanner
-^https:\/\/(api|api-cs)\.intsig\.net\/purchase\/cs\/query_property\? url script-response-body langkhach/CamScaner.js
-
-#over
-^https:\/\/api\.overhq\.com\/(user\/token\/refresh$|subscription\/verifyReceipt$) url script-response-body langkhach/over.vip.js
-
-#speak&translate
-^https:\/\/receipt-validator\.herewetest\.com\/apple\/verifyTransaction$ url script-response-body langkhach/speak&translate.js
-
-#document
-^https:\/\/license\.pdfexpert\.com\/api\/.*\/documents\/subscription\/(refresh$|check$) url script-response-body langkhach/documents.js
-
-#workingcopy
-^https:\/\/education\.github\.com\/api\/user$ url script-response-body langkhach/workingcopy.js
-
-#draft
-^https:\/\/backend\.getdrafts\.com\/api\/.*\/verification* url script-response-body langkhach/draft.js
-
-#phothop&PSexpress
-^https:\/\/lcs-mobile-cops\.adobe\.io\/mobile_profile url script-response-body langkhach/photoshop.js
-
-#itranslate&lingo&voice&converse
-^https:\/\/ssl-api\.itranslateapp\.com\/.*\/subscriptions\/.*\/ios$ url script-response-body langkhach/itranslate.js
-
-#ulysses
-^https:\/\/sk\.ulysses\.app\/api\/v1\/user_offers$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
-
-^https:\/\/sk\.ulysses\.app\/api\/v1\/itunes_receipt_verify$ url script-response-body langkhach/ulysses.js
-
-#pre_dayone
-;^https:\/\/dayone\.me\/api\/users$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
-
-#dayone
-^https:\/\/dayone\.me\/api\/(users|v2\/users\/account-status)$ url script-response-body langkhach/dayone.js
-
-#endel
-^https:\/\/api-production\.endel\.io\/.*\/user$ url script-response-body langkhach/endel.js
-
-#nichi
-^https?:\/\/mp\.bybutter\.com\/mood\/(official-templates|privileges) url script-response-body langkhach/nichi.js
-
-#grammarly
-^https:\/\/subscription\.grammarly\.com\/api\/v1$ url script-response-body langkhach/grammarly.js
-
-#splice
-^https:\/\/splice\.oracle\.\w+\.com\/devices\/me url script-response-body langkhach/splice.js
-
-#planner5d
-^https:\/\/planner5d\.com\/api\/sets url script-response-body langkhach/planner5d.js
-
-#playerxtreme
-;^https:\/\/secure\.istreamer\.com\/backend$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
-
-^https:\/\/secure\.istreamer\.com\/backend$ url script-response-body langkhach/playerxtreme.js
-
-#all apps monkey
-^https:\/\/www\.api\.monkeyuni\.net\/api\/.+\/mobile\/account\/load-update url script-response-body langkhach/monkey.js
+[task_local]
+0 6-23/3 * * * langkhach/Ncov.js, enabled=true
+0 6-23/1 * * * langkhach/Appmonitor.js, enabled=true
 

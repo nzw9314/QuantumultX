@@ -1,4 +1,16 @@
-# Update > 2019.12.13 Go advertising rule Integration lhie1 and shenji
+# Update > 2020.4.9 Go advertising rule Integration lhie1 and ConnersHua
+DOMAIN,mcupdate.gstarcad.com
+DOMAIN,adx.open-adx.com
+DOMAIN,adservice.sigmob.cn
+DOMAIN,t7z.cupid.iqiyi.com
+DOMAIN,static-s.iqiyi.com
+DOMAIN,mobile2.da.mgtv.com
+DOMAIN,mobile.da.mgtv.com
+DOMAIN,gwp.xiaojukeji.com
+DOMAIN,ct.xiaojukeji.com
+DOMAIN,news.ssp.qq.com
+DOMAIN,news.l.qq.com
+DOMAIN,unidesk.alicdn.com
 DOMAIN-SUFFIX,idealads.net
 DOMAIN-SUFFIX,ironsrc.com
 DOMAIN-SUFFIX,apoll.m.taobao.com
@@ -3795,7 +3807,6 @@ DOMAIN-SUFFIX,i.bigmir.net
 DOMAIN-SUFFIX,i.clkservice.youdao.com
 DOMAIN-SUFFIX,i.dreamfull.cn
 DOMAIN-SUFFIX,i.flow.browser.oppomobile.com
-DOMAIN-SUFFIX,i.gdt.qq.com
 DOMAIN-SUFFIX,i.go.sohu.com
 DOMAIN-SUFFIX,i.haloapps.com
 DOMAIN-SUFFIX,i.hao61.net
@@ -5089,7 +5100,6 @@ DOMAIN-SUFFIX,maw.wnbfw.com
 DOMAIN-SUFFIX,maxwebsearch.com
 DOMAIN-SUFFIX,maysunmedia.com
 DOMAIN-SUFFIX,mb.hockeybuzz.com
-DOMAIN-SUFFIX,mb.yidianzixun.com
 DOMAIN-SUFFIX,mb.zam.com
 DOMAIN-SUFFIX,mbai.cn
 DOMAIN-SUFFIX,mbd.weathercn.com
@@ -8192,7 +8202,6 @@ DOMAIN,v1.log.moji.com
 DOMAIN,ad.bn.netease.com
 DOMAIN,ad.yixin.im
 DOMAIN,admusicpic.music.126.net
-DOMAIN,iadmat.nosdn.127.net
 DOMAIN,iadmusicmat.music.126.net
 DOMAIN,iadmusicmatvideo.music.126.net
 DOMAIN,impservice.dictapp.youdao.com
@@ -8398,7 +8407,6 @@ DOMAIN-SUFFIX,4paradigm.com
 DOMAIN-KEYWORD,talkingdata
 DOMAIN-SUFFIX,catch.gift
 DOMAIN-SUFFIX,pubnative.net
-DOMAIN,suggestqueries.google.com
 DOMAIN,www.googleadservices.com
 DOMAIN,www.google-analytics.com
 DOMAIN,fusion.qq.com

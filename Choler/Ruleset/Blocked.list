@@ -1,14 +1,15 @@
 # Misc
 DOMAIN-SUFFIX,tw
-DOMAIN-SUFFIX,hk
 DOMAIN-SUFFIX,jp
 DOMAIN-SUFFIX,ly
 DOMAIN-SUFFIX,us
 DOMAIN-SUFFIX,uk
+DOMAIN-SUFFIX,au
 DOMAIN-SUFFIX,co
 DOMAIN-SUFFIX,io
 DOMAIN-SUFFIX,tk
 DOMAIN-SUFFIX,ms
+DOMAIN-SUFFIX,im
 
 DOMAIN-SUFFIX,imgur.com
 DOMAIN-SUFFIX,droplr.com
@@ -30,28 +31,40 @@ DOMAIN-SUFFIX,tenor.com
 DOMAIN-SUFFIX,pexels.com
 DOMAIN-SUFFIX,imdb.com
 DOMAIN-SUFFIX,gfycat.com
-DOMAIN-SUFFIX,baiduwp.com
 DOMAIN-SUFFIX,v2ex.com
 DOMAIN-SUFFIX,feedx.net
 DOMAIN-SUFFIX,feedex.net
 DOMAIN-SUFFIX,ampproject.org
 DOMAIN-SUFFIX,crashlytics.com
-DOMAIN-SUFFIX,iadsdk.apple.com
+DOMAIN-SUFFIX,shadowsocks.org
+DOMAIN-SUFFIX,v2ray.com
 DOMAIN-SUFFIX,outline.com
+DOMAIN-SUFFIX,weather.com
+DOMAIN-SUFFIX,maxmind.com
+DOMAIN-SUFFIX,overcast.fm
 
 AND,((DOMAIN-KEYWORD,wiki), (DOMAIN-SUFFIX,org))
 AND,((DOMAIN-KEYWORD,amazon), (DOMAIN-SUFFIX,com))
 AND,((DOMAIN-KEYWORD,github), (DOMAIN-SUFFIX,com))
 AND,((DOMAIN-KEYWORD,dropbox), (DOMAIN-SUFFIX,com))
 
-# Surge
-USER-AGENT,Surge*
-
-# Spotify
-USER-AGENT,Spotify*
-
 # Apple
+DOMAIN,xp.apple.com
 DOMAIN,ocvideo.apple.com
+DOMAIN,seed.siri.apple.com
+DOMAIN,iadsdk.apple.com
+DOMAIN,testflight.apple.com
+DOMAIN-KEYWORD,-buy.itunes.apple.com
+
+# Netflix
+USER-AGENT,Argo*
+DOMAIN-SUFFIX,netflix.com
+DOMAIN-SUFFIX,netflix.net
+DOMAIN-SUFFIX,nflxext.com
+DOMAIN-SUFFIX,nflximg.com
+DOMAIN-SUFFIX,nflximg.net
+DOMAIN-SUFFIX,nflxso.net
+DOMAIN-SUFFIX,nflxvideo.net
 
 # eBay
 DOMAIN-SUFFIX,ebay.com
@@ -62,6 +75,7 @@ DOMAIN-SUFFIX,ebaystatic.com
 # OneDrive
 USER-AGENT,OneDrive*
 USER-AGENT,OneDriveiOSApp*
+DOMAIN,onedrive.live.com
 
 # Facebook
 DOMAIN-SUFFIX,fb.me
@@ -76,8 +90,6 @@ DOMAIN-SUFFIX,oculus.com
 DOMAIN-SUFFIX,oculuscdn.com
 DOMAIN-SUFFIX,whatsapp.com
 DOMAIN-SUFFIX,whatsapp.net
-DOMAIN-SUFFIX,oculus.com
-DOMAIN-SUFFIX,oculuscdn.com
 
 # Microsoft
 DOMAIN-SUFFIX,gfx.ms
@@ -91,7 +103,7 @@ DOMAIN-SUFFIX,akamaized.net
 
 # Google
 DOMAIN-KEYWORD,google
-DOMAIN-SUFFIX,abc.xyz
+DOMAIN-KEYWORD,blogspot
 DOMAIN-SUFFIX,goo.gl
 DOMAIN-SUFFIX,youtu.be
 DOMAIN-SUFFIX,gmail.com
@@ -99,6 +111,9 @@ DOMAIN-SUFFIX,ytimg.com
 DOMAIN-SUFFIX,ggpht.com
 DOMAIN-SUFFIX,gstatic.com
 DOMAIN-SUFFIX,youtube.com
+DOMAIN-SUFFIX,appspot.com
+DOMAIN-SUFFIX,blogger.com
+DOMAIN-SUFFIX,getoutline.org
 
 # Line
 DOMAIN-SUFFIX,line.me
@@ -157,7 +172,6 @@ DOMAIN-SUFFIX,telegra.ph
 DOMAIN-SUFFIX,telegram.me
 DOMAIN-SUFFIX,telegram.org
 DOMAIN-SUFFIX,tdesktop.com
-DOMAIN-SUFFIX,telegramindex.com
 
 # WalMart
 DOMAIN-SUFFIX,walmart.com
@@ -186,6 +200,8 @@ DOMAIN-SUFFIX,xvideos-cdn.com
 # PornHub
 DOMAIN-SUFFIX,phncdn.com
 DOMAIN-SUFFIX,pornhub.com
+DOMAIN-SUFFIX,phprcdn.com
+DOMAIN-SUFFIX,pornhubpremium.com
 
 # NYTimes
 DOMAIN-SUFFIX,nyt.com
@@ -196,14 +212,14 @@ DOMAIN-SUFFIX,nytimes.com
 DOMAIN-SUFFIX,ftimg.net
 DOMAIN-SUFFIX,ftchinese.com
 
-# Requires DNS lookup
-AND,((USER-AGENT,JSBox*), (NOT,((GEOIP,CN))))
-AND,((USER-AGENT,Reeder*), (NOT,((GEOIP,CN))))
-AND,((USER-AGENT,Mozilla*), (NOT,((GEOIP,CN))))
-AND,((USER-AGENT,*appstored*), (NOT,((GEOIP,CN))))
-AND,((USER-AGENT,MobileSafari*), (NOT,((GEOIP,CN))))
-AND,((USER-AGENT,AppleCoreMedia*), (NOT,((GEOIP,CN))))
-AND,((USER-AGENT,*WebKit.Networking*), (NOT,((GEOIP,CN))))
-
 # FINAL
 AND,((IP-CIDR,0.0.0.0/0,no-resolve), (NOT,((GEOIP,CN))))
+AND,((IP-CIDR6,::/0,no-resolve), (NOT,((GEOIP,CN))))
+
+# User-Agent
+AND,((USER-AGENT,JSBox*), (NOT,((GEOIP,CN))))
+AND,((USER-AGENT,Reeder*), (NOT,((GEOIP,CN))))
+
+AND,((USER-AGENT,Mozilla*), (NOT,((GEOIP,CN))))
+AND,((USER-AGENT,*Safari*), (NOT,((GEOIP,CN))))
+AND,((USER-AGENT,*Networking*), (NOT,((GEOIP,CN))))
