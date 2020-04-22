@@ -74,7 +74,7 @@ Table of Contents
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMAGE 2019-11-12 19:58:49.jpg" height="40%" width="40%">
 Auto check-in for 1point3acres.com
 
-[Tutorial](https://nave.work/%E4%B8%80%E4%BA%A9%E4%B8%89%E5%88%86%E5%9C%B0%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC.html)
+[Tutorial](https://medium.com/navepnow/一亩三分地自动签到脚本-c718734111ac)
 
 #### 10010+.js/10010+_qx.js
 **By [NavePnow](https://github.com/NavePnow)**
@@ -129,7 +129,7 @@ Modified according to the Jsbox script from author [coo11](https://t.me/coo11)
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMG_1189.JPG" height="40%" width="40%">
 Auto check-in for Weibo Super_Talk
 
-[Tutorial](https://nave.work/微博超话自动签到脚本.html)
+[Tutorial](https://medium.com/navepnow/微博超话自动签到脚本-4826bff2112c)
 
 ### Google Apps Script
 

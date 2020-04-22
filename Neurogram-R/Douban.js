@@ -11,11 +11,15 @@ GitHub: Neurogram-R
 
 使用说明
 
+[Script]
 茶杯狐
 http-response ^https://m.douban.com/movie/subject/.+ script-path=Douban.js,requires-body=true,max-size=307200
 
 Airtable 收藏
 http-request ^https://m.douban.com/movie/subject/.+\?seen=\d script-path=Douban.js
+
+[MITM]
+hostname = m.douban.com
 
 收藏功能，需自行修改代码，点击 想看 / 看过 触发收藏
 */

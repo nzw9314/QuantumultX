@@ -13,13 +13,14 @@ QX 1.0.6+ :
 
 Surge 4.0 :  无效
 [Script]
-cron "0 9 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/tvpreview.js
+tvpreview.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/tvpreview.js,script-update-interval=0
 
 ## 远程链接
 1 10 * * * https://raw.githubusercontent.com/Sunert/Scripts/master/Task/tvpreview.js
 
 By Macsuny                   
 */
+
 const sy = init();
        d = new Date();
        M = d.getMonth()+1, D = d.getDate();
@@ -54,10 +55,9 @@ const wurl = {
        for (i = 0; i < l && result[`${c}`].program[i].showTime.split(':')[0] < result[`${c}`].program[l-1].showTime.split(':')[0]; i++)
        { 
         if (result[`${c}`].liveSt == result[`${c}`].program[i].st)
-          {   
-          subTitle = `即将播出: ${result[`${c}`].program[i+1].t}`
-           
-          } 
+         {   
+         subTitle = `即将播出: ${result[`${c}`].program[i+1].t}`
+         } 
         }
       }
     else {
@@ -117,5 +117,4 @@ function init() {
   }
   return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
 }
-
 
