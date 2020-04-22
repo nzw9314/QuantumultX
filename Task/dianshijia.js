@@ -7,7 +7,7 @@
 2.APP登陆账号后，点击首页'每日签到',即可获取Cookie.
 3.非专业人士制作，欢迎各位大佬提出宝贵意见和指导
 
-4. 2020年4月4日 14:30更新
+4. 2020年4月18日 14:30变更surge地址
 
 仅测试Quantumult x，Surge、Loon自行测试
 By Macsuny
@@ -15,9 +15,11 @@ By Macsuny
 ~~~~~~~~~~~~~~~~
 Surge 4.0 :
 [Script]
-cron "0 9 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js
+dianshijia.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js,script-update-interval=0
+
 # 获取电视家 Cookie.
-http-request http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js
+dianshijia.js = script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js,type=http-request,pattern=http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\?
+
 ~~~~~~~~~~~~~~~~
 
 QX 1.0.6+ :

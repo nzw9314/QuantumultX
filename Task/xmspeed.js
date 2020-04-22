@@ -12,9 +12,11 @@ by Macsuny
 ~~~~~~~~~~~~~~~~
 Surge 4.0 :
 [Script]
-cron "0 9 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/xmspeed.js
+xmspeed.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/xmspeed.js,script-update-interval=0
+
 # 获取喜马拉雅极速版 Cookie.
-http-request https:\/\/m\.ximalaya\.com\/speed\/task-center\/account\/coin script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/xmspeed.js
+xmspeed.js = script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/xmspeed.js,type=http-request,pattern=https:\/\/m\.ximalaya\.com\/speed\/task-center\/account\/coin
+
 ~~~~~~~~~~~~~~~~
 QX 1.0.6+ :
 [task_local]
@@ -64,9 +66,7 @@ function sign() {
 })
     shareurl = {url: 'https://m.ximalaya.com/speed/web-earn/inspire/lottery/action',
     	headers: {Cookie:cookieVal},
-     body: `{
- "sign": "EyiP5CRKRY1/oHgdyzm3SxC2jw+NrghwZG5ND4Z1+ZWVH4ttwx+nBDog+H33Et9sTDR9DxMWxgnmsghCN4MEj8Oniv8USRK2E6Jw6w6GgdOhi7PR/6aqYLQi2iaHFz6feM3skLmMGkvZsv1amzTjjs97faLzgZVT7scElwvoldQ="
-}`
+        body: ``
     } // 手动抓取请求"body"值无效果
      shareurl.headers['Content-Type'] = 'application/json;charset=utf-8'
     sy.post(shareurl, (error, response, data) => {
