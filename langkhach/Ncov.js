@@ -120,7 +120,7 @@ MITM = code.junookyo.xyz
   var ncovUrl = {
     url: 'https://code.junookyo.xyz/api/ncov-moh/data.json',
   }
-$httpClient.post(ncovUrl, function(error, response, data){
+$httpClient.get(ncovUrl, function(error, response, data){
   if (error) {
 $notification.post("NCOV", "", "Bad connection")
     $done(); 

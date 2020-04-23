@@ -74,7 +74,6 @@ function changeOutboundMode(is_cellular, mode) {
 
 //wifi select outbound
 if ($network.v4.primaryInterface == "en0" && NETWORK != null) {
-$surge.setSelectGroupPolicy('FINAL', '🟢 Wifi');
     if (BLACKNAME.indexOf(NETWORK) != -1) {
         changeOutboundMode(TAG, BLACK);
     } else if (WHITENAME.indexOf(NETWORK) != -1) {
@@ -86,7 +85,6 @@ $surge.setSelectGroupPolicy('FINAL', '🟢 Wifi');
 
 //cellular select outbound
 if($network.v4.primaryInterface == "pdp_ip0") {
-$surge.setSelectGroupPolicy('FINAL', '🔵 Cellular');
     TAG = true;
     changeOutboundMode(TAG, CELLULAR);
 }
