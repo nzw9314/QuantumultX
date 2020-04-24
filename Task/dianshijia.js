@@ -111,7 +111,7 @@ function total() {
       {
       sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
-      subTitle = `待兑换金币: 💰${result.data.coin}    `    
+      subTitle = `待兑换: ${result.data.coin}金币   `    
    try{
       for(tempCoin in data){
        for (i=0;i<result.data.tempCoin.length;i++) {  
@@ -135,7 +135,7 @@ function cash() {
       {
       sy.log(`data: ${data}`)
       const result = JSON.parse(data)
-      subTitle += '现金收益: 💶'+ result.data.amount/100+'元 '
+      subTitle += '现金: '+ result.data.amount/100+'元 '
       resolve()
       })
    })
