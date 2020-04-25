@@ -18,14 +18,11 @@ static=TẮT, direct, img-url=https://github.com/Koolson/Qure/raw/master/IconSet
 static=Chặn OTA, TẮT, BẬT, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Apple_Update.png
 static=Chặn Ads, BẬT, TẮT, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Advertising.png
 static=Chặn FB, TẮT, BẬT, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Facebook.png
-available=Fake iAP Policy, Fake iAP Server 01, Fake iAP Server 02, Fake iAP Server 03, img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Quantumult_X.png
-static=Fake PXX Policy, TẮT, Fake iAP Policy, img-url=https://raw.githubusercontent.com/crossutility/Quantumult-X/master/icon-samples/apple.PNG
 
 [server_remote]
-https://github.com/tinycarrot/tinycarrot/raw/master/quantumutlx/remote/fakeiap_server.txt, tag=Fake iAP Server, enabled=true
+
 
 [filter_remote]
-https://raw.githubusercontent.com/tinycarrot/tinycarrot/master/Profile/quantumult/fakeiap-filter.txt, tag=Fake iAP Filter, enabled=false
 https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-exceptions-rule.conf, tag=🇻🇳hostsVN, force-policy=direct, enabled=true
 https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-rule.conf, tag=🇻🇳hostsVN, force-policy=Chặn Ads, enabled=true
 https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-OTA.conf, tag=🇻🇳hostsVN-OTA, force-policy=Chặn OTA, enabled=true
