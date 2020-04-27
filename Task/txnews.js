@@ -7,10 +7,14 @@
  [rewrite_local]
 https:\/\/api\.inews\.qq\.com\/event\/v1\/user\/event\/report\? url script-request-header txnews.js
 
+^https:\/\/api\.inews\.qq\.com\/activity\/v1\/redpack\/user\/list\?activity_id url script-request-header txnews.js
+
+
  [MITM]
 hostname = api.inews.qq.com
 
 3.打开腾讯新闻app，阅读一篇文章，倒计时结束后即可获取Cookie
+红包ID的Cookie，点击红包倒计时，或者点击活动页面的专属红包任务，有些账号可能无，
 
 4.现阶段每日共9个阶梯红包，具体阅读篇数视腾讯情况而变动
 
@@ -18,9 +22,9 @@ hostname = api.inews.qq.com
 
 6.可能腾讯有某些限制，有些号码无法领取红包，手动阅读几篇，能领取红包，一般情况下都是正常的
 
-7.此版本会频繁阅读通知，可注释207行关闭通知，或者使用本仓库 txnews2.js
+7.此版本会频繁阅读通知，可关闭通知，或者使用本仓库 txnews2.js
 
-8.4月27日修复该账户为非活动用户
+8.4月27日修复该账户为非活动用户，增加获取红包ID的Cookie，点击红包倒计时，或者点击活动页面的专属红包任务
 
 ~~~~~~~~~~~~~~~~
 Cookie获取后，请注释掉Cookie地址。
@@ -28,12 +32,15 @@ Cookie获取后，请注释掉Cookie地址。
 #腾讯新闻app签到，根据红鲤鱼与绿鲤鱼与驴修改
 
 */
+const notify = true; //开启通知为true，关闭为false
 const cookieName = '腾讯新闻'
 const signurlKey = 'sy_signurl_txnews'
 const cookieKey = 'sy_cookie_txnews'
+const RedIDKey = 'sy_rd_txnews'
 const sy = init()
 const signurlVal = sy.getdata(signurlKey)
 const cookieVal = sy.getdata(cookieKey)
+const RedID = sy.getdata(RedIDKey)
 
 let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
@@ -43,7 +50,7 @@ if (isGetCookie) {
 }
 
 function GetCookie() {
-if ($request && $request.method != 'OPTIONS') {
+if ($request && $request.method != 'OPTIONS' && $request.url.match(/user\/event\/report\?/)) {
   const signurlVal =  $request.url
   const cookieVal = $request.headers['Cookie'];
   sy.log(`signurlVal:${signurlVal}`)
@@ -51,6 +58,12 @@ if ($request && $request.method != 'OPTIONS') {
   if (signurlVal) sy.setdata(signurlVal, signurlKey)
   if (cookieVal) sy.setdata(cookieVal, cookieKey)
   sy.msg(cookieName, `获取Cookie: 成功🎉`, ``)
+  }
+
+if ($request && $request.method != 'OPTIONS'&& $request.url.match(/redpack\/user\/list\?activity/)) {
+  const RedID =  $request.url.split("=")[1].split("&")[0]
+  if (RedID) sy.setdata(RedID, RedIDKey)
+  sy.msg(cookieName, `获取红包ID: 成功🎉`, ``)
   }
  }
 
@@ -76,6 +89,7 @@ function getsign() {
   })
 }
 
+
 //阅读阶梯
 function toRead() {
   const toreadUrl = {
@@ -87,39 +101,17 @@ function toRead() {
       sy.msg(cookieName, '阅读:'+ error)
         }else{
        sy.log(`${cookieName}阅读文章 - data: ${data}`)}
-       Activity_id()
+       StepsTotal()
     })
   }
-// 获取红包ID
-function Activity_id() {
-  const ID =  signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
-  const activityUrl = {
-    url: `https://api.inews.qq.com/activity/v1/user/activity/get?isJailbreak=0&appver=13.4.1_qqnews_6.1.01&${ID}`,
-    headers: {Cookie:cookieVal},
-  };
-sy.log(activityUrl)
-   sy.get(activityUrl, (error, response, data) =>{
-    if (error){
-      sy.msg(cookieName, '获取阅读红包ID失败:'+ error)
-     }else{
-     sy.log(`${cookieName}阅读红包id - data: ${data}`)
-       reddata = JSON.parse(data)
-        if (reddata.data.activity != null){
-        redpackid = reddata.data.activity.id
-        StepsTotal()
-       }
-        else {
-      sy.msg(cookieName, '获取阅读红包ID失败❌',`请检查该账号是否有阅读红包，或者该设备有其他账号已领取红包`)}
-      StepsTotal() 
-       }
-     })
-  }
+
 
 //阅读文章统计
 function StepsTotal() {
   const ID =  signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
+
   const StepsUrl = {
-    url: `https://api.inews.qq.com/activity/v1/activity/info/get?activity_id=${redpackid}&${ID}`,
+    url: `https://api.inews.qq.com/activity/v1/activity/info/get?activity_id=${RedID}&${ID}`,
    headers: {
       Cookie: cookieVal,
     },
@@ -161,7 +153,7 @@ function Redpack() {
   const cashUrl = {
     url: `https://api.inews.qq.com/activity/v1/activity/redpack/get?isJailbreak=0&${ID}`,
       headers: {Cookie: cookieVal},
-    body: `activity_id=${redpackid}`
+    body: `activity_id=${RedID}`
   };
     sy.post(cashUrl, (error, response, data) => {
       try {
@@ -204,9 +196,11 @@ function getTotal() {
     } else {
      const obj = JSON.parse(data)
         notb = '总计:'+obj.data.wealth[0].title +'金币  '+"红包" +obj.data.wealth[1].title+'元'+ redpack;
-        sy.msg(cookieName, notb, str)
-        sy.log(cookieName +","+notb+ "\n" )
         }
+       if (notify == true){
+        sy.msg(cookieName, notb, str)
+       }
+        sy.log(cookieName +","+notb+ "\n" )
      })
  }
 

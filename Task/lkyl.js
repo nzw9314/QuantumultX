@@ -41,8 +41,6 @@ const signheaderVal = sy.getdata(signheaderKey)
 const token = JSON.parse(sy.getdata(signheaderKey))
 const openid = token['openId']
 const appid = token['App-Id']
-
-
 let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
    GetCookie()
@@ -226,14 +224,14 @@ function total() {
       sy.log(`${cookieName}, data: ${data}`)
       let result = JSON.parse(data)
       const title = `${cookieName}`
-      if (SilverBean >= 20) {
+      if (SilverBean >= result.datas[0].salePrice) {
     for (k=0; k < result.datas.length;k++){
     if (result.datas[k].salePrice >= SilverBean && SilverBean > result.datas[k-1].salePrice)
      {
       subTitle += `${result.datas[k-1].memo}(手动)`
       }
      }
-   } else if (SilverBean < 20) 
+   } else if (SilverBean < result.datas[0].salePrice) 
     { 
     subTitle += `  银豆不足以兑换京豆`
     }
