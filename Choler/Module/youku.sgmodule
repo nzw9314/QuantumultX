@@ -1,0 +1,9 @@
+#!name=优酷
+#!desc=视频去片头广告
+#!system=ios
+
+[General]
+force-http-engine-hosts = %APPEND% vali.cp31.ott.cibntv.net
+
+[Rule]
+URL-REGEX,^http:\/\/vali\.cp31\.ott\.cibntv\.net\/youku\/,REJECT-TINYGIF
