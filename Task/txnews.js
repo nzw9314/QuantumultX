@@ -18,7 +18,10 @@ hostname = api.inews.qq.com
 
 6.可能腾讯有某些限制，有些号码无法领取红包，手动阅读几篇，能领取红包，一般情况下都是正常的
 
-7.此版本会频繁阅读通知，可注释182行关闭通知，或者使用本仓库 txnews2.js
+7.此版本会频繁阅读通知，可注释207行关闭通知，或者使用本仓库 txnews2.js
+
+8.4月27日修复该账户为非活动用户
+
 ~~~~~~~~~~~~~~~~
 Cookie获取后，请注释掉Cookie地址。
 
@@ -57,7 +60,7 @@ function getsign() {
     url: `https://api.inews.qq.com/task/v1/user/signin/add?`,headers:{Cookie: cookieVal}
   };
    sy.post(llUrl, (error, response, data) => {   
-     //sy.log(`${cookieName}签到 - data: ${data}`)
+     sy.log(`${cookieName}签到 - data: ${data}`)
       const obj = JSON.parse(data)
       if (obj.info=="success"){
        console.log('腾讯新闻 签到成功，已连续签到' + obj.data.signin_days+"天"+"\n")
@@ -77,22 +80,46 @@ function getsign() {
 function toRead() {
   const toreadUrl = {
     url: signurlVal, headers: {Cookie:cookieVal},
-    body: 'event=article_read&extend={"article_id":"20200420A0KBMB00","channel_id":"1979"}'
+    body: 'event=article_read&extend={"article_id":"20200424A08KNH00","channel_id":"17240460"}'
   };
    sy.post(toreadUrl,(error, response, data) =>{
       if (error){
       sy.msg(cookieName, '阅读:'+ error)
         }else{
        sy.log(`${cookieName}阅读文章 - data: ${data}`)}
-       StepsTotal()
+       Activity_id()
     })
+  }
+// 获取红包ID
+function Activity_id() {
+  const ID =  signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
+  const activityUrl = {
+    url: `https://api.inews.qq.com/activity/v1/user/activity/get?isJailbreak=0&appver=13.4.1_qqnews_6.1.01&${ID}`,
+    headers: {Cookie:cookieVal},
+  };
+sy.log(activityUrl)
+   sy.get(activityUrl, (error, response, data) =>{
+    if (error){
+      sy.msg(cookieName, '获取阅读红包ID失败:'+ error)
+     }else{
+     sy.log(`${cookieName}阅读红包id - data: ${data}`)
+       reddata = JSON.parse(data)
+        if (reddata.data.activity != null){
+        redpackid = reddata.data.activity.id
+        StepsTotal()
+       }
+        else {
+      sy.msg(cookieName, '获取阅读红包ID失败❌',`请检查该账号是否有阅读红包，或者该设备有其他账号已领取红包`)}
+      StepsTotal() 
+       }
+     })
   }
 
 //阅读文章统计
 function StepsTotal() {
   const ID =  signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
   const StepsUrl = {
-    url: `https://api.inews.qq.com/activity/v1/activity/info/get?activity_id=stair_redpack_chajian&${ID}`,
+    url: `https://api.inews.qq.com/activity/v1/activity/info/get?activity_id=${redpackid}&${ID}`,
    headers: {
       Cookie: cookieVal,
     },
@@ -116,7 +143,7 @@ function StepsTotal() {
         str += articletotal + `\n`+ Dictum
          }
      else if (article.ret == 2011){
-       str += article.info + `\n`+ Dictum
+       str += `\n`+ Dictum
          }
      else {
      sy.log(cookieName + ` 返回值: ${article.ret}, 返回信息: ${article.info}`) 
@@ -133,10 +160,8 @@ function Redpack() {
   const ID =  signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
   const cashUrl = {
     url: `https://api.inews.qq.com/activity/v1/activity/redpack/get?isJailbreak=0&${ID}`,
-      headers: {
-      Cookie: cookieVal,
-    },
-    body: 'activity_id=stair_redpack_chajian'
+      headers: {Cookie: cookieVal},
+    body: `activity_id=${redpackid}`
   };
     sy.post(cashUrl, (error, response, data) => {
       try {
