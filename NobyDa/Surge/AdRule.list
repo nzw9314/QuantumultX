@@ -1,4 +1,4 @@
-# Update > 2020.4.9 Go advertising rule Integration lhie1 and ConnersHua
+# Update > 2020.4.27 Go advertising rule Integration lhie1 and ConnersHua
 DOMAIN,mcupdate.gstarcad.com
 DOMAIN,adx.open-adx.com
 DOMAIN,adservice.sigmob.cn
@@ -2539,7 +2539,6 @@ DOMAIN-SUFFIX,daima.youbian.com
 DOMAIN-SUFFIX,daima123.cc
 DOMAIN-SUFFIX,dairuqi.com
 DOMAIN-SUFFIX,dajean.com
-DOMAIN-SUFFIX,dajiyuan.com
 DOMAIN-SUFFIX,dajiyuan.org
 DOMAIN-SUFFIX,dalianhengtai.com
 DOMAIN-SUFFIX,dandan11.top
@@ -3170,8 +3169,6 @@ DOMAIN-SUFFIX,ent1.12584.cn
 DOMAIN-SUFFIX,entry.baidu.com
 DOMAIN-SUFFIX,e-p4p.163.com
 DOMAIN-SUFFIX,epernn.cn
-DOMAIN-SUFFIX,epochtimes.org
-DOMAIN-SUFFIX,epochweekly.com
 DOMAIN-SUFFIX,epowernetworktrackerimages.s3.amazonaws.com
 DOMAIN-SUFFIX,er.dlhygj.com
 DOMAIN-SUFFIX,erebor.douban.com
@@ -3313,7 +3310,6 @@ DOMAIN-SUFFIX,fge9vbrzwt.bid
 DOMAIN-SUFFIX,fghm.ga25.com
 DOMAIN-SUFFIX,fghmc.ga25.com
 DOMAIN-SUFFIX,fghmimg.ga25.com
-DOMAIN-SUFFIX,fgmtv.org
 DOMAIN-SUFFIX,file.bmob.cn
 DOMAIN-SUFFIX,files2.sogou.com
 DOMAIN-SUFFIX,fimserve.ign.com
@@ -6451,9 +6447,7 @@ DOMAIN-SUFFIX,shbywsd.cn
 DOMAIN-SUFFIX,shenghuo.xiaomi.com
 DOMAIN-SUFFIX,shenleyuni.com
 DOMAIN-SUFFIX,shenyian.net
-DOMAIN-SUFFIX,shenyun.com
 DOMAIN-SUFFIX,shenyun.org
-DOMAIN-SUFFIX,shenyunperformingarts.org
 DOMAIN-SUFFIX,shglegle.com
 DOMAIN-SUFFIX,shibeiou.com
 DOMAIN-SUFFIX,shiftrro.com
@@ -6981,8 +6975,6 @@ DOMAIN-SUFFIX,tuanxue360.net
 DOMAIN-SUFFIX,tui.gtimg.com
 DOMAIN-SUFFIX,tui1999.com
 DOMAIN-SUFFIX,tui98.cn
-DOMAIN-SUFFIX,tuidang.epochtimes.org
-DOMAIN-SUFFIX,tuidang.org
 DOMAIN-SUFFIX,tuigoo.com
 DOMAIN-SUFFIX,tuiguang.178.com
 DOMAIN-SUFFIX,tuiguang.meitu.com
@@ -7623,7 +7615,6 @@ DOMAIN-SUFFIX,xingjuhe.com
 DOMAIN-SUFFIX,xiniuz.com
 DOMAIN-SUFFIX,xinju.cc
 DOMAIN-SUFFIX,xinray.com
-DOMAIN-SUFFIX,xinsheng.net
 DOMAIN-SUFFIX,xiongdong.com
 DOMAIN-SUFFIX,xiuxiu.android.dl.meitu.com
 DOMAIN-SUFFIX,xiuxiu.mobile.meitudata.com
@@ -7901,7 +7892,6 @@ DOMAIN-SUFFIX,zhaoshang8.com
 DOMAIN-SUFFIX,zh-cn.shenyun.com
 DOMAIN-SUFFIX,zh-cn.shenyun.org
 DOMAIN-SUFFIX,zheng.cs12d.com
-DOMAIN-SUFFIX,zhengjian.org
 DOMAIN-SUFFIX,zhichi08.com
 DOMAIN-SUFFIX,zhidian3g.cn
 DOMAIN-SUFFIX,zhifenjie.com
@@ -7916,7 +7906,6 @@ DOMAIN-SUFFIX,zhtjdl.com
 DOMAIN-SUFFIX,zhuanfakong.com
 DOMAIN-SUFFIX,zhuba8.com
 DOMAIN-SUFFIX,zhudiaosz.com
-DOMAIN-SUFFIX,zhuichaguoji.org
 DOMAIN-SUFFIX,zhushou.2345.com
 DOMAIN-SUFFIX,zhuuv.maoyumao.net
 DOMAIN-SUFFIX,zhwnlapi.etouch.cn
@@ -8160,7 +8149,6 @@ DOMAIN,log.v2.hunantv.com
 DOMAIN,v2.log.hunantv.com
 DOMAIN,ifacelog.iqiyi.com
 DOMAIN,msg.71.am
-DOMAIN,t7z.cupid.iqiyi.com
 DOMAIN-SUFFIX,deliver.ifeng.com
 DOMAIN,api.newad.ifeng.com
 DOMAIN,ifengad.3g.ifeng.com
@@ -8516,7 +8504,6 @@ DOMAIN,adbs.ximalaya.com
 DOMAIN-SUFFIX,appcpi.net
 DOMAIN-SUFFIX,bulldogcpi.com
 DOMAIN-SUFFIX,insurads.com
-DOMAIN-SUFFIX,juicyads.com
 IP-CIDR,101.227.97.240/32,no-resolve
 IP-CIDR,101.227.200.11/32,no-resolve
 IP-CIDR,101.227.200.28/32,no-resolve

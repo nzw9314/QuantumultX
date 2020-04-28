@@ -1,4 +1,4 @@
-#Update 2020.4.9 Self-use for testing only, there may be a lot of manslaughter.
+#Update 2020.4.27 Self-use for testing only, there may be a lot of manslaughter.
 DOMAIN-SUFFIX,admaster.com,REJECT
 DOMAIN-SUFFIX,0z5jn.cn,REJECT
 DOMAIN-SUFFIX,114so.cn,REJECT
@@ -440,7 +440,6 @@ DOMAIN-SUFFIX,a.tanx.com,REJECT
 DOMAIN-SUFFIX,a1.img.static.youmi.net,REJECT
 DOMAIN-SUFFIX,a2.img.static.youmi.net,REJECT
 DOMAIN-SUFFIX,a3.img.static.youmi.net,REJECT
-DOMAIN-SUFFIX,aboluowang.com,REJECT
 DOMAIN-SUFFIX,acceptable.a-ads.com,REJECT
 DOMAIN-SUFFIX,acookie.linezing.com,REJECT
 DOMAIN-SUFFIX,activity.tuipear.com,REJECT
@@ -604,8 +603,6 @@ DOMAIN-SUFFIX,diagnostics.support.microsoft.com,REJECT
 DOMAIN-SUFFIX,digg.analytics.live.com,REJECT
 DOMAIN-SUFFIX,distf.stat.kankan.com,REJECT
 DOMAIN-SUFFIX,dmm.aizhan.com,REJECT
-DOMAIN-SUFFIX,dongtaiwang.com,REJECT
-DOMAIN-SUFFIX,dongtaiwang.org,REJECT
 DOMAIN-SUFFIX,dualstack.adsame-1421766300.ap-southeast-1.elb.amazonaws.com,REJECT
 DOMAIN-SUFFIX,duomai.com,REJECT
 DOMAIN-SUFFIX,dw-collect.ksosoft.com,REJECT
@@ -628,7 +625,6 @@ DOMAIN-SUFFIX,ecpm.tanx.com,REJECT
 DOMAIN-SUFFIX,ef-dongfeng.tanx.com,REJECT
 DOMAIN-SUFFIX,ef.opendsp.tanx.com,REJECT
 DOMAIN-SUFFIX,ef.tanx.com,REJECT
-DOMAIN-SUFFIX,epochtimes.com,REJECT
 DOMAIN-SUFFIX,eso999.com,REJECT
 DOMAIN-SUFFIX,et.tanx.com,REJECT
 DOMAIN-SUFFIX,et.w.inmobi.com,REJECT
@@ -750,9 +746,7 @@ DOMAIN-SUFFIX,m.nbhaosheng168.com,REJECT
 DOMAIN-SUFFIX,m.rpaulfrank.com,REJECT
 DOMAIN-SUFFIX,m.tixing51.net,REJECT
 DOMAIN-SUFFIX,match.adsrvr.org,REJECT
-DOMAIN-SUFFIX,mhradio.org,REJECT
 DOMAIN-SUFFIX,minghui.com,REJECT
-DOMAIN-SUFFIX,minghui.org,REJECT
 DOMAIN-SUFFIX,mixpanel.com,REJECT
 DOMAIN-SUFFIX,mobaders.com,REJECT
 DOMAIN-SUFFIX,mobile.log.hunantv.com,REJECT
@@ -764,7 +758,6 @@ DOMAIN-SUFFIX,new.taobc.com,REJECT
 DOMAIN-SUFFIX,news.766ba.net,REJECT
 DOMAIN-SUFFIX,news.qhstatic.com,REJECT
 DOMAIN-SUFFIX,ns8.adk2x.com,REJECT
-DOMAIN-SUFFIX,ntdtv.com,REJECT
 DOMAIN-SUFFIX,ntdtv.org,REJECT
 DOMAIN-SUFFIX,ntjacb.com,REJECT
 DOMAIN-SUFFIX,ntpddq.com,REJECT
@@ -810,7 +803,6 @@ DOMAIN-SUFFIX,rc.mxmrt.com,REJECT
 DOMAIN-SUFFIX,rc.nxrxt.com,REJECT
 DOMAIN-SUFFIX,rdstat.tanx.com,REJECT
 DOMAIN-SUFFIX,redir.metaservices.microsoft.com,REJECT
-DOMAIN-SUFFIX,renminbao.com,REJECT
 DOMAIN-SUFFIX,report.qcloud.com,REJECT
 DOMAIN-SUFFIX,rl.go2yd.com,REJECT
 DOMAIN-SUFFIX,rs.haohaowan8.com,REJECT
@@ -841,11 +833,9 @@ DOMAIN-SUFFIX,sec-cdn.static.xiaomi.net,REJECT
 DOMAIN-SUFFIX,settings-sandbox.data.microsoft.com,REJECT
 DOMAIN-SUFFIX,sg.keytui.com,REJECT
 DOMAIN-SUFFIX,shentus.com,REJECT
-DOMAIN-SUFFIX,shenzhoufilm.com,REJECT
 DOMAIN-SUFFIX,shifen.com,REJECT
 DOMAIN-SUFFIX,shooter.m.jd.com,REJECT
 DOMAIN-SUFFIX,shouji.sougou.com,REJECT
-DOMAIN-SUFFIX,soundofhope.org,REJECT
 DOMAIN-SUFFIX,spcdnsp.i-mobile.co.jp,REJECT
 DOMAIN-SUFFIX,sqm.telemetry.microsoft.com.nsatc.net,REJECT
 DOMAIN-SUFFIX,srv.buysellads.com,REJECT
@@ -923,7 +913,6 @@ DOMAIN-SUFFIX,track.eyeviewads.com,REJECT
 DOMAIN-SUFFIX,tracker.yhd.com,REJECT
 DOMAIN-SUFFIX,tracklog.58.com,REJECT
 DOMAIN-SUFFIX,trc.taboola.com,REJECT
-DOMAIN-SUFFIX,tuidang.epochtimes.com,REJECT
 DOMAIN-SUFFIX,tvupgrade.yunos.com,REJECT
 DOMAIN-SUFFIX,u-x.jd.com,REJECT
 DOMAIN-SUFFIX,u.123hala.com,REJECT
@@ -967,7 +956,6 @@ DOMAIN-SUFFIX,whzhi.com,REJECT
 DOMAIN-SUFFIX,wmedia.adk2x.com,REJECT
 DOMAIN-SUFFIX,wn.x.jd.com,REJECT
 DOMAIN-SUFFIX,wrating.com,REJECT
-DOMAIN-SUFFIX,wujieliulan.com,REJECT
 DOMAIN-SUFFIX,wvver.com,REJECT
 DOMAIN-SUFFIX,ww6.adm-cnzz.net,REJECT
 DOMAIN-SUFFIX,wwetjy.com,REJECT
