@@ -1,32 +1,36 @@
 /*
-腾讯新闻签到修改版，可以自动阅读文章获取红包
+腾讯新闻签到修改版，可以自动阅读文章获取红包，该活动为瓜分百万阅读红包挑战赛，针对幸运用户参与
+
 获取Cookie方法:
-1. 把以下地址复制到响应配置下，非Quantumult X 1.0.8+ 版，请删除tag标签
+1. 把以下地址复制到响应配置下，非Quantumult X 1.0.8+ 版，请删除tag标签;
+2.打开腾讯新闻app，阅读几篇文章，倒计时结束后即可获取阅读Cookie;
+3.获取红包ID的Cookie方法，点击红包倒计时，或者点击活动页面的专属红包任务，有些账号可能无，或者打开链接，可能激活阅读红包，链接地址:https://news.qq.com/FERD/cjRedDown.htm
+4.现阶段每日共9个阶梯红包，具体情况视腾讯而变动
+5.脚本运行一次阅读一篇文章，请不要连续运行，防止封号，可设置每几分钟运行一次，至少每2分钟一次
+6.可能腾讯有某些限制，有些号码无法领取红包，手动阅读几篇，能领取红包，一般情况下都是正常的
+7.此版本会频繁阅读通知，可关闭通知，或者使用本仓库 txnews2.js
+
+---------------------
+Surge 4.0
+[Script]
+腾讯新闻 = type=cron,cronexp=0 8 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/txnews.js,script-update-interval=0
+
+腾讯新闻 = type=http-request,pattern=https:\/\/api\.inews\.qq\.com\/event\/v1\/user\/event\/report\?,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/txnews.js
+腾讯新闻 = type=http-request,pattern=^https:\/\/api\.inews\.qq\.com\/activity\/v1\/redpack\/user\/list\?activity_id,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/txnews.js
+
+~~~~~~~~~~~~~~~~
+QX 1.0.7+ :
  [task_local]
 0 9 * * * txnews.js, tag=腾讯新闻
  [rewrite_local]
 https:\/\/api\.inews\.qq\.com\/event\/v1\/user\/event\/report\? url script-request-header txnews.js
-
+# 获取红包ID
 ^https:\/\/api\.inews\.qq\.com\/activity\/v1\/redpack\/user\/list\?activity_id url script-request-header txnews.js
-
-
  [MITM]
 hostname = api.inews.qq.com
 
-3.打开腾讯新闻app，阅读一篇文章，倒计时结束后即可获取Cookie
-红包ID的Cookie，点击红包倒计时，或者点击活动页面的专属红包任务，有些账号可能无，
+---------------------------
 
-4.现阶段每日共9个阶梯红包，具体阅读篇数视腾讯情况而变动
-
-5.脚本运行一次阅读一篇文章，请不要连续运行，防止封号，可设置每几分钟运行一次
-
-6.可能腾讯有某些限制，有些号码无法领取红包，手动阅读几篇，能领取红包，一般情况下都是正常的
-
-7.此版本会频繁阅读通知，可关闭通知，或者使用本仓库 txnews2.js
-
-8.4月27日修复该账户为非活动用户，增加获取红包ID的Cookie，点击红包倒计时，或者点击活动页面的专属红包任务
-
-~~~~~~~~~~~~~~~~
 Cookie获取后，请注释掉Cookie地址。
 
 #腾讯新闻app签到，根据红鲤鱼与绿鲤鱼与驴修改
@@ -172,6 +176,9 @@ function Redpack() {
              }
         else if (rcash.ret == 2016){
             redpack = " "+rcash.info
+            }
+        else if (rcash.ret == 1003){
+            redpack = " 请重新获取红包ID"
             }
         else {
             redpack =  " "+rcash.info

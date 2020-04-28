@@ -16,13 +16,12 @@ by Macsuny
 ~~~~~~~~~~~~~~~~
 Surge 4.0 :
 [Script]
-jddj.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js,script-update-interval=0
+京东到家 = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js,script-update-interval=0
 
 # 获取京东到家 Cookie.
-jddj.js = script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js,type=http-request,pattern=https:\/\/daojia\.jd\.com\/client\?_jdrandom=\d{13}&functionId=%2Fsignin
-
+京东到家 = type=http-request,pattern=https:\/\/daojia\.jd\.com\/client\?_jdrandom=\d{13}&functionId=%2Fsignin,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js,
 ~~~~~~~~~~~~~~~~
-QX 1.0.5+ :
+QX 1.0.7+ :
 [task_local]
 0 9 * * * jddj.js
 

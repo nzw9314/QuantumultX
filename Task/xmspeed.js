@@ -12,10 +12,10 @@ by Macsuny
 ~~~~~~~~~~~~~~~~
 Surge 4.0 :
 [Script]
-xmspeed.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/xmspeed.js,script-update-interval=0
+喜马拉雅极速版 = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/xmspeed.js,script-update-interval=0
 
 # 获取喜马拉雅极速版 Cookie.
-xmspeed.js = script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/xmspeed.js,type=http-request,pattern=https:\/\/m\.ximalaya\.com\/speed\/task-center\/account\/coin
+喜马拉雅极速版 = type=http-request,pattern=https:\/\/m\.ximalaya\.com\/speed\/task-center\/account\/coin,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/xmspeed.js
 
 ~~~~~~~~~~~~~~~~
 QX 1.0.6+ :
@@ -23,10 +23,10 @@ QX 1.0.6+ :
 0 9 * * * xmspeed.js
 
 [rewrite_local]
-# Get cookie. QX 1.0.5(188+):
 https:\/\/m\.ximalaya\.com\/speed\/task-center\/account\/coin url script-request-header xmspeed.js
 ~~~~~~~~~~~~~~~~
-QX or Surge [MITM]
+# QX or Surge 
+[MITM]
 hostname = m.ximalaya.com
 ~~~~~~~~~~~~~~~~
 

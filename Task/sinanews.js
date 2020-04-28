@@ -3,24 +3,19 @@
 
 1.打开app,点击”我的“=>”签到“，获取第一个Cookie，通知获取信息成功
 2.在未签到情况下，先禁用第一条Cookie链接，然后再次进入签到，通知获取签到Cookie成功 surge极速版配置请自行更换
-Surge 4.0
+Surge 4.0:
 [Script]
-# 新浪新闻cookie
-新浪 Cookie = script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/sinanews.js,type=http-request,pattern=https:\/\/newsapi\.sina\.cn\/\?resource=hbpage&newsId=HB-1-sina_gold_center
-新浪 Cookie = script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/sinanews.js,type=http-request,pattern=https:\/\/newsapi\.sina\.cn\/\?resource=userpoint\/signIn
-
-#新浪新闻
-cron "58 7 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/sinanews.js
+新浪新闻 = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/sinanews.js,script-update-interval=0
+新浪新闻 = type=http-request,pattern=https:\/\/newsapi\.sina\.cn\/\?resource=hbpage&newsId=HB-1-sina_gold_center,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/sinanews.js
+新浪新闻 = type=http-request,pattern=https:\/\/newsapi\.sina\.cn\/\?resource=userpoint\/signIn,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/sinanews.js
 
 ------------------
 
-QX 1.0.5+ :
+#QX 1.0.7+ :
 [task_local]
 0 9 * * * sinanews.js
-
 [rewrite_local]
 https:\/\/newsapi\.sina\.cn\/\?resource=hbpage&newsId=HB-1-sina_gold_center url script-request-header sinanews.js
-
 https:\/\/newsapi\.sina\.cn\/\?resource=userpoint\/signIn url script-request-header sinanews.js
 
 [MITM]
@@ -29,11 +24,10 @@ hostname = newsapi.sina.cn
 ＃新浪新闻极速版配置
 
 [rewrite_local]
-https?:\/\/lite\.sina\.cn\/\?resource=hbpage&newsId=HB-1-sina_gold_center - script-request-header sinanewslite.js
-https?:\/\/lite\.sina\.cn\/\?resource=userpoint\/signIn - script-request-header sinanewslite.js
-
+https?:\/\/lite\.sina\.cn\/\?resource=hbpage&newsId=HB-1-sina_gold_center - script-request-header sinanews.js
+https?:\/\/lite\.sina\.cn\/\?resource=userpoint\/signIn - script-request-header sinanews.js
 [task_local]
-0 9 * * * sinanewslite.js
+0 9 * * * sinanews.js
 
 ~~~~~~~~~~~~~~~~
 

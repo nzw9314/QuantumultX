@@ -11,7 +11,7 @@ QX 1.0.6+ :
 [task_local]
 1 10 * * * tvpreview.js
 
-Surge 4.0 :  无效
+Surge 4.0 :  
 [Script]
 tvpreview.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/tvpreview.js,script-update-interval=0
 
