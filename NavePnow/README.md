@@ -15,7 +15,6 @@
 =================
 
    * [Profiles](#profiles)
-   * [Table of Contents](#table-of-contents)
       * [Filter - Surge and QuantumultX 规则集](#filter---surge-and-quantumultx-规则集)
       * [Scripts](#scripts)
          * [Surge/QuantumultX](#surgequantumultx)
@@ -28,11 +27,15 @@
          * [Google Apps Script](#google-apps-script)
             * [google_script/singtel.js](#google_scriptsingteljs)
             * [google_script/calendar.js](#google_scriptcalendarjs)
-            * [google_script/ss-checkin.js](#google_scriptss-checkinjs)
+            * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/ss-checkin.js" rel="nofollow">google_script/ss-checkin.js</a>](#google_scriptss-checkinjs)
          * [JSBox](#jsbox)
             * [JSBox/NUS_NextBus.js](#jsboxnus_nextbusjs)
             * [JSBox/Singtel .js](#jsboxsingteljs)
-      * [Tip Jar](#tip-jar)
+      * [作者](#作者)
+      * [<g-emoji class="g-emoji" alias="handshake" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f91d.png">🤝</g-emoji> Contributing](#-contributing)
+      * [<g-emoji class="g-emoji" alias="moneybag" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4b0.png">💰</g-emoji> Show your support](#-show-your-support)
+      * [<g-emoji class="g-emoji" alias="pray" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f64f.png">🙏</g-emoji> 鸣谢](#-鸣谢)
+      * [<g-emoji class="g-emoji" alias="memo" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png">📝</g-emoji> License](#-license)
 
 ## Filter - Surge and QuantumultX 规则集
 
@@ -240,8 +243,31 @@
 3.  注意⚠️
     1. 如果有问题，欢迎 [反馈](https://t.me/Leped_Bot) 
 
-## Tip Jar
+## 作者
 
-| PayPal                                                                                                                                                                       | 微信赞赏 WeChat Pay                                                                                                    |
+👤 **Evan**
+
+* Twitter: [@NavePnow](https://twitter.com/NavePnow)
+* Github: [@NavePnow](https://github.com/NavePnow)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+Feel free to check [issues page](https://github.com/NavePnow/Profiles/issues).
+
+## 💰 Show your support
+
+Give a ⭐️ if this project helped you!
+
+| PayPal                                                                                                                                                                       | Patron                                                                                                    |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DSZJCN4ZUEW74&currency_code=USD&source=url) | <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/1234.JPG" width="200">
+| [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DSZJCN4ZUEW74&currency_code=USD&source=url) |   <a href="https://www.patreon.com/NavePnow"> <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160"> </a>
+
+## 🙏 鸣谢
+* Instructor：[Neurogram](https://github.com/Neurogram-R), [wangfei021325](https://t.me/wangfei021325)
+
+## 📝 License
+
+---
+Copyright © 2020 [Evan](https://github.com/NavePnow).
+This project is [MIT](https://github.com/NavePnow/Profiles/blob/master/LICENSE) licensed.

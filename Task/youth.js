@@ -62,16 +62,18 @@ async function all()
 { 
   await sign();
   await signInfo();
+  await Invitant();
+  await readcmp();
 }
 
 function sign() {      
   return new Promise((resolve, reject) =>
    {
-    const url = { 
+    const signurl = { 
       url: 'https://kd.youth.cn/TaskCenter/sign', 
       headers: JSON.parse(signheaderVal),
 }
-     sy.get(url, (error, response, data) =>
+     sy.get(signurl, (error, response, data) =>
  {
       sy.log(`${CookieName}, data: ${data}`)
        signresult =JSON.parse(data)
@@ -91,29 +93,42 @@ resolve()
 function signInfo() {      
   return new Promise((resolve, reject) =>
    {
-    const url = { 
+    const infourl = { 
       url: 'https://kd.youth.cn/TaskCenter/getSign', 
       headers: JSON.parse(signheaderVal),
 }
-   sy.post(url, (error, response, data) =>
+   sy.post(infourl, (error, response, data) =>
  {
      sy.log(`${CookieName}, data: ${data}`)
       signinfo =JSON.parse(data)
       if (signinfo.status == 1){
-         subTitle += `  总计: ${signinfo.data.user.score}个青豆`
+
+         subTitle += ` 总计: ${signinfo.data.user.score}个青豆`
          detail += `账户昵称: ${signinfo.data.user.nickname}  已签到: ${signinfo.data.total_day}天，签到获得${signinfo.data.sign_score}个青豆`
            }
        else {
-          subTitle = `${signinfo.msg}`
+          subTitle += `${signinfo.msg}`
           detail= ``
          }
-
-      sy.msg(CookieName,subTitle,detail)
-resolve()
+   sy.msg(CookieName,subTitle,detail)
        })
+    resolve()
      })
   }
 
+function Invitant() {      
+  const time = new Date().getTime()
+    const url = { 
+      url: `https://kandian.youth.cn/user/share10?jsonpcallback=jQuery20308283175368764079_${time+4}&uid=46308484&_=${time}0`, 
+      headers: JSON.parse(signheaderVal),
+}
+  url.headers['Host']='kandian.youth.cn'
+   sy.get(url, (error, response, data) =>
+ {
+   //sy.log(`Invitdata:${data}`)
+ })
+ 
+}
 
 
 function init() {

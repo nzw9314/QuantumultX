@@ -50,7 +50,7 @@ let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
    GetCookie()
 } else {
-   getsign()
+   all()
 }
 
 function GetCookie() {
@@ -70,9 +70,18 @@ if ($request && $request.method != 'OPTIONS'&& $request.url.match(/redpack\/user
   sy.msg(cookieName, `获取红包ID: 成功🎉`, ``)
   }
  }
+async function all() 
+{ 
+  await getsign();
+  await toRead();
+  await StepsTotal();
+  await Redpack();
+  await getTotal();
+}
 
 //签到
 function getsign() {
+ return new Promise((resolve, reject) => {
   const llUrl = {
     url: `https://api.inews.qq.com/task/v1/user/signin/add?`,headers:{Cookie: cookieVal}
   };
@@ -84,12 +93,13 @@ function getsign() {
        next = obj.data.next_points
        tip =  obj.data.tip_soup
        Dictum = tip.replace(/[\<|\.|\>|br]/g,"")+"----- "+obj.data.author.replace(/[\<|\.|\>|br|图|腾讯网友]/g,"")
-       str =  '签到成功，已连续签到' + obj.data.signin_days+'天  '+'明天将获得'+ next +'个金币'
-       toRead()} 
+       str =  '签到成功，已连续签到' + obj.data.signin_days+'天  '+'明天将获得'+ next +'个金币'}
       else {
         sy.msg('签到失败，🉐登录腾讯新闻app获取cookie', "", "")
         console.log('签到失败，🉐登录腾讯新闻app获取cookie'+data)
      }
+  resolve()
+    })
   })
 }
 
@@ -105,7 +115,6 @@ function toRead() {
       sy.msg(cookieName, '阅读:'+ error)
         }else{
        sy.log(`${cookieName}阅读文章 - data: ${data}`)}
-       StepsTotal()
     })
   }
 
@@ -113,7 +122,7 @@ function toRead() {
 //阅读文章统计
 function StepsTotal() {
   const ID =  signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
-
+return new Promise((resolve, reject) => {
   const StepsUrl = {
     url: `https://api.inews.qq.com/activity/v1/activity/info/get?activity_id=${RedID}&${ID}`,
    headers: {
@@ -121,7 +130,6 @@ function StepsTotal() {
     },
   };
     sy.get(StepsUrl, (error, response, data) => {
-      try {
         sy.log(`${cookieName}阅读统计 - data: ${data}`)
         article = JSON.parse(data)
         if (article.ret == 0){
@@ -134,8 +142,7 @@ function StepsTotal() {
       if (redpackgot == redpacktotal-1){
          articletotal = '\n今日共'+redpacktotal+'个阶梯红包，' +'已领取'+redpackgot+'个，'+`已阅读`+ haveread+`篇文章，`+ `阅读至`+getreadpack+'篇，可领取今日最后一次红包' }
       if (redpackgot == redpacktotal){
-       articletotal = `\n今日已阅读` + getreadpack+ `篇，`+ `共领取`+  redpackgot +`个阶梯红包`
-     }
+       articletotal = `\n今日已阅读` + getreadpack+ `篇，`+ `共领取`+  redpackgot +`个阶梯红包`}
         str += articletotal + `\n`+ Dictum
          }
      else if (article.ret == 2011){
@@ -144,23 +151,20 @@ function StepsTotal() {
      else {
      sy.log(cookieName + ` 返回值: ${article.ret}, 返回信息: ${article.info}`) 
          }
-       }
-      catch (e) {
-      sy.msg(cookieName, "",'阅读统计:失败'+ e)
-     }
-   Redpack()
+    resolve()
+    })
   })
 }
 //阶梯红包到账
 function Redpack() {
   const ID =  signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
+return new Promise((resolve, reject) => {
   const cashUrl = {
     url: `https://api.inews.qq.com/activity/v1/activity/redpack/get?isJailbreak=0&${ID}`,
       headers: {Cookie: cookieVal},
     body: `activity_id=${RedID}`
   };
     sy.post(cashUrl, (error, response, data) => {
-      try {
         sy.log(`${cookieName}阶梯红包提取 - data: ${data}`)
         rcash = JSON.parse(data)
         if (rcash.ret == 0){
@@ -183,16 +187,14 @@ function Redpack() {
         else {
             redpack =  " "+rcash.info
              }
-       getTotal()
-       }
-      catch (e) {
-      sy.log(`❌ ${cookieName} read - 阅读奖励: ${e}`)
-     }
+        resolve()
+      })
   })
 }
 
 //收益总计
 function getTotal() {
+return new Promise((resolve, reject) => {
   const totalUrl = {
     url: `https://api.inews.qq.com/activity/v1/usercenter/activity/list?isJailbreak`,
     headers: {Cookie: cookieVal}};
@@ -202,13 +204,13 @@ function getTotal() {
      if (log) console.log("获取收益信息" + data)
     } else {
      const obj = JSON.parse(data)
-        notb = '总计:'+obj.data.wealth[0].title +'金币  '+"红包" +obj.data.wealth[1].title+'元'+ redpack;
-        }
-       if (notify == true){
-        sy.msg(cookieName, notb, str)
+        notb = '总计:'+obj.data.wealth[0].title +'金币  '+"红包" +obj.data.wealth[1].title+'元'+ redpack}
+   if (notify == true){
+       sy.msg(cookieName, notb, str)
+       //sy.log(cookieName +","+notb+ "\n" +str)
        }
-        sy.log(cookieName +","+notb+ "\n" )
-     })
+    })
+   })
  }
 
 function init() {
