@@ -20,7 +20,9 @@ tvpreview.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubuser
 
 By Macsuny                   
 */
+const c = "cctv8"  // 可更改电视台，从电视家网络活动中获取，央视可以直接改后缀数字
 
+const method = "GET";
 const sy = init();
        d = new Date();
        M = d.getMonth()+1, D = d.getDate();
@@ -36,11 +38,9 @@ const sy = init();
       weekday[6]="星期六";
   n = weekday[d.getDay()]
 
-const c = "cctv8"  // 可更改电视台，从电视家网络活动中获取，央视可以直接改后缀数字
 const wurl = {
     url: "http://api.cntv.cn/epg/epginfo?serviceId=cbox&c="+c,
 }
-  sy.get(wurl, (error, response, data) => {
    $task.fetch(wurl).then(response => {    
    try { 
       let result = JSON.parse(response.body)                              
@@ -69,8 +69,6 @@ const wurl = {
       $notify("无此频道节目信息或者台号错误❌", "请检查后重试", err)
      console.log(err)
     }
-    resolve()
-  })
 $done()
 })
 

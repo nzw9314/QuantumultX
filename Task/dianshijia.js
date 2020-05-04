@@ -8,6 +8,7 @@
 3.非专业人士制作，欢迎各位大佬提出宝贵意见和指导
 4. 2020年4月18日 14:30变更surge地址
 5. 5月1日添加走路金币，默认最低领取10金币,每日步数20000步，防止封号可以适当调低
+6.5月3日增加睡觉金币，请晚上设置8:00-23:00运行一次，早上7点运行一次，过时会衰减
 
 仅测试Quantumult x，Surge、Loon自行测试
 By Macsuny
@@ -82,15 +83,15 @@ function sign() {
       const url = { url: signurlVal, headers: JSON.parse(signheaderVal)}
       sy.get(url, (error, response, data) =>
        {
-      //sy.log(`${cookieName}, data: ${data}`)
+      sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
       if  (result.errCode == 0) 
           { subTitle = `签到结果: 成功🎉`
             var h = result.data.reward.length
           if (h>1){
-            detail = `获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name}`
+            detail = `获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name}\n`
            }else
-             {detail = `已签到 ${result.data.conDay}天，获取金币${result.data.reward[0].count}`
+             {detail = `已签到 ${result.data.conDay}天，获取金币${result.data.reward[0].count}\n`
              }
            }
     else if  (result.errCode == 4)
@@ -114,7 +115,7 @@ function total() {
    sy.get(coinurl, (error, response, data) => {
      sy.log(`${cookieName}, data: ${data}`)
      const result = JSON.parse(data)
-     subTitle += `待兑换: ${result.data.coin}金币 ` 
+     subTitle += `待兑换${result.data.coin}金币 ` 
    try{
       for(tempCoin in data){
        for (i=0;i<result.data.tempCoin.length;i++) {  
@@ -135,7 +136,7 @@ function cash() {
       let url = { url: `http://api.gaoqingdianshi.com/api/cash/info`, headers: JSON.parse(signheaderVal)}
       sy.get(url, (error, response, data) => 
       {
-      //sy.log(`data: ${data}`)
+      sy.log(`data: ${data}`)
       const result = JSON.parse(data)
       subTitle += '现金: '+ result.data.amount/100+'元 '
       resolve()
@@ -147,14 +148,14 @@ function share() {
  return new Promise((resolve, reject) => {    
     shareurl = { url: `http://api.gaoqingdianshi.com/api/v4/task/complete?code=1M005`, headers: JSON.parse(signheaderVal)}
     sy.get(shareurl, (error, response, data) => {
-     //sy.log(`${cookieName}, data: ${data}`)
+     sy.log(`${cookieName}, data: ${data}`)
         const result = JSON.parse(data)
      if (result.errCode == 0)  
        {
-        detail = `\n分享获取金币: 💰${result.data.getCoin}`
+        detail += `分享获取${result.data.getCoin}个金币`
        } 
     sy.get(coinurl, (error, response, data) => {
-      //sy.log(`${cookieName}, data: ${data}`)
+      sy.log(`${cookieName}, data: ${data}`)
       const result = JSON.parse(data)
        for(tempCoin in data){
   for (i=0;i<result.data.tempCoin.length;i++)                

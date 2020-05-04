@@ -2,98 +2,304 @@
 // 链接`http://html34.qukantoutiao.net/qpr2/bBmQ.html?pid=5eb14518`
 // 农妇山泉 -> 有点咸
 
+/********************
+ * 1、 为了方便任意脚本可以清除Cookie, 任意一个脚本将DeleteCookie = true且选择要清除的账号都可以生效
+ * 2、 debug模式可以在Surge&&Qx中开启,方便你判定多用户及脚本运行情况
+ * 3、 Qx==>dubug:miduRede构造请求
+ * 4、 Surge==>debug:load脚本->evalaute
+ * 5、脚本默认每半小时通知一次,建议自己先debug看看是否成功
+ *********************/
+
+// 是否开启清除Cookie
+const DeleteCookie = false // 清除所有Cookie,将下方改为true,默认false
+
+// 选取清除操作
+const DeleteCookieAll = false // 清除所有
+const DeleteCookieOne = false // 清除账户一
+const DeleteCookieTwo = false // 清除账户二
+
+const debug = false // 开启debug模式,每次脚本执行会显示通知,默认false
+
+const bind = true // 绑定作者邀请码,默认true,可更改为false
+
 const cookieName = '米读阅读时长'
-const readTimebodyKey = 'senku_readTimebody_midu'
-// 账号一
-const readTimeheaderKey = 'senku_readTimeheader_midu'
-const signbodyKey = 'senku_signbody_midu'
-const tokenKey = 'tokenMidu_read'
-// 账号二
-const readTimeheaderKey2 = 'senku_readTimeheader_midu2'
-const signbodyKey2 = 'senku_signbody_midu2'
-const tokenKey2 = 'tokenMidu_read2'
 
 const senku = init()
-const readTimebodyVal = senku.getdata(readTimebodyKey)
 
-const readTimeheaderVal = senku.getdata(readTimeheaderKey)
-const readTimeheaderVal2 = senku.getdata(readTimeheaderKey2)
-const token = senku.getdata(tokenKey)
-const token2 = senku.getdata(tokenKey2)
-const readTimeurlVal = 'https://apiwz.midukanshu.com/user/readTimeBase/readTime?' + readTimebodyVal
-const signinfo = {}
 
-// 清除Cookie,将下方改为true,默认false
-const DeleteCookie = false
-// 开启debug模式,每次脚本执行会显示通知,默认false
-const debug = false
-senku.log(`🍎${readTimeheaderVal}`)
-senku.log(`🍎${readTimeheaderVal2}`)
 if (DeleteCookie) {
-    if (token) {
-        senku.setdata("", "tokenMidu_read")
-        senku.setdata("", "tokenMidu_read2")
-        senku.setdata("", "tokenMidu_sign")
-        senku.setdata("", "tokenMidu_sign2")
-        senku.msg("米读 Cookie清除成功 !", "", '请手动关闭脚本内"DeleteCookie"选项')
+    const one = senku.getdata('tokenMidu_read')
+    const two = senku.getdata('tokenMidu_sign')
+    const three = senku.getdata('tokenMidu_read2')
+    const four = senku.getdata('tokenMidu_sign2')
+    if (DeleteCookieAll) {
+        if (one || two || three || four) {
+            senku.setdata("", 'senku_signbody_midu')
+            senku.setdata("", 'senku_signbody_midu2')
+            senku.setdata("", 'senku_readTimebody_midu')
+            senku.setdata("", 'senku_readTimebody_midu2')
+            senku.setdata("", 'senku_readTimeheader_midu')
+            senku.setdata("", 'senku_readTimeheader_midu2')
+            senku.setdata("", "tokenMidu_read")
+            senku.setdata("", "tokenMidu_read2")
+            senku.setdata("", "tokenMidu_sign")
+            senku.setdata("", "tokenMidu_sign2")
+            senku.msg("米读 Cookie清除成功 !", "", '请手动关闭脚本内"DeleteCookie"选项')
+        } else {
+            senku.msg("米读 无可清除的Cookie !", "", '请手动关闭脚本内"DeleteCookie"选项')
+        }
+    } else if (DeleteCookieOne) {
+        if (one || two) {
+            senku.setdata("", 'senku_signbody_midu')
+            senku.setdata("", 'senku_readTimebody_midu')
+            senku.setdata("", 'senku_readTimeheader_midu')
+            senku.setdata("", "tokenMidu_read")
+            senku.setdata("", "tokenMidu_sign")
+            senku.msg("米读 Cookie清除成功 !", "清除账户一选项", '请手动关闭脚本内"DeleteCookie"选项')
+        } else {
+            senku.msg("米读 无可清除的Cookie !", "清除账户一选项", '请手动关闭脚本内"DeleteCookie"选项')
+        }
+    } else if (DeleteCookieTwo) {
+        if (three || four) {
+            senku.setdata("", 'senku_signbody_midu2')
+            senku.setdata("", 'senku_readTimebody_midu2')
+            senku.setdata("", 'senku_readTimeheader_midu2')
+            senku.setdata("", "tokenMidu_read2")
+            senku.setdata("", "tokenMidu_sign2")
+            senku.msg("米读 Cookie清除成功 !", "清除账户二选项", '请手动关闭脚本内"DeleteCookie"选项')
+        } else {
+            senku.msg("米读 无可清除的Cookie !", "清除账户二选项", '请手动关闭脚本内"DeleteCookie"选项')
+        }
     } else {
-        senku.msg("米读 无可清除的Cookie !", "", '请手动关闭脚本内"DeleteCookie"选项')
+        senku.msg("米读 清除Cookie !", "未选取任何选项", '请手动关闭脚本内"DeleteCookie"选项')
     }
 }
 debug ? senku.setdata('true', 'debug') : senku.setdata('false', 'debug')
+bind ? '' : senku.setdata('', 'bind');
 
-;
-(sign = async () => {
-    senku.log(`🔔 ${cookieName},token:${token} token2:${token2}`)
-    if (token) {
-        token == token2 ? senku.msg('米读阅读', '阅读token重复', '清除Cookie再试一次') : await readTime(readTimeheaderVal, '账号一')
+function initial() {
+    signinfo = {
+        addnumList: [],
+        rollList: [],
+        doubleList: []
     }
-    if (token2 && token2 != token) {
-        await readTime(readTimeheaderVal2, '账号二')
+}
+
+(sign = () => {
+    senku.log(`🔔 ${cookieName}`)
+    senku.getdata('tokenMidu_read') ? '' : senku.msg('米读阅读', '', '不存在Cookie')
+    DualAccount = true
+    if (senku.getdata('tokenMidu_read')) {
+        tokenVal = senku.getdata('tokenMidu_read')
+        readTimeheaderVal = senku.getdata('senku_readTimeheader_midu')
+        readTimebodyVal = senku.getdata('senku_readTimebody_midu')
+        signbodyVal = senku.getdata('senku_signbody_midu')
+        all()
     }
     senku.done()
 })().catch((e) => senku.log(`❌ ${cookieName} 签到失败: ${e}`), senku.done())
 
 
+async function all() {
+    senku.log(`🍎${readTimeheaderVal}`)
+    const headerVal = readTimeheaderVal
+    const urlVal = readTimebodyVal
+    const key = signbodyVal
+    const token = tokenVal
+    initial()
+
+    await readTime(headerVal, token, urlVal)
+    await userInfo(key)
+    await prizeInfo(key)
+    if (signinfo.prizeInfo.data.total_num) {
+        await prizeTask(key)
+        await drawPrize(key)
+    }
+    await showmsg()
+
+}
+
+function double() {
+    initial()
+    DualAccount = false
+    if (senku.getdata('tokenMidu_read2')) {
+        tokenVal = senku.getdata('tokenMidu_read2')
+        readTimeheaderVal = senku.getdata('senku_readTimeheader_midu2')
+        readTimebodyVal = senku.getdata('senku_readTimebody_midu2')
+        signbodyVal = senku.getdata('senku_signbody_midu2')
+        all()
+    }
+}
+// 抽奖
+function drawPrize(bodyVal) {
+    return new Promise((resolve, reject) => {
+        const drawPrizeurlVal = 'https://apiwz.midukanshu.com/wz/task/drawPrize?' + bodyVal
+        const url = {
+            url: drawPrizeurlVal,
+            headers: {}
+        }
+        url.headers['Host'] = 'apiwz.midukanshu.com'
+        url.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        url.headers['User-Agent'] = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+        senku.post(url, (error, response, data) => {
+            try {
+                senku.log(`❕ ${cookieName} drawPrize - response: ${JSON.stringify(response)}`)
+                signinfo.drawPrize = JSON.parse(data)
+                resolve()
+            } catch (e) {
+                senku.msg(cookieName, `抽奖: 失败`, `说明: ${e}`)
+                senku.log(`❌ ${cookieName} drawPrize - 抽奖失败: ${e}`)
+                senku.log(`❌ ${cookieName} drawPrize - response: ${JSON.stringify(response)}`)
+                resolve()
+            }
+        })
+    })
+}
+
+// 观看视频获取抽奖机会
+function prizeTask(bodyVal) {
+    return new Promise((resolve, reject) => {
+        const prizeTaskurlVal = 'https://apiwz.midukanshu.com/wz/task/prizeTask?' + bodyVal
+        const url = {
+            url: prizeTaskurlVal,
+            headers: {}
+        }
+        url.headers['Host'] = 'apiwz.midukanshu.com'
+        url.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        url.headers['User-Agent'] = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+        senku.post(url, (error, response, data) => {
+            try {
+                senku.log(`❕ ${cookieName} prizeTask - response: ${JSON.stringify(response)}`)
+                signinfo.prizeTask = JSON.parse(data)
+                resolve()
+            } catch (e) {
+                senku.msg(cookieName, `观看视频抽奖: 失败`, `说明: ${e}`)
+                senku.log(`❌ ${cookieName} prizeTask - 观看视频抽奖失败: ${e}`)
+                senku.log(`❌ ${cookieName} prizeTask - response: ${JSON.stringify(response)}`)
+                resolve()
+            }
+        })
+    })
+}
+
+// 抽奖信息
+function prizeInfo(bodyVal) {
+    return new Promise((resolve, reject) => {
+        const prizeInfourlVal = 'https://apiwz.midukanshu.com/wz/task/prizeList?' + bodyVal
+        const url = {
+            url: prizeInfourlVal,
+            headers: {}
+        }
+        url.headers['Host'] = 'apiwz.midukanshu.com'
+        url.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        url.headers['User-Agent'] = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+        senku.post(url, (error, response, data) => {
+            try {
+                senku.log(`❕ ${cookieName} prizeInfo - response: ${JSON.stringify(response)}`)
+                signinfo.prizeInfo = JSON.parse(data)
+                resolve()
+            } catch (e) {
+                senku.msg(cookieName, `抽奖信息: 失败`, `说明: ${e}`)
+                senku.log(`❌ ${cookieName} prizeInfo - 抽奖信息失败: ${e}`)
+                senku.log(`❌ ${cookieName} prizeInfo - response: ${JSON.stringify(response)}`)
+                resolve()
+            }
+        })
+    })
+}
 // 阅读时长
-function readTime(header, account) {
+function readTime(header, token, urlVal) {
     return new Promise((resolve, reject) => {
         const url = {
-            url: readTimeurlVal,
-            headers: JSON.parse(header)
+            url: 'https://apiwz.midukanshu.com/user/readTimeBase/readTime?' + urlVal,
+            headers: {
+                'host': 'apiwz.midukanshu.com',
+                'versionName': '1.7.1.0430.1512',
+                "User-Agent": "MRSpeedNovel/0430.1512 CFNetwork/1125.2 Darwin/19.5.0",
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                'token': token,
+                'tk': header
+            }
         }
+
         senku.post(url, (error, response, data) => {
             try {
                 senku.log(`❕ ${cookieName} readTime - response: ${JSON.stringify(response)}`)
                 signinfo.readTime = JSON.parse(data)
-                let subTitle = ''
-                let detail = ''
-                if (signinfo.readTime && signinfo.readTime.code == 0) {
-                    const coin = signinfo.readTime.data.coin
-                    const readTotalMinute = signinfo.readTime.data.readTotalMinute
-                    coin == 0 ? detail += `` : detail += `【阅读时长】获得${coin}💰`
-                    if (readTotalMinute % 20 == 0) {
-                        readTotalMinute ? detail += ` 阅读时长${readTotalMinute / 2}分钟` : detail += ``
-                        senku.msg(cookieName, account + subTitle, detail)
-                    } else if (senku.getdata('debug') == 'true') {
-                        readTotalMinute ? detail += ` 阅读时长${readTotalMinute / 2}分钟` : detail += ``
-                        senku.msg(cookieName, account + subTitle, detail)
-                    }
-                } else if (signinfo.readTime.code != 0) {
-                    detail += `【阅读时长】错误代码${signinfo.readTime.code},错误信息${signinfo.readTime.message}`
-                    senku.msg(cookieName, account + subTitle, detail)
-                } else {
-                    detail += '【阅读时长】失败'
-                    senku.msg(cookieName, account + subTitle, detail)
-                }
                 resolve()
             } catch (e) {
-                senku.msg(cookieName, account + `阅读时长: 失败`, `说明: ${e}`)
-                senku.log(`❌ ${cookieName} readTime - 签到失败: ${e}`)
+                senku.msg(cookieName, +`阅读时长: 失败`, `说明: ${e}`)
+                senku.log(`❌ ${cookieName} readTime - 阅读时长失败: ${e}`)
                 senku.log(`❌ ${cookieName} readTime - response: ${JSON.stringify(response)}`)
                 resolve()
             }
         })
+    })
+}
+
+// 用户信息
+function userInfo(bodyVal) {
+    return new Promise((resolve, reject) => {
+        const userInfourlVal = 'https://apiwz.midukanshu.com/wz/user/getInfo?' + bodyVal
+        const url = {
+            url: userInfourlVal,
+            headers: {}
+        }
+        url.headers['Host'] = 'apiwz.midukanshu.com'
+        url.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        url.headers['User-Agent'] = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+        senku.post(url, (error, response, data) => {
+            try {
+                senku.log(`❕ ${cookieName} userInfo - response: ${JSON.stringify(response)}`)
+                signinfo.userInfo = JSON.parse(data)
+                resolve()
+            } catch (e) {
+                senku.msg(cookieName, `用户信息: 失败`, `说明: ${e}`)
+                senku.log(`❌ ${cookieName} userInfo - 用户信息失败: ${e}`)
+                senku.log(`❌ ${cookieName} userInfo - response: ${JSON.stringify(response)}`)
+                resolve()
+            }
+        })
+    })
+}
+
+function showmsg() {
+    return new Promise((resolve, reject) => {
+        let subTitle = ''
+        let detail = ''
+        const name = signinfo.userInfo.data.nickname ? signinfo.userInfo.data.nickname : `未设置昵称`
+        if (signinfo.readTime && signinfo.readTime.code == 0) {
+            const coin = signinfo.readTime.data.coin
+            const readTotalMinute = signinfo.readTime.data.readTotalMinute
+            const total_coin = signinfo.readTime.data.total_coin
+            coin == 0 ? detail += `` : detail += `【阅读时长】获得${coin}💰`
+            readTotalMinute ? detail += ` 阅读时长${readTotalMinute / 2}分钟,该账户:${total_coin}💰` : detail += `该账户:${total_coin}💰`
+        } else if (signinfo.readTime.code != 0) {
+            detail += `【阅读时长】错误代码${signinfo.readTime.code},错误信息${signinfo.readTime.message}`
+            senku.msg(cookieName + ` 用户:${name}`, subTitle, detail)
+        } else {
+            detail += '【阅读时长】失败'
+            senku.msg(cookieName + ` 用户:${name}`, subTitle, detail)
+        }
+
+        if (senku.getdata('debug') == 'true' || detail && signinfo.readTime.data.readTotalMinute % 60 == 0) {
+            senku.msg(cookieName + ` 用户:${name}`, subTitle, detail)
+        } else if (senku.getdata('debug') == 'true' || signinfo.readTime.data.readTotalMinute % 60 == 0) {
+            senku.msg(cookieName + ` 用户:${name}`, '阅读结果', '时间未到')
+        }
+
+        // 大转盘抽手机
+        if (signinfo.drawPrize) {
+            if (signinfo.drawPrize.code == 0) {
+                drawPrize.data.index >= 0 ? detail += `【转盘奖励】本次${drawPrize.data.title}\n` : detail += ``
+            } else {
+                detail += `【转盘奖励】无次数抽奖`
+            }
+            senku.msg(cookieName + ` 用户:${name}`, subTitle, detail)
+        }
+        if (DualAccount) double()
+        senku.done()
+        resolve()
     })
 }
 
