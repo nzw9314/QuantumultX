@@ -110,7 +110,7 @@ function lottery() {
      detail += `您有${Incomplete}个0元抽奖未完成\n`
      }
      else if (Incomplete == 0 ){
-detail += `今日0元抽奖任务已完成，获得${taskstatus.data.dailyTasks[0].taskReward}个银币\n` }
+detail += `今日0元抽奖任务已完成，获得${lotteryres.data.rewardAmount}个银币\n` }
    resolve()
    }) 
   })
@@ -210,7 +210,6 @@ return new Promise((resolve, reject) => {
    bean2url.headers['Content-Length'] = `0`;
     sy.get(bean2url, (error, response, data) =>
   {
-     sy.log(`${cookieName}, data: ${data}`)
     })
    resolve()
    })

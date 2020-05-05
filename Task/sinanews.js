@@ -48,7 +48,7 @@ let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
    GetCookie()
  } else {
-   getsign()
+   all()
 }
 function GetCookie() {
 if ($request && $request.method != 'OPTIONS'&&
@@ -73,6 +73,13 @@ infourlKey)
   sy.msg(CookieName, `获取信息Cookie: 成功`, ``)
   } 
 }
+async function all() 
+{ 
+  await getsign();
+  await signinfo();
+}
+
+
 //签到
 function getsign() {
   return new Promise((resolve, reject) =>{
@@ -84,18 +91,19 @@ function getsign() {
      let result = JSON.parse(data)
      if (result.status == 0){
          signres = `签到成功🎉`
-         detail = `获得收益: ${result.data.message.title}💰`  
+         detail = `获得收益: ${result.data.message.title}💰\n`  
          }  
      else if (result.status == -1){
-         signres = `重复签到‼️`
-         detail = `签到说明: `+ result.msg
+         signres = `今日`+ result.msg
+          detail = ``
          }
      else {
          signres = `签到失败❌`
          detail = `说明: `+ result.msg
+         sy.msg(CookieName,signres,detail)
          }
-    signinfo()
-    },resolve)
+    resolve()
+    })
   })
 }
 function signinfo() {
@@ -109,7 +117,7 @@ function signinfo() {
      const nickName = `用户昵称: ${result.data.nickName}`  
      if (result.status == 0){
          signcoin = `金币总计: ${result.data.coins}💰，`
-         detail = '已连续签到' + result.data.sign.conNum+"天，"+signcoin+'明日获取'+result.data.sign.timeline[1].name+": "
+         detail += '已连续签到' + result.data.sign.conNum+"天，"+signcoin+'明日获取'+result.data.sign.timeline[1].name+": "
 + result.data.sign.timeline[1].num
          }  
       subTitle = nickName +" " +signres

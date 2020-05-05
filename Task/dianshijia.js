@@ -97,7 +97,7 @@ function sign() {
     else if  (result.errCode == 4)
            {
             subTitle = ``
-            detail = `${result.msg}‼️`
+            detail = `${result.msg} `
            }       
     else if  (result.errCode == 6)
            {
@@ -207,7 +207,7 @@ function award() {
            }  
     resolve()
         }
-   sy.msg(cookieName, subTitle, detail)
+   sy.msg(cookieName+sleeping, subTitle, detail)
       })
     })
   })
@@ -243,11 +243,15 @@ function sleep() {
       sy.log(`data: ${data}`)
       const result = JSON.parse(data)
      if (result.errCode==0){
-      detail += result.data.name+'已开始 '
+      sleeping = result.data.name+'已开始 '
       }
 else if (result.errCode==4006){
-      detail += '  睡觉中😴'
+      sleeping = '   睡觉中😴'
       }
+else {
+      sleeping = ''
+    }
+
     }
  catch (e) {
         sy.msg(cookieName, `睡觉结果: 失败`, `说明: ${e}`)}
@@ -256,19 +260,7 @@ resolve()
  })
 }
 
-function wakeup() {
-  return new Promise((resolve, reject) => {
-      let url = { url: `http://act.gaoqingdianshi.com/api/taskext/getCoin?code=sleep&coin=1500&ext=1`, headers: JSON.parse(signheaderVal)}
-      sy.get(url, (error, response, data) => {
-      sy.log(`data: ${data}`)
-      const result = JSON.parse(data)
-     if (result.errCode==0){
-      detail += `获取睡觉金币:`+result.data
-      }
-   })
-resolve()
- })
-}
+
 function wakeup() {
   return new Promise((resolve, reject) => {
       let url = { url: `http://act.gaoqingdianshi.com/api/taskext/getCoin?code=sleep&coin=1500&ext=1`, headers: JSON.parse(signheaderVal)}

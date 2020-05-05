@@ -160,13 +160,13 @@ function parseData(detail, balance, info, bill) {
             return
         }
 
-        if (bill.serviceResultCode != 0) {
-            $tool.notify(config.name,`${bill.msg}`, "获取手机账单失败，请稍后重试")
-            resolve("done")
-            return
+        if (bill.serviceResultCode != 0){
+            bill = `上月账单未生成`
+             
         }
         var balanceAvailable = Number(balance.totalBalanceAvailable)
         notify(detail, balanceAvailable, info, bill)
+
         resolve("done")
     })
 }
@@ -183,10 +183,12 @@ function notify(data, balance, exdata, bldata) {
         productname = data.items[0].productOFFName
     }
     var Resourcename = "流量套餐"
-    if (typeof data.items[1].items[0].ratableResourcename != "undefined") {
-        Resourcename = data.items[1].items[0].ratableResourcename
+    if (typeof data.items[0].items[1].ratableResourcename != "undefined") {
+        Resourcename = data.items[0].items[1].ratableResourcename
     }
-    var message = "[套餐] " + productname + "\n" + "[话费] 剩余: " + (balance / 100).toFixed(2) + "元" + '  上月消费合计: '+ bldata.items[0].sumCharge/100+'元'
+
+    var message = "[套餐] " + productname + "\n" + "[话费] 剩余: " + (balance / 100).toFixed(2) + "元"
+if (bldata != '上月账单未生成'){message +=  '  上月消费合计: '+ bldata.items[0].sumCharge/100+'元'}
     if (typeof data.voiceAmount != "undefined") {
         var voice = "[通话] 已用: " + data.voiceUsage + "分, 剩余: " + data.voiceBalance + "分,  合计: " + data.voiceAmount + "分"
         message = message + "\n" + voice
@@ -196,7 +198,9 @@ function notify(data, balance, exdata, bldata) {
     //  var flow = "[流量] 已用: " + formatFlow(data.usedCommon/1024) + ", 剩余: " + formatFlow(data.balanceCommon/1024) + ", 合计: " + formatFlow(data.totalCommon/1024)
     message = message + "\n" + flow
     }
-   if (typeof bldata.items[0].acctName != "undefined" && bldata.serviceResultCode == 0) {
+ if (bldata == '上月账单未生成'){
+message = message + "\n" + bldata
+} else if (typeof bldata.items[0].acctName != "undefined" && bldata.serviceResultCode == 0) {
   var bills = '[上月话费账单]' + "\n"+ bldata.items[0].items[0].chargetypeName + ':      '+
 bldata.items[0].items[0].charge/100+'元'+ "\n"+ bldata.items[0].items[1].chargetypeName + ':    '+
 bldata.items[0].items[1].charge/100+'元'+ "\n"+ bldata.items[0].items[2].chargetypeName + ':  '+
