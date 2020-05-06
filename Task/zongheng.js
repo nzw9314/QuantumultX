@@ -163,8 +163,6 @@ if (books === "" || books === undefined) {
 checkUpdate(books);
 
 async function checkUpdate(books) {
-  const notifications = [];
-
   await Promise.all(
     ids.map(async (id) => {
       // check update from each book
@@ -189,10 +187,8 @@ async function checkUpdate(books) {
           if (book === undefined || latestChapter !== book.latestChapter) {
             // upate database
             books[id] = { title, updateCount, latestChapter };
-            // update notifications
-            notifications.push(
-              `${title}:\n最新章节:${latestChapter}\n${updateCount}`
-            );
+            // push notifications
+            $notify(title, "", `最新章节: ${latestChapter}\n${updateCount}`);
           }
           return Promise.resolve();
         })
@@ -202,19 +198,6 @@ async function checkUpdate(books) {
 
   // update database
   $prefs.setValueForKey(JSON.stringify(books), DB_KEY);
-
-  // push notifications
-  notify(notifications);
-}
-
-function notify(notifications) {
-  if (notifications.length > 0) {
-    notifications.forEach((content) => {
-      $notify("纵横更新", "", content);
-    });
-  } else {
-    console.log("无更新");
-  }
 }
 
 $done();
