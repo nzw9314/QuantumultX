@@ -20,16 +20,26 @@ Surge 4.0 :
 
 # 获取京东到家 Cookie.
 京东到家 = type=http-request,pattern=https:\/\/daojia\.jd\.com\/client\?_jdrandom=\d{13}&functionId=%2Fsignin,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js,
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+Loon 2.1.0+
+[Script]
+# 本地脚本
+cron "04 00 * * *" script-path=jddj.js, enabled=true, tag=京东到家
+
+http-request https:\/\/daojia\.jd\.com\/client\?_jdrandom=\d{13}&functionId=%2Fsignin script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js
+
+---------------------
+
 QX 1.0.7+ :
 [task_local]
 0 9 * * * jddj.js
 
 [rewrite_local]
-# Get jddj cookie. QX 1.0.5(188+):
 https:\/\/daojia\.jd\.com\/client\?_jdrandom=\d{13}&functionId=%2Fsignin url script-request-header jddj.js
 ~~~~~~~~~~~~~~~~
-QX or Surge MITM = daojia.jd.com
+
+hostname = daojia.jd.com
+
 ~~~~~~~~~~~~~~~~
 
 task

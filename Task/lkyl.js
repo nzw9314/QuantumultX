@@ -16,8 +16,17 @@ Surge 4.0 :
 lkyl.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/lkyl.js,script-update-interval=0
 
 # 来客有礼 Cookie.
-lkyl.js = type=http-request,pattern=https:\/\/draw\.jdfcloud\.com\/\/api\/bean\/square\/silverBean\/task\/get\?,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/lkyl.js,
+lkyl.js = type=http-request,pattern=https:\/\/draw\.jdfcloud\.com\/\/api\/bean\/square\/silverBean\/task\/get\?,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/lkyl.js
 ~~~~~~~~~~~~~~~~
+Loon 2.1.0+
+[Script]
+# 本地脚本
+cron "04 00 * * *" script-path=lkyl.js, enabled=true, tag=来客有礼
+
+http-request https:\/\/draw\.jdfcloud\.com\/\/api\/bean\/square\/silverBean\/task\/get\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/lkyl.js
+
+-----------------
+
 QX 1.0. 7+ :
 [task_local]
 0 9 * * * lkyl.js
@@ -57,8 +66,10 @@ if ($request && $request.method != 'OPTIONS') {
   sy.log(`signheaderVal:${signheaderVal}`)
   if (signurlVal) sy.setdata(signurlVal, signurlKey)
   if (signheaderVal) sy.setdata(signheaderVal, signheaderKey)
-     sy.setdata(openid,openkey);
-     sy.setdata(appid,appIdkey)
+  if (openid) sy.setdata(openid,openkey);
+  if (appid) sy.setdata(appid,appIdkey);
+    sy.log(`openid:${openid}`)
+    sy.log(`appid:${appid}`)
   sy.msg(cookieName, `获取Cookie: 成功🎉`, ``)
   }
  }
@@ -72,7 +83,6 @@ async function all()
   await weektask();
   await total()
 }
-
 function sign() {
   return new Promise((resolve, reject) =>{
 	let signurl = {

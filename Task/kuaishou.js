@@ -20,6 +20,15 @@ Surge 4.0 :
 快手极速版 = type=http-request,pattern=https:\/\/nebula\.kuaishou\.com\/rest\/n\/nebula\/activity\/earn\/overview,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/kuaishou.js
 
 ~~~~~~~~~~~~~~~~
+Loon 2.1.0+
+[Script]
+# 本地脚本
+cron "04 00 * * *" script-path=kuaishou.js, enabled=true, tag=快手
+
+http-request http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/kuaishou.js
+
+-----------------
+
 QX 1.0.7+ :
 [task_local]
 0 9 * * * kuaishou.js
@@ -27,7 +36,9 @@ QX 1.0.7+ :
 [rewrite_local]
 https:\/\/nebula\.kuaishou\.com\/rest\/n\/nebula\/activity\/earn\/overview url script-request-header kuaishou.js
 ~~~~~~~~~~~~~~~~
-QX or Surge MITM = nebula.kuaishou.com
+
+hostname = nebula.kuaishou.com
+
 ~~~~~~~~~~~~~~~~
 
 */

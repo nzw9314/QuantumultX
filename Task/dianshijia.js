@@ -26,6 +26,15 @@ Surge 4.0
 电视家 = type=http-request,pattern=http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\?,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js
 
 ~~~~~~~~~~~~~~~~
+Loon 2.1.0+
+[Script]
+# 本地脚本
+cron "04 00 * * *" script-path=dianshijia.js, enabled=true, tag=电视家
+
+http-request http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js
+
+---------------------
+
 
 QX 1.0.6+ :
 [task_local]
@@ -73,6 +82,7 @@ async function all()
   await share();
   await total();
   await cash();
+  await double();
   await award();
 }
 
@@ -275,6 +285,24 @@ resolve()
  })
 }
 
+function double() {
+  return new Promise((resolve, reject) => {
+      let url = { url: `http://act.gaoqingdianshi.com/api/v4/task/complete?code=MutilPlatformActive`, headers: JSON.parse(signheaderVal)}
+     sy.get(url, (error, response, data) => {
+      sy.log(`双端活跃 data: ${data}`)
+      const result = JSON.parse(data)
+     if (result.errCode == 0) {
+      subTitle += `  双端活跃任务完成`
+      detail += `\n获得金币${result.data.getCoin}`
+    } else if (result.errCode == 4000) {
+      //subTitle += `  签到结果: 没有次数了`
+    }
+   })
+resolve()
+ })
+}
+
+
 
 function init() {
   isSurge = () => {
@@ -319,4 +347,3 @@ function init() {
   }
   return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
 }
-sy.done()

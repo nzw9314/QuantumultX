@@ -76,6 +76,7 @@ var requests = {
     }
 }
 
+
 if ($tool.ishttp) {
     GetCookie()
     $tool.done()
@@ -83,7 +84,6 @@ if ($tool.ishttp) {
     cron()
     $tool.done()
 }
-
 function GetCookie() {
     if ($request && $request.headers) {
         var cookieVal = $request.headers['authToken']
@@ -112,6 +112,7 @@ async function cron() {
     }
     await parseData(detail, balance, info, bill)
 }
+
 
 async function httpRequest(resq, delay = 0, statusCode = 200) {
     return new Promise(resolve => {
@@ -159,14 +160,13 @@ function parseData(detail, balance, info, bill) {
             resolve("done")
             return
         }
-
-        if (bill.serviceResultCode != 0){
+        if (bill.paraFieldResult == "no sum charge data"||"消息格式错误-账期错误"){
             bill = `上月账单未生成`
-             
+            //resolve("done")
+            //return
         }
         var balanceAvailable = Number(balance.totalBalanceAvailable)
         notify(detail, balanceAvailable, info, bill)
-
         resolve("done")
     })
 }

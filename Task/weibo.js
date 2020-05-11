@@ -22,6 +22,17 @@ weibo.js = type=http-request,pattern=https:\/\/api\.weibo\.cn\/\d\/video\/machin
 weibo.js = type=http-request,pattern=https:\/\/pay\.sc\.weibo\.com\/aj\/mobile\/home\/welfare\/signin\/do\?,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/weibo.js
 
 ~~~~~~~~~~~~~~~~
+Loon 2.1.0+
+[Script]
+# 本地脚本
+cron "04 00 * * *" script-path=weibo.js, enabled=true, tag=新浪微博
+
+http-request https:\/\/api\.weibo\.cn\/\d\/video\/machine\?gsid script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/weibo.js
+
+http-request https:\/\/pay\.sc\.weibo\.com\/aj\/mobile\/home\/welfare\/signin\/do\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/weibo.js
+
+-----------------
+
 QX 1.0.6+ :
 [task_local]
 0 9 * * * weibo.js
@@ -33,7 +44,7 @@ https:\/\/api\.weibo\.cn\/\d\/video\/machine\?gsid url script-request-header wei
 https:\/\/pay\.sc\.weibo\.com\/aj\/mobile\/home\/welfare\/signin\/do\? url script-request-header weibo.js
 
 ~~~~~~~~~~~~~~~~
-QX or Surge [MITM]
+[MITM]
 hostname = api.weibo.cn, pay.sc.weibo.com
 ~~~~~~~~~~~~~~~~
 */

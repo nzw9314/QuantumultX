@@ -21,6 +21,14 @@ Surge 4.0 :
 
 中青看点 = type=http-request,pattern=https:\/\/kd\.youth\.cn\/TaskCenter\/sign,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/youth.js
 ~~~~~~~~~~~~~~~~
+Loon 2.1.0+
+[Script]
+# 本地脚本
+cron "04 00 * * *" script-path=youth.js, enabled=true, tag=中青看点
+
+http-request https:\/\/kd\.youth\.cn\/TaskCenter\/sign script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/youth.js
+
+-----------------
 QX 1.0. 7+ :
 [task_local]
 0 9 * * * youth.js
@@ -79,7 +87,7 @@ function sign() {
        signresult =JSON.parse(data)
        if (signresult.status == 1){
           subTitle = `签到成功🎉`
-          detail= `获取金币: ${signresult.score}，明日金币:${signresult.nextScore} `
+          detail= `获取金币: ${signresult.score}，明日金币:${signresult.nextScore}\n`
            }
        else if(signresult.status == 0){
           subTitle = `重复签到`
