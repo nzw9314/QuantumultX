@@ -6,14 +6,15 @@ const __conf = String.raw`
 
 [Local]
 // custom local...
+
 # nf
 http-request ^https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D script-path=https://raw.githubusercontent.com/yichahucha/surge/master/nf_rating.js
 http-response ^https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/nf_rating.js
 # jd
-http-response ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
+^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
 # tb
-http-request ^http://.+/amdc/mobileDispatch requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
-http-response ^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+tb_price.js = type=http-request,requires-body=1,pattern=^http://.+/amdc/mobileDispatch,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
+tb_price.js = type=http-response,requires-body=1,pattern=^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
 # wb
 http-response ^https?://(sdk|wb)app\.uve\.weibo\.com(/interface/sdk/sdkad.php|/wbapplua/wbpullad.lua) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/wb_launch.js
 http-response ^https?://m?api\.weibo\.c(n|om)/2/(statuses/(unread|extend|positives/get|(friends|video)(/|_)(mix)?timeline)|stories/(video_stream|home_list)|(groups|fangle)/timeline|profile/statuses|comments/build_comments|photo/recommend_list|service/picfeed|searchall|cardlist|page|!/photos/pic_recommend_status|video/tiny_stream_video_list) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/wb_ad.js
@@ -39,6 +40,8 @@ const __owner = "yichahucha"
 const __repo = "surge"
 // GitHub 分支（不指定就使用默认分支）
 const __branch = "master"
+// 指定 eval_script.js 文件路径（路径为空 "" 使用脚本原始路径）
+const __evalPath = "eval_script.js"
 // GitHub 文件路径（没有文件新创建，已有文件覆盖更新，路径为空 "" 不更新）
 const __quanxPath = "eval_script/qx_script.txt"
 const __surgePath = "eval_script/sg_script.sgmodule"
@@ -427,7 +430,7 @@ function ____concurrentQueueLimit(list, limit, asyncHandle) {
 function ____downloadFile(url) {
     return new Promise((resolve) => {
         __tool.get(url, (error, response, body) => {
-            const filename = url.match(/.*\/(.*?)$/)[1]
+            const filename = url.match(/[^\/]+$/)[0]
             if (!error) {
                 const code = response.statusCode
                 if (code == 200) {
@@ -513,8 +516,17 @@ function ____parseConf(lines) {
                 // content
                 const requiresBody = ____surgeArg(result[3].trim()).requiresBody
                 // surgeConfContents.splice(i, 0, `${line.replace(____surgeArg(result[3].trim()).scriptPath, "eval_script.js")}`);
-                surgeConfContents.push(`eval_script.js = type=http-${result[1].trim()},${requiresBody ? `requires-body=${requiresBody},` : ""}pattern=${result[2].trim()},script-path=eval_script.js`)
-                quanxConfContents.push(`${result[2].trim()} url script-${result[1].trim()}-${requiresBody == "1" ? "body" : "header"} eval_script.js`)
+                if (__evalPath.length > 0) {
+                    const path = __evalPath
+                    const fileName = path.match(/[^\/]+$/)[0]
+                    surgeConfContents.push(`${fileName} = type=http-${result[1].trim()},${requiresBody ? `requires-body=${requiresBody},` : ""}pattern=${result[2].trim()},script-path=${path}`)
+                    quanxConfContents.push(`${result[2].trim()} url script-${result[1].trim()}-${requiresBody == "1" ? "body" : "header"} ${path}`)
+                } else {
+                    const path = ____surgeArg(result[3].trim()).scriptPath
+                    const fileName = path.match(/[^\/]+$/)[0]
+                    surgeConfContents.push(`${fileName} = type=http-${result[1].trim()},${requiresBody ? `requires-body=${requiresBody},` : ""}pattern=${result[2].trim()},script-path=${path}`)
+                    quanxConfContents.push(`${result[2].trim()} url script-${result[1].trim()}-${requiresBody == "1" ? "body" : "header"} ${path}`)
+                }
                 // eval
                 line = `${result[1].trim()} ${result[2].trim()} eval ${____surgeArg(result[3].trim()).scriptPath}`
             }
@@ -531,8 +543,17 @@ function ____parseConf(lines) {
                     }
                 }
                 // surgeConfContents.splice(i, 0, `http-${type[0].trim()} ${result[1].trim()} ${requires == 0 ? "" : `requires-body=${requires},`}script-path=eval_script.js`)
-                surgeConfContents.push(`eval_script.js = type=http-${type[0].trim()},${requires == 0 ? "" : `requires-body=${requires},`}pattern=${result[1].trim()},script-path=eval_script.js`)
-                quanxConfContents.push(`${line.replace(result[3].trim(), "eval_script.js")}`)
+                if (__evalPath.length > 0) {
+                    const path = __evalPath
+                    const fileName = path.match(/[^\/]+$/)[0]
+                    surgeConfContents.push(`${fileName} = type=http-${type[0].trim()},${requires == 0 ? "" : `requires-body=${requires},`}pattern=${result[1].trim()},script-path=${path}`)
+                    quanxConfContents.push(`${line.replace(result[3].trim(), path)}`)
+                } else {
+                    const path = result[3].trim()
+                    const fileName = path.match(/[^\/]+$/)[0]
+                    surgeConfContents.push(`${fileName} = type=http-${type[0].trim()},${requires == 0 ? "" : `requires-body=${requires},`}pattern=${result[1].trim()},script-path=${path}`)
+                    quanxConfContents.push(line)
+                }
                 // eval
                 line = `${type[0].trim()} ${result[1].trim()} eval ${result[3].trim()}`
             }
@@ -540,9 +561,17 @@ function ____parseConf(lines) {
                 //content
                 const result = line.match(newSurge)
                 const surgeArg = ____surgeArg(result[1].trim())
-                surgeConfContents.splice(i, 0, `${surgeArg.type} ${surgeArg.pattern} ${surgeArg.requiresBody ? `requires-body=${surgeArg.requiresBody},` : ""}script-path=eval_script.js`)
-                surgeConfContents.push(`eval_script.js = ${result[1].replace(surgeArg.scriptPath, "eval_script.js")}`)
-                quanxConfContents.push(`${surgeArg.pattern} url script-${surgeArg.type.replace("http-", "")}-${(surgeArg.requiresBody && surgeArg.requiresBody == "1") ? "body" : "header"} eval_script.js`)
+                // surgeConfContents.splice(i, 0, `${surgeArg.type} ${surgeArg.pattern} ${surgeArg.requiresBody ? `requires-body=${surgeArg.requiresBody},` : ""}script-path=eval_script.js`)
+                if (__evalPath.length > 0) {
+                    const path = __evalPath
+                    const fileName = path.match(/[^\/]+$/)[0]
+                    surgeConfContents.push(`${fileName} = ${result[1].replace(surgeArg.scriptPath, path)}`)
+                    quanxConfContents.push(`${surgeArg.pattern} url script-${surgeArg.type.replace("http-", "")}-${(surgeArg.requiresBody && surgeArg.requiresBody == "1") ? "body" : "header"} ${path}`)
+                } else {
+                    const path = surgeArg.scriptPath
+                    surgeConfContents.push(line)
+                    quanxConfContents.push(`${surgeArg.pattern} url script-${surgeArg.type.replace("http-", "")}-${(surgeArg.requiresBody && surgeArg.requiresBody == "1") ? "body" : "header"} ${path}`)
+                }
                 // eval
                 line = `${surgeArg.type.replace("http-", "")} ${surgeArg.pattern} eval ${surgeArg.scriptPath}`
             }

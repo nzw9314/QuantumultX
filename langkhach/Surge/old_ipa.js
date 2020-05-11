@@ -18,5 +18,6 @@ if(url.indexOf(buy) != -1){
 var appid= $persistentStore.read("appid");
 var body= obj.replace(/\d{6,}/, appid);
 console.log('🟢 Old_iPA_Downloader \nappid: ' + appid);
+$notification.post("Old_iPA_Downloader rewrite stustus: OK","","");
 $done({body});
 }

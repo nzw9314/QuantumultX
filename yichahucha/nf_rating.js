@@ -22,7 +22,7 @@ if (!$tool.isResponse) {
         }
         url = url.replace(/&languages=(.*?)&/, "&languages=en-US&");
     }
-    // url += "&path=" + encodeURIComponent(`[${videos[0]},"details"]`);
+    url += "&path=" + encodeURIComponent(`[${videos[0]},"details"]`);
     $done({ url });
 } else {
     var IMDbApikeys = IMDbApikeys();
@@ -43,10 +43,10 @@ if (!$tool.isResponse) {
     if (type == "show") {
         type = "series";
     }
-    // if (type == "movie") {
-    //     year = video.details.releaseYear;
-    // }
-    // delete video.details;
+    if (type == "movie") {
+        year = video.details.releaseYear;
+    }
+    delete video.details;
     const requestRatings = async () => {
         const IMDb = await requestIMDbRating(title, year, type);
         const Douban = await requestDoubanRating(IMDb.id);

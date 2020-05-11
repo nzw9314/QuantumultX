@@ -1,0 +1,6 @@
+#!name=🎲 Game Mode
+#!desc= Always Real Ip Hosts
+#!system=ios
+
+[General]
+always-real-ip = %APPEND% *.srv.nintendo.net, *.stun.playstation.net, xbox.*.microsoft.com, *.xboxlive.com, *.momo.vn,

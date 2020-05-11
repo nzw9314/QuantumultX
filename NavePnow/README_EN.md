@@ -27,11 +27,15 @@ Table of Contents
          * [Google Apps Script](#google-apps-script)
             * [google_script/singtel.js](#google_scriptsingteljs)
             * [google_script/calendar.js](#google_scriptcalendarjs)
-            * [google_script/ss-checkin.js](#google_scriptss-checkinjs)
+            * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/ss-checkin.js" rel="nofollow">google_script/ss-checkin.js</a>](#google_scriptss-checkinjs)
          * [JSBox](#jsbox)
             * [JSBox/NUS_NextBus.js](#jsboxnus_nextbusjs)
             * [JSBox/Singtel .js](#jsboxsingteljs)
-      * [Tip Jar](#tip-jar)
+      * [Author](#author)
+      * [<g-emoji class="g-emoji" alias="handshake" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f91d.png">🤝</g-emoji> Contributing](#-contributing)
+      * [<g-emoji class="g-emoji" alias="moneybag" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4b0.png">💰</g-emoji> Show your support](#-show-your-support)
+      * [<g-emoji class="g-emoji" alias="pray" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f64f.png">🙏</g-emoji> Acknowledgments](#-acknowledgments)
+      * [<g-emoji class="g-emoji" alias="memo" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png">📝</g-emoji> License](#-license)
 
 ## Filter - Ruleset of Surge and QuantumultX
 
@@ -74,7 +78,7 @@ Table of Contents
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMAGE 2019-11-12 19:58:49.jpg" height="40%" width="40%">
 Auto check-in for 1point3acres.com
 
-[Tutorial](https://nave.work/%E4%B8%80%E4%BA%A9%E4%B8%89%E5%88%86%E5%9C%B0%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC.html)
+[Tutorial](https://medium.com/navepnow/一亩三分地自动签到脚本-c718734111ac)
 
 #### 10010+.js/10010+_qx.js
 **By [NavePnow](https://github.com/NavePnow)**
@@ -129,7 +133,7 @@ Modified according to the Jsbox script from author [coo11](https://t.me/coo11)
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMG_1189.JPG" height="40%" width="40%">
 Auto check-in for Weibo Super_Talk
 
-[Tutorial](https://nave.work/微博超话自动签到脚本.html)
+[Tutorial](https://medium.com/navepnow/微博超话自动签到脚本-4826bff2112c)
 
 ### Google Apps Script
 
@@ -239,9 +243,31 @@ Auto check-in for Weibo Super_Talk
 3. ⚠️ Something you know know
     1. Feel free to [contact me](https://t.me/Leped_Bot) if you have any problem.
 
-## Tip Jar
-If you're really, really enjoying the content, you can leave extra tips to support the developer. Thanks for even considering.
+## Author
 
-| PayPal                                                                                                                                                                       | 微信赞赏 WeChat Pay                                                                                                    |
+👤 **Evan**
+
+* Twitter: [@NavePnow](https://twitter.com/NavePnow)
+* Github: [@NavePnow](https://github.com/NavePnow)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+Feel free to check [issues page](https://github.com/NavePnow/Profiles/issues).
+
+## 💰 Show your support
+
+Give a ⭐️ if this project helped you!
+
+| PayPal                                                                                                                                                                       | Patron                                                                                                    |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DSZJCN4ZUEW74&currency_code=USD&source=url) | <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/1234.JPG" width="200">
+| [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DSZJCN4ZUEW74&currency_code=USD&source=url) |   <a href="https://www.patreon.com/NavePnow"> <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160"> </a>
+
+## 🙏 Acknowledgments
+* Instructor：[Neurogram](https://github.com/Neurogram-R), [wangfei021325](https://t.me/wangfei021325)
+
+## 📝 License
+
+---
+Copyright © 2020 [Evan](https://github.com/NavePnow).
+This project is [MIT](https://github.com/NavePnow/Profiles/blob/master/LICENSE) licensed.
