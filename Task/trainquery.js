@@ -16,14 +16,16 @@
 const leftstation ='深圳'  //出发地
 const tostation = '上海'   //目的地
 const leftdate = '2020-05-18' //出发日期
-const K = '5'  //车次序号!!
+const K = '1'  //车次序号!!
 
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
 let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
 // http请求
 var $task = isQuantumultX ? $task : {};
 var $httpClient = isSurge ? $httpClient : {};
-
+// cookie读写
+var $prefs = isQuantumultX ? $prefs : {};
+var $persistentStore = isSurge ? $persistentStore : {};
 // 消息通知
 var $notify = isQuantumultX ? $notify : {};
 var $notification = isSurge ? $notification : {};
@@ -107,6 +109,30 @@ if (isSurge) {
         }
     }
 }
+// #endregion 网络请求专用转换
+
+// #region cookie操作
+if (isQuantumultX) {
+    $persistentStore = {
+        read: key => {
+            return $prefs.valueForKey(key);
+        },
+        write: (val, key) => {
+            return $prefs.setValueForKey(val, key);
+        }
+    }
+}
+if (isSurge) {
+    $prefs = {
+        valueForKey: key => {
+            return $persistentStore.read(key);
+        },
+        setValueForKey: (val, key) => {
+            return $persistentStore.write(val, key);
+        }
+    }
+}
+// #endregion
 
 // #region 消息通知
 if (isQuantumultX) {
@@ -154,7 +180,7 @@ function trainscheck() {
  return new Promise((resolve, reject) =>{
    setTimeout(() => {
    const myRequest = {
-    url: `https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=2020-05-11&leftTicketDTO.from_station=${statno}&leftTicketDTO.to_station=${tostat}&purpose_codes=ADULT`,
+    url: `https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=${leftdate}&leftTicketDTO.from_station=${statno}&leftTicketDTO.to_station=${tostat}&purpose_codes=ADULT`,
     method: 'GET',
     headers: {'Cookie' : 'JSESSIONID=1B1CEADF1B9F831C25E71D7F2D996294'}
 };
@@ -188,7 +214,7 @@ $task.fetch(myRequest).then(response => {
    }
    console.log(trainlist)
 if (K<=ress.data.result.length){
-  //console.log(ress.data.result[K-1].split("|"))
+  //console.log(ress.data.result[K-1])
   traincode = ress.data.result[K-1].split("|")[3]
   trainno = ress.data.result[K-1].split("|")[2]
   fromstation = ress.data.result[K-1].split("|")[4]

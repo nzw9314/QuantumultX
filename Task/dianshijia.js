@@ -14,9 +14,6 @@
 By Macsuny
 感谢 chavyleung
 ~~~~~~~~~~~~~~~~
-Surge 4.0 :
-[Script]
-dianshijia.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js,script-update-interval=0
 
 # 获取电视家 Cookie.
 Surge 4.0
@@ -124,21 +121,21 @@ function total() {
     const coinurl = { url: `http://api.gaoqingdianshi.com/api/coin/info`, headers: JSON.parse(signheaderVal)}
    sy.get(coinurl, (error, response, data) => {
      sy.log(`${cookieName}, data: ${data}`)
-     const result = JSON.parse(data)
-     subTitle += `待兑换${result.data.coin}金币 ` 
+     const coinresult = JSON.parse(data)
+     subTitle += `待兑换${coinresult.data.coin}金币 ` 
    try{
       for(tempCoin in data){
-       for (i=0;i<result.data.tempCoin.length;i++) {  
-      coinid = result.data.tempCoin[i].id
+       for (i=0;i<coinresult.data.tempCoin.length;i++) {  
+      coinid = coinresult.data.tempCoin[i].id
       url5 = { url: `http://api.gaoqingdianshi.com/api/coin/temp/exchange?id=`+coinid, headers: JSON.parse(signheaderVal)}
       sy.get(url5, (error, response, data))    
         }
        }
       }
      catch(err){
-      err };
+      err }
+    resolve()
      })
-  resolve()
   }) 
 }
 function cash() {
@@ -149,7 +146,7 @@ function cash() {
       sy.log(`data: ${data}`)
       const result = JSON.parse(data)
       subTitle += '现金: '+ result.data.amount/100+'元 '
-      resolve()
+     resolve()
       })
    })
 }
@@ -164,19 +161,7 @@ function share() {
        {
         detail += `分享获取${result.data.getCoin}个金币`
        } 
-    sy.get(coinurl, (error, response, data) => {
-      sy.log(`${cookieName}, data: ${data}`)
-      const result = JSON.parse(data)
-       for(tempCoin in data){
-  for (i=0;i<result.data.tempCoin.length;i++)                
-    {  
-      coinid = result.data.tempCoin[i].id
-      url5 = { url: `http://api.gaoqingdianshi.com/api/coin/temp/exchange?id=`+coinid, headers: JSON.parse(signheaderVal)}
-      sy.get(url5, (error, response, data))    
-        }
-       }
-      })
-     })
+   })
 resolve()
   })
 }
@@ -187,7 +172,7 @@ function award() {
     let awardurl = { url: `http://act.gaoqingdianshi.com/api/v4/sign/get`, headers: JSON.parse(signheaderVal)}
      sy.get(awardurl, (error, response, data) => 
   {
- //  sy.log(`${cookieName}, data: ${data}`)
+    sy.log(`${cookieName}, data: ${data}`)
      const result = JSON.parse(data)
      if (result.errCode == 0) 
     {
