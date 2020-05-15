@@ -15,6 +15,7 @@
 =================
 
    * [Profiles](#profiles)
+   * [目录](#目录)
       * [Filter - Surge and QuantumultX 规则集](#filter---surge-and-quantumultx-规则集)
       * [Scripts](#scripts)
          * [Surge/QuantumultX](#surgequantumultx)
@@ -25,9 +26,10 @@
             * [weather.js/weather_qx.js](#weatherjsweather_qxjs)
             * [weibo](#weibo)
          * [Google Apps Script](#google-apps-script)
-            * [google_script/singtel.js](#google_scriptsingteljs)
-            * [google_script/calendar.js](#google_scriptcalendarjs)
+            * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/singtel.js" rel="nofollow">google_script/singtel.js</a>](#google_scriptsingteljs)
+            * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/calendar.js" rel="nofollow">google_script/calendar.js</a>](#google_scriptcalendarjs)
             * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/ss-checkin.js" rel="nofollow">google_script/ss-checkin.js</a>](#google_scriptss-checkinjs)
+            * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/server.js" rel="nofollow">google_script/server.js</a>](#google_scriptserverjs)
          * [JSBox](#jsbox)
             * [JSBox/NUS_NextBus.js](#jsboxnus_nextbusjs)
             * [JSBox/Singtel .js](#jsboxsingteljs)
@@ -136,7 +138,7 @@
 
 ### Google Apps Script
 
-#### google_script/singtel.js
+#### [google_script/singtel.js](https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/singtel.js)
 **By [NavePnow](https://github.com/NavePnow)**
 
 **powered by Google Script**
@@ -160,7 +162,7 @@
 3.  注意⚠️
     1. 如果有问题，欢迎 [反馈](https://t.me/Leped_Bot) 
 
-#### google_script/calendar.js
+#### [google_script/calendar.js](https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/calendar.js)
 **By [NavePnow](https://github.com/NavePnow)**
 
 **powered by Google Script and Google Developers Console**
@@ -206,6 +208,27 @@
     3. 如需进行测试，可以在编辑器中 `Run -> Debug function -> launch` 进行调试
     4. 如果有问题，欢迎 [反馈](https://t.me/Leped_Bot) 
 
+#### [google_script/server.js](https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/server.js)
+**By [NavePnow](https://github.com/NavePnow)**
+
+**powered by Google Script and NodeQuery**
+
+<img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private//screenshot%202020-05-14%20at%2016.45.51.png" height="40%" width="40%">
+
+1. 特点
+   1. 根据 NodeQuery API 获取信息
+   2. 显示服务器 CPU, RAM, Disk 等详细信息
+2. 步骤
+   1. 从 [BotFather](https://telegram.me/BotFather) 创建一个bot，记下 `token`，代替脚本中的关键词 `BOT_TOKEN`
+   2. 从 [get_id_bot](https://telegram.me/get_id_bot) 得到用户 `id`, 代替脚本中的关键词 `CHAT_ID`
+   3. 从 [NodeQuery API](https://nodequery.com/settings/api) 得到 `api`, 代替脚本中的关键词 `api`
+   4. 拷贝脚本内容到 [Google Script](https://script.google.com/home/my) 的编辑器中
+   5. 设置一个合适的时间去触发脚本
+   > Edit -> Current project's triggers -> Add Trigger -> Choose which function to run(launch)
+3.  注意⚠️
+    1. 如果内容出错，检查返回数据的内容 `Logger.log()` 以及格式并修改正则表达式
+    2. 如需进行测试，可以在编辑器中 `Run -> Debug function -> launch` 进行调试
+    3. 如果有问题，欢迎 [反馈](https://t.me/Leped_Bot)
 
 ### JSBox
 

@@ -4,12 +4,14 @@
 
 本脚本仅适用于中青看点极速版领取青豆
 
+增加每日打卡，打卡时间每日5:00-8:00❗️，请不要忘记设置运行时间
+
 获取Cookie方法:
 1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
 下，
 2.进入app，签到一次,即可获取Cookie. 阅读一篇文章，获取阅读请求body，在阅读文章最下面有个惊喜红包，点击获取惊喜红包请求，激励视频获取方法: 关闭vpn，进入任务中心=>抽奖赚点击下面第一个宝箱，出现视频广告页面，然后打开vpn，等待视频播放完毕，点击点我继续领青豆，再重复一次上面操作，获取激励视频请求的body，
 3.当日签过到需次日获取Cookie.
-4.增加转盘抽奖通知间隔，为了照顾新用户，默认每1次转盘抽奖通知一次，可自行修改❗️
+4.增加转盘抽奖通知间隔，为了照顾新用户，前三次会有通知，以后默认每10次转盘抽奖通知一次，可自行修改❗️ 转盘完成后通知会一直开启
 5.非专业人士制作，欢迎各位大佬提出宝贵意见和指导
 
 阅读奖励和看视频得奖励一个请求只能运行三次‼️，请不要询问为什么，次日可以继续
@@ -61,7 +63,7 @@ hostname = kd.youth.cn, ios.baertt.com
 
 */
 
-const notifyInterval = `1`  //通知间隔，默认抽奖每1次通知一次
+const notifyInterval = `10`  //通知间隔，默认抽奖每1次通知一次
 const CookieName = "中青看点"
 const signurlKey ='youthurl_zq'
 const signheaderKey = 'youthheader_zq'
@@ -118,10 +120,13 @@ async function all()
   await gameVideo();
   await readArticle();
   await Articlered();
-  await rotary2();
-  await rotary3();
-  await rotary4();
   await rotary();
+  await rotaryCheck();
+  await punchCard();
+  await endCard();
+  await Cardshare();
+  await openbox();
+  await share();
   await TurnDouble();
 }
 
@@ -256,8 +261,8 @@ function Articlered() {
    if (redres.success==true){
      detail += `阅读惊喜红包奖励${redres.items.score}个青豆，`  
      }
-   })
   resolve()
+   })
  })
 }
 //转盘奖励
@@ -274,50 +279,58 @@ function rotary() {
   sy.post(url, (error, response, data) =>{
    sy.log(`转盘抽奖:${data}`)
    rotaryres = JSON.parse(data)
-   if (rotaryres.status==1&&rotaryres.data.remainTurn%notifyInterval==0){
+   if (rotaryres.status==1){
      detail += `转盘奖励${rotaryres.data.score}个青豆，剩余${rotaryres.data.remainTurn}次，`  
    //sy.msg(CookieName,subTitle,detail)
     }
-   else if (rotaryres.code==10010){
-subTitle += ` 转盘${rotaryres.msg}🎉`
-   //sy.msg(CookieName,subTitle,detail)
-    }
+    resolve()
    })
-   resolve()
-  },200)
+  })
  })
 }
 
-//转盘双倍奖励
-function TurnDouble() {      
- const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]
+//转盘宝箱判断
+function rotaryCheck() {  
+ if (rotaryres.code==10010){
+  }
+  else if (rotaryres.data.remainTurn==rotaryres.data.chestOpen[0].times){
+    rotary1() 
+  }  
+  else if(rotaryres.data.remainTurn==rotaryres.data.chestOpen[1].times){
+    rotary2() 
+  }
+  else if(rotaryres.data.remainTurn==rotaryres.data.chestOpen[2].times){
+    rotary3() 
+  }
+  else if(rotaryres.data.remainTurn==rotaryres.data.chestOpen[3].times){
+    rotary4() 
+  }
+  else {
+  }
+}
+//开启宝箱1
+function rotary1() {      
  return new Promise((resolve, reject) => {
-    setTimeout(()=> {
-   const time = new Date().getTime()
+  setTimeout(() =>  {
+const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]+'&num=1'
+ const time = new Date().getTime()
     const url = { 
-      url: `https://kd.youth.cn/WebApi/RotaryTable/toTurnDouble?_=${time}`, 
+      url: `https://kd.youth.cn/WebApi/RotaryTable/chestReward?_=${time}`, 
       headers: JSON.parse(signheaderVal),
       body: rotarbody
 }
   sy.post(url, (error, response, data) =>{
-   sy.log(`转盘双倍奖励:${data}`)
-   Doubleres = JSON.parse(data)
-   if (Doubleres.status==1&&rotaryres.data.remainTurn%notifyInterval==0){
-     detail += `转盘双倍奖励${Doubleres.data.score1}个青豆`  
-   sy.msg(CookieName,subTitle,detail)
-    }
-   else if (rotaryres.code==10010){
-subTitle += ` 转盘${rotaryres.msg}🎉`
-   sy.msg(CookieName,subTitle,detail)
-    }
+   sy.log(`转盘宝箱1抽奖:${data}`)
+   rotaryres1 = JSON.parse(data)
+   if (rotaryres1.status==1){
+     detail += `转盘宝箱1奖励${rotaryres1.data.score}个青豆，`  
+       }
+     })
    })
-  },250)
-  resolve()
+ resolve()
  })
-sy.done()
 }
-
-
+//开启宝箱2
 function rotary2() {      
  return new Promise((resolve, reject) => {
   setTimeout(() =>  {
@@ -335,10 +348,11 @@ const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]+'
      detail += `转盘宝箱2奖励${rotaryres2.data.score}个青豆，`  
        }
      })
-   },50)
+   })
  resolve()
  })
 }
+//开启宝箱3
 function rotary3() {      
  return new Promise((resolve, reject) => {
   setTimeout(() =>  {
@@ -356,10 +370,11 @@ const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]+'
      detail += `转盘宝箱3奖励${rotaryres3.data.score}个青豆，`  
        }
      })
-   },100)
+   })
  resolve()
  })
 }
+//开启宝箱4
 function rotary4() {      
  return new Promise((resolve, reject) => {
   setTimeout(() =>  {
@@ -377,11 +392,156 @@ const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]+'
      detail += `转盘宝箱4奖励${rotaryres4.data.score}个青豆，`  
        }
      })
-   },150)
+   })
+ resolve()
+ })
+}
+//开启打卡
+function punchCard() {      
+ return new Promise((resolve, reject) => {
+  setTimeout(() =>  {
+    const url = { 
+      url: `https://kd.youth.cn/WebApi/PunchCard/signUp?`, 
+      headers: JSON.parse(signheaderVal),
+}
+  sy.post(url, (error, response, data) =>{
+   sy.log(`每日开启打卡:${data}`)
+   punchcardstart = JSON.parse(data)
+   if (punchcardstart.code==1){
+     detail += `开启打卡${punchcardstart.msg}，`  
+       }
+    else if(punchcardstart.code==0){
+     //detail += `${punchcardstart.msg}`
+       }
+     })
+   })
  resolve()
  })
 }
 
+//结束打卡
+function endCard() {      
+ return new Promise((resolve, reject) => {
+  setTimeout(() =>  {
+    const url = { 
+      url: `https://kd.youth.cn/WebApi/PunchCard/doCard?`, 
+      headers: JSON.parse(signheaderVal),
+}
+  sy.post(url, (error, response, data) =>{
+   sy.log(`打卡结果:${data}`)
+   punchcardend = JSON.parse(data)
+   if (punchcardend.code==1){
+     detail += `打卡${punchcardend.msg}，打卡时间: ${punchcardend.card_time}`  
+       }
+    else if(punchcardend.code==0){
+     //detail += `${punchcardend.msg}`
+       }
+     })
+   })
+ resolve()
+ })
+}
+
+//打卡分享
+function Cardshare() {      
+ return new Promise((resolve, reject) => {
+  setTimeout(() =>  {
+    const url = { 
+      url: `https://kd.youth.cn/WebApi/PunchCard/shareEnd?`, 
+      headers: JSON.parse(signheaderVal),
+}
+  sy.post(url, (error, response, data) =>{
+   sy.log(`打卡分享:${data}`)
+   shareres = JSON.parse(data)
+   if (shareres.code==1){
+     detail += `${shareres.msg}，获得: ${shareres.data.score}个青豆，`  
+       }
+    else if(shareres.code==0){
+     //detail += `${shareres.msg}，`
+       }
+     })
+   })
+ resolve()
+ })
+}
+//开启时段宝箱
+function openbox() {      
+ return new Promise((resolve, reject) => {
+  setTimeout(() =>  {
+    const url = { 
+      url: `https://kd.youth.cn/WebApi/invite/openHourRed`, 
+      headers: JSON.parse(signheaderVal),
+}
+  sy.post(url, (error, response, data) =>{
+   sy.log(`时段开启宝箱:${data}`)
+   boxres = JSON.parse(data)
+   if (boxres.code==1){
+     detail += `开启宝箱${boxres.msg}，获得: ${boxres.data.score}个青豆，${boxres.data.time/60}分钟后领取下次奖励，`  
+       }
+    else if(boxres.code==0){
+     //detail += `${boxres.msg}，`
+       }
+     })
+   })
+ resolve()
+ })
+}
+
+//宝箱分享
+function share() {      
+ return new Promise((resolve, reject) => {
+  setTimeout(() =>  {
+    const url = { 
+      url: `https://kd.youth.cn/WebApi/invite/shareEnd`, 
+      headers: JSON.parse(signheaderVal),
+}
+  sy.post(url, (error, response, data) =>{
+   sy.log(`宝箱分享:${data}`)
+   shareres = JSON.parse(data)
+   if (shareres.code==1){
+     detail += `${shareres.msg}，获得: ${shareres.data.score}个青豆，`  
+       }
+    else if(shareres.code==0){
+     //detail += `${shareres.msg}，`
+       }
+     })
+   })
+ resolve()
+ })
+}
+
+//转盘双倍奖励
+function TurnDouble() {      
+ const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]
+ return new Promise((resolve, reject) => {
+    setTimeout(()=> {
+   const time = new Date().getTime()
+    const url = { 
+      url: `https://kd.youth.cn/WebApi/RotaryTable/toTurnDouble?_=${time}`, 
+      headers: JSON.parse(signheaderVal),
+      body: rotarbody
+}
+  sy.post(url, (error, response, data) =>{
+   sy.log(`转盘双倍奖励:${data}`)
+   Doubleres = JSON.parse(data)
+   if(Doubleres.status==1){
+     detail += `转盘双倍奖励${Doubleres.data.score1}个青豆` };
+     if (rotaryres.status==1&&rotaryres.data.remainTurn<=3){
+     sy.msg(CookieName,subTitle,detail)
+     }
+    else if (rotaryres.status==1&&rotaryres.data.remainTurn%notifyInterval==0)    {
+   sy.msg(CookieName,subTitle,detail)
+      }
+   else if (rotaryres.code==10010){
+subTitle += ` 转盘${rotaryres.msg}🎉`
+   sy.msg(CookieName,subTitle,detail)
+      }
+    })
+   resolve()
+  })
+sy.done()
+ })
+}
 
 function init() {
   isSurge = () => {

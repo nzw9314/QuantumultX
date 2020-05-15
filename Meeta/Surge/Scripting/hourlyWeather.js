@@ -1,4 +1,4 @@
-const weaapi = "https://www.tianqiapi.com/api/?version=v6"
+const weaapi = "https://www.tianqiapi.com/api/?version=v6&appid=13333885&appsecret=v8OEJUMb"
 
 $httpClient.get(weaapi, function(error, response, data){
     if (error){
@@ -7,11 +7,11 @@ $httpClient.get(weaapi, function(error, response, data){
     } else {
         var obj = JSON.parse(data);
         console.log(obj);
-        var wea = obj.wea;
-        var city = obj.city;
-        var time = "天气更新于："+obj.update_time;
-        let wmation = [wea,time,city];
-        $notification.post(wmation[0], wmation[2], wmation[1]);
+        var city = "所在城市： " + obj.city+ "  •  " + obj.tem + "℃" ;;
+        var wea = "天气状况： " + obj.wea +"  •  " + obj.tem2 + "℃～" + obj.tem1 + "℃"
+        var air = "当前风力： " + obj.win + "  •  "+obj.win_speed + "      风速" + obj.win_meter + "\n空气指数： " +obj.air + "  •  "+ obj.air_level +"  |  湿度  •  " + obj.humidity+"  |  能见度  •  "+obj.visibility+ "\n友情提示： " + obj.air_tips + "\n更新时间： " + obj.update_time;
+        let wmation = [city,wea,air];
+        $notification.post(wmation[0], wmation[1], wmation[2]);
         $done();
     }
 }

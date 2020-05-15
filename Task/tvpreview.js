@@ -28,7 +28,7 @@ cron "04 00 * * *" script-path=tvpreview.js, enabled=true, tag=电视节目预�
 
 By Macsuny                   
 */
-const c = 'cctv8'  //修改电视台
+const c = 'hunan'  //修改电视台
 
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
 let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
