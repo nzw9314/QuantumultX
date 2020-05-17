@@ -9,15 +9,16 @@
 
 [task_local]
 0 * * * * trainquery.js
-
+# Remote 远程
+0 10 * * * https://raw.githubusercontent.com/Sunert/Scripts/master/Task/trainquery.js, tag=列车时刻表
  */
 
-const leftstation ='北京'  //出发地
+const leftstation ='潮汕'  //出发地
 const tostation = '广州'   //目的地
 const seattypes= 'MO' // 普通列车为A1A3， 高铁动车为MO
 const purpose = 'ADULT'  //乘客类型，'ADULT'是成人，'0X00'是学生
 const leftdate = '2020-05-18' //出发日期
-const K = '3'  //车次序号!!
+const K = '2'  //车次序号!!
 
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
 let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
@@ -298,7 +299,7 @@ for (i=1;i<result.data.data.length;i++){
     detail  += `\n`+result.data.data[i].arrive_time +'--'+result.data.data[i].start_time+ '  '+result.data.data[i].station_name
 }
 const title = traincode+ "次列车时刻表🚄"
-const subTitle = '始发站: '+startstation+ ' -- 终点站: '+endstation
+const subTitle = '始发站: '+startstation+ ' -- 终点站: '+endstation+ " " +leftdate
  $notify(title, subTitle, detail)
   console.log(traincode+'次列车  \n'+detail)
   }

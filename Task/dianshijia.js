@@ -1,5 +1,8 @@
 
 /*
+
+赞赏:电视家邀请码`893988`,农妇山泉 -> 有点咸，万分感谢
+
 本脚本仅适用于电视家签到 测试版，可能有bug
 获取Cookie方法:
 1.将下方[rewrite_local]和[Task]地址复制的相应的区域
@@ -43,6 +46,8 @@ http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\? url script-request-
 ~~~~~~~~~~~~~~~~
 
 */
+//赞赏:电视家邀请码`893988`
+
 const walkstep = '20000';//每日步数设置，可设置0-20000
 const cookieName = '电视家 📺'
 const signurlKey = 'sy_signurl_dsj'
@@ -80,6 +85,7 @@ async function all()
   await total();
   await cash();
   await double();
+  await minvite();
   await award();
 }
 
@@ -172,7 +178,7 @@ function award() {
     let awardurl = { url: `http://act.gaoqingdianshi.com/api/v4/sign/get`, headers: JSON.parse(signheaderVal)}
      sy.get(awardurl, (error, response, data) => 
   {
-    sy.log(`${cookieName}, data: ${data}`)
+    //sy.log(`${cookieName}, data: ${data}`)
      const result = JSON.parse(data)
      if (result.errCode == 0) 
     {
@@ -287,6 +293,20 @@ resolve()
  })
 }
 
+function minvite() {
+  return new Promise((resolve, reject) => {
+      let url = { url: `http://m3.gsyxvip.com/activity/f/transfer?uid=undefined&inviteCode=893988&type=mInvite&yrwe=1`,
+     headers: JSON.parse(signheaderVal)
+  }
+      url.headers['Host']= 'm3.gsyxvip.com'
+      sy.get(url, (error, response, data) => {
+        //sy.log(`data: ${data}`)
+       //result = JSON.parse(data)
+       //if (result.errCode==0){}
+   })
+resolve()
+ })
+}
 
 
 function init() {
