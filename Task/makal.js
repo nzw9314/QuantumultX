@@ -27,7 +27,7 @@ QX 1.0.7+ :
 
 [rewrite_local]
 https:\/\/app\.api\.versa-ai\.com\/app\/text url script-request-header makal.js
-https:\/\/activity\.versa-ai\.com\/api\/community\/user\/sign\/days url script-request-header makal.js
+https:\/\/activity\.versa-ai\.com\/api\/community\/user\/sign\/days url script-request-body makal.js
 ~~~~~~~~~~~~~~~~
 [MITM]
 hostname = app.api.versa-ai.com, activity.versa-ai.com
@@ -42,11 +42,6 @@ const sy = init()
 const signurlVal = sy.getdata(signurlKey)
 const cookieVal = sy.getdata(cookieKey)
 const tokenVal = sy.getdata(tokenKey)
-const token = JSON.parse(tokenVal)
-const uid = `${token.uid}`
-const bedate = `${token.beginDate}`
-const userToken = `${token.userToken}`
-const deviceId = `${token.deviceId}`
 const myDate = new Date();  
 
 let isGetCookie = typeof $request !== `undefined`
@@ -62,41 +57,54 @@ function GetCookie() {
   const signurlVal = requrl
   sy.log(`signurlVal:${signurlVal}`)
   if (signurlVal) sy.setdata(signurlVal, signurlKey)
+  const cookieVal = $request.headers['Cookie']
+  sy.log(`cookieVal:${cookieVal}`)
+  if (cookieVal) sy.setdata(cookieVal, cookieKey)
   sy.msg(`${cookieName}`, `获取签到地址: 成功`, ``)
 }
 else if ($request && $request.method != `OPTIONS`&&$request.url.match(/\/user\/sign\/days/)) {
-  const cookieVal = $request.headers['Cookie']
-  const signbodyVal = $request.body
-  sy.log(`cookieVal:${cookieVal}`)
-  sy.log(`signbodyVal:${signbodyVal}`)
-const queryparam = requrl.split(`?`)[1]
+  const queryparam = requrl.split(`?`)[1]
 if (queryparam) {
   const params = {}
   for (param of requrl.split(`?`)[1].split(`&`)) {
     params[param.split(`=`)[0]] = param.split(`=`)[1]
   }
-  const token = JSON.stringify(params)
-  if (sy.setdata(token, tokenKey))
-  if (cookieVal) sy.setdata(cookieVal, cookieKey)
-  sy.msg(`${cookieName}`, `获取cookie: 成功`, ``)
+  let tokenVal = JSON.stringify(params)
+  if (sy.setdata(tokenVal, tokenKey))
+  sy.msg(`${cookieName}`, `获取token: 成功`, ``)
   }
  }
 } 
 
 async function all() 
 { 
+  await tokenParse();
   await getsign();
   await sign();
   await info();
   await total();
 }
+
+
+function tokenParse() {
+  return new Promise((resolve, reject) => {
+   const token = JSON.parse(tokenVal)
+    uid = `${token.uid}`
+    bedate = `${token.beginDate}`
+    userToken = `${token.userToken}`
+    deviceId = `${token.deviceId}`
+    resolve()
+   })
+}
+
 function getsign() {
  return new Promise((resolve, reject) => {
     getsignurl = {
-      url: signurlVal,
-	headers: {Cookie: cookieVal}  }
+     url: signurlVal,
+	headers: {Cookie: cookieVal}}
+
     sy.get(getsignurl, (error, response, data) =>{
-    sy.log(`${cookieName}, data: ${data}`)
+    //sy.log(`${cookieName}, data: ${data}`)
      let result = JSON.parse(data) 
       if (result.responseCode == 0000){
            subTitle = `签到结果: 成功 🎉`
@@ -119,7 +127,7 @@ function sign() {
     time2=date.getTime()
     time = Y +'/'+M+'/'+ D;
 	 let signidurl = {
-		url: `https://activity.versa-ai.com/api/community/user/sign/days?beginDate=${bedate}&endDate=${time}&uid=${uid}&userToken=${userToken}&deviceId=${deviceId}&imei=&osType=ios&lang=zh-cn&source=app`,
+		url: `https://activity.versa-ai.com/api/community/user/sign/days?beginDate=${bedate}&endDate=${time}&uid=${uid}&userToken=${userToken}&deviceId=${deviceId}`,
 		headers: {Cookie: cookieVal}      
 	}
    sy.get(signidurl, (error, response, data) =>{

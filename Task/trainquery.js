@@ -12,13 +12,13 @@
 # Remote 远程
 0 10 * * * https://raw.githubusercontent.com/Sunert/Scripts/master/Task/trainquery.js, tag=列车时刻表
  */
-
-const leftstation ='潮汕'  //出发地
+const stop = "500" //票价报错时调整延迟时间,默认500为0.5秒
+const leftstation ='北京'  //出发地
 const tostation = '广州'   //目的地
-const seattypes= 'MO' // 普通列车为A1A3， 高铁动车为MO
+const seattypes= 'A1A3' // 普通列车为A1A3， 高铁动车为MO
 const purpose = 'ADULT'  //乘客类型，'ADULT'是成人，'0X00'是学生
-const leftdate = '2020-05-18' //出发日期
-const K = '2'  //车次序号!!
+const leftdate = '2020-05-22' //出发日期
+const K = '1'  //车次序号!!
 
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
 let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
@@ -245,6 +245,7 @@ else {
 }
 function prize() {
  return new Promise((resolve, reject) =>{
+ setTimeout(() => {
    const myRequest = {
     url: `https://kyfw.12306.cn/otn/leftTicket/queryTicketPrice?train_no=${trainno}&from_station_no=${fromstationno}&to_station_no=${tostationno}&seat_types=${seattypes}&train_date=${leftdate}`,
     method: 'GET',
@@ -274,6 +275,7 @@ catch (e){
    }
 resolve()
   })
+  },stop)
  })
 }
 

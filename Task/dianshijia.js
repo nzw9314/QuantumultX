@@ -102,9 +102,9 @@ function sign() {
           { subTitle = `签到结果: 成功🎉`
             var h = result.data.reward.length
           if (h>1){
-            detail = `获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name}\n`
+            detail = `获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name}，`
            }else
-             {detail = `已签到 ${result.data.conDay}天，获取金币${result.data.reward[0].count}\n`
+             {detail = `签到获得金币${result.data.reward[0].count}，`
              }
            }
     else if  (result.errCode == 4)
@@ -227,7 +227,7 @@ let url = { url: `http://act.gaoqingdianshi.com/api/taskext/getCoin?code=walk&co
       sy.get(url, (error, response, data) => 
       {
       const result = JSON.parse(data)
-      detail += `  走路获得${result.data}`
+      detail += `走路获得${result.data}，`
       })
      }
     resolve()

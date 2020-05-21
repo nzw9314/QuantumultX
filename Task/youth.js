@@ -56,6 +56,8 @@ https?:\/\/ios\.baertt\.com\/v5\/Game\/GameVideoReward url script-request-body y
 
 https:\/\/ios\.baertt\.com\/v5\/article\/red_packet url script-request-body youth.js
 
+https:\/\/focus\.youth\.cn\/article\/s url script-request-header youth.js
+
 ~~~~~~~~~~~~~~~~
 [MITM]
 hostname = *.youth.cn, ios.baertt.com 
@@ -70,11 +72,13 @@ const signheaderKey = 'youthheader_zq'
 const gamebodyKey = 'youthgame_zq'
 const articlebodyKey = 'read_zq'
 const redpbodyKey = 'red_zq'
+const shareurlKey = 'shareurl_zq'
 const sy = init()
 const signheaderVal = sy.getdata(signheaderKey)
 const gamebodyVal = sy.getdata(gamebodyKey)
 const redpbodyVal = sy.getdata(redpbodyKey)
 const articlebodyVal = sy.getdata(articlebodyKey)
+const shareurlVal = sy.getdata(shareurlKey)
 
 let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
@@ -108,6 +112,12 @@ else if ($request && $request.method != `OPTIONS`&& $request.url.match(/\/articl
     sy.log(`[${CookieName}] 获取惊喜红包: 成功,redpbodyVal: ${redpbodyVal}`)
     sy.msg(CookieName, `获取惊喜红包请求: 成功🎉`, ``)
   }
+else if ($request && $request.method != `OPTIONS`&& $request.url.match(/\/article\/s/)) {
+   const shareurlVal = $request.url
+    if (shareurlVal)        sy.setdata(shareurlVal,shareurlKey)
+    sy.log(`[${CookieName}] 获取文章分享地址: 成功,shareurlVal: ${shareurlVal}`)
+    sy.msg(CookieName, `获取文章分享地址: 成功🎉`, ``)
+  }
 
  }
  
@@ -127,6 +137,7 @@ async function all()
   await openbox();
   await share();
   await readArticle();
+  //await articleShare();
   //await TurnDouble();
 }
 
@@ -138,14 +149,14 @@ function sign() {
       headers: JSON.parse(signheaderVal),
 }
      sy.post(signurl, (error, response, data) =>{
-      sy.log(`${CookieName}, data: ${data}`)
-       signresult =JSON.parse(data)
-       if (signresult.status == 1){
-          subTitle = `签到成功🎉`
-          detail= `获取金币: ${signresult.score}，明日金币:${signresult.nextScore}\n`
+      //sy.log(`${CookieName}, data: ${data}`)
+       signres =JSON.parse(data)
+       if (signres.status == 1){
+          signresult = `签到成功🎉`
+          detail= `获取金币: ${signres.score}，明日金币:${signres.nextScore}\n`
            }
-       else if(signresult.status == 0){
-          subTitle = `重复签到`
+       else if(signres.status == 0){
+          signresult = `重复签到`
           detail= ``
          }
        })
@@ -164,11 +175,12 @@ function signInfo() {
      //sy.log(`${CookieName}, 签到信息: ${data}`)
       signinfo =JSON.parse(data)
       if (signinfo.status == 1){
-         subTitle += ` 总计: ${signinfo.data.user.score}个青豆`
-         detail = `账户昵称: ${signinfo.data.user.nickname}  已签到: ${signinfo.data.sign_day}天，签到获得${signinfo.data.sign_score}个青豆，`
+         subTitle = `总计: ${signinfo.data.user.score}个青豆，可兑换现金约${signinfo.data.user.money}元`
+         nick =`  账号: ${signinfo.data.user.nickname}`
+         detail = signresult+ `，已签到: ${signinfo.data.sign_day}天，签到获得${signinfo.data.sign_score}个青豆  `
            }
        else {
-          subTitle += `${signinfo.msg}`
+          subTitle = `${signinfo.msg}`
           detail= ``
          }
     resolve()
@@ -177,16 +189,17 @@ function signInfo() {
   }
 
 function Invitant() {      
-return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const url = { 
-      url: `https://kd.youth.cn/user/mmsp/99299ab7298ee4700af378d294377def?uid=46308484&reward_sign=EXM7Z2j0pGYsjR7E8KC8C4iWm66pZk2g`, 
-     headers: signheaderVal
+      url: `https://kd.youth.cn/WebApi/User/fillCode`, 
+     headers: JSON.parse(signheaderVal),
+     body: `{"code": "46308484"}`,
 }
-   sy.get(url, (error, response, data) =>
+   sy.post(url, (error, response, data) =>
  {
    //sy.log(`Invitdata:${data}`)
  })
-resolve()
+  resolve()
  })
 }
 
@@ -516,7 +529,7 @@ function share() {
        };
     if(rotaryres.code!=10010){
       if (rotaryres.data.doubleNum==0&&rotaryres.data.remainTurn%notifyInterval==0){
-      sy.msg(CookieName,subTitle,detail)
+      sy.msg(CookieName+" "+nick,subTitle,detail)
       sy.done()
       }
     else if (rotaryres.data.doubleNum!=0){
@@ -524,8 +537,8 @@ function share() {
       }
     }
   else if (rotaryres.code==10010){
-    subTitle += ` 转盘${rotaryres.msg}🎉`
-   sy.msg(CookieName,subTitle,detail)
+    rotarynum = ` 转盘${rotaryres.msg}🎉`
+   sy.msg(CookieName+" "+nick+"  "+rotarynum,subTitle,detail)
       }
      })
    })
@@ -550,15 +563,10 @@ function TurnDouble() {
    if(Doubleres.status==1){
      detail += `转盘双倍奖励${Doubleres.data.score1}个青豆` };
      if (rotaryres.status==1&&rotaryres.data.remainTurn>=95){
-     sy.msg(CookieName,subTitle,detail)
+     sy.msg(CookieName+" "+nick,subTitle,detail)
      }
     else if (rotaryres.status==1&&rotaryres.data.remainTurn%notifyInterval==0)    {
-   sy.msg(CookieName,subTitle,detail)
-      }
-   else if (rotaryres.code==10010){
-    
-subTitle += ` 转盘${rotaryres.msg}🎉`
-   sy.msg(CookieName,subTitle,detail)
+   sy.msg(CookieName+" "+nick,subTitle,detail)
       }
     })
    resolve()
@@ -566,6 +574,30 @@ subTitle += ` 转盘${rotaryres.msg}🎉`
 sy.done()
  })
 }
+
+function articleShare() {      
+ return new Promise((resolve, reject) => {
+  setTimeout(() =>  {
+    const url = { 
+      url: shareurlVal, 
+      headers: signheaderVal,
+}
+  sy.get(url, (error, response, data) =>{
+   //sy.log(`文章分享:${data}`)
+   shareres = JSON.parse(data)
+   if (shareres.success==true){
+     //detail += `${shareres.message}，获得${shareres.score_text}`  
+       }
+    else if(shareres.success==false){
+     //detail += `${shareres.message}，`
+       }
+     })
+   })
+ resolve()
+ })
+}
+
+
 
 function init() {
   isSurge = () => {
