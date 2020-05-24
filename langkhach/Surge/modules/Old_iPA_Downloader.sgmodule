@@ -5,7 +5,7 @@
 
 [Script]
 
-old_ipa.js = type=http-request,pattern=(https:\/\/.+\-buy\.itunes\.apple\.com\/WebObjects\/MZBuy.woa\/wa\/buyProduct)|(https:\/\/api\.unlimapps\.com\/.+\/apple_apps\/.+\/versions\?=),requires-body=1,max-size=0,debug=1,script-path=https://raw.githubusercontent.com/langkhach270389/Scripting/master/Surge/old_ipa.js
+old_ipa.js = type=http-request,pattern=(https:\/\/(.+\-|)buy\.itunes\.apple\.com\/WebObjects\/MZBuy.woa\/wa\/buyProduct)|(https:\/\/api\.unlimapps\.com\/.+\/apple_apps\/.+\/versions\?=),requires-body=1,max-size=0,debug=1,script-path=https://raw.githubusercontent.com/langkhach270389/Scripting/master/Surge/old_ipa.js
 
 
 [MITM]

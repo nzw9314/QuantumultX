@@ -1,6 +1,6 @@
 /**
  1.根据原版脚本修改，增加上月账单信息，需重新获取Cookie
- 2.适合流量畅享套餐使用，如非畅享套餐，可将187行前加//注释，并取消188行注释，此项仅供测试
+ 2.适合流量畅享套餐使用，如非畅享套餐，可将187行前加//注释，并取消188行注释，此项仅供测试 已失效❌
  3.因地区不同可能获取不到Cookie,可自行复制cookie至65行下覆盖"COOKIE"，
  By Macsuny 修改
  
@@ -15,7 +15,7 @@
  10 8 * * * telecomInfinity.js
 
  [Loon]
- http-request ^https?:\/\/e\.189\.cn\/store\/user\/package_detail\.do script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/telecomInfinity.js
+http-request ^https?:\/\/e\.189\.cn\/store\/user\/package_detail\.do script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/telecomInfinity.js
  
  Surge 4.0 :
 [Script]

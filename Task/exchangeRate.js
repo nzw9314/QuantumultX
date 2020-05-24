@@ -1,25 +1,34 @@
-/*
-    本作品用于QuantumultX和Surge之间js执行方法的转换
-    您只需书写其中任一软件的js,然后在您的js最【前面】追加上此段js即可
-    无需担心影响执行问题,具体原理是将QX和Surge的方法转换为互相可调用的方法
-    尚未测试是否支持import的方式进行使用,因此暂未export
-    如有问题或您有更好的改进方案,请前往 https://github.com/sazs34/TaskConfig/issues 提交内容,或直接进行pull request
-    您也可直接在tg中联系@wechatu
-*/
-// #region 固定头部
+
+/**
+本任务脚本可查询实时货币汇率及换算
+注意澳门元为澳门帕塔卡，香港元为港币，台湾为新台币
+～～～～～～～～～～～～～～～～
+QX 1.0.6+ :
+
+[task_local]
+0 * * * * exchangeRate.js
+# Remote 远程
+0 10 * * * https://raw.githubusercontent.com/Sunert/Scripts/master/Task/exchangeRate.js, 实时货币换算
+～～～～～～～～～～～～～～～～
+Surge 4.0 :  
+[Script]
+实时汇率 = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/exchangeRate.js,script-update-interval=0
+
+～～～～～～～～～～～～～～～～～
+Loon 2.1.0+
+[Script]
+
+cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/exchangeRate.js, enabled=true, tag=实时汇率
+
+-----------------
+
+ */
+const frommoney ='美元'          //使用币
+const exchangemoney = '人民币'   //换算币
+const moneynumb = '1'           //兑换金额
+
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
 let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
-// 判断request还是respons
-// down方法重写
-var $done = (obj={}) => {
-    var isRequest = typeof $request != "undefined";
-    if (isQuantumultX) {
-        return isRequest ? $done({}) : ""
-    }
-    if (isSurge) {
-        return isRequest ? $done({}) : $done()
-    }
-}
 // http请求
 var $task = isQuantumultX ? $task : {};
 var $httpClient = isSurge ? $httpClient : {};
@@ -147,92 +156,63 @@ if (isSurge) {
         $notification.post(title, subTitle, detail);
     }
 }
-// #endregion
 
-/*
-倒数日
-
-使用:
-#每天 8点通知, 也可以自定义其他时间, 详情:https://community.nssurge.com/d/33-scripting
-
-[Script]
-cron "0 8 * * *" script-path=https://github.com/congcong0806/surge-list/raw/master/Script/daysmatter.js
- 
-作者:聪聪
-聪聪 https://t.me/congcongx_bot
-群组 https://t.me/YinxiangBiji
-频道 https://t.me/YinxiangBiji_News
-*/
-
-Date.prototype.format = function(fmt) {
-    var date = {
-            "M+": this.getMonth() + 1,
-            "d+": this.getDate(),
-            "h+": this.getHours(),
-            "m+": this.getMinutes(),
-            "s+": this.getSeconds(),
-            "q+": Math.floor((this.getMonth() + 3) / 3),
-            "S": this.getMilliseconds()
-        };
-    if (/(y+)/i.test(fmt)) {
-        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
-    }
-    for (var k in date) {
-        if (new RegExp("(" + k + ")").test(fmt)) {
-            fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? date[k] : ("00" + date[k]).substr(("" + date[k]).length));
-        }
-    }
-    return fmt;
+code()
+function code() {
+  return new Promise((resolve, reject) =>{
+    const codeurl = {
+    url: `http://www.40sishi.com/currency/rate`,
+    method: 'GET',
 };
-
-//倒数日计算
-function dateDiff(startDate, endDate) {
-    //2002-12-18格式  
-    var sdate, edate, days
-    sdate = new Date(startDate)
-    edate = new Date(endDate)
-    //把相差的毫秒数转换为天数
-    days = parseInt((sdate - edate) / 1000 / 60 / 60 / 24)
-    return days;
+    $task.fetch(codeurl).then(response => { 
+     let result = JSON.parse(response.body)
+   console.log('人民币汇率'+ response.body)
+    try{
+      for (i= 0; i<result.data.length;i++){
+       if(result.data[i].name==frommoney){
+         fromcode= result.data[i].code
+         fromsymbol=result.data[i].symbol
+        };
+       if(result.data[i].name==exchangemoney){
+         exchangecode= result.data[i].code
+         exchangesymbol = result.data[i].symbol
+         cnTorate = result.data[i].rate
+        }
+       }
+      rate()
+      }
+       catch (erro){
+        $notify('货币实时汇率换算失败', '请检查币种，币种详情请查看日志', erro)
+        console.log(erro)
+         }
+      resolve()
+      })
+   })
 }
 
-const dayarr = [ 
-    [ "儿童节", "2020-06-01" ], 
-    [ "父亲节", "2020-06-21" ], 
-    [ "端午节", "2020-06-25" ],
-    [ "七夕节", "2020-08-25" ], 
-    [ "教师节", "2020-09-10" ],             
-    [ "中秋节", "2020-10-01" ], 
-    [ "国庆节", "2020-10-01" ], 
-    [ "今年     ", "2020-01-01" ],
-    [ "今年     ", "2020-12-31" ],
-]
-
-day();
-
-function valcal(days) {
-    if (days == 0)
-        return "就是今天"
-    else if (days > 0)
-        return "剩余 : " + days + "天"
-    else
-        return "已过 : " + Math.abs(days) + "天"
+function rate() {
+  return new Promise((resolve, reject) =>{
+    const rateurl = {
+    url: `https://api.jisuapi.com/exchange/single?appkey=177469794ec67f09&currency=${fromcode}`,
+    method: 'GET',
+};
+    $task.fetch(rateurl).then(response => { 
+    //console.log('外币汇率'+ response.body)
+     let result = JSON.parse(response.body)
+  try{
+      if (result.msg=="ok"){
+        const rated = moneynumb*result.result.list[`${exchangecode}`].rate
+         subTitle = frommoney+'兑'+exchangemoney+'汇率: '+ result.result.list[`${exchangecode}`].rate+'元'
+         detail = fromsymbol+""+moneynumb+" "+fromcode+' = '+ exchangesymbol+ rated.toFixed(3)+" "+ exchangecode+'\n最后更新: '+result.result.list[`${exchangecode}`].updatetime
+       }
+        $notify('货币实时汇率 💶 ', subTitle, detail)
+      }
+      catch (erro){
+         $notify('货币实时汇率换算失败', '请检查币种，币种详情请查看日志', erro)
+        console.log(erro)
+        resolve()
+         }
+      })
+   $done()
+   })
 }
-
-function day() {
-    var now = new Date()
-    var nowStr = now.format("yyyy-MM-dd")
-    var content = "";
-    for ( var i in dayarr) {
-        var d = dateDiff(dayarr[i][1], nowStr)
-        if(isNaN(d))
-            continue
-        var u = valcal(d)
-        content += dayarr[i][0] + "• " + u + "\n"
-    }
-    console.log(content);
-    $notification.post('倒数日', "", content)    
-}
-
-
-$done()

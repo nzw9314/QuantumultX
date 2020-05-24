@@ -22,7 +22,7 @@ tvpreview.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubuser
 Loon 2.1.0+
 [Script]
 # 本地脚本
-cron "04 00 * * *" script-path=tvpreview.js, enabled=true, tag=电视节目预告
+cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/tvpreview.js, enabled=true, tag=电视节目预告
 
 -----------------
 

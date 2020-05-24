@@ -1,5 +1,8 @@
 
 /*
+
+赞赏:电视家邀请码`893988`,农妇山泉 -> 有点咸，万分感谢
+
 本脚本仅适用于电视家签到 测试版，可能有bug
 获取Cookie方法:
 1.将下方[rewrite_local]和[Task]地址复制的相应的区域
@@ -14,9 +17,6 @@
 By Macsuny
 感谢 chavyleung
 ~~~~~~~~~~~~~~~~
-Surge 4.0 :
-[Script]
-dianshijia.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js,script-update-interval=0
 
 # 获取电视家 Cookie.
 Surge 4.0
@@ -28,8 +28,8 @@ Surge 4.0
 ~~~~~~~~~~~~~~~~
 Loon 2.1.0+
 [Script]
-# 本地脚本
-cron "04 00 * * *" script-path=dianshijia.js, enabled=true, tag=电视家
+
+cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js, enabled=true, tag=电视家
 
 http-request http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/dianshijia.js
 
@@ -46,6 +46,8 @@ http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\? url script-request-
 ~~~~~~~~~~~~~~~~
 
 */
+//赞赏:电视家邀请码`893988`
+
 const walkstep = '20000';//每日步数设置，可设置0-20000
 const cookieName = '电视家 📺'
 const signurlKey = 'sy_signurl_dsj'
@@ -58,7 +60,7 @@ let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
    GetCookie()
   } else {
-   all()
+    all()
   }
 function GetCookie() {
 const requrl = $request.url
@@ -83,7 +85,7 @@ async function all()
   await total();
   await cash();
   await double();
-  await award();
+  await signinfo();
 }
 
 
@@ -93,15 +95,15 @@ function sign() {
       const url = { url: signurlVal, headers: JSON.parse(signheaderVal)}
       sy.get(url, (error, response, data) =>
        {
-      sy.log(`${cookieName}, data: ${data}`)
+      sy.log(`${cookieName}, 签到结果: ${data}`)
       const result = JSON.parse(data)
       if  (result.errCode == 0) 
           { subTitle = `签到结果: 成功🎉`
             var h = result.data.reward.length
           if (h>1){
-            detail = `获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name}\n`
+            detail = `获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name}，`
            }else
-             {detail = `已签到 ${result.data.conDay}天，获取金币${result.data.reward[0].count}\n`
+             {detail = `签到获得金币${result.data.reward[0].count}，`
              }
            }
     else if  (result.errCode == 4)
@@ -121,24 +123,26 @@ function sign() {
 
 function total() {
  return new Promise((resolve, reject) => {
-    const coinurl = { url: `http://api.gaoqingdianshi.com/api/coin/info`, headers: JSON.parse(signheaderVal)}
+   const coinurl = { url: `http://api.gaoqingdianshi.com/api/coin/info`, 
+      headers: JSON.parse(signheaderVal)
+    }
    sy.get(coinurl, (error, response, data) => {
-     sy.log(`${cookieName}, data: ${data}`)
-     const result = JSON.parse(data)
-     subTitle += `待兑换${result.data.coin}金币 ` 
+     sy.log(`${cookieName}, 金币总计: ${data}`)
+     const coinresult = JSON.parse(data)
+     subTitle += `待兑换${coinresult.data.coin}金币 ` 
    try{
       for(tempCoin in data){
-       for (i=0;i<result.data.tempCoin.length;i++) {  
-      coinid = result.data.tempCoin[i].id
+       for (i=0;i<coinresult.data.tempCoin.length;i++) {  
+      coinid = coinresult.data.tempCoin[i].id
       url5 = { url: `http://api.gaoqingdianshi.com/api/coin/temp/exchange?id=`+coinid, headers: JSON.parse(signheaderVal)}
       sy.get(url5, (error, response, data))    
         }
        }
       }
      catch(err){
-      err };
+      err }
+    resolve()
      })
-  resolve()
   }) 
 }
 function cash() {
@@ -146,10 +150,10 @@ function cash() {
       let url = { url: `http://api.gaoqingdianshi.com/api/cash/info`, headers: JSON.parse(signheaderVal)}
       sy.get(url, (error, response, data) => 
       {
-      sy.log(`data: ${data}`)
+      sy.log(`现金余额: ${data}`)
       const result = JSON.parse(data)
       subTitle += '现金: '+ result.data.amount/100+'元 '
-      resolve()
+     resolve()
       })
    })
 }
@@ -158,36 +162,24 @@ function share() {
  return new Promise((resolve, reject) => {    
     shareurl = { url: `http://api.gaoqingdianshi.com/api/v4/task/complete?code=1M005`, headers: JSON.parse(signheaderVal)}
     sy.get(shareurl, (error, response, data) => {
-     sy.log(`${cookieName}, data: ${data}`)
+     sy.log(`${cookieName}, 分享: ${data}`)
         const result = JSON.parse(data)
      if (result.errCode == 0)  
        {
         detail += `分享获取${result.data.getCoin}个金币`
        } 
-    sy.get(coinurl, (error, response, data) => {
-      sy.log(`${cookieName}, data: ${data}`)
-      const result = JSON.parse(data)
-       for(tempCoin in data){
-  for (i=0;i<result.data.tempCoin.length;i++)                
-    {  
-      coinid = result.data.tempCoin[i].id
-      url5 = { url: `http://api.gaoqingdianshi.com/api/coin/temp/exchange?id=`+coinid, headers: JSON.parse(signheaderVal)}
-      sy.get(url5, (error, response, data))    
-        }
-       }
-      })
-     })
+   })
 resolve()
   })
 }
 
-function award() {
+function signinfo() {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
     let awardurl = { url: `http://act.gaoqingdianshi.com/api/v4/sign/get`, headers: JSON.parse(signheaderVal)}
      sy.get(awardurl, (error, response, data) => 
   {
- //  sy.log(`${cookieName}, data: ${data}`)
+    sy.log(`${cookieName}, 签到信息: ${data}`)
      const result = JSON.parse(data)
      if (result.errCode == 0) 
     {
@@ -228,7 +220,7 @@ function walk() {
       let url = { url: `http://act.gaoqingdianshi.com/api/taskext/getWalk?step=${walkstep}`, headers: JSON.parse(signheaderVal)}
       sy.get(url, (error, response, data) => 
       {
-      sy.log(`data: ${data}`)
+      sy.log(`走路任务: ${data}`)
       const result = JSON.parse(data)
      walkcoin = result.data.unGetCoin
     if (walkcoin>10){
@@ -236,7 +228,7 @@ let url = { url: `http://act.gaoqingdianshi.com/api/taskext/getCoin?code=walk&co
       sy.get(url, (error, response, data) => 
       {
       const result = JSON.parse(data)
-      detail += `  走路获得${result.data}`
+      detail += `走路获得${result.data}，`
       })
      }
     resolve()
@@ -250,10 +242,10 @@ function sleep() {
       let url = { url: `http://act.gaoqingdianshi.com/api/taskext/getSleep?ext=1`, headers: JSON.parse(signheaderVal)}
       sy.get(url, (error, response, data) => {
   try {
-      sy.log(`data: ${data}`)
+      sy.log(`睡觉任务: ${data}`)
       const result = JSON.parse(data)
      if (result.errCode==0){
-      sleeping = result.data.name+'已开始 '
+      sleeping = result.data.name+'报名成功🛌 '
       }
 else if (result.errCode==4006){
       sleeping = '   睡觉中😴'
@@ -273,9 +265,9 @@ resolve()
 
 function wakeup() {
   return new Promise((resolve, reject) => {
-      let url = { url: `http://act.gaoqingdianshi.com/api/taskext/getCoin?code=sleep&coin=1500&ext=1`, headers: JSON.parse(signheaderVal)}
+      let url = { url: `http://act.gaoqingdianshi.com/api/taskext/getCoin?code=sleep&coin=1500&ext=1`, headers: signheaderVal}
       sy.get(url, (error, response, data) => {
-      sy.log(`data: ${data}`)
+      sy.log(`睡觉打卡: ${data}`)
       const result = JSON.parse(data)
      if (result.errCode==0){
       detail += `获取睡觉金币:`+result.data
@@ -301,8 +293,6 @@ function double() {
 resolve()
  })
 }
-
-
 
 function init() {
   isSurge = () => {

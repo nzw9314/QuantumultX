@@ -2,9 +2,9 @@
 app下载地址：https://t.cn/A6htR2an
 
 #圈Xpear解锁会员
-^https:\/\/m\.pearkin\.com\/(api\/Movie\/WatchMovie|api\/Account\/CheckVip|api\/account\/IndexDetail) url script-response-body pear.js
+^https:\/\/(www\.baidu.com2\.club|ayk\.tmdidi\.com|m\.pearkin\.com|souhu\.mett\.me|bkcd\.b-cdn\.net)\/(api\/movie\/WatchMovie|api\/Account\/CheckVip|api\/account\/IndexDetail) url script-response-body pear.js
 
-MITM = m.pearkin.com
+MITM = bkcd.b-cdn.net, souhu.mett.me, ayk.tmdidi.com, m.pearkin.com, www.baidu.com2.club
 
 */
 
@@ -12,7 +12,7 @@ var body = $response.body;
 var url = $request.url;
 var obj = JSON.parse(body);
 
-const vip = '/api/Movie/WatchMovie';
+const vip = '/api/movie/WatchMovie';
 
 const checkvip = '/api/Account/CheckVip';
 
@@ -36,4 +36,3 @@ if (url.indexOf(vipinfo) != -1) {
 	body = JSON.stringify(obj);
  }
 $done({body});
-
