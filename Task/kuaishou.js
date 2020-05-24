@@ -25,7 +25,7 @@ Surge 4.0 :
 Loon 2.1.0+
 [Script]
 # 本地脚本
-cron "04 00 * * *" script-path=kuaishou.js, enabled=true, tag=快手
+cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/kuaishou.js, enabled=true, tag=快手
 
 http-request https:\/\/nebula\.kuaishou\.com\/rest\/n\/nebula\/activity\/earn\/overview script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/kuaishou.js
 

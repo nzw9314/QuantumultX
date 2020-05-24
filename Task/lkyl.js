@@ -21,8 +21,8 @@ lkyl.js = type=http-request,pattern=https:\/\/draw\.jdfcloud\.com\/\/api\/bean\/
 ~~~~~~~~~~~~~~~~
 Loon 2.1.0+
 [Script]
-# 本地脚本
-cron "04 00 * * *" script-path=lkyl.js, enabled=true, tag=来客有礼
+
+cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/lkyl.js, enabled=true, tag=来客有礼
 
 http-request https:\/\/draw\.jdfcloud\.com\/\/api\/bean\/square\/silverBean\/task\/get\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/lkyl.js
 
@@ -82,7 +82,7 @@ async function all()
   await info();     // 账号信息
   await tasklist(); // 任务列表
   await total();    // 总计
-  await lottery();  // o元抽奖
+  await lottery();  // 0元抽奖
   await status();   // 视频抽奖
   await Daily();    // 日常任务
   await exChange(); // 银豆兑换
@@ -148,17 +148,17 @@ function status() {
   //sy.log(`${cookieName}, data: ${data}`)
      taskstatus = JSON.parse(data)
       if (taskstatus.data.dailyTasks[1].status!='received'){
-    for (i=0;i<3;i++){
+    for (i=0;i<4;i++){
       video()} }
    else if (taskstatus.data.dailyTasks[1].status=='received'){
-   detail += `\n【视频任务】: ✅ 获得${taskstatus.data.dailyTasks[1].taskReward}个银豆` } 
-   weekresult = taskstatus.data.weeklyTasks[0].inviteAmount-taskstatus.data.weeklyTasks[0].finishedCount
+      detail += `\n【视频任务】: ✅ 获得${taskstatus.data.dailyTasks[1].taskReward}个银豆` } 
+      weekresult = taskstatus.data.weeklyTasks[0].inviteAmount-taskstatus.data.weeklyTasks[0].finishedCount
   if (weekresult >0){
       detail += `\n【每周任务】: 🔕 ${weekresult}个未完成`
       weektask()
     }
   else {
-     detail += `\n【每周任务】: ✅ 获得${taskstatus.data.weeklyTasks[0].taskReward}个银豆`
+      detail += `\n【每周任务】: ✅ 获得${taskstatus.data.weeklyTasks[0].taskReward}个银豆`
       }
     resolve()
    sy.msg(cookieName, '昵称: '+ uesername+' '+subTitle, detail)
@@ -286,16 +286,15 @@ function total() {
     for (k=0; k < result.datas.length;k++){
     if (result.datas[k].salePrice >= SilverBean && SilverBean > result.datas[k-1].salePrice)
      {
-      detail= beantotal+ `${result.datas[k-1].salePrice}银豆兑换${result.datas[k-1].productName}`}
-
+      detail += beantotal+ `${result.datas[k-1].salePrice}银豆兑换${result.datas[k-1].productName}`}
     }
    } else if (SilverBean < result.datas[0].salePrice) 
     { 
-       detail= beantotal+ `银豆不足以兑换京豆`
+       detail+= beantotal+ `银豆不足以兑换京豆`
     }
 else if (SilverBean = result.datas[0].salePrice) 
     { 
-       detail= beantotal+ `${result.datas[k-1].salePrice}银豆兑换${result.datas[k-1].productName}`
+       detail+= beantotal+ `${result.datas[k-1].salePrice}银豆兑换${result.datas[k-1].productName}`
        }
     resolve()
      })

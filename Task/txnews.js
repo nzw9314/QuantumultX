@@ -22,7 +22,7 @@ Surge 4.0
 Loon 2.1.0+
 [Script]
 # 本地脚本
-cron "04 00 * * *" script-path=txnews.js, enabled=true, tag=腾讯新闻
+cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/txnews.js, enabled=true, tag=腾讯新闻
 
 http-request https:\/\/api\.inews\.qq\.com\/event\/v1\/user\/event\/report\? script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/txnews.js
 

@@ -22,13 +22,13 @@ tvpreview.js = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubuser
 Loon 2.1.0+
 [Script]
 # 本地脚本
-cron "04 00 * * *" script-path=tvpreview.js, enabled=true, tag=电视节目预告
+cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/tvpreview.js, enabled=true, tag=电视节目预告
 
 -----------------
 
 By Macsuny                   
 */
-const c = 'hunan'  //修改电视台
+const c = 'cctv8'  //修改电视台
 
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
 let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge

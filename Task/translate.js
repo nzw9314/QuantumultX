@@ -1,10 +1,27 @@
 
 /**
  
-[task_local]
-0 * * * * translate.js, tag=谷歌中英互译(需quantumult x1.0.8+)
+～～～～～～～～～～～～～～～～
+QX 1.0.6+ :
 
- * 谷歌中英互译，适合简单的中英短语单词互译
+[task_local]
+0 * * * * translate.js, tag=谷歌中英互译
+# Remote 远程
+0 10 * * * https://raw.githubusercontent.com/Sunert/Scripts/master/Task/translate.js, 谷歌中英互译
+～～～～～～～～～～～～～～～～
+Surge 4.0 :  
+[Script]
+谷歌中英互译 = type=cron,cronexp=35 5 0 * * *,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/translate.js,script-update-interval=0
+
+～～～～～～～～～～～～～～～～～
+Loon 2.1.0+
+[Script]
+
+cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/translate.js, enabled=true, tag=谷歌中英互译
+
+----------------
+
+* 谷歌中英互译，适合简单的中英短语单词互译
 */
 
 const ENword = 'CL Online network Technology Co.LTD'  //翻译内容填入引号内
