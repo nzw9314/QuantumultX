@@ -30,11 +30,11 @@ cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/
 
  */
 const stop = "500" //票价报错时调整延迟时间,默认50为0.5秒
-const leftstation ='深圳'  //出发地
-const tostation = '菏泽'   //目的地
+const leftstation ='北京'  //出发地
+const tostation = '上海'   //目的地
 const purpose = 'ADULT'   //乘客类型，'ADULT'是成人，'0X00'是学生
 const leftdate = '2020-05-27' //出发日期
-const K = ' 5 '  //车次序号!!
+const K = ' 1 '  //车次序号!!
 
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
 let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge

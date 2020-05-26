@@ -3,12 +3,12 @@
 获取Cookie方法:
 1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
 下，
-2.微信搜索'来客有礼'小程序,登陆京东账号，点击'发现',即可获取Cookie.
+2.微信搜索'来客有礼'小程序,登陆京东账号，点击'发现',即可获取Cookie，获取后请禁用或注释掉❗️
 3.非专业人士制作，欢迎各位大佬提出宝贵意见和指导
 4.5月17日增加自动兑换京豆，需设置兑换京豆数，现可根据100、200和500设置，不可设置随机兑换数，根据页面填写兑换数值，默认设置500，注意是京豆数❗️
 5.版本更新日志:
 05-19 v1.0: 变更通知方式
-
+05-25 v1.01 修复京豆兑换报错
 
 by Macsuny
 ~~~~~~~~~~~~~~~~
@@ -124,8 +124,10 @@ function lottery() {
       Incomplete = lotteryres.data.totalSteps - lotteryres.data.doneSteps
      if (Incomplete >0 ){
     for (k=0;task.data.homeActivities[k].participated==false&&k<Incomplete;k++){
+     if (k>=2){
        lotteryId = task.data.homeActivities[k].activityId
        cycleLucky()
+        }
        };
     detail +=  `\n【抽奖任务】: 🔕 ${Incomplete}个未完成`
      resolve()
@@ -283,18 +285,23 @@ function total() {
       let result = JSON.parse(data)
       const title = `${cookieName}`
    if (SilverBean >result.datas[0].salePrice) {
-    for (k=0; k < result.datas.length;k++){
-    if (result.datas[k].salePrice >= SilverBean && SilverBean > result.datas[k-1].salePrice)
-     {
-      detail += beantotal+ `${result.datas[k-1].salePrice}银豆兑换${result.datas[k-1].productName}`}
+  for (k=0; k < result.datas.length;k++){
+    if (SilverBean < result.datas[k].salePrice && SilverBean > result.datas[k-1].salePrice)
+     { 
+     detail += beantotal+ `${result.datas[k-1].salePrice}银豆兑换${result.datas[k-1].productName}`
+    }
+    else if (result.datas[k].salePrice == SilverBean)
+     { 
+      detail += beantotal+ `${result.datas[k].salePrice}银豆兑换${result.datas[k].productName}`
+     }
     }
    } else if (SilverBean < result.datas[0].salePrice) 
     { 
        detail+= beantotal+ `银豆不足以兑换京豆`
     }
-else if (SilverBean = result.datas[0].salePrice) 
+else if (SilverBean == result.datas[0].salePrice) 
     { 
-       detail+= beantotal+ `${result.datas[k-1].salePrice}银豆兑换${result.datas[k-1].productName}`
+       detail+= beantotal+ `${result.datas[0].salePrice}银豆兑换${result.datas[0].productName}`
        }
     resolve()
      })

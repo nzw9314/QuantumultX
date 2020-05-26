@@ -56,7 +56,6 @@ https?:\/\/ios\.baertt\.com\/v5\/Game\/GameVideoReward url script-request-body y
 
 https:\/\/ios\.baertt\.com\/v5\/article\/red_packet url script-request-body youth.js
 
-https:\/\/focus\.youth\.cn\/article\/s url script-request-header youth.js
 
 ~~~~~~~~~~~~~~~~
 [MITM]
