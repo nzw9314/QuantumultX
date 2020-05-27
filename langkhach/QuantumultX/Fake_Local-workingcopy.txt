@@ -149,9 +149,9 @@ https:\/\/api\.termius\.com\/api\/v3\/bulk\/account\/ url script-response-body l
 ^https:\/\/ssl-api\.itranslateapp\.com\/.*\/subscriptions\/.*\/ios$ url script-response-body langkhach/itranslate.js
 
 #ulysses
-^https:\/\/sk\.ulysses\.app\/api\/v1\/user_offers$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
+;^https:\/\/sk\.ulysses\.app\/api\/v1\/user_offers$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
 
-^https:\/\/sk\.ulysses\.app\/api\/v1\/itunes_receipt_verify$ url script-response-body langkhach/ulysses.js
+;^https:\/\/sk\.ulysses\.app\/api\/v1\/itunes_receipt_verify$ url script-response-body langkhach/ulysses.js
 
 #pre_dayone
 ;^https:\/\/dayone\.me\/api\/users$ url request-header (\r\n)If-None-Match:.+(\r\n) request-header $1 
@@ -183,7 +183,7 @@ https:\/\/api\.termius\.com\/api\/v3\/bulk\/account\/ url script-response-body l
 ^https:\/\/www\.api\.monkeyuni\.net\/api\/.+\/mobile\/account\/load-update url script-response-body langkhach/monkey.js
 
 ##wps makexp
-^https:\/\/account\.wps\.com/\api\/users\/.+ url script-response-body langkhach/wps.js
+;^https:\/\/account\.wps\.com/\api\/users\/.+ url script-response-body langkhach/wps.js
 
 #VideoStar
 ^https?:\/\/.*\.videostarapp\.com\/scripts\/subsNew\.php url script-response-body langkhach/VideoStar.js

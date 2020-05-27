@@ -38,8 +38,8 @@ let config = {
     name: " 中国电信 世界触手可及🤝",
     authTokenKey: "china_telecom_authToken_10000",
     CookieKey: "china_telecom_cookie",
-    delay: 0,//自定义延迟签到,单位毫秒,(如填200则每个接口延迟0.2秒执行),默认无延迟
-    info: true   // 是否显示手机归属地
+    delay: 0, //自定义延迟签到,单位毫秒,(如填200则每个接口延迟0.2秒执行),默认无延迟
+    info: 1, //是否显示手机归属地，1为显示，0为不显示
 }
 const $tool = Tool()
      d = new Date();

@@ -49,7 +49,7 @@ Cookie获取后，请注释掉Cookie地址。
 #腾讯新闻app签到，根据红鲤鱼与绿鲤鱼与驴修改
 
 */
-const notify = false; //开启全部通知为true，关闭继续阅读为false
+const notify = 0; //开启全部通知为1，关闭继续阅读为1
 const cookieName = '腾讯新闻'
 const signurlKey = 'sy_signurl_txnews2'
 const cookieKey = 'sy_cookie_txnews2'
@@ -230,10 +230,56 @@ function getTotal() {
           Redpack()
           sy.log(cookieName+","+notb+ "\n" )
         }
+      titlebar()
       resolve()
       })
    })
  }
+
+//看新闻，领红包
+function titlebar() {
+ return new Promise((resolve, reject) => {
+  const barUrl = {
+    url: `https://news.qq.com/signin/v3/challredpackage.htm?disabletitlebar=1&activity_id=${RedID}`,
+    headers: {Cookie: cookieVal}};
+    sy.get(barUrl, function(error,response, data) {
+    if (error) {
+        sy.msg("看新闻，领红包‼️", "", error);
+     if (log) console.log("看新闻" + data)
+    } else {
+        //console.log("看新闻" + data)
+       activity()
+        }
+      resolve()
+      })
+   })
+ }
+
+
+//看新闻，领红包
+function activity() {
+ return new Promise((resolve, reject) => {
+ const ID =  signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
+  const activityUrl = {
+    url: `https://api.inews.qq.com/activity/v1/user/activity/get?isJailbreak=0&appver=13.5_qqnews_6.1.31&${ID}`,
+    headers: {Cookie: cookieVal},
+     body: `a=1`
+   };
+   sy.post(activityUrl, function(error,response, data) {
+    if (error) {
+        sy.msg("看新闻，领红包‼️", "", error);
+     if (log) console.log("看新闻" + data)
+    } else {
+        console.log("看新闻" + data)
+         const obj = JSON.parse(data)
+          sy.log(cookieName+","+notb+ "\n" )
+        }
+      resolve()
+      })
+   })
+ }
+
+
 
 function init() {
     isSurge = () => {
