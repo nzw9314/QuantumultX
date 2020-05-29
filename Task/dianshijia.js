@@ -91,7 +91,7 @@ function sign() {
           { subTitle = `【签到成功】🎉`
             var h = result.data.reward.length
           if (h>1){
-            detail = `获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name}\n`
+            detail = `获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name} `
            }else
              {detail = ` 已签到 ${result.data.conDay}天，获取金币${result.data.reward[0].count}\n`
              }

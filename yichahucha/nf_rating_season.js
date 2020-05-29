@@ -10,10 +10,10 @@ const netflixTitleCacheKey = "NetflixTitleCacheKey"
 const map = $tool.read(netflixTitleCacheKey)
 const id = url.match(/id=(\d+)/)[1]
 const title = map ? JSON.parse(map)[id] : null
+const obj = JSON.parse(body)
 
-if (title) {
+if (title && obj.shows[id].seasons) {
     const key = $tool.read(imdbApikeyCacheKey)
-    const obj = JSON.parse(body)
     const seasons = obj.shows[id].seasons.map(item => item.season)
     const promises = []
     for (let index = 0; index < seasons.length; index++) {

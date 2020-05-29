@@ -23,9 +23,9 @@ cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/
 -----------------
 
  */
-const frommoney ='美元'          //使用币
-const exchangemoney = '人民币'   //换算币
-const moneynumb = '1'           //兑换金额
+const frommoney ='人民币'          //使用币
+const exchangemoney = '美元'   //换算币
+const moneynumb = '100'           //兑换金额
 
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
 let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
@@ -179,6 +179,12 @@ function code() {
          cnTorate = result.data[i].rate
         }
        }
+      USDTOCN = (100/result.data[1].rate).toFixed(3)
+      JPTOCN = (100/result.data[2].rate).toFixed(3)
+      HKTOCN = (100/result.data[9].rate).toFixed(3)
+      GBTOCN = (100/result.data[3].rate).toFixed(3)
+      EUTOCN = (100/result.data[4].rate).toFixed(3)
+      detail = result.data[1].code+result.data[1].symbol+' 100 美元 = '+result.data[0].symbol+' '+USDTOCN+' 元(人民币'+result.data[0].code+')\n'+result.data[2].code+result.data[2].symbol+'  100 日元 = '+result.data[0].symbol+' '+JPTOCN+' 元\n'+result.data[3].code+result.data[3].symbol+' 100 英镑 = '+result.data[0].symbol+' '+GBTOCN+' 元\n'+result.data[4].code+result.data[4].symbol+' 100 欧元 = '+result.data[0].symbol+' '+EUTOCN+' 元\n'+result.data[9].symbol+'   100 港币 = '+result.data[0].symbol+' '+HKTOCN+' 元\n'
       rate()
       }
        catch (erro){
@@ -198,12 +204,12 @@ function rate() {
 };
     $task.fetch(rateurl).then(response => { 
     //console.log('外币汇率'+ response.body)
-     let result = JSON.parse(response.body)
+     let rateresult = JSON.parse(response.body)
   try{
-      if (result.msg=="ok"){
-        const rated = moneynumb*result.result.list[`${exchangecode}`].rate
-         subTitle = frommoney+'兑'+exchangemoney+'汇率: '+ result.result.list[`${exchangecode}`].rate+'元'
-         detail = fromsymbol+""+moneynumb+" "+fromcode+' = '+ exchangesymbol+ rated.toFixed(3)+" "+ exchangecode+'\n最后更新: '+result.result.list[`${exchangecode}`].updatetime
+      if (rateresult.msg=="ok"){
+        const rated = moneynumb*rateresult.result.list[`${exchangecode}`].rate
+         subTitle = frommoney+'兑'+exchangemoney+'汇率: '+ rateresult.result.list[`${exchangecode}`].rate+'元'
+         detail += fromcode+fromsymbol+" "+moneynumb+" "+' = '+ exchangesymbol+" "+rated.toFixed(3)+" "+ exchangecode+'(以此为准)'+'\n最后更新: '+rateresult.result.list[`${exchangecode}`].updatetime
        }
         $notify('货币实时汇率 💶 ', subTitle, detail)
       }

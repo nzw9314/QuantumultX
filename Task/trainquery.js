@@ -27,13 +27,11 @@ cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/
 
 -----------------
 
-
  */
-const stop = "500" //票价报错时调整延迟时间,默认50为0.5秒
 const leftstation ='北京'  //出发地
 const tostation = '上海'   //目的地
 const purpose = 'ADULT'   //乘客类型，'ADULT'是成人，'0X00'是学生
-const leftdate = '2020-05-27' //出发日期
+const leftdate = '2020-06-06' //出发日期
 const K = ' 1 '  //车次序号!!
 
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
@@ -191,6 +189,21 @@ resolve()
    })
   })
 }
+var date = new Date();
+var year = date.getFullYear();
+var month = date.getMonth() + 1;
+var day = date.getDate()+1;
+if (month < 10) {
+    month = "0" + month;
+}
+if (day < 10) {
+    day = "0" + day+1;
+}
+var nowDate = year + "-" + month + "-" + day;
+if (nowDate > leftdate ){
+ $notify(`火车查询错误❌`,"日期错误,请检查后重试",''),
+$done()
+}
 
 // 获取车次列表
 function trainscheck() {
@@ -324,7 +337,7 @@ catch (e){
    }
 resolve()
   })
-  },stop)
+  })
  })
 }
 
@@ -380,9 +393,9 @@ if (setdongwo){
 for (i=1;i<result.data.data.length;i++){
     detail  += `\n`+result.data.data[i].arrive_time +'--'+result.data.data[i].start_time+ '  '+result.data.data[i].station_name
 }
-const title = traincode+ "次列车时刻表🚄"
-const subTitle = '始发站: '+startstation+ '--终点站: '+endstation+ " / 出行日期 " +leftdate
- $notify(title, subTitle, detail)
+const title = traincode+ "次列车时刻🚄"
+const subTitle = '始发站: '+startstation+ '--终点站: '+endstation
+ $notify(title+ " / 出行日期 " +leftdate, subTitle, detail)
   console.log(traincode+'次列车  \n'+detail)
   }
 } catch (e){
