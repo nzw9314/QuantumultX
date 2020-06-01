@@ -9,12 +9,12 @@
 获取Cookie方法:
 1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
 下，
-2.进入app，进入任务中心或者签到一次,即可获取Cookie. 阅读一篇文章，获取阅读请求body，在阅读文章最下面有个惊喜红包，点击获取惊喜红包请求
+2.进入app，进入任务中心或者签到一次,即可获取Cookie. 阅读一篇文章，获取阅读请求body，并获取阅读时长，在阅读文章最下面有个惊喜红包，点击获取惊喜红包请求
 3.可随时获取Cookie.
 4.增加转盘抽奖通知间隔，为了照顾新用户，前五次会有通知，以后默认每10次转盘抽奖通知一次，可自行修改❗️ 转盘完成后通知会一直开启
 5.非专业人士制作，欢迎各位大佬提出宝贵意见和指导
 6.更新日志: 
- 31/05 v1.0 取消激励视频Cookie
+ 31/05 v1.01 取消激励视频Cookie，添加阅读时长
 
 阅读奖励和看视频得奖励一个请求只能运行三次‼️，请不要询问为什么，次日可以继续
 
@@ -33,6 +33,8 @@ Surge 4.0 :
 
 中青看点 = type=http-request,pattern=https:\/\/ios\.baertt\.com\/v5\/article\/red_packet,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/youth.js, requires-body=true
 
+中青看点 = type=http-request,pattern=https:\/\/ios\.baertt\.com\/v5\/user\/stay\.json,script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/youth.js, requires-body=true
+
 ~~~~~~~~~~~~~~~~
 Loon 2.1.0+
 [Script]
@@ -42,6 +44,7 @@ cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/
 http-request https:\/\/\w+\.youth\.cn\/TaskCenter\/(sign|getSign) script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/youth.js
 http-request https:\/\/ios\.baertt\.com\/v5\/article\/complete script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/youth.js, requires-body=true
 http-request https:\/\/ios\.baertt\.com\/v5\/article\/red_packet script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/youth.js, requires-body=true
+http-request https:\/\/ios\.baertt\.com\/v5\/user\/stay\.json script-path=https://raw.githubusercontent.com/Sunert/Scripts/master/Task/youth.js, requires-body=true
 -----------------
 QX 1.0. 7+ :
 [task_local]
@@ -53,6 +56,8 @@ https:\/\/\w+\.youth\.cn\/TaskCenter\/(sign|getSign) url script-request-header y
 https?:\/\/ios\.baertt\.com\/v5\/article\/complete url script-request-body youth.js
 
 https:\/\/ios\.baertt\.com\/v5\/article\/red_packet url script-request-body youth.js
+
+https:\/\/ios\.baertt\.com\/v5\/user\/stay\.json url script-request-body youth.js
 
 ~~~~~~~~~~~~~~~~
 [MITM]
@@ -66,13 +71,12 @@ const CookieName = "中青看点"
 const signheaderKey = 'youthheader_zq'
 const articlebodyKey = 'read_zq'
 const redpbodyKey = 'red_zq'
-const infourlKey = 'shareurl_zq'
+const timebodyKey = 'readtime_zq'
 const sy = init()
 const signheaderVal = sy.getdata(signheaderKey)
 const redpbodyVal = sy.getdata(redpbodyKey)
 const articlebodyVal = sy.getdata(articlebodyKey)
-const infourlVal = sy.getdata(infourlKey)
-
+const timebodyVal = sy.getdata(timebodyKey)
 let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
    GetCookie()
@@ -92,6 +96,12 @@ else if ($request && $request.method != `OPTIONS`&& $request.url.match(/\/articl
     if (articlebodyVal)        sy.setdata(articlebodyVal,articlebodyKey)
     sy.log(`[${CookieName}] 获取阅读: 成功,articlebodyVal: ${articlebodyVal}`)
     sy.msg(CookieName, `获取阅读请求: 成功🎉`, ``)
+  }
+else if ($request && $request.method != `OPTIONS`&& $request.url.match(/\/v5\/user\/stay/)) {
+   const timebodyVal = $request.body
+    if (timebodyVal)        sy.setdata(timebodyVal,timebodyKey)
+    sy.log(`[${CookieName}] 获取阅读: 成功,timebodyVal: ${timebodyVal}`)
+    sy.msg(CookieName, `获取阅读时长: 成功🎉`, ``)
   }
 else if ($request && $request.method != `OPTIONS`&& $request.url.match(/\/article\/red_packet/)) {
    const redpbodyVal = $request.body
@@ -117,6 +127,7 @@ async function all()
   await openbox();
   await share();
   await readArticle();
+  await readTime();
   await earningsInfo();
   await showmsg();
 }
@@ -539,25 +550,24 @@ function TurnDouble() {
  })
 }
 
-function articleShare() {      
+function readTime() {      
  return new Promise((resolve, reject) => {
-  setTimeout(() =>  {
     const url = { 
-      url: shareurlVal, 
-      headers: signheaderVal,
+      url: `https://ios.baertt.com/v5/user/stay.json`, 
+      body: timebodyVal,
 }
-  sy.get(url, (error, response, data) =>{
-   if(logs) sy.log(`文章分享:${data}`)
-   shareres = JSON.parse(data)
-   if (shareres.success==true){
-     //detail += `${shareres.message}，获得${shareres.score_text}`  
+  sy.post(url, (error, response, data) =>{
+    if(logs) sy.log(`阅读时长:${data}`)
+    let timeres = JSON.parse(data)
+   if (timeres.error_code==0){
+     readtimes = timeres.time/60
+     detail += `【阅读时长】  共计`+Math.floor(readtimes)+`分钟\n`  
        }
-    else if(shareres.success==false){
-     //detail += `${shareres.message}，`
+    else if(timeres.error_code==200001){
+     detail += `【阅读时长】 ❎ 阅读时长Cookie\n`  
        }
      })
    resolve()
-   })
  })
 }
 
