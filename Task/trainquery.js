@@ -31,7 +31,7 @@ cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/
 const leftstation ='北京'  //出发地
 const tostation = '上海'   //目的地
 const purpose = 'ADULT'   //乘客类型，'ADULT'是成人，'0X00'是学生
-const leftdate = '2020-06-06' //出发日期
+const leftdate = '2020-06-30' //出发日期
 const K = ' 1 '  //车次序号!!
 
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
@@ -296,40 +296,40 @@ $task.fetch(myRequest).then(response => {
     console.log('票价信息: ' + response.body+'\n');
    let result = JSON.parse(response.body)
    if (result.data.M){
-   setyideng += `(${result.data.M})`
+   setyideng += `(${result.data.M})  `
    }
    if (result.data.O){
-   seterdeng += `(${result.data.O})`
+   seterdeng += `(${result.data.O})  `
    }
    if (result.data.A3){
-   setyingwo += `(${result.data.A3})`
+   setyingwo += `(${result.data.A3})  `
    }
    if (result.data.F){
-   setdongwo += `(${result.data.F})`
+   setdongwo += `(${result.data.F})  `
    }
    if (result.data.A1){
-   setyingzuo += `(${result.data.A1})`
+   setyingzuo += `(${result.data.A1})  `
    }
    if (result.data.A2){
-   setruanzuo += `(${result.data.A2})`
+   setruanzuo += `(${result.data.A2})  `
    }
    if (result.data.WZ){
-   setwuzuo += `(${result.data.WZ})`
+   setwuzuo += `(${result.data.WZ})  `
    }
    if (result.data.A9){
-   setshangwu += `(${result.data.A9})`
+   setshangwu += `(${result.data.A9})  `
    }
    if (result.data.AI){
-   setruanwo += `(${result.data.AI})`
+   setruanwo += `(${result.data.AI})  `
    }
    if (result.data.A4){
-   setruanwo += `(${result.data.A4})`
+   setruanwo += `(${result.data.A4})  `
    }
    if (result.data.A6){
-   setruanwopro += `(${result.data.A6})`
+   setruanwopro += `(${result.data.A6})  `
    }
    if (result.data.AJ){
-   setyingwo += `(${result.data.AJ})`
+   setyingwo += `(${result.data.AJ})  `
    }
 }
 catch (e){
@@ -363,7 +363,7 @@ if (setyideng){
    detail += '一等座: '+setyideng
   }
 if (seterdeng){
-   detail += '  二等座: '+seterdeng
+   detail += '二等座: '+seterdeng
   }
 if (setshangwu){
    detail += '\n商务座: '+setshangwu
@@ -372,22 +372,22 @@ if (setyingzuo){
    detail += '硬座: '+setyingzuo
   }
 if (setruanzuo){
-   detail += '   软座: '+setruanzuo
+   detail += '软座: '+setruanzuo  
   }
 if (setwuzuo){
-   detail += '   无座: '+setwuzuo
+   detail += '无座: '+setwuzuo
   }
 if (setruanwo){
    detail += '\n软卧: '+setruanwo
   }
 if (setyingwo){
-   detail += '  硬卧: '+setyingwo
+   detail += '硬卧: '+setyingwo
   }
 if (setruanwopro){
-   detail += '  高级软卧: '+setruanwopro
+   detail += '高级软卧: '+setruanwopro
   }
 if (setdongwo){
-  detail += '  动卧: '+setdongwo
+  detail += '动卧: '+setdongwo
   }
   detail +='\n'+leftstation+'到达目的地'+tostation+'历时'+totaltime+'\n'+arrivetime +'--'+starttime+ '  '+stationname
 for (i=1;i<result.data.data.length;i++){

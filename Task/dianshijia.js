@@ -10,6 +10,7 @@
 更新日志:
 v0527: 修复无法领取睡觉金币，增加激励视频等任务，更新通知方式，包含每日签到、走路任务、睡觉赚钱任务、分享任务、激励视频任务、双端活跃和手机在线时长共计7个任务，其中激励视频可多次叠加，即可多次运行，次数未知，激励视频金币未叠加在总金币中，原因未知
 v0530: 添加播放任务，共9次，需运行9次，添加随机提现，请添加Cookie，提现一次即可获取，仅测试
+v0602 增加每日瓜分百万金币，每日12点准时运行
 
 By Facsuny
 感谢 chavyleung 等
@@ -40,7 +41,7 @@ QX 1.0.6+ :
 [rewrite_local]
 http:\/\/act\.gaoqingdianshi\.com\/\/api\/v4\/sign\/signin\? url script-request-header dianshijia.js
 
-http:\/\/api\.gaoqingdianshi\.com\/api\/v2\/cash\/withdrawal\? url script-request-header dianshijia.js  //(提现测试)
+http:\/\/api\.gaoqingdianshi\.com\/api\/v2\/cash\/withdrawal\?code= url script-request-header dianshijia.js  //(随机提现测试)
 
 ~~~~~~~~~~~~~~~~~
 
@@ -91,10 +92,12 @@ async function all()
   await total();      // 总计
   await cash();       // 现金
   await signinfo();   // 签到信息
-  await CarveUp();    //瓜分金币
+  await CarveUp();    //瓜分报名
+  await getCUpcoin;   //瓜分金币
   await watchvideo(); // 观看视频
   await SpWatchVideo();//激励视频
   await Withdrawal(); // 随机兑换
+  //await Withdrawal2(); //固定兑换
   await playTask();   // 播放任务
   await coinlist();   // 金币列表
 }
@@ -111,9 +114,9 @@ function signin() {
           { subTitle = `【签到成功】🎉`
             var h = result.data.reward.length
           if (h>1){
-            detail = `获取金币${result.data.reward[0].count}，获得奖励${result.data.reward[1].name} `
+            detail = `【签到收益】+${result.data.reward[0].count}金币，奖励${result.data.reward[1].name}\n `
            }else
-             {detail = ` 已签到 ${result.data.conDay}天，获取金币${result.data.reward[0].count}\n`
+             {detail = `【签到收益】+${result.data.reward[0].count}金币\n`
              }
            }
     else if  (result.errCode == 4)
@@ -362,6 +365,9 @@ function coinlist() {
      if (result.data[i].from=="播放任务"){
       detail += `【播放任务】✅ 获得金币`+result.data[i].amount+'\n'
       }
+     if (result.data[i].from=="领取瓜分金币"){
+      detail += `【瓜分金币】✅ 获得金币`+result.data[i].amount+'\n'
+      }
      if (result.data[i].from=="手机在线"){
       for (j=0;result.data[j].from=="手机在线";j++) {
      onlamount += result.data[j].amount
@@ -393,7 +399,6 @@ resolve()
 }
 
 
-
 function CarveUp() {
   return new Promise((resolve, reject) => {
     let url = { 
@@ -404,14 +409,33 @@ function CarveUp() {
       if(logs)sy.log(`瓜分百万金币: ${data}`)
       const result = JSON.parse(data)
      if (result.errCode == 0) {
-      detail += `【金币瓜分】✅ +`+result.data.getCoin+`金币\n`
+      detail += `【金币瓜分】✅ 报名成功\n`
     } else if (result.errCode == 4006) {
-      detail += `【金币瓜分】🔁 ${result.msg} \n`
+      //detail += `【金币瓜分】🔁 ${result.msg} \n`
     }
    })
 resolve()
  })
 }
+function getCUpcoin() {
+  return new Promise((resolve, reject) => {
+    let url = { 
+     url: `http://act.gaoqingdianshi.com/api/taskext/getCoin?code=carveUp&coin=0&ext=1`, 
+     headers: JSON.parse(signheaderVal),
+   }
+    sy.get(url, (error, response, data) => {
+    if(logs)sy.log(`瓜分百万金币: ${data}`)
+      const result = JSON.parse(data)
+     if (result.errCode == 0) {
+      //detail += `【金币瓜分】✅ `+result.data+`金币\n`
+    } else if (result.errCode == 4006) {
+      //detail += `【金币瓜分】🔁 ${result.msg} \n`
+    }
+   })
+resolve()
+ })
+}
+
 function Withdrawal() {
   return new Promise((resolve, reject) => {
    if (drawalVal !=undefined||null){
@@ -437,6 +461,7 @@ else {
 resolve()
  })
 }
+
 
 function playTask() {
   return new Promise((resolve, reject) => {
