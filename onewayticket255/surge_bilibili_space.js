@@ -1,3 +1,4 @@
+//收藏排行前10，长按通知进入（iOS13以下通知中心不支持）
 let url = $request.url
 let regex = /vmid=(\d*)/
 let vmid = regex.exec(url)
@@ -16,7 +17,7 @@ $httpClient.get(api, (error, response, body) => {
       let scheme = `bilibili://av/${element['aid']}`
       info += index + ": " + element['title'] + "\n" + scheme + "\n"
     })
-    $notification.post('收藏排行前10', '长按进入', info)
+    $notification.post('', '', info)
     $done({})
   }
 })
