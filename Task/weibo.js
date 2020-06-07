@@ -133,27 +133,32 @@ function paysign() {
    let payurl =  {
       url: `https://pay.sc.weibo.com/aj/mobile/home/welfare/signin/do?_=${time}`,
      headers: JSON.parse(payheaderVal)}
-     sy.post(payurl, (error, response, data) => {
+sy.post(payurl, (error, response, data) => {
      sy.log(`${CookieName}钱包, data: ${data}`)
-     let result = JSON.parse(data)
+   try{
+     let result = JSON.parse(response.body)
      if (result.status == 1){
          subTitle += `  钱包签到成功 🎉`
          detail += `  钱包获取积分:`+ result.score+' 分'
          }  
-     else if (result.status == 2){
+     else if (result.code == 100000){
          subTitle += `   钱包: 重复签到`
-         //detail += `钱包: `+ result.msg
+         detail += ``
        }
      else {
          subTitle = `钱包签到失败❌`
          //detail += ` 钱包: `+result.msg
          }
        sy.msg(CookieName, subTitle, detail)
-       })
+        }
+    catch(e){
+         sy.msg(CookieName, subTitle+`  钱包Cookie失效 ❎`, detail)
+       }
+     })
     }
-  resolve()
   })
 }
+
 
 function init() {
   isSurge = () => {
