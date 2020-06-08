@@ -274,16 +274,12 @@ function runtime() {
   var hour = date.getHours();
   var sleeping = ""
      if(hour>20){
-     async function run(){
-      await sleep();
-      await CarveUp();
-    }
+       sleep();
+       CarveUp();
   }
    else if(hour > 11&&hour <14){
-     async function run(){
-      await getCUpcoin();
-      await walk();
-    }
+       getCUpcoin();
+       walk();
    }
    else if(hour > 6&&hour <10){
        wakeup()

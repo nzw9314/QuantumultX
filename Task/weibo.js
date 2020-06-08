@@ -136,7 +136,7 @@ function paysign() {
 sy.post(payurl, (error, response, data) => {
      sy.log(`${CookieName}钱包, data: ${data}`)
    try{
-     let result = JSON.parse(response.body)
+     let result = JSON.parse(data)
      if (result.status == 1){
          subTitle += `  钱包签到成功 🎉`
          detail += `  钱包获取积分:`+ result.score+' 分'
