@@ -16,7 +16,7 @@ $.html = $.name
   }
   // 处理 App 请求 => /app
   else if (/^\/app/.test(path)) {
-    handleApp()
+    handleApp(path.split('/app/')[1])
   }
   // 处理 Api 请求 => /api
   else if (/^\/api/.test(path)) {
@@ -46,6 +46,17 @@ function getPath(url) {
   return new RegExp($.domain).test(url) ? fullpath.split($.domain)[1] : undefined
 }
 
+function getSystemCfgs() {
+  return {
+    env: $.isSurge() ? 'Surge' : $.isQuanX ? 'QuanX' : 'Loon',
+    envs: [
+      { id: 'Surge', icon: 'https://is3-ssl.mzstatic.com/image/thumb/Purple123/v4/21/0a/0d/210a0df9-cbe1-b9dc-7549-4c10cd996279/AppIcon-0-0-1x_U007emarketing-0-0-0-6-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/492x0w.png' },
+      { id: 'QuanX', icon: 'https://is4-ssl.mzstatic.com/image/thumb/Purple123/v4/ae/7c/a2/ae7ca2fb-c4b6-d3a9-885a-935c1ea34cdb/AppIcon-1x_U007emarketing-0-7-0-0-85-220.png/492x0w.png' },
+      { id: 'Loon', icon: 'https://is2-ssl.mzstatic.com/image/thumb/Purple123/v4/59/2c/fb/592cfb3b-162e-83dc-4e96-7a2175e1d29f/AppIcon-0-1x_U007emarketing-0-7-0-0-85-220.png/492x0w.png' }
+    ]
+  }
+}
+
 function getSystemApps() {
   const sysapps = [
     {
@@ -71,6 +82,17 @@ function getSystemApps() {
       author: '@chavyleung',
       repo: 'https://github.com/chavyleung/scripts/tree/master/acfun',
       icon: 'https://is5-ssl.mzstatic.com/image/thumb/Purple123/v4/41/f0/11/41f011f8-1bbc-188f-220f-3db5164a9ae9/AppIcon-1x_U007emarketing-0-7-0-0-85-220.png/492x0w.png'
+    },
+    {
+      id: 'ApkTw',
+      name: 'ApkTw',
+      keys: ['chavy_cookie_apktw'],
+      author: '@chavyleung',
+      repo: 'https://github.com/chavyleung/scripts/tree/master/apktw',
+      url: 'https://apk.tw/',
+      icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/apktw.png',
+      tasks: [{ cron: '3 0 * * *', script: 'noteyoudao.js' }],
+      rewrites: [{ type: 'request', pattern: '^https://note.youdao.com/yws/mapi/user?method=checkin', script: 'noteyoudao.cookie.js', body: true }]
     },
     {
       id: 'BAIDU',
@@ -119,6 +141,17 @@ function getSystemApps() {
       author: '@chavyleung',
       repo: 'https://github.com/chavyleung/scripts/tree/master/v2ex',
       icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/v2ex.png'
+    },
+    {
+      id: 'NoteYoudao',
+      name: '有道云笔记',
+      keys: ['chavy_signurl_noteyoudao', 'chavy_signbody_noteyoudao', 'chavy_signheaders_noteyoudao'],
+      author: '@chavyleung',
+      repo: 'https://github.com/chavyleung/scripts/tree/master/noteyoudao',
+      url: 'https://apps.apple.com/cn/app/有道云笔记-扫描王版/id450748070',
+      icon: 'https://is1-ssl.mzstatic.com/image/thumb/Purple113/v4/25/6a/00/256a002d-b5f0-46e1-ef55-841d41f8aafc/AppIcon-0-1x_U007emarketing-0-7-0-0-85-220.png/460x0w.png',
+      tasks: [{ cron: '3 0 * * *', script: 'noteyoudao.js' }],
+      rewrites: [{ type: 'request', pattern: '^https://note.youdao.com/yws/mapi/user?method=checkin', script: 'noteyoudao.cookie.js', body: true }]
     }
   ]
   sysapps.forEach((app) => {
@@ -204,17 +237,38 @@ function handleApi() {
   }
 }
 
-function handleHome() {
-  const data = JSON.stringify({
+function handleApp(appId) {
+  const box = {
     sessions: getSessions(),
     sysapps: getSystemApps(),
     userapps: getUserApps(),
+    syscfgs: getSystemCfgs(),
     colors: getSystemThemes()
-  })
-  $.html = `
+  }
+  const curapp = appId ? box.sysapps.find((app) => app.id === appId) : null
+  $.html = printHtml(JSON.stringify(box), JSON.stringify(curapp))
+  console.log($.html)
+}
+
+function handleHome() {
+  $.html = printHtml(
+    JSON.stringify({
+      sessions: getSessions(),
+      sysapps: getSystemApps(),
+      userapps: getUserApps(),
+      syscfgs: getSystemCfgs(),
+      colors: getSystemThemes()
+    })
+  )
+  console.log($.html)
+}
+
+function printHtml(data, curapp = null) {
+  return `
   <!DOCTYPE html>
   <html lang="zh-CN">
     <head>
+      <title>BoxJs</title>
       <meta charset="utf-8" />
       <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet" />
       <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet" />
@@ -225,13 +279,28 @@ function handleHome() {
       <div id="app">
         <v-app>
           <v-app-bar :color="ui.appbar.color" app dense>
-            <v-menu bottom left v-if="['app', 'home', 'log', 'data'].includes(ui.curview)">
+            <v-menu bottom left v-if="['app', 'home', 'log', 'data'].includes(ui.curview) && box.syscfgs.env === ''">
               <template v-slot:activator="{ on }">
                 <v-btn icon v-on="on"><v-icon>mdi-palette</v-icon></v-btn>
               </template>
               <v-list>
                 <v-list-item v-for="(color, colorIdx) in box.colors" :key="color.id" @click="ui.appbar.color=color.id">
-                  <v-list-item-title>{{ color.name }}</v-list-item-title>
+                  <v-list-item-title>22{{ color.name }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+            <v-menu bottom left v-else-if="['app', 'home', 'log', 'data'].includes(ui.curview) && box.syscfgs.env !== ''">
+              <template v-slot:activator="{ on }">
+                <v-btn icon v-on="on">
+                  <v-avatar size="24">
+                    <img :src="box.syscfgs.envs.find(e=>e.id===box.syscfgs.env).icon" alt="box.syscfgs.env" />
+                  </v-avatar>
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item v-for="(env, envIdx) in box.syscfgs.envs" :key="env.id" @click="box.syscfgs.env=env.id">
+                  <v-list-item-avatar size="24"><v-img :src="env.icon"></v-img></v-list-item-avatar>
+                  <v-list-item-title>{{ env.id }}</v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -395,7 +464,8 @@ function handleHome() {
               ui: {
                 bfview: 'app',
                 curview: 'app',
-                curapp: null,
+                curapp: ${curapp},
+                curappTabs: { curtab: 'sessions' },
                 curappSessions: null,
                 impSessionDialog: { show: false, impval: '' },
                 snackbar: { show: false, text: '已复制!', timeout: 2000 },
@@ -413,6 +483,9 @@ function handleHome() {
                 if (newval === 'app') {
                   this.ui.curapp = null
                   this.ui.curappSessions = null
+                  var state = { title: 'BoxJs' }
+                  document.title = state.title
+                  history.pushState(state, '', '/home')
                 }
               }
             }
@@ -423,6 +496,9 @@ function handleHome() {
               this.ui.curapp = app
               this.ui.curappSessions = this.box.sessions.filter((s) => s.appId === this.ui.curapp.id)
               this.ui.curview = 'appsession'
+              var state = { title: 'BoxJs - ' + this.ui.curapp.name, url: window.location.href }
+              history.pushState(state, '', '/app/' + this.ui.curapp.id)
+              document.title = state.title
             },
             onSaveSession() {
               const session = {
@@ -478,6 +554,11 @@ function handleHome() {
             onCopy(e) {
               this.ui.snackbar.show = true
             }
+          },
+          mounted: function () {
+            if (this.ui.curapp) {
+              this.goAppSessionView(this.ui.curapp)
+            }
           }
         })
       </script>
@@ -485,12 +566,8 @@ function handleHome() {
   </html>
   
   `
-  console.log($.html)
 }
 
-function printHtml() {
-  return ''
-}
 function printJson() {
   return ''
 }
