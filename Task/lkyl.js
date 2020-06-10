@@ -1,4 +1,6 @@
 /*
+更新时间: 2020-06-08 20:45
+
 本脚本仅适用于京东来客有礼每日获取京豆
 获取Cookie方法:
 1.将下方[rewrite_local]和[MITM]地址复制的相应的区域
@@ -6,10 +8,6 @@
 2.微信搜索'来客有礼'小程序,登陆京东账号，点击'发现',即可获取Cookie，获取后请禁用或注释掉❗️
 3.非专业人士制作，欢迎各位大佬提出宝贵意见和指导
 4.5月17日增加自动兑换京豆，需设置兑换京豆数，现可根据100、200和500设置，不可设置随机兑换数，根据页面填写兑换数值，默认设置500，注意是京豆数❗️
-5.版本更新日志:
-05-19 v1.0: 变更通知方式
-05-25 v1.01 修复京豆兑换报错
-05-29 v1.02 修复抽奖任务
 
 by Macsuny
 ~~~~~~~~~~~~~~~~
@@ -44,15 +42,11 @@ hostname = draw.jdfcloud.com
 const jdbean = "500" //兑换京豆数
 const logs = 0   //响应日志开关,默认关闭
 const cookieName = '来客有礼小程序'
-const signurlKey = 'sy_signurl_lkyl'
-const signheaderKey = 'sy_signheader_lkyl'
-const openkey = 'openid_lkyl'
-const appIdkey = 'app_lkyl'
 const sy = init()
-const signurlVal = sy.getdata(signurlKey)
-const signheaderVal = sy.getdata(signheaderKey)
-const openid = sy.getdata(openkey)
-const appid = sy.getdata(appIdkey)
+const signurlVal = sy.getdata('sy_signurl_lkyl')
+const signheaderVal = sy.getdata('sy_signheader_lkyl')
+const openid = sy.getdata('openid_lkyl')
+const appid = sy.getdata('app_lkyl')
 let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
    GetCookie()
@@ -68,10 +62,10 @@ if ($request && $request.method != 'OPTIONS') {
   const appid = $request.headers['App-Id'];
   sy.log(`signurlVal:${signurlVal}`)
   sy.log(`signheaderVal:${signheaderVal}`)
-  if (signurlVal) sy.setdata(signurlVal, signurlKey)
-  if (signheaderVal) sy.setdata(signheaderVal, signheaderKey)
-  if (openid) sy.setdata(openid,openkey);
-  if (appid) sy.setdata(appid,appIdkey);
+  if (signurlVal) sy.setdata(signurlVal, 'sy_signurl_lkyl')
+  if (signheaderVal) sy.setdata(signheaderVal, 'sy_signheader_lkyl')
+  if (openid) sy.setdata(openid,'openid_lkyl');
+  if (appid) sy.setdata(appid,'app_lkyl');
     sy.log(`openid:${openid}`)
     sy.log(`appid:${appid}`)
   sy.msg(cookieName, `获取Cookie: 成功🎉`, ``)
@@ -86,6 +80,7 @@ async function all()
   await tasklist(); // 任务列表
   await lottery();  // 0元抽奖
   await status();   // 任务状态
+  await video();    // 视频任务
   await Daily();    // 日常任务
   await exChange(); // 银豆兑换
 }
@@ -121,14 +116,6 @@ function status() {
    sy.get(statusurl, (error, response, data) =>{
    if(logs)sy.log(`${cookieName}, 任务状态: ${data}`)
      taskstatus = JSON.parse(data)
-      if (taskstatus.data.dailyTasks[1].status!='received'){
-   for (j=0;j<3;j++){
-      video()
-        }
-       }
-    
-      if (taskstatus.data.dailyTasks[1].status=='received'){
-    detail += `【视频任务】: ✅  +${taskstatus.data.dailyTasks[1].taskReward} 银豆\n`}
       if (taskstatus.data.dailyTasks[0].status!='received'){
       detail +=  `【日常抽奖】: 🔕 已完成/总计: ${doneSteps} / ${totalSteps}\n`
        };
@@ -136,7 +123,7 @@ function status() {
       detail += `【日常抽奖】: ✅  +${taskstatus.data.dailyTasks[0].taskReward} 银豆\n`
        };
       if (taskstatus.data.weeklyTasks[0].status!='received'){
-    detail += `【每周任务】: 🔕 已完成/总计: ${taskstatus.data.weeklyTasks[0].finishedCount} / ${taskstatus.data.weeklyTasks[0].inviteAmount}\n`
+    detail += `【每周任务】: 🔕 已完成/总计:${taskstatus.data.weeklyTasks[0].finishedCount}/${taskstatus.data.weeklyTasks[0].inviteAmount}次\n`
       weektask()
        }
   else if (taskstatus.data.weeklyTasks[0].status=='received'){
@@ -148,23 +135,22 @@ function status() {
 }
 
 function video() {
-  return new Promise((resolve, reject) =>{
-    const bodyVal = '{"openId": '+'"'+openid+'","taskCode": "watch_video"}'
-	let videourl = {
-          url: `https://draw.jdfcloud.com//api/bean/square/silverBean/task/join?appId=${appid}`,
-		headers: JSON.parse(signheaderVal),
-          body: bodyVal}
-    videourl.headers['Content-Length'] = `0`;
-   sy.post(videourl, (error, response, data) =>{
-   if(logs)sy.log(`${cookieName}, 视频: ${data}`)
-    let videotaskurl = {
+ return new Promise((resolve, reject) =>{
+  if (taskstatus.data.dailyTasks[1].status!='received'){
+    bodyVal = '{"openId": '+'"'+openid+'","taskCode": "watch_video"}'
+ for (j=0;taskstatus.data.dailyTasks[1].status!='received';j++){
+   videourl = {
+     url: `https://draw.jdfcloud.com//api/bean/square/silverBean/task/join?appId=${appid}`,headers: JSON.parse(signheaderVal),body: bodyVal}
+   videotaskurl = {
 	 url: `https://draw.jdfcloud.com//api/bean/square/silverBean/taskReward/get?openId=${openid}&taskCode=watch_video&inviterOpenId=&appId=${appid}`,headers: JSON.parse(signheaderVal)}
-    videotaskurl.headers['Content-Length'] = `0`;
-   sy.get(videotaskurl, (error, response, data) => { 
-     if(logs) sy.log(`${cookieName}, 视频银豆: ${data}`)
-     })
+   sy.post(videourl, function(error, response, data){if(logs)sy.log(`${cookieName}, 视频: ${data}`)})
+   sy.get(videotaskurl, function(error, response, data){if(logs)sy.log(`${cookieName}, 视频银豆: ${data}`)})
+    }
+  }
+  if (taskstatus.data.dailyTasks[1].status=='received'){
+    detail += `【视频任务】: ✅  +${taskstatus.data.dailyTasks[1].taskReward} 银豆\n`
+   }
   resolve()
-   })
  })
 }
 

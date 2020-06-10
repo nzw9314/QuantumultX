@@ -1,4 +1,6 @@
 /*
+更新时间: 2020-06-08 20:45
+
 腾讯新闻签到修改版，可以自动阅读文章获取红包，该活动为瓜分百万阅读红包挑战赛，针对幸运用户参与
 
 获取Cookie方法:
@@ -205,12 +207,20 @@ totalnum.data.show_list[1].schedule.current
   })
 }
 function RednumCheck() {
+  var date = new Date();
+  var hour = date.getHours();
   redpackres = ""
   if(readcoins=="红包+1"){
     Redpack()
   }
   if(videocoins=="红包+1"){
    videoPack()
+  }
+  else if(hour>20){
+     async function run(){
+      await Redpack();
+      await videoPack();
+   }
   }
 }
 

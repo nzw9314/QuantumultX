@@ -122,6 +122,12 @@ function getSystemApps() {
       id: 'JD618',
       name: '京东618',
       keys: ['chavy_url_jd816', 'chavy_body_jd816', 'chavy_headers_jd816'],
+      settings: [
+        { id: 'CFG_618_isSignShop', name: '商店签到', val: true, type: 'boolean', desc: '71 家商店, 如果每天都签不上, 可以关掉了! 默认: true' },
+        { id: 'CFG_618_isJoinBrand', name: '品牌会员', val: false, type: 'boolean', desc: '25 个品牌, 会自动加入品牌会员! 默认: true' },
+        { id: 'CFG_BOOM_times_JD618', name: '炸弹次数', val: 1, type: 'text', desc: '总共发送多少次炸弹! 默认: 1' },
+        { id: 'CFG_BOOM_interval_JD618', name: '炸弹间隔 (毫秒)', val: 100, type: 'text', desc: '每次间隔多少毫秒! 默认: 100' }
+      ],
       author: '@chavyleung',
       repo: 'https://github.com/chavyleung/scripts/tree/master/jd',
       icon: 'https://is4-ssl.mzstatic.com/image/thumb/Purple113/v4/0b/7c/08/0b7c08b3-4c03-1d92-5461-32c176a6fc30/AppIcon-0-0-1x_U007emarketing-0-0-0-6-0-0-85-220.png/460x0w.png'
@@ -143,6 +149,14 @@ function getSystemApps() {
       icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/v2ex.png'
     },
     {
+      id: 'WPS',
+      name: 'WPS',
+      keys: ['chavy_signhomeurl_wps', 'chavy_signhomeheader_wps', 'chavy_signwxurl_wps', 'chavy_signwxheader_wps'],
+      author: '@chavyleung',
+      repo: 'https://github.com/chavyleung/scripts/tree/master/wps',
+      icon: 'https://is3-ssl.mzstatic.com/image/thumb/Purple123/v4/a0/15/bc/a015bcec-e853-cdb3-a97b-573c15771265/AppIcon-0-1x_U007emarketing-0-7-0-0-0-0-85-220.png/492x0w.png'
+    },
+    {
       id: 'NoteYoudao',
       name: '有道云笔记',
       keys: ['chavy_signurl_noteyoudao', 'chavy_signbody_noteyoudao', 'chavy_signheaders_noteyoudao'],
@@ -159,6 +173,17 @@ function getSystemApps() {
     app.keys.forEach((key) => {
       app.datas.push({ key, val: $.getdata(key) })
     })
+    Array.isArray(app.settings) &&
+      app.settings.forEach((setting) => {
+        const val = $.getdata(setting.id)
+        if (setting.type === 'boolean') {
+          setting.val = val === null ? setting.val : val === 'true'
+        } else if (setting.type === 'int') {
+          setting.val = val * 1 || setting.val
+        } else {
+          setting.val = val || setting.val
+        }
+      })
   })
   return sysapps
 }
@@ -203,6 +228,22 @@ function handleApi() {
       $.msg($.name, $.subt, $.desc.join('\n'))
     }
   }
+  // 保存设置
+  else if (data.cmd === 'savePops') {
+    $.log(`❕ ${$.name}, 保存设置!`)
+    const settings = data.val
+    if (Array.isArray(settings)) {
+      settings.forEach((setting) => {
+        const oldval = $.getdata(setting.id)
+        const newval = setting.val
+        const usesuc = $.setdata(`${newval}`, setting.id)
+        $.log(`❕ ${$.name}, 保存设置: ${setting.id} ${usesuc ? '成功' : '失败'}!`, `旧值: ${oldval}`, `新值: ${newval}`)
+        $.setdata(`${newval}`, setting.id)
+      })
+      $.subt = `保存设置: 成功! `
+      $.msg($.name, $.subt, '')
+    }
+  }
   // 应用会话
   else if (data.cmd === 'useSession') {
     $.log(`❕ ${$.name}, 应用会话!`)
@@ -213,7 +254,7 @@ function handleApi() {
       session.datas.forEach((data) => {
         const oldval = $.getdata(data.key)
         const newval = data.val
-        const usesuc = $.setdata(newval, data.key)
+        const usesuc = $.setdata(`${newval}`, data.key)
         $.log(`❕ ${$.name}, 替换数据: ${data.key} ${usesuc ? '成功' : '失败'}!`, `旧值: ${oldval}`, `新值: ${newval}`)
       })
       $.subt = `应用会话: 成功 (${session.appName})`
@@ -346,6 +387,25 @@ function printHtml(data, curapp = null) {
               </v-card>
             </v-container>
             <v-container fluid v-if="ui.curview === 'appsession'">
+              <v-card class="mx-auto mb-4">
+                <template v-if="Array.isArray(ui.curapp.settings)">
+                  <v-subheader v-if="Array.isArray(ui.curapp.settings)">
+                    应用设置 ({{ ui.curapp.settings.length }})
+                  </v-subheader>
+                  <v-form class="pl-4 pr-4">
+                    <template v-for="(setting, settingIdx) in ui.curapp.settings">
+                      <v-text-field :label="setting.name" v-model="setting.val" :hint="setting.desc" v-if="setting.type === 'text'"></v-text-field>
+                      <v-slider :label="setting.name" v-model="setting.val" :hint="setting.desc" :min="setting.min" :max="setting.max" thumb-label="always" v-else-if="setting.type === 'slider'"></v-slider>
+                      <v-switch :label="setting.name" v-model="setting.val" :hint="setting.desc" v-else-if="setting.type === 'boolean'"></v-switch>
+                    </template>
+                  </v-form>
+                  <v-divider></v-divider>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn small text color="success" @click="onSavePops">保存设置</v-btn>
+                  </v-card-actions>
+                </template>
+              </v-card>
               <v-card class="mx-auto">
                 <v-subheader>
                   当前会话 ({{ ui.curapp.datas.length }})
@@ -379,17 +439,6 @@ function printHtml(data, curapp = null) {
               <v-card class="ml-10 mt-4" v-for="(session, sessionIdx) in ui.curappSessions" :key="session.id">
                 <v-subheader>
                   #{{ sessionIdx + 1 }} {{ session.name }}
-                  <v-spacer></v-spacer>
-                  <v-menu bottom left>
-                    <template v-slot:activator="{ on }">
-                      <v-btn icon v-on="on"><v-icon>mdi-dots-vertical</v-icon></v-btn>
-                    </template>
-                    <v-list>
-                      <v-list-item @click="" v-clipboard:copy="JSON.stringify(session)" v-clipboard:success="onCopy">
-                        <v-list-item-title>复制会话</v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
                 </v-subheader>
                 <v-list-item two-line dense v-for="(data, dataIdx) in session.datas" :key="dataIdx">
                   <v-list-item-content>
@@ -399,7 +448,7 @@ function printHtml(data, curapp = null) {
                 </v-list-item>
                 <v-divider></v-divider>
                 <v-card-actions>
-                  <v-btn x-small text color="grey">{{ session.createTime }}</v-btn>
+                  <v-btn small text color="grey">{{ session.createTime }}</v-btn>
                   <v-spacer></v-spacer>
                   <v-btn small text color="error" @click="onDelSession(session)">删除</v-btn>
                   <v-btn small text color="success" @click="onUseSession(session)">应用</v-btn>
@@ -513,6 +562,9 @@ function printHtml(data, curapp = null) {
               this.box.sessions.push(session)
               this.ui.curappSessions.push(session)
               axios.post('/api', JSON.stringify({ cmd: 'saveSession', val: session }))
+            },
+            onSavePops() {
+              axios.post('/api', JSON.stringify({ cmd: 'savePops', val: this.ui.curapp.settings }))
             },
             onImpSession() {
               const impjson = this.ui.impSessionDialog.impval
