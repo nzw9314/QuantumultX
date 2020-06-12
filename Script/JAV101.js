@@ -8,7 +8,11 @@ https://zhhml.cn?code=NDHJVB&channelCode=share
 
 */
 
-let obj = JSON.parse($response.body);
-obj.response.expiry = 9576796302;
-obj.response.level = 2;
-$done({body: JSON.stringify(obj)});
+if ($response.body != "") {
+  let obj = JSON.parse($response.body);
+  obj.response.expiry = 9576796302;
+  obj.response.level = 2;
+  $done({body: JSON.stringify(obj)});
+} else {
+  $done({body: $response.body});
+}
