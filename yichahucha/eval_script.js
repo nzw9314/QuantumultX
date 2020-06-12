@@ -250,26 +250,8 @@ if (!__tool.isTask) {
             const value = __confObj[key]
             for (let j = 0, len = value.length; j < len; j++) {
                 const match = value[j]
-                const regular = new RegExp(match.regular)
-                if (__debug) {
-                    try {
-                        if (regular.test(__url)) {
-                            const type = match.type
-                            if (type && type.length > 0) {
-                                if (__tool.scriptType == type) {
-                                    script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
-                                    break
-                                }
-                            } else {
-                                script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
-                                break
-                            }
-                        }
-                    } catch (error) {
-                        if (__debug) __tool.notify("[eval_script.js]", "", `Error regular : ${match.regular}\nRequest: ${__url}`)
-                        throw error
-                    }
-                } else {
+                try {
+                    const regular = new RegExp(match.regular)
                     if (regular.test(__url)) {
                         const type = match.type
                         if (type && type.length > 0) {
@@ -282,6 +264,9 @@ if (!__tool.isTask) {
                             break
                         }
                     }
+                } catch (error) {
+                    if (__debug) __tool.notify("[eval_script.js]", "", `Error regular : ${match.regular}\nRequest: ${__url}`)
+                    //throw error
                 }
             }
         }

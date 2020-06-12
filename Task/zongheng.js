@@ -5,7 +5,7 @@
  */
 
 // 书籍id列表
-const ids = [408586,672340];
+const ids = [408586];
 /********************************* CONVERTER START *******************************************************/
 // #region 固定头部
 let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
@@ -168,6 +168,9 @@ async function checkUpdate(books) {
       // check update from each book
       let config = {
         url: `http://book.zongheng.com/book/${id}.html`,
+headers: {
+"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"
+}
       };
 
       await $task
@@ -179,9 +182,7 @@ async function checkUpdate(books) {
           updateCount = html.match(parsers.updateCount)[1];
           latestChapter = html.match(parsers.latestChapter)[1];
 
-          console.log(
-            `title: ${title}, latest chapter: ${latestChapter}, ${updateCount}`
-          );
+          //console.log(`title: ${title}, latest chapter: ${latestChapter}, ${updateCount}`);
 
           book = books[id];
           if (book === undefined || latestChapter !== book.latestChapter) {

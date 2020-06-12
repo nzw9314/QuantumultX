@@ -91,8 +91,8 @@ function getSystemApps() {
       repo: 'https://github.com/chavyleung/scripts/tree/master/apktw',
       url: 'https://apk.tw/',
       icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/apktw.png',
-      tasks: [{ cron: '3 0 * * *', script: 'noteyoudao.js' }],
-      rewrites: [{ type: 'request', pattern: '^https://note.youdao.com/yws/mapi/user?method=checkin', script: 'noteyoudao.cookie.js', body: true }]
+      tasks: [{ cron: '3 0 * * *', script: 'apktw.js' }],
+      rewrites: [{ type: 'request', pattern: '^https://apk.tw/member.php(.*?)action=login', script: 'apktw.cookie.js', body: true }]
     },
     {
       id: 'BAIDU',
@@ -151,7 +151,7 @@ function getSystemApps() {
     {
       id: 'WPS',
       name: 'WPS',
-      keys: ['chavy_signhomeurl_wps', 'chavy_signhomeheader_wps', 'chavy_signwxurl_wps', 'chavy_signwxheader_wps'],
+      keys: ['chavy_signhomeurl_wps', 'chavy_signhomeheader_wps'],
       author: '@chavyleung',
       repo: 'https://github.com/chavyleung/scripts/tree/master/wps',
       icon: 'https://is3-ssl.mzstatic.com/image/thumb/Purple123/v4/a0/15/bc/a015bcec-e853-cdb3-a97b-573c15771265/AppIcon-0-1x_U007emarketing-0-7-0-0-0-0-85-220.png/492x0w.png'
@@ -228,8 +228,31 @@ function handleApi() {
       $.msg($.name, $.subt, $.desc.join('\n'))
     }
   }
+  // 保存当前会话
+  if (data.cmd === 'saveCurAppSession') {
+    const app = data.val
+    const isExistsApp = getSystemApps().find((_app) => _app.id === app.id)
+    if (isExistsApp) {
+      let isAllSaveSuc = true
+      app.datas.forEach((data) => {
+        const oldval = $.getdata(data.key)
+        const newval = data.val
+        const savesuc = $.setdata(`${newval}`, data.key)
+        isAllSaveSuc = !savesuc ? false : isAllSaveSuc
+        $.log('', `❕ ${app.name}, 保存设置: ${data.key} ${savesuc ? '成功' : '失败'}!`, `旧值: ${oldval}`, `新值: ${newval}`)
+      })
+      $.subt = `保存会话: ${isAllSaveSuc ? '成功' : '失败'} (${app.name})`
+      $.msg($.name, $.subt, '')
+      // sessions.push(session)
+      // const savesuc = $.setdata(JSON.stringify(sessions), $.KEY_sessions)
+      // $.subt = `保存会话: ${savesuc ? '成功' : '失败'} (${session.appName})`
+      // $.desc = []
+      // $.desc.push(`会话名称: ${session.name}`, `应用名称: ${session.appName}`, `会话编号: ${session.id}`, `应用编号: ${session.appId}`, `数据: ${JSON.stringify(session)}`)
+      // $.msg($.name, $.subt, $.desc.join('\n'))
+    }
+  }
   // 保存设置
-  else if (data.cmd === 'savePops') {
+  else if (data.cmd === 'saveSettings') {
     $.log(`❕ ${$.name}, 保存设置!`)
     const settings = data.val
     if (Array.isArray(settings)) {
@@ -402,7 +425,7 @@ function printHtml(data, curapp = null) {
                   <v-divider></v-divider>
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn small text color="success" @click="onSavePops">保存设置</v-btn>
+                    <v-btn small text color="success" @click="onSaveSettings">保存设置</v-btn>
                   </v-card-actions>
                 </template>
               </v-card>
@@ -429,6 +452,11 @@ function printHtml(data, curapp = null) {
                     <v-list-item-title>{{ data.key }}</v-list-item-title>
                     <v-list-item-subtitle>{{ data.val ? data.val : '无数据!' }}</v-list-item-subtitle>
                   </v-list-item-content>
+                  <v-list-item-action>
+                    <v-btn icon @click.stop="onClearCurAppSessionData(ui.curapp, ui.curapp.datas, data)">
+                      <v-icon color="grey darken-1">mdi-close</v-icon>
+                    </v-btn>
+                  </v-list-item-action>
                 </v-list-item>
                 <v-divider></v-divider>
                 <v-card-actions>
@@ -549,6 +577,10 @@ function printHtml(data, curapp = null) {
               history.pushState(state, '', '/app/' + this.ui.curapp.id)
               document.title = state.title
             },
+            onClearCurAppSessionData(app, datas, data) {
+              data.val = ''
+              axios.post('/api', JSON.stringify({ cmd: 'saveCurAppSession', val: app }))
+            },
             onSaveSession() {
               const session = {
                 id: uuidv4(),
@@ -563,8 +595,8 @@ function printHtml(data, curapp = null) {
               this.ui.curappSessions.push(session)
               axios.post('/api', JSON.stringify({ cmd: 'saveSession', val: session }))
             },
-            onSavePops() {
-              axios.post('/api', JSON.stringify({ cmd: 'savePops', val: this.ui.curapp.settings }))
+            onSaveSettings() {
+              axios.post('/api', JSON.stringify({ cmd: 'saveSettings', val: this.ui.curapp.settings }))
             },
             onImpSession() {
               const impjson = this.ui.impSessionDialog.impval
@@ -601,7 +633,7 @@ function printHtml(data, curapp = null) {
             },
             onUseSession(session) {
               axios.post('/api', JSON.stringify({ cmd: 'useSession', val: session }))
-              this.ui.curapp.datas = session.datas
+              this.ui.curapp.datas = JSON.parse(JSON.stringify(session.datas))
             },
             onCopy(e) {
               this.ui.snackbar.show = true
@@ -625,4 +657,4 @@ function printJson() {
 }
 
 // prettier-ignore
-function Env(t){this.name=t,this.logs=[],this.isSurge=(()=>"undefined"!=typeof $httpClient),this.isQuanX=(()=>"undefined"!=typeof $task),this.log=((...t)=>{this.logs=[...this.logs,...t],t?console.log(t.join("\n")):console.log(this.logs.join("\n"))}),this.msg=((t=this.name,s="",i="")=>{this.isSurge()&&$notification.post(t,s,i),this.isQuanX()&&$notify(t,s,i),this.log("==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="),t&&this.log(t),s&&this.log(s),i&&this.log(i)}),this.getdata=(t=>this.isSurge()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):void 0),this.setdata=((t,s)=>this.isSurge()?$persistentStore.write(t,s):this.isQuanX()?$prefs.setValueForKey(t,s):void 0),this.get=((t,s)=>this.send(t,"GET",s)),this.wait=((t,s=t)=>i=>setTimeout(()=>i(),Math.floor(Math.random()*(s-t+1)+t))),this.post=((t,s)=>this.send(t,"POST",s)),this.send=((t,s,i)=>{if(this.isSurge()){const e="POST"==s?$httpClient.post:$httpClient.get;e(t,(t,s,e)=>{s&&(s.body=e,s.statusCode=s.status),i(t,s,e)})}this.isQuanX()&&(t.method=s,$task.fetch(t).then(t=>{t.status=t.statusCode,i(null,t,t.body)},t=>i(t.error,t,t)))}),this.done=((t={})=>$done(t))}
+function Env(t){this.name=t,this.logs=[],this.isSurge=(()=>"undefined"!=typeof $httpClient),this.isQuanX=(()=>"undefined"!=typeof $task),this.log=((...t)=>{this.logs=[...this.logs,...t],t?console.log(t.join("\n")):console.log(this.logs.join("\n"))}),this.msg=((t=this.name,s="",i="")=>{this.isSurge()&&$notification.post(t,s,i),this.isQuanX()&&$notify(t,s,i);const e=["","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];t&&e.push(t),s&&e.push(s),i&&e.push(i),console.log(e.join("\n"))}),this.getdata=(t=>this.isSurge()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):void 0),this.setdata=((t,s)=>this.isSurge()?$persistentStore.write(t,s):this.isQuanX()?$prefs.setValueForKey(t,s):void 0),this.get=((t,s)=>this.send(t,"GET",s)),this.wait=((t,s=t)=>i=>setTimeout(()=>i(),Math.floor(Math.random()*(s-t+1)+t))),this.post=((t,s)=>this.send(t,"POST",s)),this.send=((t,s,i)=>{if(this.isSurge()){const e="POST"==s?$httpClient.post:$httpClient.get;e(t,(t,s,e)=>{s&&(s.body=e,s.statusCode=s.status),i(t,s,e)})}this.isQuanX()&&(t.method=s,$task.fetch(t).then(t=>{t.status=t.statusCode,i(null,t,t.body)},t=>i(t.error,t,t)))}),this.done=((t={})=>$done(t))}
