@@ -3,7 +3,7 @@ https://zhhml.cn?code=NDHJVB&channelCode=share
 
 [rewrite_local] 
 #JAV101无限观看
-^https\:\/\/api\..*\.cn\/v1\/user\/info url script-response-body JAV101.js
+^https\:\/\/pwaapi\.gao1gps\.cn\/v1\/user\/info url script-response-body JAV101.js
 [mitm] hostname = api.*.cn,
 
 */
