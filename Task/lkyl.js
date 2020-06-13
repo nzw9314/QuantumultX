@@ -104,6 +104,7 @@ function sign() {
       subTitle = `签到失败，Cookie 失效❌`
       detail = `说明: ${result.errorMessage}`
       sy.msg(cookieName, subTitle, detail)
+      return
       }
      resolve()
      })

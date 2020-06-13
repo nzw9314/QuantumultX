@@ -151,8 +151,14 @@ function sign() {
           signresult = `【签到信息】重复`
           detail= ``
          }
+        else if(signres.status == 2){
+         signresult = `签到失败，Cookie已失效‼️`
+         detail= ``
+         sy.msg(CookieName,signresult,detail)
+         return
+         }
+       resolve()
        })
-    resolve()
      })
   }
       

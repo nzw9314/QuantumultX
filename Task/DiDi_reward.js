@@ -56,9 +56,9 @@ function Checkin() {
                             url: rewardURL
                         }
                         $cmp.get(reward, function (error, response, data) {
-                            let rewardresult = JSON.parse(data)
-                            total += Number(rewardresult.bonus_info.amount)
+
                         })
+                        total += Number(l.bonus_info.amount)
                     }
                     $cmp.notify('滴滴出行 - 遗忘的福利金', '', '捡回遗忘的 ' + total + ' 元福利金。🤸🏼')
                 } else {

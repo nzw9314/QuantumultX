@@ -1,6 +1,39 @@
 //jd免费水果 搬的https://github.com/liuxiaoyucc/jd-helper/blob/a6f275d9785748014fc6cca821e58427162e9336/fruit/fruit.js
 //只能quanx用，request里面的请求跟获取cookie的地方改改，别的app应该也能用
+let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
+let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
+// http请求
+var $task = isQuantumultX ? $task : {};
+var $httpClient = isSurge ? $httpClient : {};
+// cookie读写
+var $prefs = isQuantumultX ? $prefs : {};
+var $persistentStore = isSurge ? $persistentStore : {};
+// 消息通知
+var $notify = isQuantumultX ? $notify : {};
+var $notification = isSurge ? $notification : {};
+// #endregion 固定头部
 
+// #region 网络请求专用转换
+if (isQuantumultX) {
+    var errorInfo = {
+        error: ''
+    };
+    $httpClient = {
+        get: (url, cb) => {
+            var urlObj;
+            if (typeof (url) == 'string') {
+                urlObj = {
+                    url: url
+                }
+            } else {
+                urlObj = url;
+            }
+            $task.fetch(urlObj).then(response => {
+                cb(undefined, response, response.body)
+            }, reason => {
+                errorInfo.error = reason.error;
+                cb(errorInfo, response, '')
+            }
 //京东接口地址
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 

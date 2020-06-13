@@ -114,6 +114,7 @@ function getsign() {
          signres = `签到失败❌`
          detail = `说明: `+ result.msg
          sy.msg(CookieName,signres,detail)
+         return
          }
     resolve()
     })
