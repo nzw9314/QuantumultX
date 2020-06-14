@@ -26,7 +26,6 @@ api.weibo.cn, mapi.weibo.com, *.uve.weibo.com, trade-acs.m.taobao.com, api.m.jd.
 
 `
 
-// 是否更新 GitHub（如果开启 true，需配置 token 或 账号密码）
 const __isUpdateGithub = true
 // GitHub Token（如果使用账号密码 token 请设置为空 ""）
 const __token = ""
@@ -35,9 +34,9 @@ const __username = "xxx"
 // GitHub 密码
 const __password = "xxx"
 // GitHub 用户名
-const __owner = "yichahucha"
+const __owner = "xxx"
 // GitHub 仓库名
-const __repo = "surge"
+const __repo = "xxx"
 // GitHub 分支（不指定就使用默认分支）
 const __branch = "master"
 // 指定 eval_script.js 文件路径（路径为空 "" 使用脚本原始路径）
@@ -61,7 +60,7 @@ const __showLine = 15
 const __log = false
 const __debug = false
 const __developmentMode = false
-const __concurrencyLimit = 5
+const __concurrencyLimit = 20
 
 const __tool = new ____Tool()
 const __base64 = new ____Base64()

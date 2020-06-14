@@ -126,7 +126,7 @@ function signinfo() {
       url: infourlVal,
       headers: JSON.parse(infoheaderVal)}
    sy.get(infourl, (error, response, data) => {
-     sy.log(`${CookieName}, data: ${data}`)
+     //sy.log(`${CookieName}, data: ${data}`)
      let result = JSON.parse(data)
      const nickName = `用户昵称: ${result.data.nickName}`  
      if (result.status == 0){

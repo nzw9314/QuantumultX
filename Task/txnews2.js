@@ -75,6 +75,7 @@ async function all()
   await toRead();
   await lookVideo();
   await openApp();
+  await shareApp();
   await StepsTotal();
   await StepsTotal2();
   await RednumCheck();
@@ -234,7 +235,7 @@ return new Promise((resolve, reject) => {
     body: `redpack_type=free_redpack&activity_id=${RedID}`
   }
    sy.post(openUrl, (error, response, data) => {
-    sy.log(`${cookieName}每日开启- data: ${data}`)
+    if(logs)sy.log(`${cookieName}每日开启- data: ${data}`)
       let opcash = JSON.parse(data)
       if(opcash.data.award.num){
        redpackres = `【每日开启】到账`+opcash.data.award.num/100+` 元 🌷\n` 
@@ -243,7 +244,20 @@ return new Promise((resolve, reject) => {
     resolve()
    })
 }
-
+function shareApp() {
+   ID = signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
+return new Promise((resolve, reject) => {
+  const openUrl = {
+    url: `https://gh.prize.qq.com/show/_bxzep/invPack/index.html?${ID}&uid=100208136356&from=singlemessage&isappinstalled=0#/Share?info=oI6CFjvMbjEjSJt1CwlYqb4YEC68`,
+    headers: {Cookie: cookieVal},
+  }
+   sy.get(openUrl, (error, response, data) => {
+    if(logs)sy.log(`${cookieName}- data: ${data}`)
+      let opcash = JSON.parse(data)
+      })
+    resolve()
+   })
+}
 //阶梯红包到账
 function Redpack() {
    ID = signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)

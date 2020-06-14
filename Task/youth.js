@@ -134,7 +134,7 @@ async function all()
 }
 
 function sign() {      
-  return new Promise((resolve, reject) =>
+ return new Promise((resolve, reject) =>
    {
     const signurl = { 
       url: 'https://kd.youth.cn/TaskCenter/sign', 
@@ -187,13 +187,13 @@ function signInfo() {
   }
 
 function Invitant() {      
-  return new Promise((resolve, reject) => {
-   CookieVal = JSON.parse(signheaderVal)['Cookie']
-    const url = { 
-      url: `https://kandian.youth.cn/user/mmsp/5625d269c769a5b3dc1087b7957910d0?avatar=share_reward_sign=0&code=021koBJS0F7XW12X5vLS08kCJS0koBJm&state=46308484`, 
-     headers: {Cookie: CookieVal},
+ return new Promise((resolve, reject) => {
+   const url = { 
+     url: `https://kd.youth.cn/WebApi/User/fillCode`, 
+     headers: JSON.parse(signheaderVal),
+     body: `{"code": "46308484"}`,
 }
-  sy.get(url, (error, response, data) =>
+   sy.post(url, (error, response, data) =>
  {
    //sy.log(`Invitdata:${data}`)
  })
@@ -221,7 +221,7 @@ resolve()
 // 点我激励视频奖励
 function gameVideo() {      
  return new Promise((resolve, reject) => {
-    const url = { 
+   const url = { 
       url: `https://ios.baertt.com/v5/Game/GameVideoReward.json`, 
       body: articlebodyVal,
 }
