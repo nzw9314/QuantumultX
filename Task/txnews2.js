@@ -248,12 +248,11 @@ function shareApp() {
    ID = signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
 return new Promise((resolve, reject) => {
   const openUrl = {
-    url: `https://gh.prize.qq.com/show/_bxzep/invPack/index.html?${ID}&uid=100208136356&from=singlemessage&isappinstalled=0#/Share?info=oI6CFjvMbjEjSJt1CwlYqb4YEC68`,
+    url: `https://url.cn/Wv7ja1sY?${ID}&qimei=5b5cbdb2-8afc-4354-ab93-03e3717abd9f&uid=100208136356`,
     headers: {Cookie: cookieVal},
   }
    sy.get(openUrl, (error, response, data) => {
-    if(logs)sy.log(`${cookieName}- data: ${data}`)
-      let opcash = JSON.parse(data)
+    //sy.log(`${cookieName}- data: ${data}`)
       })
     resolve()
    })
@@ -366,7 +365,7 @@ function init() {
       if (isSurge()) $notification.post(title, subtitle, body)
       if (isQuanX()) $notify(title, subtitle, body)
     }
-    log = (message) => console.log(message)
+    log = (message) => console.log(message+'\n')
     get = (url, cb) => {
       if (isSurge()) {
         $httpClient.get(url, cb)
