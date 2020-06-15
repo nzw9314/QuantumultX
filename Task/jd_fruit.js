@@ -11,6 +11,8 @@ const name = '京东水果'
 var shareCodes = [ // 这个列表填入你要助力的好友的shareCode, 最多可能是5个? 没有验证过
     'a6f686a9f6aa4c80977370b03681c553',
     'f92cb56c6a1349f5a35f0372aa041ea0',
+    '6fbd26cc27ac44d6a7fed34092453f77',
+    '61ff5c624949454aa88561f2cd721bf6'
 ]
 var Task = step();
 Task.next();
@@ -240,7 +242,14 @@ function taskInitForFarm() {
  */
 function initForFarm() {
     let functionId = arguments.callee.name.toString();
-    request(functionId);
+    //request(functionId);
+    for (let code of shareCodes) {
+		console.log('开始助力好友: ', code);
+		let response = await request(functionId, {
+			shareCode: code
+		});
+		console.log('助理好友结果: ' + response);
+	}
 }
 
 
