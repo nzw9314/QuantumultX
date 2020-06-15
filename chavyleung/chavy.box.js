@@ -98,6 +98,12 @@ function getSystemApps() {
       id: 'BAIDU',
       name: '百度签到',
       keys: ['chavy_cookie_tieba'],
+      settings: [
+        { id: 'CFG_tieba_isOrderBars', name: '按连签排序', val: false, type: 'boolean', desc: '默认按经验排序' },
+        { id: 'CFG_tieba_maxShowBars', name: '每页显示数', val: 15, type: 'text', desc: '每页最显示多少个吧信息' },
+        { id: 'CFG_tieba_maxSignBars', name: '每次并发', val: 5, type: 'text', desc: '每次并发签到多少个吧' },
+        { id: 'CFG_tieba_signWaitTime', name: '并发间隔 (毫秒)', val: 2000, type: 'text', desc: '每次并发间隔时间' }
+      ],
       author: '@chavyleung',
       repo: 'https://github.com/chavyleung/scripts/tree/master/tieba',
       icon: 'https://is4-ssl.mzstatic.com/image/thumb/Purple113/v4/0a/33/50/0a335055-952a-6860-76aa-c657b2627a78/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-85-220.jpeg/434x0w.jpg'
@@ -123,6 +129,8 @@ function getSystemApps() {
       name: '京东618',
       keys: ['chavy_url_jd816', 'chavy_body_jd816', 'chavy_headers_jd816'],
       settings: [
+        { id: 'CFG_618_radomms_min', name: '最小随机等待 (毫秒)', val: 2000, type: 'text', desc: '在任务默认的等待时间基础上，再增加的随机等待时间！' },
+        { id: 'CFG_618_radomms_max', name: '最大随机等待 (毫秒)', val: 5000, type: 'text', desc: '在任务默认的等待时间基础上，再增加的随机等待时间！' },
         { id: 'CFG_618_isSignShop', name: '商店签到', val: true, type: 'boolean', desc: '71 家商店, 如果每天都签不上, 可以关掉了! 默认: true' },
         { id: 'CFG_618_isJoinBrand', name: '品牌会员', val: false, type: 'boolean', desc: '25 个品牌, 会自动加入品牌会员! 默认: true' },
         { id: 'CFG_BOOM_times_JD618', name: '炸弹次数', val: 1, type: 'text', desc: '总共发送多少次炸弹! 默认: 1' },
@@ -147,6 +155,18 @@ function getSystemApps() {
       author: '@chavyleung',
       repo: 'https://github.com/chavyleung/scripts/tree/master/v2ex',
       icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/v2ex.png'
+    },
+    {
+      id: 'NeteaseMusic',
+      name: '网易云音乐',
+      keys: ['chavy_cookie_neteasemusic'],
+      settings: [
+        { id: 'CFG_neteasemusic_retryCnt', name: '重试次数', val: 10, type: 'text', desc: '一直尝试签到直至出现“重复签到”标识!' },
+        { id: 'CFG_neteasemusic_retryInterval', name: '重试间隔 (毫秒)', val: 500, type: 'text', desc: '每次重试间隔时间 (毫秒)！' }
+      ],
+      author: '@chavyleung',
+      repo: 'https://github.com/chavyleung/scripts/tree/master/neteasemusic',
+      icon: 'https://is3-ssl.mzstatic.com/image/thumb/Purple113/v4/ef/e3/f4/efe3f4fa-288f-65fc-fc59-eacf6c1cea01/AppIcon-0-0-1x_U007emarketing-0-0-0-6-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/460x0w.png'
     },
     {
       id: 'WPS',
@@ -243,12 +263,6 @@ function handleApi() {
       })
       $.subt = `保存会话: ${isAllSaveSuc ? '成功' : '失败'} (${app.name})`
       $.msg($.name, $.subt, '')
-      // sessions.push(session)
-      // const savesuc = $.setdata(JSON.stringify(sessions), $.KEY_sessions)
-      // $.subt = `保存会话: ${savesuc ? '成功' : '失败'} (${session.appName})`
-      // $.desc = []
-      // $.desc.push(`会话名称: ${session.name}`, `应用名称: ${session.appName}`, `会话编号: ${session.id}`, `应用编号: ${session.appId}`, `数据: ${JSON.stringify(session)}`)
-      // $.msg($.name, $.subt, $.desc.join('\n'))
     }
   }
   // 保存设置
