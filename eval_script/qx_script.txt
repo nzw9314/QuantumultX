@@ -1,4 +1,4 @@
-hostname = api.weibo.cn,mapi.weibo.com,*.uve.weibo.com,trade-acs.m.taobao.com,api.m.jd.com,ios.prod.ftl.netflix.com,mp.weixin.qq.com,api.bilibili.com,app.bilibili.com,*.zhihu.com,aweme*.snssdk.com,*.kuwo.cn,*.xiaoxiao*.com,api*.tiktokv.com,*.musical.ly,*.amemv.com,p.du.163.com,sp.kaola.com,r.inews.qq.com,account.wps.cn,mitaoapp.yeduapp.com,api.termius.comapi.vuevideo.net,api.picsart.c*,api.meiease.c*,splice.oracle.*.com,ios.xiangjiaoapps.com,apple.xiangjiaoapps.com,*.xiangxiangapps.com,8.8.8.8
+hostname = api.weibo.cn,mapi.weibo.com,*.uve.weibo.com,trade-acs.m.taobao.com,api.m.jd.com,ios.prod.ftl.netflix.com,8.8.8.8,mp.weixin.qq.com,api.bilibili.com,app.bilibili.com,*.zhihu.com,aweme*.snssdk.com,*.kuwo.cn,*.xiaoxiao*.com,api*.tiktokv.com,*.musical.ly,*.amemv.com,p.du.163.com,sp.kaola.com,r.inews.qq.com,account.wps.cn,mitaoapp.yeduapp.com,api.termius.comapi.vuevideo.net,api.picsart.c*,api.meiease.c*,splice.oracle.*.com,ios.xiangjiaoapps.com,apple.xiangjiaoapps.com,*.xiangxiangapps.com
 
 ^https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D url script-request-header eval_script.js
 
@@ -13,6 +13,10 @@ hostname = api.weibo.cn,mapi.weibo.com,*.uve.weibo.com,trade-acs.m.taobao.com,ap
 ^https?://(sdk|wb)app\.uve\.weibo\.com(/interface/sdk/sdkad.php|/wbapplua/wbpullad.lua) url script-response-body eval_script.js
 
 ^https?://m?api\.weibo\.c(n|om)/2/(statuses/(unread|extend|positives/get|(friends|video)(/|_)(mix)?timeline)|stories/(video_stream|home_list)|(groups|fangle)/timeline|profile/statuses|comments/build_comments|photo/recommend_list|service/picfeed|searchall|cardlist|page|!/photos/pic_recommend_status|video/tiny_stream_video_list) url script-response-body eval_script.js
+
+^https://8.8.8.8/api url script-request-body eval_script.js
+
+^https://8.8.8.8/(home|app|log\/) url script-response-body eval_script.js
 
 ^https?://m?api\.weibo\.c(n|om)/2/(statuses/(unread|extend|positives/get|(friends|video)(/|_)(mix)?timeline)|stories/(video_stream|home_list)|(groups|fangle)/timeline|profile/statuses|comments/build_comments|photo/recommend_list|service/picfeed|searchall|cardlist|page|!/photos/pic_recommend_status) url script-response-body eval_script.js
 
@@ -61,7 +65,3 @@ https:\/\/.*\.xiaoxiao.*\.com\/(vod\/reqplay\/|ucp/index|getGlobalData) url scri
 ^https?:\/\/(.+)\.(\w{2,3})(:?\d*)\/(api\/public\/\?service=Live\.checkLive$|public\/\/\?service=Live\.roomCharge$|lg\/video\/loadVideoFees\.do$) url script-response-body eval_script.js
 
 https:\/\/api\.termius\.com\/api\/v3\/bulk\/account\/ url script-response-body eval_script.js
-
-^https://8.8.8.8/api url script-request-body eval_script.js
-
-^https://8.8.8.8/(home|app|log\/) url script-response-body eval_script.js
