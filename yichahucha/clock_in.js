@@ -1,6 +1,6 @@
 /*
 README：https://github.com/yichahucha/surge/tree/master
-每日打卡提醒（corn "0 9,18 * * 1-5" 周一到周五，早九晚六）+ 每日壹句（有道词典）+ 跳转钉钉打卡页面（下拉通知点击链接）
+每日打卡提醒（corn "0 9,18 * * 1-5" 周一到周五，早九晚六）+ 每日壹句（有道词典）+ 跳转钉钉打卡页面
 */
 
 const $tool = new Tool()
@@ -10,14 +10,17 @@ $tool.get('https://dict.youdao.com/infoline/style/cardList?mode=publish&client=m
     let isAM = date.getHours() < 12 ? true : false;
     let title = 'Clock' + (isAM ? ' in' : ' out') + (isAM ? ' ☀️' : ' 🌙');
     let subtitle = '';
-    let content = 'dingtalk://dingtalkclient/page/link?url=https://attend.dingtalk.com/attend/index.html';
+    let scheme = 'dingtalk://dingtalkclient/page/link?url=https://attend.dingtalk.com/attend/index.html';
+    let content = scheme;
+    let option = {"open-url" : scheme};
     if (!error) {
         if (obj && obj.length > 1) {
             let yi = obj[1];
             content = yi.title + '\n' + yi.summary + '\n\n' + content;
+            option["media-url"] = yi.image[0];
         }
     }
-    $tool.notify(title, subtitle, content);
+    $tool.notify(title, subtitle, content, option);
     $done();
 })
 
@@ -35,9 +38,9 @@ function Tool() {
     this.isSurge = _isSurge
     this.isQuanX = _isQuanX
     this.isResponse = typeof $response != "undefined"
-    this.notify = (title, subtitle, message) => {
-        if (_isQuanX) $notify(title, subtitle, message)
-        if (_isSurge) $notification.post(title, subtitle, message)
+    this.notify = (title, subtitle, message, option) => {
+        if (_isQuanX) $notify(title, subtitle, message, option)
+        if (_isSurge) $notification.post(title, subtitle, message, option["open-url"])
         if (_node) console.log(JSON.stringify({ title, subtitle, message }));
     }
     this.write = (value, key) => {
