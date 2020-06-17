@@ -1,6 +1,6 @@
 /*
 README：https://github.com/yichahucha/surge/tree/master
-每日蚂蚁收能量提醒（corn "11 7 * * *" 每天7:11）+ 每日壹句（有道词典）+ 跳转支付宝蚂蚁森林页面（下拉通知点击链接）
+每日蚂蚁收能量提醒（corn "11 7 * * *" 每天7:11）+ 每日壹句（有道词典）+ 跳转支付宝蚂蚁森林页面
 */
 
 const $tool = new Tool()
@@ -11,13 +11,16 @@ $tool.get('https://dict.youdao.com/infoline/style/cardList?mode=publish&client=m
     let title = '每日' + (isAM ? ' 壹句' : ' 壹句') + (isAM ? ' ☀️' : ' 🌙');
     let subtitle = '';
     let content = '收能量啦👉' + 'alipay://platformapi/startapp?appId=60000002';
+    let content = scheme;
+    let option = {"open-url" : scheme};
     if (!error) {
         if (obj && obj.length > 1) {
             let yi = obj[1];
             content = yi.title + '\n' + yi.summary + '\n\n' + content;
+            option["media-url"] = yi.image[0];
         }
     }
-    $tool.notify(title, subtitle, content);
+    $tool.notify(title, subtitle, content, option);
     $done();
 })
 
@@ -35,9 +38,9 @@ function Tool() {
     this.isSurge = _isSurge
     this.isQuanX = _isQuanX
     this.isResponse = typeof $response != "undefined"
-    this.notify = (title, subtitle, message) => {
-        if (_isQuanX) $notify(title, subtitle, message)
-        if (_isSurge) $notification.post(title, subtitle, message)
+    this.notify = (title, subtitle, message, option) => {
+        if (_isQuanX) $notify(title, subtitle, message, option)
+        if (_isSurge) $notification.post(title, subtitle, message, option["open-url"])
         if (_node) console.log(JSON.stringify({ title, subtitle, message }));
     }
     this.write = (value, key) => {

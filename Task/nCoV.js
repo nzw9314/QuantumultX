@@ -136,35 +136,41 @@ if (isSurge) {
         $notification.post(title, subTitle, detail);
     }
 }
+
 // #endregion
-const nCoVdata = encodeURI("https://lab.isaaclin.cn/nCoV/api/area?latest=1&province=湖北省")
-$httpClient.get(nCoVdata, function(error, response, data){
-    if (error){
+const nCoVdata = encodeURI("https://lab.isaaclin.cn/nCoV/api/overall?latest=1")
+const newData = encodeURI("https://lab.isaaclin.cn/nCoV/api/news?page=1&num=1")
+$httpClient.get(newData, function (error, response, data) {
+    if (error) {
         console.log(error);
-        $done();                   
+        $done();
     } else {
-        var obj = JSON.parse(data);
-        console.log(obj);
-        var province = "所在省份:" + obj.results[0].provinceName;
-        var province_status = "现存确诊: " + obj.results[0].currentConfirmedCount + "  累计确诊: " + obj.results[0].confirmedCount + "  治愈: " + obj.results[0].curedCount + "  死亡: " + obj.results[0].deadCount + "\n";
-        var cities_status = "";
-        for (var i = 0; i < obj.results[0].cities.length; i++) {
-        var cities_status = cities_status + "地级市: " + obj.results[0].cities[i].cityName + "  现存确诊: " + obj.results[0].cities[i].currentConfirmedCount + "  累计确诊: " + obj.results[0].cities[i].confirmedCount + "  治愈: " + obj.results[0].cities[i].curedCount + "  死亡: " + obj.results[0].cities[i].deadCount + "\n";}
-        let nCoV = [province,province_status,cities_status];
-        $notification.post(nCoV[0], nCoV[1],nCoV[2]);
+        let obj = JSON.parse(data);
+        let newObj = obj.results[0];
+        console.log(newObj);
+        $httpClient.get(nCoVdata, function (error, response, data) {
+            if (error) {
+                console.log(error);
+                $done();
+            } else {
+                let obj = JSON.parse(data);
+                let title = "【全国疫情信息概览】"
+                let subTitle = "\n"
+                let detail = "「数据统计」" + "\n现有确诊: " + obj.results[0].currentConfirmedCount + "\n累计确诊: " + obj.results[0].confirmedCount + "\n治愈: " + obj.results[0].curedCount + "\n死亡: " + obj.results[0].deadCount + "\n\n「疫情动态」\n" + newObj.title +"\n\n「动态详情」\n"+ newObj.summary;
+                let nCoV = [title, subTitle, detail];
+                $notification.post(nCoV[0], nCoV[1], nCoV[2]);
+                $done();
+            }
+        }
+        );
         $done();
     }
 }
 );
 
 /*****************************************************************
-# 疫情查看 (By @Dachaw)
-
+# 全国疫情速看 (By By @Dachaw & @Mazetsz)
 [Task]
-
 # 在每天 9:00 报告新冠肺炎疫情
-
 0 9 * * * nCoV.js
-
-
 *****************************************************************/
