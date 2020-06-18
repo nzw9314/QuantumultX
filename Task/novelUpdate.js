@@ -1,9 +1,7 @@
-/**
- *  原author: Peng-YM
- *  原项目地址: https://github.com/Peng-YM/QuanX/blob/master/Tasks/zongheng.js#L20
- *  更新数据来源: 优书网
- *  优书网查询书籍后复制id填入id列表，弹窗跳转爱阅书香
- */
+//   原author: Peng-YM
+//   原项目地址: https://github.com/Peng-YM/QuanX/blob/master/Tasks/zongheng.js
+//   更新数据来源: 优书网
+//   优书网查询书籍后复制id填入id列表，弹窗跳转爱阅书香
 
 // 书籍id列表
 const ids = ["169413"];
@@ -12,6 +10,12 @@ const alwaysNotice = false; // 设置为true则每次运行通知，否则只通
 /********************************* SCRIPT START *******************************************************/
 const $ = API("yousuu");
 
+const parsers = {
+  title: new RegExp(/class="book-name"[\s\S]*?>(.*?)</),
+  coverURL: new RegExp(/"cover":"(.*?)"/),
+  updateTime: new RegExp(/更新时间\S\s*<span.+?>(.*?)</),
+  author: new RegExp(/"author":"(.*?)"/),
+};
 // check update
 checkUpdate($.read("books") || {}).finally(() => $.done());
 
@@ -21,7 +25,7 @@ async function checkUpdate(books) {
       $.log(`Handling book with id: ${id}...`);
       // check update from each book
       const config = {
-        url: `https://www.yousuu.com/api/book/${id}`,
+        url: `http://www.yousuu.com/book/${id}`,
         headers: {
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
@@ -30,16 +34,15 @@ async function checkUpdate(books) {
 
       await $.get(config)
         .then((response) => {
-          const datas = JSON.parse(response.body);
-          // parse json
+          const html = response.body;
+          // parse html
           const book = {
-            title: datas.data.bookInfo.title,
-            score: datas.data.bookInfo.score,
-            coverURL: datas.data.bookInfo.cover,
-            updateTime: getDateDiff(datas.data.bookInfo.updateAt),
-            author: datas.data.bookInfo.author,
+            title: html.match(parsers.title)[1],
+            coverURL: html.match(parsers.coverURL)[1].replace(/\\u002F/g,'/'),
+            updateTime: html.match(parsers.updateTime)[1],
+           
+            author: html.match(parsers.author)[1],
           };
-          
           $.log(book);
           const cachebook = books[id];
           if (
@@ -52,8 +55,8 @@ async function checkUpdate(books) {
             // push notifications
             $.notify(
               `🎉🎉🎉 《${book.title}》更新`,
-              `⏰ 更新时间: ${book.updateTime}`,
-              `🎩作者: ${book.author}\n🎈评分: ${book.score}`,
+              `⏰ 更新时间: ${book.updateTime}前`,
+              `🎩作者: ${book.author}`,
               {
                 "open-url": `iFreeTime://bk/a=${encodeURIComponent(book.author)}&n=${encodeURIComponent(book.title)}&d=0`,
                 "media-url": book.coverURL,
@@ -68,39 +71,6 @@ async function checkUpdate(books) {
   // update database
   $.write(books, "books");
 }
-
-function getDateDiff(time) {
-  time = time.substring(0, 19);
-  time = time.replace(/-/g, "/").replace(/T/, " ");
-  let timeStamp = new Date(time).getTime();
-  let minute = 1000 * 60;
-  let hour = minute * 60;
-  let day = hour * 24;
-  let month = day * 30;
-  let now = new Date().getTime();
-  let diff = now - timeStamp;
-  if (diff < 0) {
-    return;
-  }
-  let minD = diff / minute;
-  let hourD = diff / hour;
-  let dayD = diff / day;
-  let weekD = diff / (7 * day);
-  let monthD = diff / month;
-  if (monthD > 1) {
-    return `${parseInt(monthD)}月前`;
-  } else if (weekD > 1) {
-    return `${parseInt(weekD)}周前`;
-  } else if (dayD > 1) {
-    return `${parseInt(dayD)}天前`;
-  } else if (hourD > 1) {
-    return `${parseInt(hourD)}小时前`;
-  } else if (minD > 1) {
-    return `${parseInt(minD)}分钟前`;
-  } else return "刚刚更新";
-}
-
-
 /********************************* SCRIPT END *******************************************************/
 
 // prettier-ignore
