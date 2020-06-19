@@ -21,8 +21,7 @@
   *************************
   【Surge 4.2+ 脚本配置】
   *************************
-  微博超话cookie获取 = type=http-request,pattern=https:\/\/api\.weibo\.cn\/2\/cardlist?,script-path=https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.cookie.js,requires-body=false
-  微博超话cookie2获取 = type=http-request,pattern=https:\/\/api\.weibo\.cn\/2\/page\/button?,script-path=https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.cookie.js,requires-body=false
+  微博超话cookie获取 = type=http-request,pattern=^https:\/\/api\.weibo\.cn\/2\/(cardlist|page\/button),script-path=https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.cookie.js,requires-body=false
   微博超话 = type=cron,cronexp="5 0  * * *",script-path=https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.js,wake-system=true,timeout=600
 
   [MITM]
@@ -33,8 +32,7 @@
   *************************
   [script]
   cron "5 0 * * *" script-path=https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.js, timeout=600, tag=微博超话
-  http-request https:\/\/api\.weibo\.cn\/2\/cardlist? script-path=https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.cookie.js,requires-body=false, tag=微博超话cookie获取
-  http-request https:\/\/api\.weibo\.cn\/2\/page\/button? script-path=https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.cookie.js,requires-body=false, tag=微博超话cookie获取2
+  http-request ^https:\/\/api\.weibo\.cn\/2\/(cardlist|page\/button) script-path=https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.cookie.js,requires-body=false, tag=微博超话cookie获取
   
   [MITM]
   hostname = api.weibo.cn
@@ -43,8 +41,7 @@
   【 QX 1.0.10+ 脚本配置 】 
   *************************
   [rewrite_local]
-  https:\/\/api\.weibo\.cn\/2\/cardlist? url script-request-header https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.cookie.js
-  https:\/\/api\.weibo\.cn\/2\/page\/button? url script-request-header https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.cookie.js
+  ^https:\/\/api\.weibo\.cn\/2\/(cardlist|page\/button) url script-request-header https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.cookie.js
 
   [task]
   5 0 * * * https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.js, tag=微博超话
@@ -73,9 +70,11 @@
  $.name_list = []
  $.id_list = []
  $.val_list = []
- $.msg_max_num = 20
+$.msg_max_num = 30 //一个通知显示30个超话的签到情况
+ $.time = 700      //【签到间隔，单位ms】，若超话过多，建议填1000ms以上。
  $.successNum = 0
- $.failNum = 0
+$.failNum = 0
+ 
  !(async () => {
      await getnumber(time);
      for (j = 1; j <= pagenumber; j++) {
@@ -83,7 +82,7 @@
      }
      for (var i in $.name_list) {
        await checkin($.id_list[i], $.name_list[i], $.val_list[i], time);
-       $.wait(500)
+       $.wait($.time)
      }
      output()
    })()
@@ -98,13 +97,13 @@
    $.this_msg = ""
    for (var i = 0; i < $.message.length; ++i) {
      if (i && i % $.msg_max_num == 0) {
-       $.msg(`${$.name}: 成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)}页 / 共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
+       $.msg(`${$.name}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)}页 ，共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
        $.this_msg = ""
      }
      $.this_msg += `${$.message[i]}\n`
    }
    if ($.message.length % $.msg_max_num != 0) {
-     $.msg(`${$.name}: 成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)+1}页 / 共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
+     $.msg(`${$.name}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)+1}页 ，共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
    }
  }
  
@@ -120,7 +119,7 @@
        //console.log(obj);
        allnumber = obj.cardlistInfo.total;
        console.log("当前已关注超话" + allnumber + "个");
-       $.message.push(`当前已关注超话${allnumber}个`);
+      //  $.message.push(`当前已关注超话${allnumber}个`);
        pagenumber = Math.ceil(allnumber / 20);
        //$notify("超话","",JSON.stringify($.message))
        resove();
@@ -208,8 +207,8 @@
            $.message.push(`【${name}】：✨今天已签到`);
            console.log(`【${name}】：${obj.error_msg}`);
          } else if (result == 388000) {
-           $.message.push(`【${name}】："需要拼图验证⚠️"`);
-           console.log(`【${name}】："需要拼图验证⚠️"`);
+           $.message.push(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
+           console.log(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
            if(debug) console.log(response)
          } else if (result == 382010) {
            $.message.push(`\n【${name}】："超话不存在⚠️"`);

@@ -1,11 +1,13 @@
 #!name= ZhiHu
-#!desc= Remove ZhiHu Ads (ZhiHu Version:6.42.0)
+#!desc= Remove ZhiHu Ads (ZhiHu Version:6.45.0)
 #!system=ios
 
 [Rule]
 
 //SOME MCN INFO MAY BE USEFUL
 //URL-REGEX,https://www.zhihu.com/api/v4/mcn/,REJECT
+
+DOMAIN,appcloud2.zhihu.com,REJECT
 
 //DO NOT GET CDN-BASED IP
 DOMAIN,118.89.204.198,REJECT

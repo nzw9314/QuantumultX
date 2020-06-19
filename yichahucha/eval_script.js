@@ -2,7 +2,7 @@ const __conf = String.raw`
 
 [Remote]
 // custom remote...
-https://raw.githubusercontent.com/yichahucha/surge/master/qx_sub.txt
+# https://raw.githubusercontent.com/yichahucha/surge/master/qx_sub.txt
 
 
 [Local]
@@ -643,6 +643,7 @@ function ____Tool() {
             return (null)
         }
     })()
+    _isJsBox = typeof $jsbox != "undefined"
     _isSurge = typeof $httpClient != "undefined"
     _isQuanX = typeof $task != "undefined"
     _isTask = typeof $request == "undefined"
@@ -674,6 +675,10 @@ function ____Tool() {
         if (_isQuanX) $notify(title, subtitle, message)
         if (_isSurge) $notification.post(title, subtitle, message)
         if (_node) console.log(JSON.stringify({ title, subtitle, message }));
+        if (_isJsBox) {
+            const push = require("push");
+            push.schedule({ title: title, body: `${subtitle}${subtitle.length > 0 ? "\n" : ""}${message}` });
+        }
     }
     this.write = (value, key) => {
         if (_isQuanX) return $prefs.setValueForKey(value, key)
