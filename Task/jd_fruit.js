@@ -96,12 +96,12 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
 //直接用NobyDa的jd cookie
 const cookie = $hammer.read('CookieJD')
 const name = '京东水果'
-//助力好友分享码(最多4个,否则后面的助力失败),原因:京东农场每人每天只有四次助力机会
+
 var shareCodes = [ // 这个列表填入你要助力的好友的shareCode
     'a6f686a9f6aa4c80977370b03681c553',
     'f92cb56c6a1349f5a35f0372aa041ea0',
-    '6fbd26cc27ac44d6a7fed34092453f77',
-    '61ff5c624949454aa88561f2cd721bf6'
+    'a9360baeceb04c9baaaa109f5d428d3c',
+    'dc033c0c5a11490bac61115e8be875fe',
 ]
 var Task = step();
 Task.next();
@@ -120,7 +120,7 @@ function* step() {
     
     let farmInfo = yield initForFarm();
     if (farmInfo.farmUserPro) {
-      subTitle = farmInfo.farmUserPro.nickName + '的' + farmInfo.farmUserPro.name;
+        subTitle = farmInfo.farmUserPro.name
         console.log('shareCode为: ' + farmInfo.farmUserPro.shareCode);
         farmTask = yield taskInitForFarm();
         // console.log(`当前任务详情: ${JSON.stringify(farmTask)}`);
@@ -193,30 +193,10 @@ function* step() {
             // message += '当前不在定时领水时间断或者已经领过\n'
             console.log('当前不在定时领水时间断或者已经领过')
         }
-        const masterHelpResult = yield masterHelpTaskInitForFarm();
-        console.log("初始化助力信息", masterHelpResult);
-        if (masterHelpResult.code === '0' && (masterHelpResult.masterHelpPeoples && masterHelpResult.masterHelpPeoples.length >=5)) {
-          // 已有五人助力。领取助力后的奖励
-            if (!masterHelpResult.masterGotFinal ) {
-                const masterGotFinished = yield masterGotFinishedTaskForFarm();
-                if (masterGotFinished.code === '0') {
-                    console.log(`已成功领取好友助力奖励：【${masterGotFinished.amount}】g水`);
-                    message += `【好友助力额外奖励】:${masterGotFinished.amount}g水领取成功\n`;
-                }
-            } else {
-                console.log("已经领取过5好友助力额外奖励");
-                message += `【好友助力额外奖励】已被领取过\n`;
-            }
-        } else {
-            console.log("助力好友未达到5个");
-            message += `【额外奖励领取失败】原因：助力好友未达5个\n`;
-        }
         //助力
         // masterHelpTaskInitForFarm
         console.log('开始助力好友')
         let salveHelpAddWater = 0;
-        let remainTimes = null;//今日剩余助力次数
-        let helpSuccessPeoples = '';//成功助力好友
         for (let code of shareCodes) {
             if (code == farmInfo.farmUserPro.shareCode) {
                 console.log('跳过自己的shareCode')
@@ -224,30 +204,15 @@ function* step() {
             }
             console.log(`开始助力好友: ${code}`);
             let helpResult = yield masterHelp(code)
-            if (helpResult.code == 0) {
-                if (helpResult.helpResult.code === '0') {
-                    //助力成功
-                    salveHelpAddWater += helpResult.helpResult.salveHelpAddWater;
-                    console.log(`【助力好友结果】: 已成功给【${helpResult.helpResult.masterUserInfo.nickName}】助力`);
-                    helpSuccessPeoples += response.result.masterNickName + '，';
-                } else if (helpResult.helpResult.code === '8'){
-                    console.log(`【助力好友结果】: 助力【${helpResult.helpResult.masterUserInfo.nickName}】失败，您今天助力次数已耗尽`);
-                } else if (helpResult.helpResult.code === '9'){
-                    console.log(`【助力好友结果】: 之前给【${helpResult.helpResult.masterUserInfo.nickName}】助力过了`);
-                } else if (helpResult.helpResult.code === '10') {
-                    console.log(`【助力好友结果】: 好友【${helpResult.helpResult.masterUserInfo.nickName}】已满五人助力`);
-                }
-                console.log(`【今日助力次数还剩】${helpResult.helpResult.remainTimes}次`);
-                remainTimes =  helpResult.helpResult.remainTimes;
+            if (helpResult.code == 0 && helpResult.helpResult.code == 0) {
+                salveHelpAddWater += helpResult.helpResult.salveHelpAddWater
+            } else {
+                console.log(`助理好友结果: ${JSON.stringify(helpResult)}`);
             }
-        }
-        if (helpSuccessPeoples && helpSuccessPeoples.length > 0) {
-            message += `已成功给${helpSuccessPeoples}助力\n`;
         }
         if (salveHelpAddWater > 0) {
             message += `【助力好友】获得${salveHelpAddWater}g\n`
         }
-        message += `【今日剩余助力次数】：${remainTimes}\n`;
         console.log('助力好友结束，即将开始每日浇水任务');
         // console.log('当前水滴剩余: ' + farmInfo.farmUserPro.totalEnergy);
         // farmTask = yield taskInitForFarm();
@@ -388,7 +353,7 @@ function* step() {
         console.log(`初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常,农场初始化数据: ${JSON.stringify(farmInfo)}`);
         message = '初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常'
     }
-    $hammer.alert(name, subTitle, message);
+    $hammer.alert(name, message, subTitle);
     $hammer.done();
 }
 
@@ -431,12 +396,6 @@ function gotWaterGoalTaskForFarm() {
 
 //助力好友信息
 function masterHelpTaskInitForFarm() {
-    let functionId = arguments.callee.name.toString();
-    request(functionId);
-}
-//领取5人助力后的额外奖励
-function masterGotFinishedTaskForFarm() {
-    console.log("领取助力完成后的水滴")
     let functionId = arguments.callee.name.toString();
     request(functionId);
 }
