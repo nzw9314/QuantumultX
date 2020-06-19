@@ -141,7 +141,7 @@ function* entrance() {
     }
 
     yield energyCollect();
-    $hammer.alert(name, subTitle, message)
+    $hammer.alert(name, message, subTitle)
     console.log('全部任务完成, 如果帮助到您可以点下🌟STAR鼓励我一下, 明天见~');
 }
 
