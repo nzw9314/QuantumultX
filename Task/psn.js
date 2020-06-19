@@ -1,68 +1,46 @@
-/**
- *  疫情日报，自动获取当前位置的疫情信息
- *  API来自 https://lab.isaaclin.cn
- *  @author: Peng-YM
- *  感谢 @Mazetsz 提供腾讯API接口Token
- *  更新地址: https://raw.githubusercontent.com/Peng-YM/QuanX/master/Tasks/nCov.js
- */
-
-const $ = API("nCov");
-
-const key = "NOUBZ-7BNHD-SZ64A-HUWCW-YBGZ7-DDBNK";
-const headers = {
-  "User-Agent":
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
-};
-
-!(async () => {
-  // get current location
-  const province = await $.get(`https://apis.map.qq.com/ws/location/v1/ip?key=${key}`).then(resp => {
-    const data = JSON.parse(resp.body);
-    return data.result.ad_info.province;
-  });
-  $.log(province);
-
-  const overall = await $.get({
-    url: "https://lab.isaaclin.cn/nCoV/api/overall?latest=1",
-    headers,
+const $ = API("psn");
+const url =
+  "https://store.playstation.com/zh-hant-hk/grid/STORE-MSF86012-PLUS_FTT_CONTENT/1";
+$.get({
+  url,
+  headers: {
+    "User-Agent":
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
+  },
+})
+  .then((resp) => {
+    const body = resp.body;
+    const data = JSON.parse(body.match(/({"@context"[\s\S]*?)<\/script>/)[1]);
+    $.log(data);
+    return parse(data['@graph']);
   })
-    .then((resp) => JSON.parse(resp.body).results[0])
-    .delay(1000);
-  $.log(overall);
-  const news = await $.get({
-    url: `https://lab.isaaclin.cn/nCoV/api/news?page=1&num=1&province=${encodeURIComponent(province)}`,
-    headers,
-  }).then((resp) => JSON.parse(resp.body).results[0]);
-  $.log(news);
-
-  let title = `🗞【疫情日报】🇨🇳 ${province}`;
-  let subtitle = `🗓 ${formatTime()}`;
-  let detail =
-    "「全国数据统计」" +
-    "\n    -新增确诊: " +
-    overall.currentConfirmedIncr +
-    "\n    -现有确诊: " +
-    overall.currentConfirmedCount +
-    "\n    -累计确诊: " +
-    overall.confirmedCount +
-    "\n    -治愈: " +
-    overall.curedCount +
-    "\n    -死亡: " +
-    overall.deadCount +
-    "\n「疫情动态」\n     " +
-    news.title +
-    "\n「动态详情」\n     " +
-    news.summary;
-  $.notify(title, subtitle, detail);
-})()
   .catch((err) => $.error(err))
-  .finally(() => $.done());
+  .finally($.done());
 
-function formatTime() {
-    const date = new Date();
-    return `${
-        date.getMonth() + 1
-    }月${date.getDate()}日${date.getHours()}时`;
+function parse(products) {
+    products.forEach(item => {
+        let description = item.description;
+        // clean up css codes
+        description = description.replace(/\s+/g, '');
+        description = description.replace(/br|\\r|\\n/g, '');
+        description = description.replace(/\w*&\w*?;/g, '');
+        description = description.replace(/\w+\s{0,1}\w+="\w+"/g, '')
+        const name = item.name.trim().match(/《([\s\Sz]+?)》/)[1];
+        $.notify(
+            `🎮 [PSN会免] ${name}`,
+            `🗓 时间：${getTime()}`,
+            `📦 类别：${item.category}\n💡 游戏简介：${description}`,
+            {
+                'media-url': `${item.image}`,
+                'open-url': `https://store.playstation.com/zh-hant-hk/product/${item.sku}`
+            }
+        )
+    })
+}
+
+function getTime(){
+    const today = new Date();
+    return `${today.getFullYear()}年${today.getMonth() + 1}月`;
 }
 
 // prettier-ignore

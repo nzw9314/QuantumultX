@@ -1,5 +1,5 @@
 /*
-更新时间: 2020-06-12 12:35
+更新时间: 2020-06-15 15:35 取消打卡挑战，ck时效短，可弃坑
 
 本脚本仅适用于京东来客有礼每日获取京豆
 获取Cookie方法:
@@ -79,7 +79,7 @@ async function all()
   await total();    // 总计
   await tasklist(); // 任务列表
   await lottery();  // 0元抽奖
-  await challenge();// 打卡挑战
+  //await challenge();// 打卡挑战
   await status();   // 任务状态
   await video();    // 视频任务
   await Daily();    // 日常任务

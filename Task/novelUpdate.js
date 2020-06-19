@@ -1,26 +1,20 @@
-/**
- *  @author: Peng-YM
- *  更新地址: https://raw.githubusercontent.com/Peng-YM/QuanX/master/Tasks/zongheng.js
- *  使用方法：进入纵横小说页面，例如<<剑来>>：http://book.zongheng.com/book/672340.html 则id为672340，将id添加到列表即可。
- */
+//   原author: Peng-YM
+//   原项目地址: https://github.com/Peng-YM/QuanX/blob/master/Tasks/zongheng.js
+//   更新数据来源: 优书网
+//   优书网查询书籍后复制id填入id列表，弹窗跳转爱阅书香
 
 // 书籍id列表
-const ids = ["672340", "408586"];
+const ids = ["169413"];
 const alwaysNotice = false; // 设置为true则每次运行通知，否则只通知更新
 
 /********************************* SCRIPT START *******************************************************/
-const $ = API("zongheng");
+const $ = API("yousuu");
 
 const parsers = {
-  title: new RegExp(/bookname="(\S+)"/, "i"),
-  latestChapter: new RegExp(/class="tit"><a[^>]*>([^<]*)/, "i"),
-  coverURL: new RegExp(
-    /<div class="book-img fl">[\s\S]*?<img src="(.*?)".*>[\s\S]*?<\/div>/
-  ),
-  description: new RegExp(/<div class="con">([\s\S]*?)<\/div>/),
-  updateTime: new RegExp(/(\d+)(?:小时|天)前/),
-  updateCount: new RegExp(/今日更新\d+章/),
-  author: new RegExp(/<div class="au-name"><a [\s\S]*?>(\S*)<\/a><\/div>/),
+  title: new RegExp(/class="book-name"[\s\S]*?>(.*?)</),
+  coverURL: new RegExp(/"cover":"(.*?)"/),
+  updateTime: new RegExp(/更新时间\S\s*<span.+?>(.*?)</),
+  author: new RegExp(/"author":"(.*?)"/),
 };
 // check update
 checkUpdate($.read("books") || {}).finally(() => $.done());
@@ -31,7 +25,7 @@ async function checkUpdate(books) {
       $.log(`Handling book with id: ${id}...`);
       // check update from each book
       const config = {
-        url: `http://book.zongheng.com/book/${id}.html`,
+        url: `http://www.yousuu.com/book/${id}`,
         headers: {
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
@@ -44,11 +38,9 @@ async function checkUpdate(books) {
           // parse html
           const book = {
             title: html.match(parsers.title)[1],
-            updateCount: html.match(parsers.updateCount)[0],
-            latestChapter: html.match(parsers.latestChapter)[1],
-            coverURL: html.match(parsers.coverURL)[1],
-            updateTime: html.match(parsers.updateTime)[0],
-            description: html.match(parsers.description)[1],
+            coverURL: html.match(parsers.coverURL)[1].replace(/\\u002F/g,'/'),
+            updateTime: html.match(parsers.updateTime)[1],
+           
             author: html.match(parsers.author)[1],
           };
           $.log(book);
@@ -56,17 +48,17 @@ async function checkUpdate(books) {
           if (
             cachebook === undefined ||
             alwaysNotice ||
-            latestChapter !== cachebook.latestChapter
+            updateTime !== cachebook.updateTime
           ) {
             // upate database
             books[id] = book;
             // push notifications
             $.notify(
-              `🎉🎉🎉[纵横小说] 《${book.title}》更新`,
-              `⏰ 更新时间: ${book.updateTime}`,
-              `🎩作者: ${book.author}\n📌 最新章节: ${book.latestChapter}\n${book.description}\n⌨️ ${book.updateCount}`,
+              `🎉🎉🎉 《${book.title}》更新`,
+              `⏰ 更新时间: ${book.updateTime}前`,
+              `🎩作者: ${book.author}`,
               {
-                "open-url": `http://book.zongheng.com/book/${id}.html`,
+                "open-url": `iFreeTime://bk/a=${encodeURIComponent(book.author)}&n=${encodeURIComponent(book.title)}&d=0`,
                 "media-url": book.coverURL,
               }
             );
