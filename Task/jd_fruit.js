@@ -388,7 +388,7 @@ function* step() {
         console.log(`初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常,农场初始化数据: ${JSON.stringify(farmInfo)}`);
         message = '初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常'
     }
-    $hammer.alert(name, subTitle, message);
+    $hammer.alert(name, message, subTitle)
     $hammer.done();
 }
 
