@@ -74,8 +74,6 @@ eval_script.js = type=http-request,pattern=https:\/\/api\.m\.jd\.com\/client\.ac
 
 eval_script.js = type=http-request,pattern=https?:\/\/.*\.iqiyi\.com\/.*authcookie=,script-path=eval_script.js
 
-eval_script.js = type=http-request,pattern=https:\/\/www\.52pojie\.cn\/home\.php\?mod=space,script-path=eval_script.js
-
 eval_script.js = type=http-request,pattern=https:\/\/manga\.bilibili\.com\/.*\.User\/GetWallet,script-path=eval_script.js
 
 eval_script.js = type=http-request,pattern=^https:\/\/www\.smzdm\.com\/?.?,script-path=eval_script.js
@@ -103,8 +101,6 @@ eval_script.js = type=http-request,pattern=^https:\/\/luckman.suning.com\/luck-w
 eval_script.js = type=http-request,pattern=^https:\/\/sign.suning.com\/sign-web\/m\/promotion\/sign\/doSign.do,script-path=eval_script.js
 
 eval_script.js = type=http-request,pattern=^https:\/\/gameapi.suning.com\/sngame-web\/(api\/signin\/private\/customerSignOperation.do|gateway\/api\/queryPrize.do),script-path=eval_script.js
-
-eval_script.js = type=http-request,requires-body=1,pattern=^https:\/\/api.m.jd.com\/client.action\?functionId=cakebaker_getHomeData,script-path=eval_script.js
 
 eval_script.js = type=http-request,pattern=^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user$,script-path=eval_script.js
 
