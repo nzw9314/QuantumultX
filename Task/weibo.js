@@ -124,6 +124,7 @@ function Judgment() {
 else {
    subTitle += `  微博钱包未获取Cookie❌`
    sy.msg(CookieName, subTitle, detail)
+   return
    }
 }
 

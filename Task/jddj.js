@@ -109,6 +109,7 @@ function sign() {
       subTitle = `签到结果: 失败`
       detail = `说明: ${result.msg}`
       sy.msg(title, subTitle, detail)
+      return
     } else if (result.result.userInfoResponse.hasSign == true) {    
     for (let i = 0; i < result.result.sevenDaysRewardResponse.items.length; i++){
     if (result.result.sevenDaysRewardResponse.items[i].day == result.result.sevenDaysRewardResponse.alreadySignInDays){

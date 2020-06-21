@@ -1,170 +1,69 @@
-/*
-    本作品用于QuantumultX和Surge之间js执行方法的转换
-    您只需书写其中任一软件的js,然后在您的js最【前面】追加上此段js即可
-    无需担心影响执行问题,具体原理是将QX和Surge的方法转换为互相可调用的方法
-    尚未测试是否支持import的方式进行使用,因此暂未export
-    如有问题或您有更好的改进方案,请前往 https://github.com/sazs34/TaskConfig/issues 提交内容,或直接进行pull request
-    您也可直接在tg中联系@wechatu
-*/
-// #region 固定头部
-let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
-let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
-// http请求
-var $task = isQuantumultX ? $task : {};
-var $httpClient = isSurge ? $httpClient : {};
-// cookie读写
-var $prefs = isQuantumultX ? $prefs : {};
-var $persistentStore = isSurge ? $persistentStore : {};
-// 消息通知
-var $notify = isQuantumultX ? $notify : {};
-var $notification = isSurge ? $notification : {};
-// #endregion 固定头部
+/**
+ *  疫情日报，自动获取当前位置的疫情信息
+ *  API来自 http://api.tianapi.com/txapi/ncov/
+ *  @author: Peng-YM
+ *  感谢 @Mazetsz 提供腾讯API接口Token
+ *  更新地址: https://raw.githubusercontent.com/Peng-YM/QuanX/master/Tasks/nCov.js
+ */
 
-// #region 网络请求专用转换
-if (isQuantumultX) {
-    var errorInfo = {
-        error: ''
-    };
-    $httpClient = {
-        get: (url, cb) => {
-            var urlObj;
-            if (typeof (url) == 'string') {
-                urlObj = {
-                    url: url
-                }
-            } else {
-                urlObj = url;
-            }
-            $task.fetch(urlObj).then(response => {
-                cb(undefined, response, response.body)
-            }, reason => {
-                errorInfo.error = reason.error;
-                cb(errorInfo, response, '')
-            })
-        },
-        post: (url, cb) => {
-            var urlObj;
-            if (typeof (url) == 'string') {
-                urlObj = {
-                    url: url
-                }
-            } else {
-                urlObj = url;
-            }
-            url.method = 'POST';
-            $task.fetch(urlObj).then(response => {
-                cb(undefined, response, response.body)
-            }, reason => {
-                errorInfo.error = reason.error;
-                cb(errorInfo, response, '')
-            })
-        }
-    }
+const $ = API("nCov");
+
+const key = "NOUBZ-7BNHD-SZ64A-HUWCW-YBGZ7-DDBNK";
+const headers = {
+  "User-Agent":
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
+};
+
+!(async () => {
+  // get current location
+  const province = await $.get(`https://apis.map.qq.com/ws/location/v1/ip?key=${key}`).then(resp => {
+    const data = JSON.parse(resp.body);
+    return data.result.ad_info.province;
+  });
+  $.log(province);
+  console.log(province);
+  const newslist = await $.get({
+    url: "http://api.tianapi.com/txapi/ncov/index?key=5dcf1a3871f36bcc48c543c8193223fc",
+    headers,
+  }).then((resp) => JSON.parse(resp.body).newslist[0])
+    .delay(1000);
+  $.log(newslist);
+  console.log(newslist);
+  let desc = newslist.desc;
+  let news = newslist.news[0];
+  let title = "🗞【疫情信息概览】";
+  let subtitle = `📅  ${formatTime()}`;
+  let detail = 
+    "\n「全国数据」" +
+    "\n\n    -新增确诊: " +
+    desc.confirmedIncr +
+    "\n    -现有确诊: " +
+    desc.currentConfirmedCount +
+    "\n    -累计确诊: " +
+    desc.confirmedCount +
+    "\n    -治愈: " +
+    desc.curedCount +
+    "\n    -死亡: " +
+    desc.deadCount +
+    "\n\n「疫情动态」\n\n     " +
+    news.title +
+    "\n\n「动态详情」\n\n     " +
+    news.summary +
+    "\n\n    发布时间：" +
+    news.pubDateStr;
+  $.notify(title, subtitle, detail);
+})()
+  .catch((err) => $.error(err))
+  .finally(() => $.done());
+
+function formatTime() {
+    const date = new Date();
+    return `${
+        date.getMonth() + 1
+    }月${date.getDate()}日 ${date.getHours()}时`;
 }
-if (isSurge) {
-    $task = {
-        fetch: url => {
-            //为了兼容qx中fetch的写法,所以永不reject
-            return new Promise((resolve, reject) => {
-                if (url.method == 'POST') {
-                    $httpClient.post(url, (error, response, data) => {
-                        if (response) {
-                            response.body = data;
-                            resolve(response, {
-                                error: error
-                            });
-                        } else {
-                            resolve(null, {
-                                error: error
-                            })
-                        }
-                    })
-                } else {
-                    $httpClient.get(url, (error, response, data) => {
-                        if (response) {
-                            response.body = data;
-                            resolve(response, {
-                                error: error
-                            });
-                        } else {
-                            resolve(null, {
-                                error: error
-                            })
-                        }
-                    })
-                }
-            })
 
-        }
-    }
-}
-// #endregion 网络请求专用转换
-
-// #region cookie操作
-if (isQuantumultX) {
-    $persistentStore = {
-        read: key => {
-            return $prefs.valueForKey(key);
-        },
-        write: (val, key) => {
-            return $prefs.setValueForKey(val, key);
-        }
-    }
-}
-if (isSurge) {
-    $prefs = {
-        valueForKey: key => {
-            return $persistentStore.read(key);
-        },
-        setValueForKey: (val, key) => {
-            return $persistentStore.write(val, key);
-        }
-    }
-}
-// #endregion
-
-// #region 消息通知
-if (isQuantumultX) {
-    $notification = {
-        post: (title, subTitle, detail) => {
-            $notify(title, subTitle, detail);
-        }
-    }
-}
-if (isSurge) {
-    $notify = function (title, subTitle, detail) {
-        $notification.post(title, subTitle, detail);
-    }
-}
-// #endregion
-const nCoVdata = encodeURI("https://lab.isaaclin.cn/nCoV/api/area?latest=1&province=湖北省")
-$httpClient.get(nCoVdata, function(error, response, data){
-    if (error){
-        console.log(error);
-        $done();                   
-    } else {
-        var obj = JSON.parse(data);
-        console.log(obj);
-        var province = "所在省份:" + obj.results[0].provinceName;
-        var province_status = "现存确诊: " + obj.results[0].currentConfirmedCount + "  累计确诊: " + obj.results[0].confirmedCount + "  治愈: " + obj.results[0].curedCount + "  死亡: " + obj.results[0].deadCount + "\n";
-        var cities_status = "";
-        for (var i = 0; i < obj.results[0].cities.length; i++) {
-        var cities_status = cities_status + "地级市: " + obj.results[0].cities[i].cityName + "  现存确诊: " + obj.results[0].cities[i].currentConfirmedCount + "  累计确诊: " + obj.results[0].cities[i].confirmedCount + "  治愈: " + obj.results[0].cities[i].curedCount + "  死亡: " + obj.results[0].cities[i].deadCount + "\n";}
-        let nCoV = [province,province_status,cities_status];
-        $notification.post(nCoV[0], nCoV[1],nCoV[2]);
-        $done();
-    }
-}
-);
-
-/*****************************************************************
-# 疫情查看 (By @Dachaw)
-
-[Task]
-
-# 在每天 9:00 报告新冠肺炎疫情
-
-0 9 * * * nCoV.js
-
-
-*****************************************************************/
+// prettier-ignore
+/*********************************** API *************************************/
+function API(t="untitled",e=!1){return new class{constructor(t,e){this.name=t,this.debug=e,this.isQX="undefined"!=typeof $task,this.isLoon="undefined"!=typeof $loon,this.isSurge="undefined"!=typeof $httpClient&&!this.isLoon,this.isNode="function"==typeof require,this.node=(()=>this.isNode?{request:require("request"),fs:require("fs")}:null)(),this.cache=this.initCache(),this.log(`INITIAL CACHE:\n${JSON.stringify(this.cache)}`),Promise.prototype.delay=function(t){return this.then(function(e){return((t,e)=>new Promise(function(s){setTimeout(s.bind(null,e),t)}))(t,e)})}}get(t){return this.isQX?("string"==typeof t&&(t={url:t,method:"GET"}),$task.fetch(t)):new Promise((e,s)=>{this.isLoon||this.isSurge?$httpClient.get(t,(t,i,o)=>{t?s(t):e({...i,body:o})}):this.node.request(t,(t,i,o)=>{t?s(t):e({...i,status:i.statusCode,body:o})})})}post(t){return this.isQX?("string"==typeof t&&(t={url:t}),t.method="POST",$task.fetch(t)):new Promise((e,s)=>{this.isLoon||this.isSurge?$httpClient.post(t,(t,i,o)=>{t?s(t):e({...i,body:o})}):this.node.request.post(t,(t,i,o)=>{t?s(t):e({...i,status:i.statusCode,body:o})})})}initCache(){if(this.isQX)return JSON.parse($prefs.valueForKey(this.name)||"{}");if(this.isLoon||this.isSurge)return JSON.parse($persistentStore.read(this.name)||"{}");if(this.isNode){const t=`${this.name}.json`;return this.node.fs.existsSync(t)?JSON.parse(this.node.fs.readFileSync(`${this.name}.json`)):(this.node.fs.writeFileSync(t,JSON.stringify({}),{flag:"wx"},t=>console.log(t)),{})}}persistCache(){const t=JSON.stringify(this.cache);this.log(`FLUSHING DATA:\n${t}`),this.isQX&&$prefs.setValueForKey(t,this.name),(this.isLoon||this.isSurge)&&$persistentStore.write(t,this.name),this.isNode&&this.node.fs.writeFileSync(`${this.name}.json`,t,{flag:"w"},t=>console.log(t))}write(t,e){this.log(`SET ${e} = ${t}`),this.cache[e]=t,this.persistCache()}read(t){return this.log(`READ ${t} ==> ${this.cache[t]}`),this.cache[t]}delete(t){this.log(`DELETE ${t}`),delete this.cache[t],this.persistCache()}notify(t,e,s,i){const o="string"==typeof i?i:void 0,n=s+(null==o?"":`\n${o}`);this.isQX&&(void 0!==o?$notify(t,e,s,{"open-url":o}):$notify(t,e,s,i)),this.isSurge&&$notification.post(t,e,n),this.isLoon&&$notification.post(t,e,s),this.isNode&&("undefined"==typeof $jsbox?console.log(`${t}\n${e}\n${n}\n\n`):require("push").schedule({title:t,body:e?e+"\n"+s:s}))}log(t){this.debug&&console.log(t)}info(t){console.log(t)}error(t){this.log("ERROR: "+t)}wait(t){return new Promise(e=>setTimeout(e,t))}done(t={}){this.log("DONE"),this.isNode||$done(t)}}(t,e)}
+/*****************************************************************************/

@@ -114,6 +114,7 @@ function getsign() {
          signres = `签到失败❌`
          detail = `说明: `+ result.msg
          sy.msg(CookieName,signres,detail)
+         return
          }
     resolve()
     })
@@ -125,7 +126,7 @@ function signinfo() {
       url: infourlVal,
       headers: JSON.parse(infoheaderVal)}
    sy.get(infourl, (error, response, data) => {
-     sy.log(`${CookieName}, data: ${data}`)
+     //sy.log(`${CookieName}, data: ${data}`)
      let result = JSON.parse(data)
      const nickName = `用户昵称: ${result.data.nickName}`  
      if (result.status == 0){

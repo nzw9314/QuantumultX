@@ -2,31 +2,22 @@ const __conf = String.raw`
 
 [Remote]
 // custom remote...
+# https://raw.githubusercontent.com/yichahucha/surge/master/qx_sub.txt
 
 
 [Local]
 // custom local...
-
-# nf
-http-request ^https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D script-path=https://raw.githubusercontent.com/yichahucha/surge/master/nf_rating.js
-http-response ^https?://ios\.prod\.ftl\.netflix\.com/iosui/user/.+path=%5B%22videos%22%2C%\d+%22%2C%22summary%22%5D requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/nf_rating.js
 # jd
-^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
-# tb
-tb_price.js = type=http-request,requires-body=1,pattern=^http://.+/amdc/mobileDispatch,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
-tb_price.js = type=http-response,requires-body=1,pattern=^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/tb_price.js
-# wb
-http-response ^https?://(sdk|wb)app\.uve\.weibo\.com(/interface/sdk/sdkad.php|/wbapplua/wbpullad.lua) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/wb_launch.js
-http-response ^https?://m?api\.weibo\.c(n|om)/2/(statuses/(unread|extend|positives/get|(friends|video)(/|_)(mix)?timeline)|stories/(video_stream|home_list)|(groups|fangle)/timeline|profile/statuses|comments/build_comments|photo/recommend_list|service/picfeed|searchall|cardlist|page|!/photos/pic_recommend_status|video/tiny_stream_video_list) requires-body=1,script-path=https://raw.githubusercontent.com/yichahucha/surge/master/wb_ad.js
+# ^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig) url script-response-body https://raw.githubusercontent.com/yichahucha/surge/master/jd_price.js
 
 
 [Hostname]
 // custom hostname...
-api.weibo.cn, mapi.weibo.com, *.uve.weibo.com, trade-acs.m.taobao.com, api.m.jd.com, ios.prod.ftl.netflix.com
+# api.m.jd.com
+
 
 `
 
-// 是否更新 GitHub（如果开启 true，需配置 token 或 账号密码）
 const __isUpdateGithub = true
 // GitHub Token（如果使用账号密码 token 请设置为空 ""）
 const __token = ""
@@ -35,9 +26,9 @@ const __username = "xxx"
 // GitHub 密码
 const __password = "xxx"
 // GitHub 用户名
-const __owner = "yichahucha"
+const __owner = "xxx"
 // GitHub 仓库名
-const __repo = "surge"
+const __repo = "xxx"
 // GitHub 分支（不指定就使用默认分支）
 const __branch = "master"
 // 指定 eval_script.js 文件路径（路径为空 "" 使用脚本原始路径）
@@ -61,47 +52,18 @@ const __showLine = 15
 const __log = false
 const __debug = false
 const __developmentMode = false
-const __concurrencyLimit = 5
+const __concurrencyLimit = 15
+const __cacheKey = "ScriptCacheKey"
 
 const __tool = new ____Tool()
 const __base64 = new ____Base64()
 
 if (__tool.isTask) {
-    const ____getConf = (() => {
-        return new Promise((resolve) => {
-            const remoteConf = ____removeAnnotation(____extractConf(__conf, "Remote"))
-            const localConf = ____removeAnnotation(____extractConf(__conf, "Local"))
-            const hostnameConf = ____parseHostname(____removeAnnotation(____extractConf(__conf, "Hostname")))
-            if (remoteConf.length > 0) {
-                console.log("Start updating conf...")
-                if (__debug) __tool.notify("", "", `Start updating ${remoteConf.length} confs...`)
-                ____concurrentQueueLimit(remoteConf, __concurrencyLimit, (url) => {
-                    return ____downloadFile(url)
-                })
-                    .then(results => {
-                        console.log("Stop updating conf.")
-                        let contents = []
-                        let hostnames = []
-                        results.forEach(data => {
-                            const parseRemoteResult = ____parseRemoteConf(data.body)
-                            if (data.body) {
-                                contents = contents.concat(parseRemoteResult.contents)
-                                hostnames = hostnames.concat(parseRemoteResult.hostnames)
-                            }
-                        });
-                        contents = localConf.concat(contents)
-                        hostnames = hostnameConf.concat(hostnames)
-                        resolve({ contents, hostnames, results })
-                    })
-            } else {
-                resolve({ contents: localConf, hostnames: hostnameConf, results: [] })
-            }
-        })
-    })
     const begin = new Date()
     const storeObj = {}
+    //get conf info (local remote)
     ____getConf()
-        //check
+        //check conf
         .then((conf) => {
             return new Promise((resolve, reject) => {
                 if (conf.contents.length > 0) {
@@ -118,7 +80,7 @@ if (__tool.isTask) {
                 }
             })
         })
-        //parse
+        //parse conf
         .then((contents) => {
             return new Promise((resolve, reject) => {
                 const parseResult = ____parseConf(contents)
@@ -135,7 +97,7 @@ if (__tool.isTask) {
                 }
             })
         })
-        //download
+        //download script
         .then((confMap) => {
             const scriptUrls = Object.keys(confMap)
             __tool.notify("", "", `Start updating ${scriptUrls.length} scripts...`)
@@ -157,11 +119,11 @@ if (__tool.isTask) {
                 })
             })
         })
-        //write map
+        //write cache
         .then((scriptResults) => {
             console.log("Stop updating script.")
             storeObj["scriptResults"] = scriptResults
-            return __tool.write(JSON.stringify(storeObj.confMap), "ScriptConfObjKey")
+            return __tool.write(JSON.stringify(storeObj.confMap), __cacheKey)
         })
         //update github
         .then(() => {
@@ -238,7 +200,7 @@ if (!__tool.isTask) {
         if (__developmentMode) {
             return ____parseDevelopmentModeConf(__conf)
         } else {
-            return JSON.parse(__tool.read("ScriptConfObjKey"))
+            return JSON.parse(__tool.read(__cacheKey))
         }
     })()
     const __script = (() => {
@@ -250,26 +212,8 @@ if (!__tool.isTask) {
             const value = __confObj[key]
             for (let j = 0, len = value.length; j < len; j++) {
                 const match = value[j]
-                const regular = new RegExp(match.regular)
-                if (__debug) {
-                    try {
-                        if (regular.test(__url)) {
-                            const type = match.type
-                            if (type && type.length > 0) {
-                                if (__tool.scriptType == type) {
-                                    script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
-                                    break
-                                }
-                            } else {
-                                script = { url: key, match, content: __developmentMode ? key : __tool.read(key) }
-                                break
-                            }
-                        }
-                    } catch (error) {
-                        if (__debug) __tool.notify("[eval_script.js]", "", `Error regular : ${match.regular}\nRequest: ${__url}`)
-                        throw error
-                    }
-                } else {
+                try {
+                    const regular = new RegExp(match.regular)
                     if (regular.test(__url)) {
                         const type = match.type
                         if (type && type.length > 0) {
@@ -282,6 +226,9 @@ if (!__tool.isTask) {
                             break
                         }
                     }
+                } catch (error) {
+                    if (__debug) __tool.notify("[eval_script.js]", "", `Error regular : ${match.regular}\nRequest: ${__url}`)
+                    //throw error
                 }
             }
         }
@@ -393,6 +340,38 @@ async function ____updateGitHub(path, content, message) {
     const sha = await getContent()
     const result = await updateContent(sha)
     return result
+}
+
+function ____getConf() {
+    return new Promise((resolve) => {
+        const remoteConf = ____removeAnnotation(____extractConf(__conf, "Remote"))
+        const localConf = ____removeAnnotation(____extractConf(__conf, "Local"))
+        const hostnameConf = ____parseHostname(____removeAnnotation(____extractConf(__conf, "Hostname")))
+        if (remoteConf.length > 0) {
+            console.log("Start updating conf...")
+            if (__debug) __tool.notify("", "", `Start updating ${remoteConf.length} confs...`)
+            ____concurrentQueueLimit(remoteConf, __concurrencyLimit, (url) => {
+                return ____downloadFile(url)
+            })
+                .then(results => {
+                    console.log("Stop updating conf.")
+                    let contents = []
+                    let hostnames = []
+                    results.forEach(data => {
+                        const parseRemoteResult = ____parseRemoteConf(data.body)
+                        if (data.body) {
+                            contents = contents.concat(parseRemoteResult.contents)
+                            hostnames = hostnames.concat(parseRemoteResult.hostnames)
+                        }
+                    });
+                    contents = localConf.concat(contents)
+                    hostnames = hostnameConf.concat(hostnames)
+                    resolve({ contents, hostnames, results })
+                })
+        } else {
+            resolve({ contents: localConf, hostnames: hostnameConf, results: [] })
+        }
+    })
 }
 
 function ____parseDevelopmentModeConf(conf) {
@@ -664,6 +643,7 @@ function ____Tool() {
             return (null)
         }
     })()
+    _isJsBox = typeof $jsbox != "undefined"
     _isSurge = typeof $httpClient != "undefined"
     _isQuanX = typeof $task != "undefined"
     _isTask = typeof $request == "undefined"
@@ -695,6 +675,10 @@ function ____Tool() {
         if (_isQuanX) $notify(title, subtitle, message)
         if (_isSurge) $notification.post(title, subtitle, message)
         if (_node) console.log(JSON.stringify({ title, subtitle, message }));
+        if (_isJsBox) {
+            const push = require("push");
+            push.schedule({ title: title, body: `${subtitle}${subtitle.length > 0 ? "\n" : ""}${message}` });
+        }
     }
     this.write = (value, key) => {
         if (_isQuanX) return $prefs.setValueForKey(value, key)
