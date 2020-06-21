@@ -70,8 +70,6 @@ https:\/\/api\.m\.jd\.com\/client\.action.*functionId=signBean url script-reques
 
 https?:\/\/.*\.iqiyi\.com\/.*authcookie= url script-request-header eval_script.js
 
-https:\/\/www\.52pojie\.cn\/home\.php\?mod=space url script-request-header eval_script.js
-
 https:\/\/manga\.bilibili\.com\/.*\.User\/GetWallet url script-request-header eval_script.js
 
 ^https:\/\/www\.smzdm\.com\/?.? url script-request-header eval_script.js
@@ -99,8 +97,6 @@ https:\/\/manga\.bilibili\.com\/.*\.User\/GetWallet url script-request-header ev
 ^https:\/\/sign.suning.com\/sign-web\/m\/promotion\/sign\/doSign.do url script-request-header eval_script.js
 
 ^https:\/\/gameapi.suning.com\/sngame-web\/(api\/signin\/private\/customerSignOperation.do|gateway\/api\/queryPrize.do) url script-request-header eval_script.js
-
-^https:\/\/api.m.jd.com\/client.action\?functionId=cakebaker_getHomeData url script-request-body eval_script.js
 
 ^https:\/\/h5\.ele\.me\/restapi\/eus\/v\d\/current_user$ url script-request-header eval_script.js
 
