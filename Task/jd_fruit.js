@@ -304,7 +304,7 @@ function* step() {
 
         farmInfo = yield initForFarm();
         // 所有的浇水(10次浇水)任务，获取水滴任务完成后，如果剩余水滴大于等于110g,则继续浇水(保留100g是用于完成第二天的浇水10次的任务)
-        const overageEnergy = farmInfo.farmUserPro.totalEnergy - 100;
+        let overageEnergy = farmInfo.farmUserPro.totalEnergy - 100;
         if (overageEnergy >= 10) {
           console.log("目前剩余水滴：【" + farmInfo.farmUserPro.totalEnergy + "】g，可继续浇水");
           for (let i = 0; i < parseInt(overageEnergy / 10); i++){
