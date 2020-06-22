@@ -1,9 +1,93 @@
 //jd宠汪汪 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
 
-//只能quanx用，request里面的请求跟获取cookie的地方改改，别的app应该也能用
+const $hammer = (() => {
+    const isRequest = "undefined" != typeof $request,
+        isSurge = "undefined" != typeof $httpClient,
+        isQuanX = "undefined" != typeof $task;
+
+    const log = (...n) => { for (let i in n) console.log(n[i]) };
+    const alert = (title, body = "", subtitle = "", link = "") => {
+        if (isSurge) return $notification.post(title, subtitle, body, link);
+        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body));
+        log("==============📣系统通知📣==============");
+        log("title:", title, "subtitle:", subtitle, "body:", body, "link:", link);
+    };
+    const read = key => {
+        if (isSurge) return $persistentStore.read(key);
+        if (isQuanX) return $prefs.valueForKey(key);
+    };
+    const write = (val, key) => {
+        if (isSurge) return $persistentStore.write(val, key);
+        if (isQuanX) return $prefs.setValueForKey(val, key);
+    };
+    const request = (method, params, callback) => {
+        /**
+         * 
+         * params(<object>): {url: <string>, headers: <object>, body: <string>} | <url string>
+         * 
+         * callback(
+         *      error, 
+         *      <response-body string>?,
+         *      {status: <int>, headers: <object>, body: <string>}?
+         * )
+         * 
+         */
+        let options = {};
+        if (typeof params == "string") {
+            options.url = params;
+        } else {
+            options.url = params.url;
+            if (typeof params == "object") {
+                params.headers && (options.headers = params.headers);
+                params.body && (options.body = params.body);
+            }
+        }
+        method = method.toUpperCase();
+
+        const writeRequestErrorLog = function (m, u) {
+            return err => {
+                log("=== request error -s--");
+                log(`${m} ${u}`, err);
+                log("=== request error -e--");
+            };
+        }(method, options.url);
+
+        if (isSurge) {
+            const _runner = method == "GET" ? $httpClient.get : $httpClient.post;
+            return _runner(options, (error, response, body) => {
+                if (error == null || error == "") {
+                    response.body = body;
+                    callback("", body, response);
+                } else {
+                    writeRequestErrorLog(error);
+                    callback(error);
+                }
+            });
+        }
+        if (isQuanX) {
+            options.method = method;
+            $task.fetch(options).then(
+                response => {
+                    response.status = response.statusCode;
+                    delete response.statusCode;
+                    callback("", response.body, response);
+                },
+                reason => {
+                    writeRequestErrorLog(reason.error);
+                    callback(reason.error);
+                }
+            );
+        }
+    };
+    const done = (value = {}) => {
+        if (isQuanX) return isRequest ? $done(value) : null;
+        if (isSurge) return isRequest ? $done(value) : $done();
+    };
+    return { isRequest, isSurge, isQuanX, log, alert, read, write, request, done };
+})();
 
 //直接用NobyDa的jd cookie
-const cookie = $prefs.valueForKey('CookieJD')
+const cookie = $hammer.read('CookieJD')
 const name = '京东宠汪汪'
 
 var Task = step();
@@ -98,7 +182,7 @@ function* step() {
     } else {
         message = '请先获取cookie\n直接使用NobyDa的京东签到获取'
     }
-    $notify(name, '', message)
+    $hammer.alert(name, '', message)
 }
 //浏览商品
 function ScanDeskGood(sku){
@@ -143,38 +227,32 @@ function ThreeMeals() {
 }
 
 function request(url) {
-    $task.fetch({
+    const option =  {
         url: url,
         headers: {
             Cookie: cookie,
             UserAgent: `Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1`,
             reqSource: 'h5',
-        },
-        method: "GET",
-    }).then(
-        (response) => {
-            return JSON.parse(response.body)
-        },
-        (reason) => console.log(reason.error, reason)
-    ).then((response) => sleep(response))
+        }
+    };
+    $hammer.request('GET', option, (error, response) => {
+        error ? $hammer.log("Error:", error) : sleep(JSON.parse(response));
+    })
 }
 
 function requestPost(url, body, ContentType) {
-    $task.fetch({
+    const options = {
         url: url,
         body: body,
         headers: {
             Cookie: cookie,
             reqSource: 'h5',
             'Content-Type': ContentType,
-        },
-        method: "POST",
-    }).then(
-        (response) => {
-            return JSON.parse(response.body)
-        },
-        (reason) => console.log(reason.error, reason)
-    ).then((response) => sleep(response))
+        }
+    };
+    $hammer.request('POST', options, (error, response) => {
+        error ? $hammer.log("Error:", error) : sleep(JSON.parse(response));
+    })
 }
 
 function sleep(response) {
