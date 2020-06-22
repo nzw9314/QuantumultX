@@ -8,46 +8,52 @@
  * 2. Loon & Surge
  * domain, rsshub.app, proxy
  */
-
-
-/******************** 转换器 ********************/
-let qx=null!=$task,sg=null!=$httpClient,ln=sg&&null!=typeof $loon;var $task=qx?$task:{},$httpClient=sg?$httpClient:{},$prefs=qx?$prefs:{},$persistentStore=sg?$persistentStore:{},$notify=qx?$notify:{},$notification=sg?$notification:{};if(qx){var errorInfo={error:""};$httpClient={get:(t,o)=>{var r;r="string"==typeof t?{url:t}:t,$task.fetch(r).then(t=>{o(void 0,t,t.body)},t=>{errorInfo.error=t.error,o(errorInfo,response,"")})},post:(t,o)=>{var r;r="string"==typeof t?{url:t}:t,t.method="POST",$task.fetch(r).then(t=>{o(void 0,t,t.body)},t=>{errorInfo.error=t.error,o(errorInfo,response,"")})}}}sg&&($task={fetch:t=>new Promise((o,r)=>{"POST"==t.method?$httpClient.post(t,(t,r,e)=>{r?(r.body=e,o(r,{error:t})):o(null,{error:t})}):$httpClient.get(t,(t,r,e)=>{r?(r.body=e,o(r,{error:t})):o(null,{error:t})})})}),qx&&($persistentStore={read:t=>$prefs.valueForKey(t),write:(t,o)=>$prefs.setValueForKey(t,o)}),sg&&($prefs={valueForKey:t=>$persistentStore.read(t),setValueForKey:(t,o)=>$persistentStore.write(t,o)}),qx&&($notify=(t=>(function(o,r,e,n){t(o,r,e=void 0===n?e:`${e}\n点击链接跳转: ${n}`)}))($notify),$notification={post:(t,o,r,e)=>{$notify(t,o,r=void 0===e?r:`${r}\n点击链接跳转: ${e}`)}}),sg&&!ln&&($notification.post=(t=>(function(o,r,e,n){t(o,r,e=void 0===n?e:`${e}\n点击链接跳转: ${n}`)}))($notification.post),$notify=((t,o,r,e)=>{r=void 0===e?r:`${r}\n点击链接跳转: ${e}`,$notification.post(t,o,r)})),ln&&($notify=((t,o,r,e)=>{$notification.post(t,o,r,e)}));
-/******************** 转换器 ********************/
-
+const $ = API("epic");
 checkUpdate().then(() => $done());
 
 async function checkUpdate() {
-  const html = await $task
-    .fetch({ url: "https://rsshub.app/epicgames/freegames" })
-    .then((resp) => resp.body);
-  const itemRegex = new RegExp(/<item>[\s\S]*?<\/item>/g);
-  html.match(itemRegex).forEach(async (item) => {
-    let name = item.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>/)[1];
-    let url = item.match(/<link>([\s\S]*?)<\/link>/)[1];
-    let time = item.match(/<pubDate>([\s\S]*?)<\/pubDate>/)[1];
-    let { description, publisher } = await fetchGameInfo(url);
-    $notify(
-        `🎮 [Epic 限免]  ${name}`,
-        `⏰ 发布时间: ${formatTime(time)}`,
-        `💡 游戏简介:\n${description}`,
-url
-    );
-  });
+    const html = await $.get({
+        url: "https://rsshub.app/epicgames/freegames"
+    })
+        .then((resp) => resp.body);
+    const itemRegex = new RegExp(/<item>[\s\S]*?<\/item>/g);
+    html.match(itemRegex).forEach(async (item) => {
+        let name = item.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>/)[1];
+        let url = item.match(/<link>([\s\S]*?)<\/link>/)[1];
+        let imgurl = item.match(/<img src=\"(.*)\" referrerpolicy/)[1];
+        let notificationURL = {
+            "open-url": url,
+            "media-url": imgurl
+        }
+        let time = item.match(/<pubDate>([\s\S]*?)<\/pubDate>/)[1];
+        let { description, publisher } = await fetchGameInfo(url);
+        $.notify(
+            `🎮 [Epic 限免]  ${name}`,
+            `⏰ 发布时间: ${formatTime(time)}`,
+            `💡 游戏简介:\n${description}`,
+            notificationURL
+        );
+    });
 }
 
 async function fetchGameInfo(url) {
-  const html = await $task.fetch({ url }).then((resp) => resp.body);
-  const description = html.match(/"og:description" content="([\s\S]*?)"/)[1];
-  const publisher = html.match();
-  return {
-    description,
-    publisher
-  };
+    const html = await $.get({ url }).then((resp) => resp.body);
+    const description = html.match(/"og:description" content="([\s\S]*?)"/)[1];
+    const publisher = html.match();
+    return {
+        description,
+        publisher
+    };
 }
 
 function formatTime(timestamp) {
-  const date = new Date(timestamp);
-  return `${date.getFullYear()}年${
-    date.getMonth() + 1
-  }月${date.getDate()}日${date.getHours()}时`;
+    const date = new Date(timestamp);
+    return `${date.getFullYear()}年${
+        date.getMonth() + 1
+    }月${date.getDate()}日${date.getHours()}时`;
 }
+
+// prettier-ignore
+/*********************************** API *************************************/
+function API(t="untitled",s=!1){return new class{constructor(t,s){this.name=t,this.debug=s,this.isQX="undefined"!=typeof $task,this.isLoon="undefined"!=typeof $loon,this.isSurge="undefined"!=typeof $httpClient&&!this.isLoon,this.isNode="function"==typeof require,this.isJSBox=this.isNode&&"undefined"!=typeof $jsbox,this.node=(()=>this.isNode?{request:"undefined"!=typeof $request?void 0:require("request"),fs:require("fs")}:null)(),this.cache=this.initCache(),this.log(`INITIAL CACHE:\n${JSON.stringify(this.cache)}`),Promise.prototype.delay=function(t){return this.then(function(s){return((t,s)=>new Promise(function(e){setTimeout(e.bind(null,s),t)}))(t,s)})}}get(t){return this.isQX?("string"==typeof t&&(t={url:t,method:"GET"}),$task.fetch(t)):new Promise((s,e)=>{this.isLoon||this.isSurge?$httpClient.get(t,(t,i,o)=>{t?e(t):s({status:i.status,headers:i.headers,body:o})}):this.node.request(t,(t,i,o)=>{t?e(t):s({...i,status:i.statusCode,body:o})})})}post(t){return this.isQX?("string"==typeof t&&(t={url:t}),t.method="POST",$task.fetch(t)):new Promise((s,e)=>{this.isLoon||this.isSurge?$httpClient.post(t,(t,i,o)=>{t?e(t):s({status:i.status,headers:i.headers,body:o})}):this.node.request.post(t,(t,i,o)=>{t?e(t):s({...i,status:i.statusCode,body:o})})})}initCache(){if(this.isQX)return JSON.parse($prefs.valueForKey(this.name)||"{}");if(this.isLoon||this.isSurge)return JSON.parse($persistentStore.read(this.name)||"{}");if(this.isNode){const t=`${this.name}.json`;return this.node.fs.existsSync(t)?JSON.parse(this.node.fs.readFileSync(`${this.name}.json`)):(this.node.fs.writeFileSync(t,JSON.stringify({}),{flag:"wx"},t=>console.log(t)),{})}}persistCache(){const t=JSON.stringify(this.cache);this.log(`FLUSHING DATA:\n${t}`),this.isQX&&$prefs.setValueForKey(t,this.name),(this.isLoon||this.isSurge)&&$persistentStore.write(t,this.name),this.isNode&&this.node.fs.writeFileSync(`${this.name}.json`,t,{flag:"w"},t=>console.log(t))}write(t,s){this.log(`SET ${s} = ${JSON.stringify(t)}`),this.cache[s]=t,this.persistCache()}read(t){return this.log(`READ ${t} ==> ${JSON.stringify(this.cache[t])}`),this.cache[t]}delete(t){this.log(`DELETE ${t}`),delete this.cache[t],this.persistCache()}notify(t,s,e,i){const o="string"==typeof i?i:void 0,n=e+(null==o?"":`\n${o}`);this.isQX&&(void 0!==o?$notify(t,s,e,{"open-url":o}):$notify(t,s,e,i)),this.isSurge&&$notification.post(t,s,n),this.isLoon&&$notification.post(t,s,e),this.isNode&&(this.isJSBox?require("push").schedule({title:t,body:s?s+"\n"+e:e}):console.log(`${t}\n${s}\n${n}\n\n`))}log(t){this.debug&&console.log(t)}info(t){console.log(t)}error(t){console.log("ERROR: "+t)}wait(t){return new Promise(s=>setTimeout(s,t))}done(t={}){this.isQX||this.isLoon||this.isSurge?$done(t):this.isNode&&!this.isJSBox&&"undefined"!=typeof $context&&($context.headers=t.headers,$context.statusCode=t.statusCode,$context.body=t.body)}}(t,s)}
+/*****************************************************************************/
