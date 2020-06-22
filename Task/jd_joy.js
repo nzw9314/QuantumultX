@@ -1,5 +1,7 @@
 //jd宠汪汪 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
 
+//自动投喂还没写，主要是任务完不成，不想写 了
+
 //只能quanx用，request里面的请求跟获取cookie的地方改改，别的app应该也能用
 
 //直接用NobyDa的jd cookie
@@ -48,6 +50,9 @@ function* step() {
             if (scanMarketTask && scanMarketTask.taskStatus == 'processing' && scanMarketTask.taskChance > scanMarketTask.joinedCount) {
                 for (let market of scanMarketTask.scanMarketList) {
                     if (!market.status) {
+                        let clickResult = yield click(market.marketLink)
+                        console.log(`逛会场点击${market.marketName}结果${JSON.stringify(clickResult)}`)
+                        
                         let scanMarketResult = yield ScanMarket(market.marketLink)
                         console.log(`逛会场${market.marketName}结果${JSON.stringify(scanMarketResult)}`)
                     }
@@ -77,7 +82,7 @@ function* step() {
                     }
                 }
             } else {
-                console.log(`浏览频道今天已完成或任务不存在`)
+                console.log(`浏览商品今天已完成或任务不存在`)
             }
             //浏览商品奖励积分
             let deskGoodDetails = yield getDeskGoodDetails()
@@ -88,7 +93,7 @@ function* step() {
                         console.log(`浏览频道${deskGood.skuName}结果${JSON.stringify(scanDeskGoodResult)}`)
                     }
                 }
-            }else{
+            } else {
                 console.log(`浏览商品奖励积分返回结果${JSON.stringify(deskGoodDetails)}`)
             }
         } else {
@@ -100,8 +105,13 @@ function* step() {
     }
     $notify(name, '', message)
 }
+
+function click(marketLink) {
+    request(`https://jdjoy.jd.com/pet/icon/click?reqSource=h5&iconCode=scan_market&linkAddr=${marketLink}`)
+}
+
 //浏览商品
-function ScanDeskGood(sku){
+function ScanDeskGood(sku) {
     requestPost(`https://jdjoy.jd.com/pet/scan`, JSON.stringify({ sku: sku, taskType: 'ScanDeskGood', reqSource: 'h5' }), 'application/json')
 }
 
@@ -147,7 +157,6 @@ function request(url) {
         url: url,
         headers: {
             Cookie: cookie,
-            UserAgent: `Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1`,
             reqSource: 'h5',
         },
         method: "GET",
@@ -165,6 +174,7 @@ function requestPost(url, body, ContentType) {
         body: body,
         headers: {
             Cookie: cookie,
+	    UserAgent: `Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1`,
             reqSource: 'h5',
             'Content-Type': ContentType,
         },
@@ -182,7 +192,7 @@ function sleep(response) {
     setTimeout(() => {
         console.log('休息结束');
         Task.next(response)
-    }, 2000);
+    }, 3000);
 }
 
 // https://jdjoy.jd.com/pet/getPetTaskConfig?reqSource=h5
