@@ -118,7 +118,7 @@ gen.next();
 /**
  * 入口函数
  */
-function* entrance() {
+async function* entrance() {
     if (!cookie) {
         return $hammer.alert("京东萌宠", '请先获取cookie\n直接使用NobyDa的京东签到获取');
     }
@@ -139,7 +139,32 @@ function* entrance() {
             console.log('任务' + task_name + '已完成');
         }
     }
-
+    const response = await secondInitPetTown(); //再次初始化萌宠
+    console.log('再次初始化萌宠的信息', response);
+    if (response.code === '0' && response.resultCode === '0' && response.message === 'success') {
+      let secondPetInfo = response.result;
+      let foodAmount = secondPetInfo.foodAmount; //剩余狗粮
+      if (foodAmount - 100 >= 10) {
+        for (let i = 0; i < parseInt((foodAmount - 100) / 10); i++) {
+          const feedPetRes = await feedPets();
+          console.log('feedPetRes', feedPetRes);
+          if (feedPetRes.resultCode == 0 && feedPetRes.code == 0) {
+             console.log('投食成功')
+          }
+        }
+        yield initPetTown(); //初始化萌宠
+        subTitle = petInfo.goodsInfo.goodsName;
+        message += `【与爱宠相识】${petInfo.meetDays}天\n`;
+        message += `【剩余狗粮】${petInfo.foodAmount}g\n`;
+      } else {
+        console.log("目前剩余狗粮：【" + foodAmount + "】g,不再继续投食,保留100g用于完成第二天任务");
+        subTitle = secondPetInfo.goodsInfo.goodsName;
+        message += `【与爱宠相识】${secondPetInfo.meetDays}天\n`;
+        message += `【剩余狗粮】${secondPetInfo.foodAmount}g\n`;
+      }
+    } else {
+      console.log(`初始化萌宠失败:  ${JSON.stringify(petInfo)}`);
+    }
     yield energyCollect();
     $hammer.alert(name, message, subTitle)
     // $notify(name, subTitle, message);
@@ -176,7 +201,7 @@ function firstFeedInit() {
 async function feedReachInit() {
     console.log('投食任务开始...');
 
-    let foodAmount = petInfo.foodAmount; //剩余狗粮
+    // let foodAmount = petInfo.foodAmount; //剩余狗粮
     let finishedTimes = taskInfo.feedReachInit.hadFeedAmount / 10; //已经喂养了几次
     let needFeedTimes = 10 - finishedTimes; //还需要几次
     // let canFeedTimes = foodAmount / 10;
@@ -353,9 +378,6 @@ function initPetTown() {
             petInfo = response.result;
             console.log(`初始化萌宠信息完成: ${JSON.stringify(petInfo)}`);
             console.log(`您的shareCode为: ${petInfo.shareCode}`);
-            subTitle = petInfo.goodsInfo.goodsName;
-            message += `【与爱宠相识】${petInfo.meetDays}天\n`;
-            message += `【剩余狗粮】${petInfo.foodAmount}g\n`;
           gen.next();
         } else {
             console.log(`初始化萌宠失败:  ${JSON.stringify(petInfo)}`);
@@ -364,7 +386,15 @@ function initPetTown() {
     })
 
 }
-
+// 再次查询萌宠信息
+function secondInitPetTown() {
+  console.log('开始再次初始化萌宠信息');
+  return new Promise((rs, rj) => {
+    request("initPetTown").then(response => {
+      rs(response);
+    })
+  })
+}
 // 邀请新用户
 function inviteFriendsInit() {
     console.log('邀请新用户功能未实现');
