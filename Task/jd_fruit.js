@@ -100,7 +100,7 @@ const name = '京东水果'
 var shareCodes = [ // 这个列表填入你要助力的好友的shareCode
     'a6f686a9f6aa4c80977370b03681c553',
     'f92cb56c6a1349f5a35f0372aa041ea0',
-    '6fbd26cc27ac44d6a7fed34092453f77',
+    'a9360baeceb04c9baaaa109f5d428d3c',
     '61ff5c624949454aa88561f2cd721bf6',
     '40dbf12bb7ea4b8eb772741afe2125da'
 ]
@@ -276,7 +276,7 @@ function* step() {
             farmTask = yield taskInitForFarm();
             message += `【自动浇水】浇水${waterCount}次，今日浇水${farmTask.totalWaterTaskInit.totalWaterTaskTimes}次\n`
         } else {
-            console.log('今日已完成10次浇水任务，不继续自动浇水');
+            console.log('今日已完成10次浇水任务');
         }
         //领取首次浇水奖励
         if (!farmTask.firstWaterInit.f && farmTask.firstWaterInit.totalWaterTimes > 0) {
@@ -303,6 +303,22 @@ function* step() {
         }
         console.log('finished 水果任务完成!');
 
+        farmInfo = yield initForFarm();
+        // 所有的浇水(10次浇水)任务，获取水滴任务完成后，如果剩余水滴大于等于110g,则继续浇水(保留100g是用于完成第二天的浇水10次的任务)
+        let overageEnergy = farmInfo.farmUserPro.totalEnergy - 100;
+        if (overageEnergy >= 10) {
+          console.log("目前剩余水滴：【" + farmInfo.farmUserPro.totalEnergy + "】g，可继续浇水");
+          for (let i = 0; i < parseInt(overageEnergy / 10); i++){
+            let res = yield waterGoodForFarm();
+            if (res.totalEnergy <= 100) {
+              console.log('目前水滴【${res.totalEnergy}】g，不再继续浇水')
+            } else {
+              console.log(`目前剩余水滴：【${res.totalEnergy}】g，可继续浇水`);
+            }
+          }
+        } else {
+          console.log("目前剩余水滴：【" + farmInfo.farmUserPro.totalEnergy + "】g,不再继续浇水,保留100g水滴用于完成第二天任务")
+        }
         farmInfo = yield initForFarm();
         message += `【水果进度】已浇水${farmInfo.farmUserPro.treeEnergy / 10}次,还需${(farmInfo.farmUserPro.treeTotalEnergy - farmInfo.farmUserPro.treeEnergy) / 10}次\n`
         if (farmInfo.toFlowTimes > (farmInfo.farmUserPro.treeEnergy / 10)) {
