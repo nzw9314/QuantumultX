@@ -1,6 +1,6 @@
 /**
  *  疫情日报，自动获取当前位置的疫情信息
- *  API来自 https://lab.isaaclin.cn
+ *  API来自 http://api.tianapi.com/txapi/ncov/
  *  @author: Peng-YM
  *  感谢 @Mazetsz 提供腾讯API接口Token
  *  更新地址: https://raw.githubusercontent.com/Peng-YM/QuanX/master/Tasks/nCov.js
@@ -21,38 +21,36 @@ const headers = {
     return data.result.ad_info.province;
   });
   $.log(province);
-
-  const overall = await $.get({
-    url: "https://lab.isaaclin.cn/nCoV/api/overall?latest=1",
+  console.log(province);
+  const newslist = await $.get({
+    url: "http://api.tianapi.com/txapi/ncov/index?key=5dcf1a3871f36bcc48c543c8193223fc",
     headers,
-  })
-    .then((resp) => JSON.parse(resp.body).results[0])
+  }).then((resp) => JSON.parse(resp.body).newslist[0])
     .delay(1000);
-  $.log(overall);
-  const news = await $.get({
-    url: `https://lab.isaaclin.cn/nCoV/api/news?page=1&num=1&province=${encodeURIComponent(province)}`,
-    headers,
-  }).then((resp) => JSON.parse(resp.body).results[0]);
-  $.log(news);
-
-  let title = `🗞【疫情日报】🇨🇳 ${province}`;
-  let subtitle = `🗓 ${formatTime()}`;
-  let detail =
-    "「全国数据统计」" +
-    "\n    -新增确诊: " +
-    overall.currentConfirmedIncr +
+  $.log(newslist);
+  console.log(newslist);
+  let desc = newslist.desc;
+  let news = newslist.news[0];
+  let title = "🗞【疫情信息概览】";
+  let subtitle = `📅  ${formatTime()}`;
+  let detail = 
+    "\n「全国数据」" +
+    "\n\n    -新增确诊: " +
+    desc.confirmedIncr +
     "\n    -现有确诊: " +
-    overall.currentConfirmedCount +
+    desc.currentConfirmedCount +
     "\n    -累计确诊: " +
-    overall.confirmedCount +
+    desc.confirmedCount +
     "\n    -治愈: " +
-    overall.curedCount +
+    desc.curedCount +
     "\n    -死亡: " +
-    overall.deadCount +
-    "\n「疫情动态」\n     " +
+    desc.deadCount +
+    "\n\n「疫情动态」\n\n     " +
     news.title +
-    "\n「动态详情」\n     " +
-    news.summary;
+    "\n\n「动态详情」\n\n     " +
+    news.summary +
+    "\n\n    发布时间：" +
+    news.pubDateStr;
   $.notify(title, subtitle, detail);
 })()
   .catch((err) => $.error(err))
@@ -62,7 +60,7 @@ function formatTime() {
     const date = new Date();
     return `${
         date.getMonth() + 1
-    }月${date.getDate()}日${date.getHours()}时`;
+    }月${date.getDate()}日 ${date.getHours()}时`;
 }
 
 // prettier-ignore
