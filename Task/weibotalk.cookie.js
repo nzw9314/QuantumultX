@@ -15,9 +15,9 @@
   1. 根据你当前的软件，配置好srcipt。 Tips:由于是远程文件，记得顺便更新文件。
   2. 打开微博APP，”我的“， ”超话社区“， ”底部栏--我的“， ”关注“， 弹出通知，提示获取已关注超话链接成功。
   3. 点进一个超话页面，手动签到一次。弹出通知，提示获取超话签到链接成功。 若之前所有已经签到，请关注一个新超话进行签到。
-  4. 回到quanx等软件，关掉获取cookie的 2 个rewrite。（loon是关掉获取cookie的脚本）
+  4. 回到quanx等软件，关掉获取cookie的rewrite。（loon是关掉获取cookie的脚本）
 
-
+  📌 配置第2个账号方法：只需在第1个账号获取cookie结束后。在微博app中切换到第2个号，进行相同的获取逻辑即可。
 
   *************************
   【Surge 4.2+ 脚本配置】
@@ -53,25 +53,54 @@
   *********/
   
 $ = new Env("微博超话")
+//账号1
 const tokenurl = 'evil_tokenurl';
 const tokencheckinurl = 'evil_tokencheckinurl'
 const tokenheaders = 'evil_tokenheaders'
 const tokencheckinheaders = 'evil_tokencheckinheaders'
+//账号2
+const tokenurl2 = 'evil_tokenurl2';
+const tokencheckinurl2 = 'evil_tokencheckinurl2'
+const tokenheaders2= 'evil_tokenheaders2'
+const tokencheckinheaders2 = 'evil_tokencheckinheaders2'
 
 if ($request && $request.method != 'OPTIONS' && $request.url.match(/\_\-\_myfollow\&need\_head\_cards/) && $request.url.match(/cardlist/)){
   const listurl = $request.url
-  console.log(listurl)
+  
   const listheaders = JSON.stringify($request.headers)
-  $.setdata(listurl, tokenurl)
-  $.setdata(listheaders, tokenheaders)
-  $.msg("微博超话","", "获取已关注超话列表成功✅")
+  if ($.getdata(tokenurl) == undefined || $.getdata(tokenurl) == "") {
+    console.log(listurl)
+    $.setdata(listurl, tokenurl)
+    $.setdata(listheaders, tokenheaders)
+    $.msg("微博超话 [账号一]", "✅获取已关注超话列表成功", "✨接下来，请点进一个超话进行签到\n如果没有签到的超话，请关注新的进行签到。")
+  }
+  else {
+    if (!($.getdata(tokencheckinurl) == undefined || $.getdata(tokencheckinurl) == "") && listurl != $.getdata(tokenurl)) {
+      console.log(listurl)
+      $.setdata(listurl, tokenurl2)
+      $.setdata(listheaders, tokenheaders2)
+      $.msg("微博超话 [账号二]", "✅获取已关注超话列表成功", "✨接下来，请点进一个超话进行签到\n如果没有签到的超话，请关注新的进行签到。")
+    }
+  }
 } else if ($request && $request.method != 'OPTIONS' && $request.url.match(/active\_checkin/) && $request.url.match(/page\/button/)){
   const checkinurl = $request.url
-  console.log(checkinurl)
+  
   const checkinheaders = JSON.stringify($request.headers)
-  $.setdata(checkinurl, tokencheckinurl)
-  $.setdata(checkinheaders, tokencheckinheaders)
-  $.msg("微博超话","", "获取超话签到链接成功🎉")
+  if ($.getdata(tokencheckinurl) == undefined || $.getdata(tokencheckinurl) == "") {
+    console.log(checkinurl)
+    $.setdata(checkinurl, tokencheckinurl)
+    $.setdata(checkinheaders, tokencheckinheaders)
+    $.msg("微博超话 [账号一]", "🎉获取超话签到链接成功", `若之前已弹出【获取已关注列表成功】的通知，那么已完成当前账号cookie获取。`)
+
+  }
+  else {
+    if (!($.getdata(tokenurl2) == undefined || $.getdata(tokenurl2) == "")) {
+      console.log(checkinurl)
+      $.setdata(checkinurl, tokencheckinurl2)
+      $.setdata(checkinheaders, tokencheckinheaders2)
+      $.msg("微博超话 [账号二]", "🎉获取超话签到链接成功", `若之前已弹出【获取已关注列表成功】的通知，那么已完成当前账号cookie获取。`)
+    }
+  }
 }
 
 $.done()
