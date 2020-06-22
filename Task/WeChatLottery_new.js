@@ -20,6 +20,9 @@ Author: zZPiglet
 
 ----------
 更新日志：
+- 2020/06/22：
+更新接口 v2 -> v1。
+
 - 2020/04/15：
 更新任务接口。
 修改部分细节。
@@ -89,7 +92,7 @@ hostname = api-hdcj.9w9.com
 //填入想要自动兑换的金额，默认 50。若不需要请改为 0。
 const exchangeMoney = 50 //5, 20, 0
 
-const mainURL = 'https://api-hdcj.9w9.com/v2/'
+const mainURL = 'https://api-hdcj.9w9.com/v1/'
 const CheckinURL = mainURL + 'sign/sign'
 const CheckindataURL = mainURL + 'sign'
 const DataURL = mainURL + 'informations'
