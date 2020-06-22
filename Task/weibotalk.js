@@ -15,8 +15,9 @@
   1. 根据你当前的软件，配置好srcipt。 Tips:由于是远程文件，记得顺便更新文件。
   2. 打开微博APP，”我的“， ”超话社区“， ”底部栏--我的“， ”关注“， 弹出通知，提示获取已关注超话链接成功。
   3. 点进一个超话页面，手动签到一次。弹出通知，提示获取超话签到链接成功。 若之前所有已经签到，请关注一个新超话进行签到。
-  4. 回到quanx等软件，关掉获取cookie的 2 个rewrite。（loon是关掉获取cookie的脚本）
+  4. 回到quanx等软件，关掉获取cookie的rewrite。（loon是关掉获取cookie的脚本）
 
+  📌 配置第2个账号方法：只需在第1个账号获取cookie结束后。在微博app中切换到第2个号，进行相同的获取逻辑即可。
 
   *************************
   【Surge 4.2+ 脚本配置】
@@ -51,214 +52,277 @@
 
   *********/
 
- $ = new Env("微博超话")
- debug = false
- const tokenurl = "evil_tokenurl";
- const tokencheckinurl = "evil_tokencheckinurl";
- const tokenheaders = "evil_tokenheaders";
- const tokencheckinheaders = "evil_tokencheckinheaders";
- 
- var time = 0; //任务执行间隔
- var number;
- var allnumber;
- var pagenumber;
- var listurl = $.getdata(tokenurl);
- var listheaders = $.getdata(tokenheaders);
- var checkinurl = $.getdata(tokencheckinurl);
- var checkinheaders = $.getdata(tokencheckinheaders);
- $.message = [];
- $.name_list = []
- $.id_list = []
- $.val_list = []
+$ = new Env("微博超话")
+
+/*
+ * 可自定义的参数
+ */
+$.delete_cookie = false //若需要清空cookie，请把它置为true。清空完毕后，请重新置为false.
 $.msg_max_num = 30 //一个通知显示30个超话的签到情况
- $.time = 700      //【签到间隔，单位ms】，若超话过多，建议填1000ms以上。
- $.successNum = 0
-$.failNum = 0
- 
- !(async () => {
-     await getnumber(time);
-     for (j = 1; j <= pagenumber; j++) {
-       await getid(j);
-     }
-     for (var i in $.name_list) {
-       await checkin($.id_list[i], $.name_list[i], $.val_list[i], time);
-       $.wait($.time)
-     }
-     output()
-   })()
-   .catch((e) => {
-     $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
-   })
-   .finally(() => {
-     $.done()
-   })
- 
- function output() {
-   $.this_msg = ""
-   for (var i = 0; i < $.message.length; ++i) {
-     if (i && i % $.msg_max_num == 0) {
-       $.msg(`${$.name}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)}页 ，共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
-       $.this_msg = ""
-     }
-     $.this_msg += `${$.message[i]}\n`
-   }
-   if ($.message.length % $.msg_max_num != 0) {
-     $.msg(`${$.name}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)+1}页 ，共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
-   }
- }
- 
- function getnumber(s) {
-   return new Promise((resove) => {
-     var idrequest = {
-       url: listurl,
-       header: listheaders
-     };
-     $.get(idrequest, (error, response, data) => {
-       var body = response.body;
-       var obj = JSON.parse(body);
-       //console.log(obj);
-       allnumber = obj.cardlistInfo.total;
-       console.log("当前已关注超话" + allnumber + "个");
+$.time = 700 //【签到间隔，单位ms】，若超话过多，建议填1000ms以上。
+
+debug = false
+const tokenurl = "evil_tokenurl";
+const tokencheckinurl = "evil_tokencheckinurl";
+const tokenheaders = "evil_tokenheaders";
+const tokencheckinheaders = "evil_tokencheckinheaders";
+const tokenurl2 = "evil_tokenurl2";
+const tokencheckinurl2 = "evil_tokencheckinurl2";
+const tokenheaders2 = "evil_tokenheaders2";
+const tokencheckinheaders2 = "evil_tokencheckinheaders2";
+
+
+var listurl = $.getdata(tokenurl);
+var listheaders = $.getdata(tokenheaders);
+var checkinurl = $.getdata(tokencheckinurl);
+var checkinheaders = $.getdata(tokencheckinheaders);
+
+var listurl2 = $.getdata(tokenurl2);
+var listheaders2 = $.getdata(tokenheaders2);
+var checkinurl2 = $.getdata(tokencheckinurl2);
+var checkinheaders2 = $.getdata(tokencheckinheaders2);
+
+!(async () => {
+  if ($.delete_cookie) {
+    deleteCookie()
+    $.done()
+    return
+  }
+  $.count_num = 0;
+  //判断当前是几个账号
+  if (listurl == undefined || listurl == "" ||
+    listheaders == undefined || listheaders == "" ||
+    checkinurl == undefined || checkinurl == "" ||
+    checkinheaders == undefined || checkinheaders == "") {
+    $.msg($.name, "🚫cookie不完整 或 没有cookie", "🚫请认真阅读配置，按流程获取cookie。\n🔍若仍无法解决，请先清空cookie再获取。\n🔍如何清空？请将文件内delete_cookie置为true。")
+    $.done()
+    return
+  } else {
+    $.count_num = 1
+  }
+  if (!(listurl2 == undefined || listurl2 == "" ||
+      listheaders2 == undefined || listheaders2 == "" ||
+      checkinurl2 == undefined || checkinurl2 == "" ||
+      checkinheaders2 == undefined || checkinheaders2 == "")) {
+    $.count_num = 2;
+  }
+  console.log(`账号数 = ${$.count_num}`)
+  for (var current = 1; current <= $.count_num; ++current) {
+    init_env(current)
+    await getnumber();
+    for (var i = 1; i <= $.pagenumber; i++) {
+      await getid(i);
+    }
+    for (var i in $.name_list) {
+      await checkin($.id_list[i], $.name_list[i]);
+      $.wait($.time)
+    }
+    output(current)
+  }
+})()
+.catch((e) => {
+    $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
+  })
+  .finally(() => {
+    $.done()
+  })
+
+function init_env(current) {
+  $.message = [];
+  $.name_list = []
+  $.id_list = []
+  $.val_list = []
+  $.successNum = 0
+  $.failNum = 0
+  $.allnumber = 0;
+  $.pagenumber = 0;
+  if (current == 2) {
+    listurl = listurl2
+    listheaders = listheaders2
+    checkinurl = checkinurl2
+    checkinheaders = checkinheaders2
+  }
+}
+
+function deleteCookie() {
+  $.setdata("", tokenurl)
+  $.setdata("", tokenheaders)
+  $.setdata("", tokenurl2)
+  $.setdata("", tokenheaders2)
+  $.setdata("", tokencheckinurl)
+  $.setdata("", tokencheckinheaders)
+  $.setdata("", tokencheckinurl2)
+  $.setdata("", tokencheckinheaders2)
+  $.msg($.name, "", "✅已清空cookie。请将文件内delete_cookie置为false。\n🔍然后，按流程获取cookie。")
+}
+
+function output(current) {
+  $.this_msg = ""
+  for (var i = 0; i < $.message.length; ++i) {
+    if (i && i % $.msg_max_num == 0) {
+      $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)}页 ，共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
+      $.this_msg = ""
+    }
+    $.this_msg += `${$.message[i]}\n`
+  }
+  if ($.message.length % $.msg_max_num != 0) {
+    $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)+1}页 ，共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
+  }
+}
+
+function getnumber() {
+  return new Promise((resove) => {
+    var idrequest = {
+      url: listurl,
+      header: listheaders
+    };
+    // console.log(idrequest)
+    $.get(idrequest, (error, response, data) => {
+      var body = response.body;
+      var obj = JSON.parse(body);
+      // console.log(obj);
+      $.allnumber = obj.cardlistInfo.total;
+      console.log("当前已关注超话" + $.allnumber + "个");
       //  $.message.push(`当前已关注超话${allnumber}个`);
-       pagenumber = Math.ceil(allnumber / 20);
-       //$notify("超话","",JSON.stringify($.message))
-       resove();
-     });
-   });
- }
- 
- //获取超话签到id
- function getid(j) {
- 
- 
-   var getlisturl = listurl.replace(
-     new RegExp("&page=.*?&"),
-     "&page=" + j + "&"
-   );
-   //console.log(getlisturl);
-   var idrequest = {
-     url: getlisturl,
-     header: listheaders
-   };
-   return new Promise((resove) => {
-     $.get(idrequest, (error, response, data) => {
-       var body = response.body;
-       var obj = JSON.parse(body);
-       var group = obj.cards[0]["card_group"];
-       number = group.length;
-       for (i = 0; i < number; i++) {
-         var name = group[i]["title_sub"];
-         $.name_list.push(name)
- 
-         var val = group[i].desc;
-         $.val_list.push(val)
- 
-         var id = group[i].scheme.slice(33, 71);
-         $.id_list.push(id)
-         if (debug) {
-           console.log(name)
-           console.log(val)
-           console.log(id)
-         }
-         // checkin(id, name, val, time);
-       }
-       resove()
-     })
-   })
- }
- 
- 
- 
- 
- //签到
- function checkin(id, name, val, s) {
- 
-   var sendcheckinurl = checkinurl
-     .replace(new RegExp("&fid=.*?&"), "&fid=" + id + "&")
-     .replace(new RegExp("pageid%3D.*?%26"), "pageid%3D" + id + "%26");
-   var checkinrequest = {
-     url: sendcheckinurl,
-     header: checkinheaders
-   };
-   return new Promise(resolve => {
-     $.get(checkinrequest, (error, response, data) => {
-       //console.log(response)
-       name = name.replace(/超话/, "")
-       if ((response.statusCode == 418)) {
-         $.failNum += 1
-         $.message.push(`【${name}】："签到太频繁啦，请稍后再试"`);
-         console.log(`【${name}】："签到太频繁啦，请稍后再试"`);
-         if(debug) console.log(response)
-       } else {
-         var body = response.body;
-         var obj = JSON.parse(body);
-         //console.log(obj);
-         var result = obj.result;
-         //console.log(result);
-         if (result == 1) {
-           $.successNum += 1;
-         } else {
-           $.failNum += 1;
-         }
-         if (result == 1) {
-           $.message.push(`【${name}】：✅${obj.button.name}`)
-           console.log(`【${name}】：${obj.button.name}`);
-         } else if (result == 382004) {
-           $.message.push(`【${name}】：✨今天已签到`);
-           console.log(`【${name}】：${obj.error_msg}`);
-         } else if (result == 388000) {
-           $.message.push(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
-           console.log(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
-           if(debug) console.log(response)
-         } else if (result == 382010) {
-           $.message.push(`\n【${name}】："超话不存在⚠️"`);
-           console.log(`【${name}】："超话不存在⚠️"`);
-           if(debug) console.log(response)
-         } else {
-           $.message.push(`【${name}】："未知错误⚠️"`);
-           console.log(`【${name}】："未知错误⚠️"`);
-           if(debug) console.log(response)
-         }
-       }
-       resolve();
-     })
- 
-   })
- }
- 
- //@Chavy
- function Env(s) {
-   this.name = s, this.data = null, this.logs = [], this.isSurge = (() => "undefined" != typeof $httpClient), this.isQuanX = (() => "undefined" != typeof $task), this.isNode = (() => "undefined" != typeof module && !!module.exports), this.log = ((...s) => {
-     this.logs = [...this.logs, ...s], s ? console.log(s.join("\n")) : console.log(this.logs.join("\n"))
-   }), this.msg = ((s = this.name, t = "", i = "") => {
-     this.isSurge() && $notification.post(s, t, i), this.isQuanX() && $notify(s, t, i);
-     const e = ["", "==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];
-     s && e.push(s), t && e.push(t), i && e.push(i), console.log(e.join("\n"))
-   }), this.getdata = (s => {
-     if (this.isSurge()) return $persistentStore.read(s);
-     if (this.isQuanX()) return $prefs.valueForKey(s);
-     if (this.isNode()) {
-       const t = "box.dat";
-       return this.fs = this.fs ? this.fs : require("fs"), this.fs.existsSync(t) ? (this.data = JSON.parse(this.fs.readFileSync(t)), this.data[s]) : null
-     }
-   }), this.setdata = ((s, t) => {
-     if (this.isSurge()) return $persistentStore.write(s, t);
-     if (this.isQuanX()) return $prefs.setValueForKey(s, t);
-     if (this.isNode()) {
-       const i = "box.dat";
-       return this.fs = this.fs ? this.fs : require("fs"), !!this.fs.existsSync(i) && (this.data = JSON.parse(this.fs.readFileSync(i)), this.data[t] = s, this.fs.writeFileSync(i, JSON.stringify(this.data)), !0)
-     }
-   }), this.wait = ((s, t = s) => i => setTimeout(() => i(), Math.floor(Math.random() * (t - s + 1) + s))), this.get = ((s, t) => this.send(s, "GET", t)), this.post = ((s, t) => this.send(s, "POST", t)), this.send = ((s, t, i) => {
-     if (this.isSurge()) {
-       const e = "POST" == t ? $httpClient.post : $httpClient.get;
-       e(s, (s, t, e) => {
-         t && (t.body = e, t.statusCode = t.status), i(s, t, e)
-       })
-     }
-     this.isQuanX() && (s.method = t, $task.fetch(s).then(s => {
-       s.status = s.statusCode, i(null, s, s.body)
-     }, s => i(s.error, s, s))), this.isNode() && (this.request = this.request ? this.request : require("request"), s.method = t, s.gzip = !0, this.request(s, (s, t, e) => {
-       t && (t.status = t.statusCode), i(null, t, e)
-     }))
-   }), this.done = ((s = {}) => this.isNode() ? null : $done(s))
- }
+      $.pagenumber = Math.ceil($.allnumber / 20);
+      //$notify("超话","",JSON.stringify($.message))
+      resove();
+    });
+  });
+}
+
+//获取超话签到id
+function getid(page) {
+  var getlisturl = listurl.replace(
+    new RegExp("&page=.*?&"),
+    "&page=" + page + "&"
+  );
+  //console.log(getlisturl);
+  var idrequest = {
+    url: getlisturl,
+    header: listheaders
+  };
+  // console.log(idrequest)
+  return new Promise((resove) => {
+    $.get(idrequest, (error, response, data) => {
+      var body = response.body;
+      var obj = JSON.parse(body);
+      var group = obj.cards[0]["card_group"];
+      number = group.length;
+      for (i = 0; i < number; i++) {
+        var name = group[i]["title_sub"];
+        $.name_list.push(name)
+
+        var val = group[i].desc;
+        $.val_list.push(val)
+
+        var id = group[i].scheme.slice(33, 71);
+        $.id_list.push(id)
+        if (debug) {
+          console.log(name)
+          console.log(val)
+          console.log(id)
+        }
+        // checkin(id, name, val, time);
+      }
+      resove()
+    })
+  })
+}
+
+
+
+
+//签到
+function checkin(id, name) {
+
+  var sendcheckinurl = checkinurl
+    .replace(new RegExp("&fid=.*?&"), "&fid=" + id + "&")
+    .replace(new RegExp("pageid%3D.*?%26"), "pageid%3D" + id + "%26");
+  var checkinrequest = {
+    url: sendcheckinurl,
+    header: checkinheaders
+  };
+
+  return new Promise(resolve => {
+    $.get(checkinrequest, (error, response, data) => {
+      //console.log(response)
+      name = name.replace(/超话/, "")
+      if ((response.statusCode == 418)) {
+        $.failNum += 1
+        $.message.push(`【${name}】："签到太频繁啦，请稍后再试"`);
+        console.log(`【${name}】："签到太频繁啦，请稍后再试"`);
+        if (debug) console.log(response)
+      } else {
+        var body = response.body;
+        var obj = JSON.parse(body);
+        //console.log(obj);
+        var result = obj.result;
+        //console.log(result);
+        if (result == 1) {
+          $.successNum += 1;
+        } else {
+          $.failNum += 1;
+        }
+        if (result == 1) {
+          $.message.push(`【${name}】：✅${obj.button.name}`)
+          console.log(`【${name}】：${obj.button.name}`);
+        } else if (result == 382004) {
+          $.message.push(`【${name}】：✨今天已签到`);
+          console.log(`【${name}】：${obj.error_msg}`);
+        } else if (result == 388000) {
+          $.message.push(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
+          console.log(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
+          if (debug) console.log(response)
+        } else if (result == 382010) {
+          $.message.push(`\n【${name}】："超话不存在⚠️"`);
+          console.log(`【${name}】："超话不存在⚠️"`);
+          if (debug) console.log(response)
+        } else {
+          $.message.push(`【${name}】："未知错误⚠️"`);
+          console.log(`【${name}】："未知错误⚠️ 该请求的返回情况如下"`);
+          console.log(response)
+        }
+      }
+      resolve();
+    })
+
+  })
+}
+
+//@Chavy
+function Env(s) {
+  this.name = s, this.data = null, this.logs = [], this.isSurge = (() => "undefined" != typeof $httpClient), this.isQuanX = (() => "undefined" != typeof $task), this.isNode = (() => "undefined" != typeof module && !!module.exports), this.log = ((...s) => {
+    this.logs = [...this.logs, ...s], s ? console.log(s.join("\n")) : console.log(this.logs.join("\n"))
+  }), this.msg = ((s = this.name, t = "", i = "") => {
+    this.isSurge() && $notification.post(s, t, i), this.isQuanX() && $notify(s, t, i);
+    const e = ["", "==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];
+    s && e.push(s), t && e.push(t), i && e.push(i), console.log(e.join("\n"))
+  }), this.getdata = (s => {
+    if (this.isSurge()) return $persistentStore.read(s);
+    if (this.isQuanX()) return $prefs.valueForKey(s);
+    if (this.isNode()) {
+      const t = "box.dat";
+      return this.fs = this.fs ? this.fs : require("fs"), this.fs.existsSync(t) ? (this.data = JSON.parse(this.fs.readFileSync(t)), this.data[s]) : null
+    }
+  }), this.setdata = ((s, t) => {
+    if (this.isSurge()) return $persistentStore.write(s, t);
+    if (this.isQuanX()) return $prefs.setValueForKey(s, t);
+    if (this.isNode()) {
+      const i = "box.dat";
+      return this.fs = this.fs ? this.fs : require("fs"), !!this.fs.existsSync(i) && (this.data = JSON.parse(this.fs.readFileSync(i)), this.data[t] = s, this.fs.writeFileSync(i, JSON.stringify(this.data)), !0)
+    }
+  }), this.wait = ((s, t = s) => i => setTimeout(() => i(), Math.floor(Math.random() * (t - s + 1) + s))), this.get = ((s, t) => this.send(s, "GET", t)), this.post = ((s, t) => this.send(s, "POST", t)), this.send = ((s, t, i) => {
+    if (this.isSurge()) {
+      const e = "POST" == t ? $httpClient.post : $httpClient.get;
+      e(s, (s, t, e) => {
+        t && (t.body = e, t.statusCode = t.status), i(s, t, e)
+      })
+    }
+    this.isQuanX() && (s.method = t, $task.fetch(s).then(s => {
+      s.status = s.statusCode, i(null, s, s.body)
+    }, s => i(s.error, s, s))), this.isNode() && (this.request = this.request ? this.request : require("request"), s.method = t, s.gzip = !0, this.request(s, (s, t, e) => {
+      t && (t.status = t.statusCode), i(null, t, e)
+    }))
+  }), this.done = ((s = {}) => this.isNode() ? null : $done(s))
+}
