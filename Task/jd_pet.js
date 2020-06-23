@@ -109,7 +109,7 @@ var function_map = {
     signInit: getSignReward, //每日签到
     threeMealInit: getThreeMealReward, //三餐
     browseSingleShopInit: getSingleShopReward, //浏览店铺
-    browseShopsInit: getBrowseShopsReward, //浏览店铺s, 目前只有一个店铺
+    //browseShopsInit: getBrowseShopsReward, //浏览店铺s, 目前只有一个店铺
     firstFeedInit: firstFeedInit, //首次喂食
     inviteFriendsInit: inviteFriendsInit, //邀请好友, 暂未处理
     feedReachInit: feedReachInit, //喂食10次任务  最后执行投食10次任务, 提示剩余狗粮是否够投食10次完成任务, 并询问要不要继续执行
