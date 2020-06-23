@@ -35,7 +35,7 @@ const repositories = [
   },
   {
     name: "uniqueque 脚本",
-    url: "https://github.com/uniqueque/QuantumultX/tree/master/Script",
+    url: "https://github.com/uniqueque/QuantumultX",
   }
 ];
 
