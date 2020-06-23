@@ -32,6 +32,10 @@ const repositories = [
     name: "NobyDa",
     file_names: ["JD-DailyBonus/JD_DailyBonus.js", "52pojie-DailyBonus"],//路径模板🌟
     url: "https://github.com/NobyDa/Script/tree/master",
+  },
+  {
+    name: "uniqueque 脚本",
+    url: "https://github.com/uniqueque/QuantumultX",
   }
 ];
 
