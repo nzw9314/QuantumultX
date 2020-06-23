@@ -6,9 +6,9 @@ const $hammer = (() => {
         isQuanX = "undefined" != typeof $task;
 
     const log = (...n) => { for (let i in n) console.log(n[i]) };
-    const alert = (title, body = "", subtitle = "", link = "") => {
+    const alert = (title, body = "", subtitle = "", link = "", option) => {
         if (isSurge) return $notification.post(title, subtitle, body, link);
-        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body));
+        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body), option);
         log("==============📣系统通知📣==============");
         log("title:", title, "subtitle:", subtitle, "body:", body, "link:", link);
     };
@@ -103,17 +103,18 @@ var taskInfo = null;
 const name = '东东萌宠';
 let message = '';
 let subTitle = '';
-
+let goodsUrl = '';
 //按顺序执行, 尽量先执行不消耗狗粮的任务, 避免中途狗粮不够, 而任务还没做完
-var function_map = {
-    signInit: getSignReward, //每日签到
-    threeMealInit: getThreeMealReward, //三餐
-    browseSingleShopInit: getSingleShopReward, //浏览店铺
-    //browseShopsInit: getBrowseShopsReward, //浏览店铺s, 目前只有一个店铺
-    firstFeedInit: firstFeedInit, //首次喂食
-    inviteFriendsInit: inviteFriendsInit, //邀请好友, 暂未处理
-    feedReachInit: feedReachInit, //喂食10次任务  最后执行投食10次任务, 提示剩余狗粮是否够投食10次完成任务, 并询问要不要继续执行
-};
+// var function_map = {
+//     signInit: getSignReward, //每日签到
+//     threeMealInit: getThreeMealReward, //三餐
+//     browseSingleShopInit: getSingleShopReward, //浏览店铺
+//     //browseShopsInit: getBrowseShopsReward, //浏览店铺s, 目前只有一个店铺
+//     firstFeedInit: firstFeedInit, //首次喂食
+//     inviteFriendsInit: inviteFriendsInit, //邀请好友, 暂未处理
+//     feedReachInit: feedReachInit, //喂食10次任务  最后执行投食10次任务, 提示剩余狗粮是否够投食10次完成任务, 并询问要不要继续执行
+// };
+var function_map = [];
 let gen = entrance();
 gen.next();
 /**
@@ -132,10 +133,10 @@ async function* entrance() {
     yield masterHelpInit();//获取助力信息
 
     // 任务开始
-    for (let task_name in function_map) {
+    for (let task_name of function_map) {
         if (!taskInfo[task_name].finished) {
             console.log('任务' + task_name + '开始');
-            yield function_map[task_name]();
+            yield eval(task_name + '()');
         } else {
             console.log('任务' + task_name + '已完成');
         }
@@ -167,7 +168,10 @@ async function* entrance() {
       console.log(`初始化萌宠失败:  ${JSON.stringify(petInfo)}`);
     }
     yield energyCollect();
-    $hammer.alert(name, message, subTitle)
+    let option = {
+      "media-url" : goodsUrl
+    }
+    $hammer.alert(name, message, subTitle, '', option)
     // $notify(name, subTitle, message);
     console.log('全部任务完成, 如果帮助到您可以点下🌟STAR鼓励我一下, 明天见~');
 }
@@ -308,14 +312,14 @@ function getSportReward() {
 }
 
 // 浏览店铺任务, 任务可能为多个? 目前只有一个
-async function getBrowseShopsReward() {
+async function browseShopsInit() {
     console.log('开始浏览店铺任务');
     let times = 0;
     let resultCode = 0;
     let code = 0;
 
     do {
-        let response = await request(arguments.callee.name.toString());
+        let response = await request("getBrowseShopsReward");
         console.log(`第${times}次浏览店铺结果: ${JSON.stringify(response)}`);
         code = response.code;
         resultCode = response.resultCode;
@@ -327,9 +331,9 @@ async function getBrowseShopsReward() {
 }
 
 // 浏览指定店铺 任务
-function getSingleShopReward() {
+function browseSingleShopInit() {
     console.log('准备浏览指定店铺');
-    request(arguments.callee.name.toString()).then(response => {
+    request("getSingleShopReward").then(response => {
         console.log(`浏览指定店铺结果: ${JSON.stringify(response)}`);
         message += '【浏览指定店铺】成功,获取狗粮8g\n';
         gen.next();
@@ -337,9 +341,9 @@ function getSingleShopReward() {
 }
 
 // 三餐签到, 每天三段签到时间
-function getThreeMealReward() {
+function threeMealInit() {
     console.log('准备三餐签到');
-    request(arguments.callee.name.toString()).then(response => {
+    request("getThreeMealReward").then(response => {
         console.log(`三餐签到结果: ${JSON.stringify(response)}`);
         if (response.code === '0' && response.resultCode === '0') {
             message += `【定时领狗粮】获得${response.result.threeMealReward}g\n`;
@@ -351,9 +355,9 @@ function getThreeMealReward() {
 }
 
 // 每日签到, 每天一次
-function getSignReward() {
+function signInit() {
     console.log('准备每日签到');
-    request(arguments.callee.name.toString()).then(response => {
+    request("getSignReward").then(response => {
         console.log(`每日签到结果: ${JSON.stringify(response)}`);
         message += `【每日签到成功】奖励${response.result.signReward}g狗粮\n`;
         gen.next();
@@ -377,6 +381,7 @@ function initPetTown() {
     request(arguments.callee.name.toString()).then((response) => {
         if (response.code === '0' && response.resultCode === '0' && response.message === 'success') {
             petInfo = response.result;
+            goodsUrl = response.result.goodsInfo.goodsUrl;
             console.log(`初始化萌宠信息完成: ${JSON.stringify(petInfo)}`);
             console.log(`您的shareCode为: ${petInfo.shareCode}`);
           gen.next();
@@ -441,7 +446,8 @@ function taskInit() {
             console.log('初始化任务异常, 请稍后再试');
             gen.return();
         }
-        taskInfo = response.result
+        taskInfo = response.result;
+        function_map = taskInfo.taskList;
         console.log(`任务初始化完成: ${JSON.stringify(taskInfo)}`);
         gen.next();
     })
