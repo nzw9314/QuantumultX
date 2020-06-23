@@ -1,52 +1,94 @@
 /**
- * 每月PSN会员限免游戏提醒
+ * 本脚本旨在获取机场流量使用详情, 链接需支持Quantumult 显示流量使用情况
+ * 原作者 @Meeta
  * @author: Peng-YM
- * 更新地址：https://raw.githubusercontent.com/Peng-YM/QuanX/master/Tasks/psn.js
+ * 修改增加多机场信息显示，以及支持多平台，图标。优化通知显示。
+ * 更新地址：https://raw.githubusercontent.com/Peng-YM/QuanX/master/Tasks/flow.js
+ * 推荐使用mini图标组：https://github.com/Orz-3/mini
  */
-
-const $ = API("psn");
-const url =
-  "https://store.playstation.com/zh-hant-hk/grid/STORE-MSF86012-PLUS_FTT_CONTENT/1";
-$.get({
-  url,
-  headers: {
-    "User-Agent":
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
+const $ = API("flow");
+const subscriptions = [
+  {
+    link: "机场订阅地址1",
+    name: "取个名字1",
+    icon: "https://raw.githubusercontent.com/Orz-3/mini/master/图标名字.png"
   },
-})
-  .then((resp) => {
-    const body = resp.body;
-    const data = JSON.parse(body.match(/({"@context"[\s\S]*?)<\/script>/)[1]);
-    $.log(data);
-    return parse(data['@graph']);
-  })
-  .catch((err) => $.error(err))
-  .finally($.done());
+  {
+    link: "机场订阅地址2",
+    name: "取个名字2",
+    icon: "https://raw.githubusercontent.com/Orz-3/mini/master/图标名字.png"
+  },
+];
 
-function parse(products) {
-    products.forEach(item => {
-        let description = item.description;
-        // clean up css codes
-        description = description.replace(/\s+/g, '');
-        description = description.replace(/br|\\r|\\n/g, '');
-        description = description.replace(/\w*&\w*?;/g, '');
-        description = description.replace(/\w+\s{0,1}\w+="\w+"/g, '')
-        const name = item.name.trim().match(/《([\s\Sz]+?)》/)[1];
-        $.notify(
-            `🎮 [PSN会免] ${name}`,
-            `🗓 时间：${getTime()}`,
-            `📦 类别：${item.category}\n💡 游戏简介：${description}`,
-            {
-                'media-url': `${item.image}`,
-                'open-url': `https://store.playstation.com/zh-hant-hk/product/${item.sku}`
-            }
-        )
-    })
+Promise.all(subscriptions.map(async (sub) => fetchInfo(sub)))
+  .catch((err) => $.error(err))
+  .finally(() => $.done());
+
+async function fetchInfo(sub) {
+  const headers = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
+  };
+  $.get({
+    url: sub.link,
+    headers
+  }).then((resp) => {
+    const userinfo = resp.headers["Subscription-Userinfo"] || resp.headers["subscription-userinfo"];
+    const KEY_o_now = "o_now" + sub.name;
+    const KEY_today_flow = "today_flow" + sub.name;
+    $.log(userinfo);
+    const upload_k = Number(userinfo.match(/upload=(\d+)/)[1]);
+    const download_k = Number(userinfo.match(/download=(\d+)/)[1]);
+    const total_k = Number(userinfo.match(/total=(\d+)/)[1]);
+    const expires = formatTime(Number(userinfo.match(/expire=(\d+)/)[1])*1000);
+
+    const residue_m =
+      total_k / 1048576 - download_k / 1048576 - upload_k / 1048576;
+    const residue = residue_m.toFixed(2).toString();
+    const dnow = new Date().getTime().toString();
+    const utime = dnow - $.read(KEY_o_now);
+    const todayflow = $.read(KEY_today_flow) - residue;
+    $.write(residue, KEY_today_flow);
+    $.write(dnow, KEY_o_now);
+    const title = `🚀 [机场流量] ${sub.name}`;
+    const hutime = parseInt(utime / 3600000);
+    const mutime = (utime / 60000) % 60;
+    const subtitle = `剩余流量: ${(residue_m / 1024).toFixed(2)} G`;
+    const details = `
+📌 [使用情况]
+${
+    hutime == 0
+    ? "在过去的" +
+        mutime.toFixed(1) +
+        "分钟内使用了: " +
+        todayflow.toFixed(2) +
+        " M流量"
+    : "在过去的" +
+        hutime +
+        "时 " +
+        mutime.toFixed(1) +
+        "分钟内使用了: " +
+        todayflow.toFixed(2) +
+        " M流量"
+}
+📝 [统计]
+总上传: ${(upload_k / 1073741824).toFixed(2)} G
+总下载: ${(download_k / 1073741824).toFixed(2)} G
+🛎 [到期时间]
+${expires}
+    `;
+    if (sub.icon) {
+      $.notify(title, subtitle, details, { "media-url": sub.icon });
+    } else {
+      $.notify(title, subtitle, details);
+    }
+  });
 }
 
-function getTime(){
-    const today = new Date();
-    return `${today.getFullYear()}年${today.getMonth() + 1}月`;
+function formatTime(timestamp) {
+  const date = new Date(timestamp);
+  return `${date.getFullYear()}年${
+    date.getMonth() + 1
+  }月${date.getDate()}日${date.getHours()}时`;
 }
 
 // prettier-ignore
