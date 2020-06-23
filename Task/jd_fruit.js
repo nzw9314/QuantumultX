@@ -230,7 +230,7 @@ function* step() {
                     //助力成功
                     salveHelpAddWater += helpResult.helpResult.salveHelpAddWater;
                     console.log(`【助力好友结果】: 已成功给【${helpResult.helpResult.masterUserInfo.nickName}】助力`);
-                    helpSuccessPeoples += response.result.masterNickName + '，';
+                    helpSuccessPeoples += helpResult.helpResult.masterUserInfo.nickName + '，';
                 } else if (helpResult.helpResult.code === '8'){
                     console.log(`【助力好友结果】: 助力【${helpResult.helpResult.masterUserInfo.nickName}】失败，您今天助力次数已耗尽`);
                 } else if (helpResult.helpResult.code === '9'){
@@ -311,7 +311,7 @@ function* step() {
           for (let i = 0; i < parseInt(overageEnergy / 10); i++){
             let res = yield waterGoodForFarm();
             if (res.totalEnergy <= 100) {
-              console.log('目前水滴【${res.totalEnergy}】g，不再继续浇水')
+              console.log(`目前水滴【${res.totalEnergy}】g，不再继续浇水`)
             } else {
               console.log(`目前剩余水滴：【${res.totalEnergy}】g，可继续浇水`);
             }
