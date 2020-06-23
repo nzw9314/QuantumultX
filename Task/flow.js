@@ -6,40 +6,47 @@
  * 更新地址：https://raw.githubusercontent.com/Peng-YM/QuanX/master/Tasks/flow.js
  * 推荐使用mini图标组：https://github.com/Orz-3/mini
  */
-const $ = API("flow");
+const $ = API("flow", true);
 const subscriptions = [
   {
-    link: "机场订阅地址1",
+    link: "订阅地址1",
     name: "取个名字1",
-    icon: "https://raw.githubusercontent.com/Orz-3/mini/master/图标名字.png"
+    icon: "https://raw.githubusercontent.com/Orz-3/mini/master/pudding.png"
   },
-  {
-    link: "机场订阅地址2",
+{
+    link: "订阅地址2",
     name: "取个名字2",
-    icon: "https://raw.githubusercontent.com/Orz-3/mini/master/图标名字.png"
+    icon: "https://raw.githubusercontent.com/Orz-3/mini/master/Nexitally.png"
   },
 ];
 
-Promise.all(subscriptions.map(async (sub) => fetchInfo(sub)))
-  .catch((err) => $.error(err))
+Promise.all(subscriptions.map(async sub => await fetchInfo(sub)))
+  .catch(err => $.error(err))
   .finally(() => $.done());
 
 async function fetchInfo(sub) {
   const headers = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
+    "User-Agent":
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"
   };
   $.get({
     url: sub.link,
     headers
-  }).then((resp) => {
-    const userinfo = resp.headers["Subscription-Userinfo"] || resp.headers["subscription-userinfo"];
+  }).then(resp => {
+    const userinfo =
+      resp.headers["Subscription-Userinfo"] ||
+      resp.headers["subscription-userinfo"];
     const KEY_o_now = "o_now" + sub.name;
     const KEY_today_flow = "today_flow" + sub.name;
     $.log(userinfo);
     const upload_k = Number(userinfo.match(/upload=(\d+)/)[1]);
     const download_k = Number(userinfo.match(/download=(\d+)/)[1]);
     const total_k = Number(userinfo.match(/total=(\d+)/)[1]);
-    const expires = formatTime(Number(userinfo.match(/expire=(\d+)/)[1])*1000);
+    const expire_time = userinfo.match(/expire=(\d+)/)
+    let expires = "无信息"
+    if (expire_time) {
+      expires = formatTime(Number(expire_time[1]*1000));
+    }
 
     const residue_m =
       total_k / 1048576 - download_k / 1048576 - upload_k / 1048576;
@@ -56,26 +63,26 @@ async function fetchInfo(sub) {
     const details = `
 📌 [使用情况]
 ${
-    hutime == 0
+  hutime == 0
     ? "在过去的" +
-        mutime.toFixed(1) +
-        "分钟内使用了: " +
-        todayflow.toFixed(2) +
-        " M流量"
+      mutime.toFixed(1) +
+      "分钟内使用了: " +
+      todayflow.toFixed(2) +
+      " M流量"
     : "在过去的" +
-        hutime +
-        "时 " +
-        mutime.toFixed(1) +
-        "分钟内使用了: " +
-        todayflow.toFixed(2) +
-        " M流量"
+      hutime +
+      "时 " +
+      mutime.toFixed(1) +
+      "分钟内使用了: " +
+      todayflow.toFixed(2) +
+      " M流量"
 }
 📝 [统计]
 总上传: ${(upload_k / 1073741824).toFixed(2)} G
 总下载: ${(download_k / 1073741824).toFixed(2)} G
 🛎 [到期时间]
-${expires}
-    `;
+${expires}`;
+
     if (sub.icon) {
       $.notify(title, subtitle, details, { "media-url": sub.icon });
     } else {
@@ -86,9 +93,8 @@ ${expires}
 
 function formatTime(timestamp) {
   const date = new Date(timestamp);
-  return `${date.getFullYear()}年${
-    date.getMonth() + 1
-  }月${date.getDate()}日${date.getHours()}时`;
+  return `${date.getFullYear()}年${date.getMonth() +
+    1}月${date.getDate()}日${date.getHours()}时`;
 }
 
 // prettier-ignore
