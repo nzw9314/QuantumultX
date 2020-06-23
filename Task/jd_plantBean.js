@@ -1,152 +1,103 @@
 /*
 种豆得豆 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
-
 会自动关注任务中的店铺跟商品
 
-
+// quantumultx
 [task_local]
-
 1 7-21/2 * * * jd_plantBean.js
 
+// Loon
+cron "1 7-21/2 * * *" script-path=https://github.com/nzw9314/QuantumultX/raw/master/Task/jd_plantBean.js,tag=京东种豆得豆
 */
-/******************** 转换器 ********************/
-let isQuantumultX = $task != undefined;
-let isSurge = $httpClient != undefined;
-let isLoon = isSurge && typeof $loon != undefined;
-var $task = isQuantumultX ? $task : {};
-var $httpClient = isSurge ? $httpClient : {};
-var $prefs = isQuantumultX ? $prefs : {};
-var $persistentStore = isSurge ? $persistentStore : {};
-var $notify = isQuantumultX ? $notify : {};
-var $notification = isSurge ? $notification : {};
-if (isQuantumultX) {
-  var errorInfo = {
-    error: "",
-  };
-  $httpClient = {
-    get: (url, cb) => {
-      var urlObj;
-      if (typeof url == "string") {
-        urlObj = {
-          url: url,
-        }
-      } else {
-        urlObj = url
-      }
-      $task.fetch(urlObj).then((response) => {
-        cb(undefined, response, response.body)
-      }, (reason) => {
-        errorInfo.error = reason.error;
-        cb(errorInfo, response, "")
-      })
-    }, post: (url, cb) => {
-      var urlObj;
-      if (typeof url == "string") {
-        urlObj = {
-          url: url,
-        }
-      } else {
-        urlObj = url
-      }
-      url.method = "POST"
-      $task.fetch(urlObj).then((response) => {
-        cb(undefined, response, response.body)
-      }, (reason) => {
-        errorInfo.error = reason.error;
-        cb(errorInfo, response, "")
-      })
-    },
-  }
-}
-if (isSurge) {
-  $task = {
-    fetch: (url) => {
-      return new Promise((resolve, reject) => {
-        if (url.method == "POST") {
-          $httpClient.post(url, (error, response, data) => {
-            if (response) {
-              response.body = data;
-              resolve(response, {
-                error: error,
-              })
-            } else {
-              resolve(null, {
-                error: error,
-              })
-            }
-          })
+
+const $hammer = (() => {
+    const isRequest = "undefined" != typeof $request,
+        isSurge = "undefined" != typeof $httpClient,
+        isQuanX = "undefined" != typeof $task;
+
+    const log = (...n) => { for (let i in n) console.log(n[i]) };
+    const alert = (title, body = "", subtitle = "", link = "") => {
+        if (isSurge) return $notification.post(title, subtitle, body, link);
+        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body));
+        log("==============📣系统通知📣==============");
+        log("title:", title, "subtitle:", subtitle, "body:", body, "link:", link);
+    };
+    const read = key => {
+        if (isSurge) return $persistentStore.read(key);
+        if (isQuanX) return $prefs.valueForKey(key);
+    };
+    const write = (val, key) => {
+        if (isSurge) return $persistentStore.write(val, key);
+        if (isQuanX) return $prefs.setValueForKey(val, key);
+    };
+    const request = (method, params, callback) => {
+        /**
+         * 
+         * params(<object>): {url: <string>, headers: <object>, body: <string>} | <url string>
+         * 
+         * callback(
+         *      error, 
+         *      <response-body string>?,
+         *      {status: <int>, headers: <object>, body: <string>}?
+         * )
+         * 
+         */
+        let options = {};
+        if (typeof params == "string") {
+            options.url = params;
         } else {
-          $httpClient.get(url, (error, response, data) => {
-            if (response) {
-              response.body = data;
-              resolve(response, {
-                error: error,
-              })
-            } else {
-              resolve(null, {
-                error: error,
-              })
+            options.url = params.url;
+            if (typeof params == "object") {
+                params.headers && (options.headers = params.headers);
+                params.body && (options.body = params.body);
             }
-          })
         }
-      })
-    },
-  }
-}
-if (isQuantumultX) {
-  $persistentStore = {
-    read: (key) => {
-      return $prefs.valueForKey(key)
-    }, write: (val, key) => {
-      return $prefs.setValueForKey(val, key)
-    },
-  }
-}
-if (isSurge) {
-  $prefs = {
-    valueForKey: (key) => {
-      return $persistentStore.read(key)
-    }, setValueForKey: (val, key) => {
-      return $persistentStore.write(val, key)
-    },
-  }
-}
-if (isQuantumultX) {
-  $notify = ((notify) => {
-    return function (title, subTitle, detail, url = undefined) {
-      detail = url === undefined ? detail : `${detail}\n点击链接跳转: ${url}`;
-      notify(title, subTitle, detail)
-    }
-  })($notify);
-  $notification = {
-    post: (title, subTitle, detail, url = undefined) => {
-      detail = url === undefined ? detail : `${detail}\n点击链接跳转: ${url}`;
-      $notify(title, subTitle, detail)
-    },
-  }
-}
-if (isSurge && !isLoon) {
-  $notification.post = ((notify) => {
-    return function (title, subTitle, detail, url = undefined) {
-      detail = url === undefined ? detail : `${detail}\n点击链接跳转: ${url}`;
-      notify.call($notification, title, subTitle, detail)
-    }
-  })($notification.post);
-  $notify = (title, subTitle, detail, url = undefined) => {
-    detail = url === undefined ? detail : `${detail}\n点击链接跳转: ${url}`;
-    $notification.post(title, subTitle, detail)
-  }
-}
-if (isLoon) {
-  $notify = (title, subTitle, detail, url = undefined) => {
-    $notification.post(title, subTitle, detail, url)
-  }
-}
-/******************** 转换器 ********************/
-// 兼容Loon,surge等app，转化器代码来自：https://github.com/Peng-YM/ScriptConverter
+        method = method.toUpperCase();
+
+        const writeRequestErrorLog = function (m, u) {
+            return err => {
+                log("=== request error -s--");
+                log(`${m} ${u}`, err);
+                log("=== request error -e--");
+            };
+        }(method, options.url);
+
+        if (isSurge) {
+            const _runner = method == "GET" ? $httpClient.get : $httpClient.post;
+            return _runner(options, (error, response, body) => {
+                if (error == null || error == "") {
+                    response.body = body;
+                    callback("", body, response);
+                } else {
+                    writeRequestErrorLog(error);
+                    callback(error);
+                }
+            });
+        }
+        if (isQuanX) {
+            options.method = method;
+            $task.fetch(options).then(
+                response => {
+                    response.status = response.statusCode;
+                    delete response.statusCode;
+                    callback("", response.body, response);
+                },
+                reason => {
+                    writeRequestErrorLog(reason.error);
+                    callback(reason.error);
+                }
+            );
+        }
+    };
+    const done = (value = {}) => {
+        if (isQuanX) return isRequest ? $done(value) : null;
+        if (isSurge) return isRequest ? $done(value) : $done();
+    };
+    return { isRequest, isSurge, isQuanX, log, alert, read, write, request, done };
+})();
 
 //直接用NobyDa的jd cookie
-const cookie = $prefs.valueForKey('CookieJD')
+const cookie = $hammer.read('CookieJD')
 const name = '京东种豆得豆'
 
 //京东接口地址
@@ -156,6 +107,7 @@ var plantUuids = [ // 这个列表填入你要助力的好友的plantUuid
     'avlxbxdxf3altnm77gkqweriwik3gtnp3vhxdwy',
     'olmijoxgmjutztzexoyxf22tw2cb5uw4ovuv4dq',
     'qawf5ls3ucw25yhfulu32xekqy3h7wlwy7o5jii',
+    'zanmzshzq4ykx5xirwj7y7lmki',
     'd6wg7f6syive54q4yfrdmaddo4'
 ]
 
@@ -340,7 +292,7 @@ function* step() {
     } else {
         message = '请先获取cookie\n直接使用NobyDa的京东签到获取'
     }
-    $notify(name, '', message)
+    $hammer.alert(name, message)
 }
 
 function purchaseRewardTask(roundId) {
@@ -456,28 +408,22 @@ function plantBeanIndex() {
     request(functionId, body);//plantBeanIndexBody
 }
 
-function requestGet(url) {
-    $task.fetch({
+function requestGet(url){
+    const option =  {
         url: url,
         headers: {
             Cookie: cookie,
-        },
-        method: "GET",
-    }).then(
-        (response) => {
-            return JSON.parse(response.body)
-        },
-        (reason) => console.log(reason.error, reason)
-    ).then((response) => sleep(response))
+        }
+    };
+    $hammer.request('GET', option, (error, response) => {
+        error ? $hammer.log("Error:", error) : sleep(JSON.parse(response));
+    })
 }
 
 function request(function_id, body = {}) {
-    $task.fetch(taskurl(function_id, body)).then(
-        (response) => {
-            return JSON.parse(response.body)
-        },
-        (reason) => console.log(reason.error, reason)
-    ).then((response) => sleep(response))
+    $hammer.request('POST', taskurl(function_id, body), (error, response) => {
+        error ? $hammer.log("Error:", error) : sleep(JSON.parse(response));
+    })
 }
 
 function taskurl(function_id, body) {
@@ -488,9 +434,7 @@ function taskurl(function_id, body) {
         body: `functionId=${function_id}&body=${JSON.stringify(body)}&appid=ld&client=apple&clientVersion=&networkType=&osVersion=&uuid=`,
         headers: {
             Cookie: cookie,
-        },
-        // method: "GET",
-        method: "POST",
+        }
     }
 }
 
