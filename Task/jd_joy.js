@@ -1,5 +1,12 @@
 //jd宠汪汪 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
 
+//0 */3 * * * jd_joy.js  #每隔三小时运行一次，加快升级
+//feedCount:自定义 每次喂养数量; 等级只和喂养次数有关，与数量无关
+//推荐每次投喂10个，积累狗粮，然后去聚宝盆赌每小时的幸运奖，据观察，投入3000-6000中奖概率大，超过7000基本上注定亏本，即使是第一名
+//Combine from Zero-S1/JD_tools(https://github.com/Zero-S1/JD_tools)
+
+const FEED_NUM = 10   // [10,20,40,80]
+
 const $hammer = (() => {
     const isRequest = "undefined" != typeof $request,
         isSurge = "undefined" != typeof $httpClient,
@@ -22,15 +29,15 @@ const $hammer = (() => {
     };
     const request = (method, params, callback) => {
         /**
-         * 
+         *
          * params(<object>): {url: <string>, headers: <object>, body: <string>} | <url string>
-         * 
+         *
          * callback(
-         *      error, 
+         *      error,
          *      <response-body string>?,
          *      {status: <int>, headers: <object>, body: <string>}?
          * )
-         * 
+         *
          */
         let options = {};
         if (typeof params == "string") {
@@ -132,6 +139,9 @@ function* step() {
             if (scanMarketTask && scanMarketTask.taskStatus == 'processing' && scanMarketTask.taskChance > scanMarketTask.joinedCount) {
                 for (let market of scanMarketTask.scanMarketList) {
                     if (!market.status) {
+                        let clickResult = yield click(market.marketLink)
+                        console.log(`逛会场点击${market.marketName}结果${JSON.stringify(clickResult)}`)
+                        
                         let scanMarketResult = yield ScanMarket(market.marketLink)
                         console.log(`逛会场${market.marketName}结果${JSON.stringify(scanMarketResult)}`)
                     }
@@ -161,7 +171,7 @@ function* step() {
                     }
                 }
             } else {
-                console.log(`浏览频道今天已完成或任务不存在`)
+                console.log(`浏览商品今天已完成或任务不存在`)
             }
             //浏览商品奖励积分
             let deskGoodDetails = yield getDeskGoodDetails()
@@ -172,9 +182,16 @@ function* step() {
                         console.log(`浏览频道${deskGood.skuName}结果${JSON.stringify(scanDeskGoodResult)}`)
                     }
                 }
-            }else{
+            } else {
                 console.log(`浏览商品奖励积分返回结果${JSON.stringify(deskGoodDetails)}`)
             }
+            // 喂食
+            let feedPetsResult = yield feedPets()
+            console.log(`喂食结果${JSON.stringify(feedPetsResult)}`)
+            // 喂养状态
+            let enterRoomResult = yield enterRoom()
+            console.log(`喂养状态${JSON.stringify(enterRoomResult)}`)
+            message = `现有积分: ${enterRoomResult.data.petCoin}\n现有狗粮: ${enterRoomResult.data.petFood}\n喂养次数: ${enterRoomResult.data.feedCount}\n宠物等级: ${enterRoomResult.data.petLevel}`
         } else {
             console.log(`任务信息${JSON.stringify(petTaskConfig)}`)
             message = petTaskConfig.errorMessage
@@ -182,10 +199,15 @@ function* step() {
     } else {
         message = '请先获取cookie\n直接使用NobyDa的京东签到获取'
     }
-    $hammer.alert(name, '', message)
+    $hammer.alert(name, message, '')
 }
+
+function click(marketLink) {
+    request(`https://jdjoy.jd.com/pet/icon/click?reqSource=h5&iconCode=scan_market&linkAddr=${marketLink}`)
+}
+
 //浏览商品
-function ScanDeskGood(sku){
+function ScanDeskGood(sku) {
     requestPost(`https://jdjoy.jd.com/pet/scan`, JSON.stringify({ sku: sku, taskType: 'ScanDeskGood', reqSource: 'h5' }), 'application/json')
 }
 
@@ -226,12 +248,22 @@ function ThreeMeals() {
     request(`https://jdjoy.jd.com/pet/getFood?taskType=ThreeMeals`)
 }
 
+//喂食
+function feedPets() {
+    request(`https://jdjoy.jd.com/pet/feed?feedCount=${FEED_NUM}`)
+}
+
+//喂养状态
+function enterRoom() {
+    request(`https://jdjoy.jd.com/pet/enterRoom?reqSource=h5`)
+}
+
 function request(url) {
+    $hammer.log("request url:", url);
     const option =  {
         url: url,
         headers: {
             Cookie: cookie,
-            UserAgent: `Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1`,
             reqSource: 'h5',
         }
     };
@@ -241,11 +273,13 @@ function request(url) {
 }
 
 function requestPost(url, body, ContentType) {
+    $hammer.log("request url:", url, "body:", body, "ContetentType:", ContentType);
     const options = {
         url: url,
         body: body,
         headers: {
             Cookie: cookie,
+        UserAgent: `Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1`,
             reqSource: 'h5',
             'Content-Type': ContentType,
         }
@@ -260,7 +294,7 @@ function sleep(response) {
     setTimeout(() => {
         console.log('休息结束');
         Task.next(response)
-    }, 2000);
+    }, 3000);
 }
 
 // https://jdjoy.jd.com/pet/getPetTaskConfig?reqSource=h5

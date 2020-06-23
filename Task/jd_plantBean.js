@@ -1,11 +1,9 @@
 /*
 种豆得豆 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
 会自动关注任务中的店铺跟商品
-
 // quantumultx
 [task_local]
 1 7-21/2 * * * jd_plantBean.js
-
 // Loon
 cron "1 7-21/2 * * *" script-path=https://github.com/nzw9314/QuantumultX/raw/master/Task/jd_plantBean.js,tag=京东种豆得豆
 */
@@ -267,6 +265,10 @@ function* step() {
                 console.log(`助力好友失败: ${JSON.stringify(helpResult)}`);
             }
         }
+
+        //todo 扭蛋
+
+
         plantBeanIndexResult = yield plantBeanIndex()
         if (plantBeanIndexResult.code == '0') {
             let plantBeanRound = plantBeanIndexResult.data.roundList[1]
@@ -462,4 +464,4 @@ function getParam(url, name) {
     var r = url.match(reg);
     if (r != null) return unescape(r[2]);
     return null;
-} 
+}
