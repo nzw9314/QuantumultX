@@ -3,6 +3,7 @@
 //0 */3 * * * jd_joy.js  #每隔三小时运行一次，加快升级
 //feedCount:自定义 每次喂养数量; 等级只和喂养次数有关，与数量无关
 //推荐每次投喂10个，积累狗粮，然后去聚宝盆赌每小时的幸运奖，据观察，投入3000-6000中奖概率大，超过7000基本上注定亏本，即使是第一名
+//Combine from Zero-S1/JD_tools(https://github.com/Zero-S1/JD_tools)
 
 const FEED_NUM = 10   // [10,20,40,80]
 
