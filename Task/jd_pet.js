@@ -6,9 +6,9 @@ const $hammer = (() => {
         isQuanX = "undefined" != typeof $task;
 
     const log = (...n) => { for (let i in n) console.log(n[i]) };
-    const alert = (title, body = "", subtitle = "", link = "") => {
+    const alert = (title, body = "", subtitle = "", link = "", option) => {
         if (isSurge) return $notification.post(title, subtitle, body, link);
-        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body));
+        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body), option);
         log("==============📣系统通知📣==============");
         log("title:", title, "subtitle:", subtitle, "body:", body, "link:", link);
     };
@@ -103,7 +103,7 @@ var taskInfo = null;
 const name = '东东萌宠';
 let message = '';
 let subTitle = '';
-
+let goodsUrl = '';
 //按顺序执行, 尽量先执行不消耗狗粮的任务, 避免中途狗粮不够, 而任务还没做完
 var function_map = {
     signInit: getSignReward, //每日签到
@@ -167,7 +167,10 @@ async function* entrance() {
       console.log(`初始化萌宠失败:  ${JSON.stringify(petInfo)}`);
     }
     yield energyCollect();
-    $hammer.alert(name, message, subTitle)
+    let option = {
+      "media-url" : goodsUrl
+    }
+    $hammer.alert(name, message, subTitle, '', option)
     // $notify(name, subTitle, message);
     console.log('全部任务完成, 如果帮助到您可以点下🌟STAR鼓励我一下, 明天见~');
 }
@@ -377,6 +380,7 @@ function initPetTown() {
     request(arguments.callee.name.toString()).then((response) => {
         if (response.code === '0' && response.resultCode === '0' && response.message === 'success') {
             petInfo = response.result;
+            goodsUrl = response.result.goodsInfo.goodsUrl;
             console.log(`初始化萌宠信息完成: ${JSON.stringify(petInfo)}`);
             console.log(`您的shareCode为: ${petInfo.shareCode}`);
           gen.next();

@@ -10,9 +10,9 @@ const $hammer = (() => {
         isQuanX = "undefined" != typeof $task;
 
     const log = (...n) => { for (let i in n) console.log(n[i]) };
-    const alert = (title, body = "", subtitle = "", link = "") => {
+    const alert = (title, body = "", subtitle = "", link = "", option) => {
         if (isSurge) return $notification.post(title, subtitle, body, link);
-        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body));
+        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body), option);
         log("==============📣系统通知📣==============");
         log("title:", title, "subtitle:", subtitle, "body:", body, "link:", link);
     };
@@ -405,7 +405,10 @@ function* step() {
         console.log(`初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常,农场初始化数据: ${JSON.stringify(farmInfo)}`);
         message = '初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常'
     }
-    $hammer.alert(name, message, subTitle)
+    let option = {
+      'media-url': farmInfo.farmUserPro.goodsImage
+    }
+    $hammer.alert(name, message, subTitle, '', option)
     $hammer.done();
 }
 
