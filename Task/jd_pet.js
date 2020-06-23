@@ -114,6 +114,7 @@ let goodsUrl = '';
 //     inviteFriendsInit: inviteFriendsInit, //邀请好友, 暂未处理
 //     feedReachInit: feedReachInit, //喂食10次任务  最后执行投食10次任务, 提示剩余狗粮是否够投食10次完成任务, 并询问要不要继续执行
 // };
+// function_map不再写固定死的，改成从初始化任务api那边拿取，避免6.22日下午京东服务器下架一个任务后，脚本对应不上，从而报错的bug
 var function_map = [];
 let gen = entrance();
 gen.next();
