@@ -98,11 +98,16 @@ const cookie = $hammer.read('CookieJD')
 const name = '京东水果'
 //助力好友分享码(最多4个,否则后面的助力失败),原因:京东农场每人每天只有四次助力机会
 var shareCodes = [ // 这个列表填入你要助力的好友的shareCode
-    'a6f686a9f6aa4c80977370b03681c553',
-    'f92cb56c6a1349f5a35f0372aa041ea0',
-    'a9360baeceb04c9baaaa109f5d428d3c',
-    '61ff5c624949454aa88561f2cd721bf6',
-    '40dbf12bb7ea4b8eb772741afe2125da'
+//桃子
+'8fb49c4142f74fae9bc58975eb5a8ea6',
+//唐僧
+'107224d5f1564288aba4fd03c2b98c7c',
+//wang
+'dc4a5ce6b4d8405eb3eb671068cb4715',
+//millerchen
+'fd59577b313a4da0918ad214e1e9b935',
+//MEOWwONE
+'c2bb7363134f421bb8d95fd5e302fdeb',
 ]
 var Task = step();
 Task.next();
