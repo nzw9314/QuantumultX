@@ -128,7 +128,7 @@ if (isSurge) {
     }
 }
 
-const weaapi = "https://www.tianqiapi.com/api/?version=v6&appid=13333885&appsecret=v8OEJUMb"//该接口最快3小时更新一次，包含基本天气信息、湿度、能见度、气压、空气质量指数等
+const weaapi = "https://www.tianqiapi.com/api/?version=v6&appid=47273245&appsecret=BCK1QTW5"//该接口最快3小时更新一次，包含基本天气信息、湿度、能见度、气压、空气质量指数等
 $httpClient.get(weaapi, function(error, response, data){
     if (error){
         console.log(error);
