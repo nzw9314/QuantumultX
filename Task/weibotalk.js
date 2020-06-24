@@ -106,7 +106,7 @@ var checkinheaders2 = $.getdata(tokencheckinheaders2);
       checkinheaders2 == undefined || checkinheaders2 == "")) {
     $.count_num = 2;
   }
-  console.log(`账号数 = ${$.count_num}`)
+  console.log(`🌟 账号数 = ${$.count_num}`)
   for (var current = 1; current <= $.count_num; ++current) {
     init_env(current)
     await getnumber();
@@ -128,6 +128,7 @@ var checkinheaders2 = $.getdata(tokencheckinheaders2);
   })
 
 function init_env(current) {
+  console.log(`🌟 清空环境，开始账号 ${current}`)
   $.message = [];
   $.name_list = []
   $.id_list = []
@@ -158,15 +159,15 @@ function deleteCookie() {
 
 function output(current) {
   $.this_msg = ""
-  for (var i = 0; i < $.message.length; ++i) {
-    if (i && i % $.msg_max_num == 0) {
-      $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)}页 ，共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
+  for (var i = 1; i <= $.message.length; ++i) {
+    if (i % ($.msg_max_num) == 0) {
+      $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${Math.ceil(i/$.msg_max_num)}页 ，共${Math.ceil($.message.length/$.msg_max_num)}页`, $.this_msg)
       $.this_msg = ""
     }
-    $.this_msg += `${$.message[i]}\n`
+    $.this_msg += `${$.message[i-1]}\n`
   }
   if ($.message.length % $.msg_max_num != 0) {
-    $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${parseInt(i/$.msg_max_num)+1}页 ，共${parseInt($.message.length/$.msg_max_num)+1}页`, $.this_msg)
+    $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`,  `当前第${Math.ceil((i-1)/$.msg_max_num)}页 ，共${Math.ceil($.message.length/$.msg_max_num)}页`, $.this_msg)
   }
 }
 
