@@ -104,6 +104,24 @@ var shareCodes = [ // 这个列表填入你要助力的好友的shareCode
     '61ff5c624949454aa88561f2cd721bf6',
     '40dbf12bb7ea4b8eb772741afe2125da'
 ]
+// 添加box功能
+// 【用box订阅的好处】
+// 1️⃣脚本也可以远程挂载了。助力功能只需在box里面设置助力码。
+// 2️⃣所有脚本的cookie都可以备份，方便你迁移到其他支持box的软件。
+let isBox = false //默认没有使用box
+const boxShareCodeArr = ['jd_fruit1', 'jd_fruit2', 'jd_fruit3', 'jd_fruit4'];
+isBox = boxShareCodeArr.some((item) => {
+  const boxShareCode = $hammer.read(item);
+  return (boxShareCode !== undefined && boxShareCode !== null && boxShareCode !== '');
+});
+if (isBox) {
+  shareCodes = [];
+  for (const item of boxShareCodeArr) {
+    if ($hammer.read(item)) {
+      shareCodes.push($hammer.read(item));
+    }
+  }
+}
 var Task = step();
 Task.next();
 
