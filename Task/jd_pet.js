@@ -97,7 +97,24 @@ var shareCodes = [ // 这个列表填入你要助力的好友的shareCode, 最�
     'MTAxODc2NTEzOTAwMDAwMDAxODQ5MDg5NQ==',
     'MTAxODcxOTI2NTAwMDAwMDAxOTQ3MjkzMw=='
 ]
-
+// 添加box功能
+// 【用box订阅的好处】
+// 1️⃣脚本也可以远程挂载了。助力功能只需在box里面设置助力码。
+// 2️⃣所有脚本的cookie都可以备份，方便你迁移到其他支持box的软件。
+let isBox = false //默认没有使用box
+const boxShareCodeArr = ['jd_pet1', 'jd_pet2', 'jd_pet3', 'jd_pet4', 'jd_pet5'];
+isBox = boxShareCodeArr.some((item) => {
+  const boxShareCode = $hammer.read(item);
+  return (boxShareCode !== undefined && boxShareCode !== null && boxShareCode !== '');
+});
+if (isBox) {
+  shareCodes = [];
+  for (const item of boxShareCodeArr) {
+    if ($hammer.read(item)) {
+      shareCodes.push($hammer.read(item));
+    }
+  }
+}
 var petInfo = null;
 var taskInfo = null;
 const name = '东东萌宠';
