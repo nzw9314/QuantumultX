@@ -235,7 +235,7 @@ function* step() {
         // masterHelpTaskInitForFarm
         console.log('开始助力好友')
         let salveHelpAddWater = 0;
-        let remainTimes = null;//今日剩余助力次数
+        let remainTimes = 4;//今日剩余助力次数,默认4次（京东农场每人每天4次助力机会）。
         let helpSuccessPeoples = '';//成功助力好友
         for (let code of shareCodes) {
             if (code == farmInfo.farmUserPro.shareCode) {
