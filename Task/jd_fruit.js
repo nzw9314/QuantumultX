@@ -3,7 +3,8 @@
 // [task_local]
 // #jd免费水果
 // cron "1 0 7,12,18 * * *" script-path=https://raw.githubusercontent.com/iepngs/Script/master/jd/fruit.js,tag=jd免费水果
-
+//兼容surge和Loon等软件功能 by@iepngs
+//新增和维护功能 by@lxk0301
 const $hammer = (() => {
     const isRequest = "undefined" != typeof $request,
         isSurge = "undefined" != typeof $httpClient,
@@ -324,25 +325,30 @@ function* step() {
           console.log(`水滴雨任务，每天两次，最多可得10g水滴`);
           console.log(`两次水滴雨任务是否全部完成：${farmTask.waterRainInit.f ? '是' : '否'}`);
           if (farmTask.waterRainInit.winTimes === 0) {
-            console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes}次，剩余${2 - farmTask.waterRainInit.winTimes}次`);
+            console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
             let waterRain = yield waterRainForFarm();
             console.log('水滴雨waterRain', waterRain);
             if (waterRain.code === '0') {
               console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
-              message += `【第${farmTask.waterRainInit.winTimes}次水滴雨任务】获得${waterRain.addEnergy}g水滴`
+              message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
             }
           } else {
-            //执行了第一次水滴雨。需等待3小时候才能继续
+            //执行了第一次水滴雨。需等待3小时候才能再次执行
             if (new Date().getTime()  > (farmTask.waterRainInit.lastTime + 3 * 60 * 60 *1000)) {
-              console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes}次，剩余${2 - farmTask.waterRainInit.winTimes}次`);
+              console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
               let waterRain = yield waterRainForFarm();
               console.log('水滴雨waterRain', waterRain);
               if (waterRain.code === '0') {
                 console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
-                message += `【第${farmTask.waterRainInit.winTimes}次水滴雨任务】获得${waterRain.addEnergy}g水滴`
+                message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
               }
+            } else {
+              console.log(`【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`)
+              message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`
             }
           }
+        } else {
+          message += `【当天两次水滴雨任务】已全部完成，获得20g水滴\n`
         }
         console.log('finished 水果任务完成!');
 
