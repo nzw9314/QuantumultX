@@ -43,7 +43,7 @@ const app_ver = '23.5.1'
 const CookieName = '115'
 const CookieKey = 'wp115'
 const UIDKey = 'uid115'
-const reg = /^https?:\/\/proapi\.115\.com\/ios\/user\/takespc\?(.*)&user_id=(\d+)$/
+const reg = /^https?:\/\/proapi\.115\.com\/ios\/user\/takespc\?(.*)user_id=(\d+)/
 const UTC8 = new Date(new Date().getTime() + new Date().getTimezoneOffset()*60*1000 + 8*60*60*1000)
 const today = UTC8.getFullYear() + "-" + ("00" + Number(UTC8.getMonth() + 1)).substr(-2) + "-" + ("00" + UTC8.getDate()).substr(-2)
 const $cmp = compatibility()
