@@ -319,6 +319,11 @@ function* step() {
         } else if (farmTask.totalWaterTaskInit.totalWaterTaskTimes < farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
             message += `【十次浇水奖励】任务未完成，今日浇水${farmTask.totalWaterTaskInit.totalWaterTaskTimes}次\n`
         }
+        // 水滴雨
+        if (!farmTask.waterRainInit.f) {
+          let waterRain = yield waterRainForFarm();
+          console.log('水滴雨waterRain', waterRain);
+        }
         console.log('finished 水果任务完成!');
 
         farmInfo = yield initForFarm();
@@ -536,13 +541,26 @@ function initForFarm() {
     request(functionId);
 }
 
-
+/**
+ * 水滴雨
+ * @param function_id
+ * @param body
+ */
+function waterRainForFarm() {
+  let functionId = arguments.callee.name.toString();
+  let body = {"type":1,"hongBaoTimes":100,"version":3};
+  postRequest(functionId, body);
+}
 function request(function_id, body = {}) {
     $hammer.request('GET', taskurl(function_id, body), (error, response) => {
         error ? $hammer.log("Error:", error) : sleep(JSON.parse(response.body));
     })
 }
-
+function postRequest(function_id, body = {}) {
+  $hammer.request('POST', taskPostUrl(function_id, body), (error, response) => {
+    error ? $hammer.log("Error:", error) : sleep(JSON.parse(response.body));
+  })
+}
 function sleep(response) {
     console.log('休息一下');
     setTimeout(() => {
@@ -562,13 +580,12 @@ function taskurl(function_id, body = {}) {
     }
 }
 
-function taskposturl(function_id, body = {}) {
+function taskPostUrl(function_id, body = {}) {
     return {
         url: JD_API_HOST,
         body: `functionId=${function_id}&body=${JSON.stringify(body)}&appid=wh5`,
         headers: {
             Cookie: cookie,
-        },
-        method: "POST",
+        }
     }
 }
