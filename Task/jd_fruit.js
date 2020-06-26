@@ -321,8 +321,28 @@ function* step() {
         }
         // 水滴雨
         if (!farmTask.waterRainInit.f) {
-          let waterRain = yield waterRainForFarm();
-          console.log('水滴雨waterRain', waterRain);
+          console.log(`水滴雨任务，每天两次，最多可得10g水滴`);
+          console.log(`两次水滴雨任务是否全部完成：${farmTask.waterRainInit.f ? '是' : '否'}`);
+          if (farmTask.waterRainInit.winTimes === 0) {
+            console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes}次，剩余${2 - farmTask.waterRainInit.winTimes}次`);
+            let waterRain = yield waterRainForFarm();
+            console.log('水滴雨waterRain', waterRain);
+            if (waterRain.code === '0') {
+              console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
+              message += `【第${farmTask.waterRainInit.winTimes}次水滴雨任务】获得${waterRain.addEnergy}g水滴`
+            }
+          } else {
+            //执行了第一次水滴雨。需等待3小时候才能继续
+            if (new Date().getTime()  > (farmTask.waterRainInit.lastTime + 3 * 60 * 60 *1000)) {
+              console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes}次，剩余${2 - farmTask.waterRainInit.winTimes}次`);
+              let waterRain = yield waterRainForFarm();
+              console.log('水滴雨waterRain', waterRain);
+              if (waterRain.code === '0') {
+                console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
+                message += `【第${farmTask.waterRainInit.winTimes}次水滴雨任务】获得${waterRain.addEnergy}g水滴`
+              }
+            }
+          }
         }
         console.log('finished 水果任务完成!');
 
@@ -549,18 +569,14 @@ function initForFarm() {
 function waterRainForFarm() {
   let functionId = arguments.callee.name.toString();
   let body = {"type":1,"hongBaoTimes":100,"version":3};
-  postRequest(functionId, body);
+  request(functionId, body);
 }
 function request(function_id, body = {}) {
     $hammer.request('GET', taskurl(function_id, body), (error, response) => {
         error ? $hammer.log("Error:", error) : sleep(JSON.parse(response.body));
     })
 }
-function postRequest(function_id, body = {}) {
-  $hammer.request('POST', taskPostUrl(function_id, body), (error, response) => {
-    error ? $hammer.log("Error:", error) : sleep(JSON.parse(response.body));
-  })
-}
+
 function sleep(response) {
     console.log('休息一下');
     setTimeout(() => {
