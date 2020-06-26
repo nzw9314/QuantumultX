@@ -3,7 +3,8 @@
 // [task_local]
 // #jd免费水果
 // cron "1 0 7,12,18 * * *" script-path=https://raw.githubusercontent.com/iepngs/Script/master/jd/fruit.js,tag=jd免费水果
-
+//兼容surge和Loon等软件功能 by@iepngs
+//新增和维护功能 by@lxk0301
 const $hammer = (() => {
     const isRequest = "undefined" != typeof $request,
         isSurge = "undefined" != typeof $httpClient,
@@ -104,6 +105,24 @@ var shareCodes = [ // 这个列表填入你要助力的好友的shareCode
     '61ff5c624949454aa88561f2cd721bf6',
     '40dbf12bb7ea4b8eb772741afe2125da'
 ]
+// 添加box功能
+// 【用box订阅的好处】
+// 1️⃣脚本也可以远程挂载了。助力功能只需在box里面设置助力码。
+// 2️⃣所有脚本的cookie都可以备份，方便你迁移到其他支持box的软件。
+let isBox = false //默认没有使用box
+const boxShareCodeArr = ['jd_fruit1', 'jd_fruit2', 'jd_fruit3', 'jd_fruit4'];
+isBox = boxShareCodeArr.some((item) => {
+  const boxShareCode = $hammer.read(item);
+  return (boxShareCode !== undefined && boxShareCode !== null && boxShareCode !== '');
+});
+if (isBox) {
+  shareCodes = [];
+  for (const item of boxShareCodeArr) {
+    if ($hammer.read(item)) {
+      shareCodes.push($hammer.read(item));
+    }
+  }
+}
 var Task = step();
 Task.next();
 
@@ -300,6 +319,36 @@ function* step() {
             }
         } else if (farmTask.totalWaterTaskInit.totalWaterTaskTimes < farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
             message += `【十次浇水奖励】任务未完成，今日浇水${farmTask.totalWaterTaskInit.totalWaterTaskTimes}次\n`
+        }
+        // 水滴雨
+        if (!farmTask.waterRainInit.f) {
+          console.log(`水滴雨任务，每天两次，最多可得10g水滴`);
+          console.log(`两次水滴雨任务是否全部完成：${farmTask.waterRainInit.f ? '是' : '否'}`);
+          if (farmTask.waterRainInit.winTimes === 0) {
+            console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
+            let waterRain = yield waterRainForFarm();
+            console.log('水滴雨waterRain', waterRain);
+            if (waterRain.code === '0') {
+              console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
+              message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
+            }
+          } else {
+            //执行了第一次水滴雨。需等待3小时候才能再次执行
+            if (new Date().getTime()  > (farmTask.waterRainInit.lastTime + 3 * 60 * 60 *1000)) {
+              console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
+              let waterRain = yield waterRainForFarm();
+              console.log('水滴雨waterRain', waterRain);
+              if (waterRain.code === '0') {
+                console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
+                message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
+              }
+            } else {
+              console.log(`【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`)
+              message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`
+            }
+          }
+        } else {
+          message += `【当天两次水滴雨任务】已全部完成，获得20g水滴\n`
         }
         console.log('finished 水果任务完成!');
 
@@ -518,7 +567,16 @@ function initForFarm() {
     request(functionId);
 }
 
-
+/**
+ * 水滴雨
+ * @param function_id
+ * @param body
+ */
+function waterRainForFarm() {
+  let functionId = arguments.callee.name.toString();
+  let body = {"type":1,"hongBaoTimes":100,"version":3};
+  request(functionId, body);
+}
 function request(function_id, body = {}) {
     $hammer.request('GET', taskurl(function_id, body), (error, response) => {
         error ? $hammer.log("Error:", error) : sleep(JSON.parse(response.body));
@@ -529,7 +587,7 @@ function sleep(response) {
     console.log('休息一下');
     setTimeout(() => {
         $hammer.log('休息结束');
-        $hammer.log(response)
+        // $hammer.log(response)
         Task.next(response)
     }, 2000);
 }
@@ -544,13 +602,12 @@ function taskurl(function_id, body = {}) {
     }
 }
 
-function taskposturl(function_id, body = {}) {
+function taskPostUrl(function_id, body = {}) {
     return {
         url: JD_API_HOST,
         body: `functionId=${function_id}&body=${JSON.stringify(body)}&appid=wh5`,
         headers: {
             Cookie: cookie,
-        },
-        method: "POST",
+        }
     }
 }
