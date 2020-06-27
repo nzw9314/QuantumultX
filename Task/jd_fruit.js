@@ -158,8 +158,8 @@ function* step() {
             // message += `今天已签到,连续签到${farmTask.signInit.totalSigned},下次签到可得${farmTask.signInit.signEnergyEachAmount}g\n`
         }
         console.log(`签到结束,开始广告浏览任务`);
-        // let goalResult = yield gotWaterGoalTaskForFarm();
-        // console.log('被水滴砸中奖励: ', goalResult);
+        let goalResult = yield gotWaterGoalTaskForFarm();
+        console.log(`被水滴砸中奖励:${JSON.stringify(goalResult)}`);
         if (!farmTask.gotBrowseTaskAdInit.f) {
             let adverts = farmTask.gotBrowseTaskAdInit.userBrowseTaskAds
             let browseReward = 0
