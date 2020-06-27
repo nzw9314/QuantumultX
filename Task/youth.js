@@ -66,7 +66,7 @@ hostname = *.youth.cn, ios.baertt.com
 ~~~~~~~~~~~~~~~~
 
 */
-const notifyInterval = `10`  //通知间隔，默认抽奖每10次通知一次
+const notifyInterval = `20`  //通知间隔，默认抽奖每10次通知一次
 const logs = 0;   //0为关闭日志，1为开启
 const CookieName = "中青看点"
 const signheaderKey = 'youthheader_zq'
@@ -604,7 +604,7 @@ function earningsInfo() {
 }
 
 function showmsg() {  
-    if (rotaryres.status==1&&rotaryres.data.remainTurn>=95){
+    if (rotaryres.status==1&&rotaryres.data.remainTurn>=97){
      sy.msg(CookieName+" "+nick,subTitle,detail)
      }
     else if (rotaryres.status==1&&rotaryres.data.remainTurn%notifyInterval==0)    {
