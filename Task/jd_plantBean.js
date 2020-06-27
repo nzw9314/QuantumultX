@@ -108,6 +108,10 @@ var plantUuids = [ // 这个列表填入你要助力的好友的plantUuid
     'zanmzshzq4ykx5xirwj7y7lmki',
     'd6wg7f6syive54q4yfrdmaddo4'
 ]
+let currentRoundId = null;//本期活动id
+let lastRoundId = null;//上期id
+let roundList = [];
+let awardState = '';//上期活动的京豆是否收取
 // 添加box功能
 // 【用box订阅的好处】
 // 1️⃣脚本也可以远程挂载了。助力功能只需在box里面设置助力码。
@@ -141,6 +145,10 @@ function* step() {
             //todo
             return
         }
+        roundList = plantBeanIndexResult.data.roundList;
+        currentRoundId = roundList[1].roundId;
+        lastRoundId = roundList[0].roundId;
+        awardState = roundList[0].awardState;
         let shareUrl = plantBeanIndexResult.data.jwordShareInfo.shareUrl
         let myPlantUuid = getParam(shareUrl, 'plantUuid')
         console.log(`你的plantUuid为${myPlantUuid}`)
@@ -307,6 +315,30 @@ function* step() {
         } else {
             console.log(`plantBeanIndexResult:${JSON.stringify(plantBeanIndexResult)}`)
         }
+        // 偷大于等于3瓶好友的营养液
+        let stealRes = yield steal();
+        if (stealRes.code == 0) {
+          if (stealRes.data.tips) {
+            console.log('今日已达上限');
+            return
+          }
+          if (stealRes.data && stealRes.data.friendInfoList && stealRes.data.friendInfoList.length > 0) {
+            for (let item of stealRes.data.friendInfoList) {
+              if (item.nutrCount >= 3) {
+                console.log(`可以偷的好友的信息::${JSON.stringify(item)}`);
+                console.log(`可以偷的好友的信息paradiseUuid::${JSON.stringify(item.paradiseUuid)}`);
+                let stealFriendRes = yield collectUserNutr(item.paradiseUuid);
+                console.log(`偷取好友营养液情况:${JSON.stringify(stealFriendRes)}`)
+                if (stealFriendRes.code == '0') {
+                  console.log(`偷取好友营养液成功`)
+                }
+              }
+            }
+          }
+        }
+        //收获
+        let res = yield getReward();
+        console.log(`种豆得豆收获的京豆情况---res,${JSON.stringify(res)}`);
         console.log('结束')
     } else {
         message = '请先获取cookie\n直接使用NobyDa的京东签到获取'
@@ -427,6 +459,36 @@ function plantBeanIndex() {
     request(functionId, body);//plantBeanIndexBody
 }
 
+//偷营养液大于等于3瓶的好友
+//①查询好友列表
+function steal() {
+  const body = {
+    pageNum: '1'
+  }
+  request('plantFriendList', body);
+}
+//②执行偷好友营养液的动作
+function collectUserNutr(paradiseUuid) {
+  console.log('开始偷好友');
+  console.log(paradiseUuid);
+  let functionId = arguments.callee.name.toString();
+  const body = {
+    "paradiseUuid": paradiseUuid,
+    "roundId": currentRoundId
+  }
+  request(functionId, body);
+}
+//每轮种豆活动获取结束后,自动收取京豆
+function getReward() {
+  if (awardState === '5') {
+    const body = {
+      "roundId": lastRoundId
+    }
+    request('receivedBean', body);
+  } else if (awardState === '6') {
+    console.log("上轮活动您已领奖，去京豆明细页看看");
+  }
+}
 function requestGet(url){
     const option =  {
         url: url,
