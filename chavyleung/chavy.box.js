@@ -1,7 +1,7 @@
 const $ = new Env('BoxJs')
 $.domain = '8.8.8.8'
 
-$.version = '0.1.2'
+$.version = '0.1.3'
 $.versionType = 'beta'
 $.KEY_sessions = 'chavy_boxjs_sessions'
 $.KEY_userCfgs = 'chavy_boxjs_userCfgs'
@@ -11,6 +11,7 @@ $.json = $.name
 $.html = $.name
 
 !(async () => {
+  // $.setdata('', 'github')
   const path = getPath($request.url)
   // 处理主页请求 => /home
   if (/^\/home/.test(path)) {
@@ -22,7 +23,8 @@ $.html = $.name
   }
   // 处理 App 请求 => /app
   else if (/^\/app/.test(path)) {
-    await handleApp(path.split('/app/')[1])
+    const [, appId] = path.split('/app/')
+    await handleApp(decodeURIComponent(decodeURIComponent(appId)))
   }
   // 处理 Api 请求 => /api
   else if (/^\/api/.test(path)) {
@@ -369,6 +371,11 @@ function wrapapps(apps) {
         } else {
           setting.val = val || setting.val
         }
+        if (!Array.isArray(app.icons)) {
+          app.icons = ['https://raw.githubusercontent.com/Orz-3/mini/master/appstore.png', 'https://raw.githubusercontent.com/Orz-3/task/master/appstore.png']
+        }
+        app.author = app.author ? app.author : '@anonymous'
+        app.repo = app.repo ? app.repo : '作者很神秘, 没有留下任何线索!'
       })
     // 判断是否收藏应用
     const usercfgs = getUserCfgs()
@@ -854,7 +861,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                   <v-btn small text color="success" @click="onUseSession(session)">应用</v-btn>
                 </v-card-actions>
               </v-card>
-              <v-card class="ma-4" v-if="!ui.curappSessions || ui.curappSessions.length === 0">
+              <v-card class="ma-4" v-if="(!ui.curappSessions || ui.curappSessions.length === 0) && ui.curapp.keys.length > 0">
                 <v-card-text>当前脚本没有自建会话!</v-card-text>
               </v-card>
               <v-dialog v-model="ui.impSessionDialog.show" scrollable>
@@ -1021,7 +1028,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="grey darken-1" text @click="ui.reloadConfirmDialog.show = false">稍候</v-btn>
-                  <v-btn color="green darken-1" text @click="onReload">马上刷新</v-btn>
+                  <v-btn color="green darken-1" text @click="reload">马上刷新</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -1347,11 +1354,13 @@ function printHtml(data, curapp = null, curview = 'app') {
               }
               axios.post('/api', JSON.stringify({ cmd: 'addAppSub', val: sub }))
               this.ui.addAppSubDialog.show = false
-              this.ui.reloadConfirmDialog.show = true
+              this.onReload()
+            },
+            reload() {
+              window.location.reload()
             },
             onReload() {
-              this.ui.overlay.show = true
-              window.location.reload()
+              this.ui.reloadConfirmDialog.show = true
             },
             onDelSession(session) {
               axios.post('/api', JSON.stringify({ cmd: 'delSession', val: session }))
@@ -1409,7 +1418,7 @@ function printHtml(data, curapp = null, curview = 'app') {
             },
             onRevertGlobalBak(id) {
               axios.post('/api', JSON.stringify({ cmd: 'revertGlobalBak', val: id }))
-              this.ui.reloadConfirmDialog.show = true
+              this.onReload()
             },
             onCopy(e) {
               this.ui.snackbar.show = true
