@@ -1,9 +1,12 @@
-// 从 https://github.com/Zero-S1/JD_tools/blob/master/moneyTree.py 改写来的
+// 现有功能
 // 1、收金果
-// 2、每日签到
+// 2、每日签到（也就是三餐签到）
 // 3、分享
-// 其他功能待测试
-// cron */6 * * * *   # 表示每6分钟收取一次，自行设定运行间隔
+// 4、浏览任务
+// 5、自动领取浏览后的奖励
+// 6、七天签到（连续不间断签到七天）
+// cron */6 * * * *
+//表示每6分钟收取一次，自行设定运行间隔
 // 圈X,Loon,surge均可使用
 const $hammer = (() => {
   const isRequest = "undefined" != typeof $request,
@@ -98,7 +101,7 @@ const JD_API_HOST = 'https://ms.jr.jd.com/gw/generic/uc/h5/m';
 let userInfo = null, taskInfo = [];
 let gen = entrance();
 gen.next();
-function* entrance() {
+async function* entrance() {
   let message = '';
   if (!cookie) {
     // return $hammer.alert("京东萌宠", '请先获取cookie\n直接使用NobyDa的京东签到获取');
@@ -111,15 +114,20 @@ function* entrance() {
   console.log(`浏览任务列表：：${JSON.stringify(taskInfo)}`);
   for (let task of taskInfo) {
     if (task.mid && task.workStatus === 0) {
+      console.log('开始做浏览任务');
       yield setUserLinkStatus(task.mid);
-    } else {
+    } else if (task.mid && task.workStatus === 1){
+      console.log(`开始领取浏览后的奖励:mid:${task.mid}`);
+      let receiveAwardRes = await receiveAward(task.mid);
+      console.log(`领取浏览任务奖励成功：${JSON.stringify(receiveAwardRes)}`)
+    } else if (task.mid && task.workStatus === 2) {
       console.log('所有的浏览任务都做完了')
     }
   }
   yield harvest(userInfo);//收获
   message += `收金果,签到,分享任务做完了\n`;
   // $hammer.alert(name, message);
-  console.log('收金果,签到,分享任务做完了');
+  console.log('任务做完了');
 }
 
 function user_info() {
@@ -153,8 +161,8 @@ async function dayWork() {
   console.log(`开始做任务userInfo了\n`)
   const data = {
     "source":0,
-    "linkMissonIds":["666","667"],
-    "LinkMissonIdValues":[7,7],
+    "linkMissionIds":["666","667"],
+    "LinkMissionIdValues":[7,7],
     "riskDeviceParam":{"eid":"","dt":"","ma":"","im":"","os":"","osv":"","ip":"","apid":"","ia":"","uu":"","cv":"","nt":"","at":"1","fp":"","token":""}
   };
   let response = await request('dayWork', data);
@@ -170,8 +178,6 @@ async function dayWork() {
         if (item.workType === 7 && item.prizeType === 0) {
           // missionId.push(item.mid);
           taskInfo.push(item);
-        } else {
-          console.log('浏览任务走了else')
         }
         // if (item.workType === 7 && item.prizeType === 0) {
         //   missionId2 = item.mid;
@@ -294,7 +300,7 @@ async function setUserLinkStatus(missionId) {
       "riskDeviceParam":{"eid":"","dt":"","ma":"","im":"","os":"","osv":"","ip":"","apid":"","ia":"","uu":"","cv":"","nt":"","at":"1","fp":"","token":""}
     }
     let response = await request('setUserLinkStatus', params)
-    console.log(`missionId为${missionId}：：第${index}次浏览活动完成: ${JSON.stringify(response)}`);
+    console.log(`missionId为${missionId}：：第${index + 1}次浏览活动完成: ${JSON.stringify(response)}`);
     resultCode = response.resultCode;
     code = response.resultData.code;
     // if (resultCode === 0) {
@@ -302,9 +308,29 @@ async function setUserLinkStatus(missionId) {
     //   console.log(`领取遛狗奖励完成: ${JSON.stringify(sportRevardResult)}`);
     // }
     index++;
-  } while (resultCode === 0 && code === 200)
+  } while (index < 7) //不知道结束的条件，目前写死循环7次吧
   console.log('浏览店铺任务结束');
+  console.log('开始领取浏览后的奖励');
+  let receiveAwardRes = await receiveAward(missionId);
+  console.log(`领取浏览任务奖励成功：${JSON.stringify(receiveAwardRes)}`)
   gen.next();
+}
+// 领取浏览后的奖励
+function receiveAward(mid) {
+  if (!mid) return
+  mid = mid + "";
+  const params = {
+    "source":0,
+    "workType": 7,
+    "opType": 2,
+    "mid": mid,
+    "riskDeviceParam":{"eid":"","dt":"","ma":"","im":"","os":"","osv":"","ip":"","apid":"","ia":"","uu":"","cv":"","nt":"","at":"1","fp":"","token":""}
+  }
+  return new Promise((rs, rj) => {
+    request('doWork', params).then(response => {
+      rs(response);
+    })
+  })
 }
 function share(data) {
   if (data.opType === 1) {
@@ -368,5 +394,3 @@ function taskurl(function_id, body) {
       'Referer' : `https://uua.jr.jd.com/uc-fe-wxgrowing/moneytree/index/?channel=yxhd&lng=113.325896&lat=23.204600&sid=2d98e88cf7d182f60d533476c2ce777w&un_area=19_1601_50258_51885`,
       'Accept-Language' : `zh-cn`
     }
-  }
-}
