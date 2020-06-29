@@ -394,3 +394,5 @@ function taskurl(function_id, body) {
       'Referer' : `https://uua.jr.jd.com/uc-fe-wxgrowing/moneytree/index/?channel=yxhd&lng=113.325896&lat=23.204600&sid=2d98e88cf7d182f60d533476c2ce777w&un_area=19_1601_50258_51885`,
       'Accept-Language' : `zh-cn`
     }
+  }
+}
