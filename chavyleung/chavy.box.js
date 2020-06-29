@@ -1,9 +1,10 @@
 const $ = new Env('BoxJs')
 $.domain = '8.8.8.8'
 
-$.version = '0.1.3'
+$.version = '0.3.0'
 $.versionType = 'beta'
 $.KEY_sessions = 'chavy_boxjs_sessions'
+$.KEY_versions = 'chavy_boxjs_versions'
 $.KEY_userCfgs = 'chavy_boxjs_userCfgs'
 $.KEY_globalBaks = 'chavy_boxjs_globalBaks'
 
@@ -322,7 +323,7 @@ async function getAppSubs() {
     const sub = usercfgs.appsubs[subIdx]
     subActs.push(
       new Promise((resolve) => {
-        $.get({ url: sub.url }, (err, resp, data) => {
+        $.get({ url: sub.url.replace(/[ ]|[\r\n]/g, '') }, (err, resp, data) => {
           try {
             const respsub = JSON.parse(data)
             if (Array.isArray(respsub.apps)) {
@@ -390,6 +391,24 @@ function getSessions() {
   const sessionstr = $.getdata($.KEY_sessions)
   const sessions = sessionstr ? JSON.parse(sessionstr) : []
   return Array.isArray(sessions) ? sessions : []
+}
+
+async function getVersions() {
+  let vers = []
+  await new Promise((resolve) => {
+    const verurl = 'https://github.com/chavyleung/scripts/raw/master/box/release/box.release.json'
+    $.get({ url: verurl }, (err, resp, data) => {
+      try {
+        const _data = JSON.parse(data)
+        vers = Array.isArray(_data.releases) ? _data.releases : vers
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        resolve()
+      }
+    })
+  })
+  return vers
 }
 
 function getSystemThemes() {
@@ -544,6 +563,7 @@ function handleApi() {
 async function getBoxData() {
   return {
     sessions: getSessions(),
+    versions: await getVersions(),
     sysapps: getSystemApps(),
     userapps: getUserApps(),
     appsubs: await getAppSubs(),
@@ -637,7 +657,24 @@ function printHtml(data, curapp = null, curview = 'app') {
               </v-list>
             </v-menu>
             <v-btn icon @click="ui.curview = ui.bfview" v-else><v-icon>mdi-chevron-left</v-icon></v-btn>
-            <v-autocomplete :label="ui.curapp ? ui.curapp.name + ' ' + ui.curapp.author : 'chavy.box.js'" no-data-text="未实现" dense hide-details solo> </v-autocomplete>
+            <v-autocomplete v-model="ui.autocomplete.curapp" :items="apps" :filter="appfilter" :menu-props="{ closeOnContentClick: true, overflowY: true }" :label="ui.curapp ? ui.curapp.name + ' ' + ui.curapp.author : 'BoxJs - v' + box.syscfgs.version" no-data-text="未实现" dense hide-details solo>
+              <template v-slot:item="{ item }">
+                <v-list-item @click="goAppSessionView(item)">
+                  <v-list-item-avatar>
+                    <img :src="item.icons[box.usercfgs.isTransparentIcons ? 0 : 1]">
+                  </v-list-item-avatar>
+                  <v-list-item-content>
+                    <v-list-item-title>{{ item.name }} ({{ item.id }})</v-list-item-title>
+                    <v-list-item-subtitle>{{ item.repo }}</v-list-item-subtitle>
+                    <v-list-item-subtitle>{{ item.author }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <v-btn icon v-if="item.isFav" @click.stop="onFav(item)"><v-icon color="yellow darken-2">mdi-star</v-icon></v-btn>
+                    <v-btn icon v-else @click.stop="onFav(item)"><v-icon color="grey">mdi-star-outline</v-icon></v-btn>
+                  </v-list-item-action>
+                </v-list-item>
+              </template>
+            </v-autocomplete>
             <v-btn icon @click="ui.drawer.show = true">
               <v-avatar size="26">
                 <img :src="box.syscfgs.orz3.icon" :alt="box.syscfgs.orz3.repo" />
@@ -645,7 +682,7 @@ function printHtml(data, curapp = null, curview = 'app') {
             </v-btn>
           </v-app-bar>
           <v-fab-transition>
-            <v-speed-dial v-show="ui.box.show && !box.usercfgs.isHideBoxIcon" fixed fab bottom :left="ui.drawer.show" :right="!ui.drawer.show" class="mb-12">
+            <v-speed-dial v-show="ui.box.show && !box.usercfgs.isHideBoxIcon" fixed fab bottom direction="top" :left="ui.drawer.show || box.usercfgs.isLeftBoxIcon" :right="!box.usercfgs.isLeftBoxIcon === true" class="mb-12">
               <template v-slot:activator>
                 <v-btn fab>
                   <v-avatar size="48">
@@ -653,8 +690,12 @@ function printHtml(data, curapp = null, curview = 'app') {
                   </v-avatar>
                 </v-btn>
               </template>
-              <v-btn fab small color="grey" @click="box.usercfgs.isHideBoxIcon = true, onUserCfgsChange()">
-                <v-icon>mdi-eye-off</v-icon>
+              <v-btn v-if="!box.usercfgs.isHideHelp" fab small color="grey" @click="ui.versheet.show = true">
+                <v-icon>mdi-help</v-icon>
+              </v-btn>
+              <v-btn fab small color="pink" @click="box.usercfgs.isLeftBoxIcon = !box.usercfgs.isLeftBoxIcon, onUserCfgsChange()">
+                <v-icon v-if="!box.usercfgs.isLeftBoxIcon">mdi-format-horizontal-align-left</v-icon>
+                <v-icon v-else>mdi-format-horizontal-align-right</v-icon>
               </v-btn>
               <v-btn fab small color="indigo" @click="ui.impGlobalBakDialog.show = true">
                 <v-icon>mdi-database-import</v-icon>
@@ -662,7 +703,7 @@ function printHtml(data, curapp = null, curview = 'app') {
               <v-btn fab small color="green" @click="" v-clipboard:copy="JSON.stringify(boxdat)" v-clipboard:success="onCopy">
                 <v-icon>mdi-export-variant</v-icon>
               </v-btn>
-              <v-btn fab small color="orange" @click="onReload">
+              <v-btn fab small color="orange" @click="reload">
                 <v-icon>mdi-refresh</v-icon>
               </v-btn>
             </v-speed-dial>
@@ -696,6 +737,16 @@ function printHtml(data, curapp = null, curview = 'app') {
                 <v-list-item-action @click="onLink(box.syscfgs.boxjs.repo)">
                   <v-btn fab small text>
                     <v-avatar size="32"><img :src="box.syscfgs.boxjs.icon" :alt="box.syscfgs.boxjs.repo" /></v-avatar>
+                  </v-btn>
+                </v-list-item-action>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-content>
+                  <v-switch label="隐藏帮助按钮" v-model="box.usercfgs.isHideHelp" @change="onUserCfgsChange"></v-switch>
+                </v-list-item-content>
+                <v-list-item-action @click="onLink(box.syscfgs.boxjs.repo)">
+                  <v-btn fab small text>
+                    <v-avatar size="32"><v-icon>mdi-help</v-icon></v-avatar>
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
@@ -973,7 +1024,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                       <v-list-item-title>{{ bak.name }}</v-list-item-title>
                       <v-list-item-subtitle>{{ bak.createTime}}</v-list-item-subtitle>
                       <v-list-item-subtitle>
-                        <v-chip x-small class="mr-2" v-for="(tag, tagIdx) in bak.tags">{{ tag }}</v-chip>
+                        <v-chip x-small class="mr-2" v-for="(tag, tagIdx) in bak.tags" :key="tagIdx">{{ tag }}</v-chip>
                       </v-list-item-subtitle>
                     </v-list-item-content>
                     <v-list-item-action>
@@ -1084,6 +1135,105 @@ function printHtml(data, curapp = null, curview = 'app') {
               </v-btn>
             </v-bottom-navigation>
           </v-expand-transition>
+          <v-bottom-sheet v-model="ui.versheet.show" hide-overlay scrollable>
+            <v-card flat scrollable>
+              <v-subheader class="my-4">
+                <v-btn text @click="ui.versheet.show = false, ui.updatesheet.show = true">升级教程</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn text>新版本</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn text @click="ui.versheet.show = false">朕, 知道了!</v-btn>
+              </v-subheader>
+              <v-card-text>
+                <v-timeline dense>
+                  <v-timeline-item small v-for="(ver, verIdx) in box.versions" :key="ver.version">
+                    <div class="py-4">
+                      <h2 v-if="box.syscfgs.version === ver.version" class="headline font-weight-bold mb-4 green--text">v{{ ver.version }} (当前)</h2>
+                      <h2 v-else class="headline font-weight-bold mb-4 grey--text">v{{ ver.version }}</h2>
+                      <template v-for="(note, noteIdx) in ver.notes">
+                        <strong>{{ note.name }}</strong>
+                        <ul><li v-for="(desc, descIdx) in note.descs">{{ desc }}</li></ul>
+                      </template>
+                    </div>
+                  </v-timeline-item>
+                </v-timeline>
+              </v-card-text>
+            </v-card>
+          </v-bottom-sheet>
+          <v-bottom-sheet v-model="ui.updatesheet.show" hide-overlay>
+            <v-sheet>
+              <v-subheader>
+                <v-menu bottom left v-if="box.syscfgs.env !== ''">
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-avatar size="26">
+                        <img :src="box.syscfgs.envs.find(e=>e.id===box.syscfgs.env).icon" alt="box.syscfgs.env" />
+                      </v-avatar>
+                    </v-btn>
+                  </template>
+                  <v-list dense>
+                    <v-list-item v-for="(env, envIdx) in box.syscfgs.envs" :key="env.id" @click="box.syscfgs.env=env.id">
+                      <v-list-item-avatar size="24"><v-img :src="env.icon"></v-img></v-list-item-avatar>
+                      <v-list-item-title>{{ env.id }}</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+                <v-spacer></v-spacer>
+                <v-btn text @click="ui.updatesheet.show = false">朕, 知道了!</v-btn>
+              </v-subheader>
+              <v-card flat v-if="box.syscfgs.env === 'Surge'">
+                <v-card-text>
+                  <p class="subtitle-1">【安装模块】</p>
+                  <p class="body-1">
+                    首页 &gt; 模块 &gt; 安装新模块
+                    https://github.com/chavyleung/scripts/raw/master/surge.box.sgmodule
+                  </p>
+                  <p class="body-2">最后重启 Surge 代理 (首页右上角的开关)</p>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-text>
+                  <p class="subtitle-1">【更新模块】</p>
+                  <p class="body-1">首页 &gt; Surge图标 (左上角) &gt; 外部资源 &gt; 全部更新</p>
+                  <p class="body-2">最后重启 Surge 代理 (首页右上角的开关)</p>
+                </v-card-text>
+              </v-card>
+              <v-card flat v-else-if="box.syscfgs.env === 'QuanX'">
+                <v-card-title>QuanX TF 或 商店 (购买超 90 天)</v-card-title>
+                <v-card-text>
+                  <p class="subtitle-1">【远程订阅】</p>
+                  <p class="body-1">
+                    风车 &gt; 重写 &gt; 引用 &gt; 添加 (右上角)
+                    https://github.com/chavyleung/scripts/raw/master/QuantumultX.box.remote.conf
+                  </p>
+                  <p class="subtitle-1">【订阅更新】</p>
+                  <p class="body-2">长按风车 &gt; 刷新 (左下角) &gt; 重启代理 (主界面右上角的开关)</p>
+                  <p class="caption">注意: 不是能只更新订阅链接, 必须长按风车全部更新!</p>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-title>QuanX 商店 (购买少于 90 天)</v-card-title>
+                <v-card-text>
+                  <p class="subtitle-1">【本地更新】</p>
+                  <p class="body-2">下载最新脚本 &gt; 重启代理 (主界面右上角的开关)</p>
+                </v-card-text>
+              </v-card>
+              <v-card flat v-if="box.syscfgs.env === 'Loon'">
+                <v-card-text>
+                  <p class="subtitle-1">【远程订阅】</p>
+                  <p class="body-1">
+                    配置 (底栏) &gt; Rewrite &gt; 订阅Rewrite &gt; 添加 (右上角图标)
+                    https://github.com/chavyleung/scripts/raw/master/loon.box.conf
+                  </p>
+                  <p class="body-2">最后重启 Loon 代理 (首页右上角的开关)</p>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-text>
+                  <p class="subtitle-1">【订阅更新】</p>
+                  <p class="body-1">配置 (底栏) &gt; Rewrite &gt; 订阅Rewrite &gt; 刷新 (右上角图标)</p>
+                  <p class="body-2">最后重启 Loon 代理 (首页右上角的开关)</p>
+                </v-card-text>
+              </v-card>
+            </v-sheet>
+          </v-bottom-sheet>
         </v-app>
       </div>
       <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
@@ -1106,11 +1256,14 @@ function printHtml(data, curapp = null, curview = 'app') {
                 curappTabs: { curtab: 'sessions' },
                 curappSessions: null,
                 overlay: { show: false },
+                autocomplete: { curapp: null },
                 editProfileDialog: { show: false, bak: '' },
                 impGlobalBakDialog: { show: false, bak: '' },
                 reloadConfirmDialog: { show: false, title: '操作成功', message: '是否马上刷新页面?' },
                 impSessionDialog: { show: false, impval: '' },
                 addAppSubDialog: { show: false, url: '' },
+                versheet: { show: false },
+                updatesheet: { show: false },
                 snackbar: { show: false, text: '已复制!', timeout: 2000 },
                 appbar: { color: '' },
                 box: { show: false },
@@ -1121,6 +1274,13 @@ function printHtml(data, curapp = null, curview = 'app') {
             }
           },
           computed: {
+            apps: function () {
+              const apps = []
+              apps.push(...this.box.sysapps)
+              this.box.appsubs.forEach((sub, subIdx) => apps.push(...sub.apps))
+              apps.sort((a, b) => a.id.localeCompare(b.id))
+              return apps
+            },
             appcnt: function () {
               let cnt = 0
               cnt += Array.isArray(this.box.sysapps) ? this.box.sysapps.length : 0
@@ -1234,6 +1394,9 @@ function printHtml(data, curapp = null, curview = 'app') {
             }
           },
           methods: {
+            appfilter(item, queryText, itemText) {
+              return item.id.includes(queryText) || item.name.includes(queryText)
+            },
             onLink(link) {
               window.open(link)
             },
@@ -1434,6 +1597,15 @@ function printHtml(data, curapp = null, curview = 'app') {
             setTimeout(() => {
               this.ui.box.show = true
             }, 500)
+
+            const curver = this.box.syscfgs.version
+            const vers = this.box.versions
+            if (curver && Array.isArray(vers)) {
+              const lastestVer = vers[0].version
+              if (curver < lastestVer) {
+                this.ui.versheet.show = true
+              }
+            }
           }
         })
       </script>
