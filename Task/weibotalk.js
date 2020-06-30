@@ -61,6 +61,21 @@ $.delete_cookie = false //若需要清空cookie，请把它置为true。清空�
 $.msg_max_num = 30 //一个通知显示30个超话的签到情况
 $.time = 700 //【签到间隔，单位ms】，若超话过多，建议填1000ms以上。
 
+if ($.getdata('wb_delete_cookie') != undefined) {
+    if ($.getdata('wb_delete_cookie') == true || $.getdata('wb_delete_cookie') == 'true')
+        $.delete_cookie = true
+    else
+        $.delete_cookie = false
+}
+if ($.getdata('wb_msg_max_num') != undefined) {
+    if($.getdata('wb_msg_max_num') != "")
+        $.msg_max_num = $.getdata('wb_msg_max_num') * 1
+}
+if ($.getdata('wb_request_time') != undefined) {
+    if($.getdata('wb_request_time') != "")
+        $.time = $.getdata('wb_request_time') * 1
+}
+
 debug = false
 const tokenurl = "evil_tokenurl";
 const tokencheckinurl = "evil_tokencheckinurl";

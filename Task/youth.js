@@ -197,9 +197,24 @@ function Invitant() {
  {
    //sy.log(`Invitdata:${data}`)
  })
+  aticleshare()
   resolve()
  })
 }
+
+function aticleshare() {      
+ return new Promise((resolve, reject) => {
+     shareurl = { 
+      url: `https://kd.youth.cn/n/27043840?46746961.html`, 
+      headers: {Cookie: JSON.parse(signheaderVal)['Cookie']},
+}
+   sy.get(shareurl, (error, response, data) =>{
+   //sy.log(`data:${data}`)
+   })
+resolve()
+ })
+}
+
 
 //看视频奖励
 function getAdVideo() {      

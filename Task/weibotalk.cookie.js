@@ -86,11 +86,11 @@ if ($request && $request.method != 'OPTIONS' && $request.url.match(/\_\-\_myfoll
   const checkinurl = $request.url
   
   const checkinheaders = JSON.stringify($request.headers)
-  if ($.getdata(tokencheckinurl) == undefined || $.getdata(tokencheckinurl) == "") {
+  if (($.getdata(tokenurl) != undefined && $.getdata(tokenurl) != "") && ($.getdata(tokencheckinurl) == undefined || $.getdata(tokencheckinurl) == "")) {
     console.log(checkinurl)
     $.setdata(checkinurl, tokencheckinurl)
     $.setdata(checkinheaders, tokencheckinheaders)
-    $.msg("微博超话 [账号一]", "🎉获取超话签到链接成功", `若之前已弹出【获取已关注列表成功】的通知，那么已完成当前账号cookie获取。`)
+    $.msg("微博超话 [账号一]", "🎉获取超话签到链接成功", `若之前已弹出【获取已关注列表成功】的通知，那么已完成当前账号cookie获取。\n若你只准备签到1个账号，那么现在请关闭获取cookie的脚本或重写了。`)
 
   }
   else {
@@ -98,7 +98,7 @@ if ($request && $request.method != 'OPTIONS' && $request.url.match(/\_\-\_myfoll
       console.log(checkinurl)
       $.setdata(checkinurl, tokencheckinurl2)
       $.setdata(checkinheaders, tokencheckinheaders2)
-      $.msg("微博超话 [账号二]", "🎉获取超话签到链接成功", `若之前已弹出【获取已关注列表成功】的通知，那么已完成当前账号cookie获取。`)
+      $.msg("微博超话 [账号二]", "🎉获取超话签到链接成功", `若之前已弹出【获取已关注列表成功】的通知，那么已完成当前账号cookie获取。\n请关闭获取cookie的脚本或重写，然后可以愉快使用了。`)
     }
   }
 }

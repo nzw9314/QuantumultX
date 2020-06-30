@@ -1,5 +1,5 @@
 /*
-更新时间: 2020-06-13 00:40
+更新时间: 2020-06-29 23:40
 
 腾讯新闻签到修改版，可以自动阅读文章获取红包，该活动为瓜分百万阅读红包挑战赛，针对幸运用户参与
 
@@ -34,7 +34,7 @@ QX 1.0.7+ :
 0 9 * * * txnews2.js, tag=腾讯新闻
  [rewrite_local]
 https:\/\/api\.inews\.qq\.com\/event\/v1\/user\/event\/report\? url script-request-header txnews2.js
-
+https:\/\/api\.inews\.qq\.com\/event\/v1\/user\/event\/report\? url script-response-body txnews2.js
 ~~~~~~~~~~~~~~~~~~
  [MITM]
 hostname = api.inews.qq.com
@@ -59,13 +59,18 @@ if (isGetCookie) {
 }
 
 function GetCookie() {
-if ($request && $request.method != 'OPTIONS' && $request.url.match(/user\/event\/report\?/)) {
+if ($request && $request.method != 'OPTIONS' && $request.url.match(/user\/event\/report\?/)&&$request.headers!==undefined) {
   const signurlVal =  $request.url
   const cookieVal = $request.headers['Cookie'];
   sy.log(`signurlVal:${signurlVal}`)
   sy.log(`cookieVal:${cookieVal}`)
   if (signurlVal) sy.setdata(signurlVal, 'sy_signurl_txnews2')
   if (cookieVal) sy.setdata(cookieVal,  'sy_cookie_txnews2')
+if($response&&$response.statusCode==200){
+     RedID =  JSON.parse(response.body).data.activity.id
+  sy.setdata(RedID,'activity_txnews2')
+  sy.log(`RedID:${RedID}`)
+}
   sy.msg(cookieName, `获取Cookie: 成功🎉`, ``)
   }
  }
@@ -77,7 +82,6 @@ async function all()
   await openApp();
   await shareApp();
   await StepsTotal();
-  await StepsTotal2();
   await RednumCheck();
   await getTotal();
   await showmsg();
@@ -126,7 +130,8 @@ try {
       }
      }
     catch(error) {
-    sy.msg(cookieName, '无法获取活动激活ID',  error)
+        sy.msg(cookieName, '无法获取活动激活ID',  error)
+        return
       }
     resolve()
     })
@@ -147,7 +152,7 @@ function lookVideo() {
         if(logs)sy.log(`${cookieName}观看视频 - data: ${data}`)
        tolookresult = JSON.parse(data)
       if(tolookresult.info=='success'){
-        RedID = tolookresult.data.activity.id
+        //RedID = tolookresult.data.activity.id
         videocoins = tolookresult.data.countdown_timer.countdown_tips
      }
     }
@@ -176,12 +181,14 @@ return new Promise((resolve, reject) => {
 totalred.data.award[i].title.split("，")[0].replace(/[\u4e00-\u9fa5]/g,``)
        getreadred=totalred.data.award[i].can_get
        openreadred= totalred.data.award[i].opened
+       readnum = totalred.data.award[i].event_num
         }
    if(totalred.data.award[i].type=='video'){
         videoredtotal = totalred.data.award[i].total
         videotitle = totalred.data.award[i].title.split("，")[0].replace(/[\u4e00-\u9fa5]/g,``)
         getreadred = totalred.data.award[i].can_get        
         openvideored = totalred.data.award[i].opened
+        videonum = totalred.data.award[i].event_num/2
         }
       }
      }
@@ -190,25 +197,6 @@ totalred.data.award[i].title.split("，")[0].replace(/[\u4e00-\u9fa5]/g,``)
   })
 }
 
-function StepsTotal2() {
- const ID = signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
-return new Promise((resolve, reject) => {
-  const StepsUrl = {
-    url: `https://api.inews.qq.com/activity/v1/activity/notice/info?activity_id=${RedID}&${ID}`,
-   headers: {Cookie: cookieVal},
-  };
-    sy.get(StepsUrl, (error, response, data) => {
-     if(logs)sy.log(`${cookieName}阅读统计- data: ${data}\n`)
-       totalnum = JSON.parse(data)
-        if (totalnum.ret == 0){
-        readnum =  totalnum.data.show_list[0].schedule.current
-        videonum =
-totalnum.data.show_list[1].schedule.current
-     }
-    resolve()
-    })
-  })
-}
 function RednumCheck() {
   var date = new Date();
   var hour = date.getHours();
@@ -217,13 +205,11 @@ function RednumCheck() {
     Redpack()
   }
   if(videocoins=="红包+1"){
-   videoPack()
+    videoPack()
   }
-  else if(hour>20){
-     async function run(){
-      await Redpack();
-      await videoPack();
-   }
+   else if(hour>20){
+     Redpack(),
+     videoPack()
   }
 }
 function openApp() {
@@ -248,7 +234,7 @@ function shareApp() {
    ID = signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
 return new Promise((resolve, reject) => {
   const openUrl = {
-    url: `https://url.cn/xk3Zs0Vc`,
+    url: `https://gh.prize.qq.com/show/_by0n9/invPack/index.html?#/Share?info=17A2385EE6D27888DB9F9D6B0BE90EEA&referpage=defaults`,
     headers: {Cookie: cookieVal},
   }
    sy.get(openUrl, (error, response, data) => {
@@ -275,22 +261,23 @@ return new Promise((resolve, reject) => {
        for (i=0;i<rcash.data.award.length;i++){
         readredpack += rcash.data.award[i].num/100
             }
-       redpackres += `【阅读红包】到账`+readredpack+` 元 🌷\n` 
+       if(readredpack!=0){
+       redpackres += `【阅读红包】到账`+readredpack+`元 🌷\n` 
            }
+         }
+     resolve()
        })
-    resolve()
    })
 }
 
 function videoPack() {
   const ID =  signurlVal.match(/devid=[a-zA-Z0-9_-]+/g)
 return new Promise((resolve, reject) => {
- setTimeout(()=>{
   const cashUrl = {
     url: `https://api.inews.qq.com/activity/v1/activity/redpack/get?isJailbreak=0&${ID}`,
     headers: {Cookie: cookieVal},
     body: `redpack_type=video&activity_id=${RedID}`
-  };
+  }
     sy.post(cashUrl, (error, response, data) => {
     if(logs)sy.log(`${cookieName}视频红包-data:${data}`)
         let vcash = JSON.parse(data)
@@ -300,10 +287,11 @@ return new Promise((resolve, reject) => {
        for (i=0;i<vcash.data.award.length;i++){
         videoredpack += vcash.data.award[i].num/100
              }
-        redpackres += `【视频红包】到账`+videoredpack+` 元 🌷\n` 
+       if(videoredpack!=0){
+        redpackres += `【视频红包】到账`+videoredpack+`元 🌷\n` 
+          }
          }
      resolve()
-       },100)
       })
    })
 }
@@ -321,15 +309,17 @@ return new Promise((resolve, reject) => {
     if (logs) console.log("获取收益信息" +data)
      const obj = JSON.parse(data)
       subTile = '【收益总计】'+obj.data.wealth[0].title +'金币  '+"现金: " +obj.data.wealth[1].title+'元'
-      }
-    resolve()
-    })
+        }
+     resolve()
+      })
    })
  }
 
 function showmsg() {
  return new Promise((resolve, reject) => {
-   detail = signinfo+ redpackres + `【文章阅读】已读/再读: `+ readnum +`/`+readtitle+` 篇\n`+`【阅读红包】已开/总计: `+openreadred+`/`+readredtotal+` 个🧧\n`+ `【观看视频】已看/再看: `+ videonum +`/`+videotitle+` 分钟\n`+`【视频红包】已开/总计: `+openvideored+`/`+videoredtotal+` 个🧧\n【每日一句】`+Dictum
+  if(readnum&&videonum){
+   detail = signinfo+redpackres + `【文章阅读】已读/再读: `+ readnum +`/`+readtitle+` 篇\n`+`【阅读红包】已开/总计: `+openreadred+`/`+readredtotal+` 个🧧\n`+ `【观看视频】已看/再看: `+ videonum +`/`+videotitle+` 分钟\n`+`【视频红包】已开/总计: `+openvideored+`/`+videoredtotal+` 个🧧\n【每日一句】`+Dictum
+  }
    if
 (openvideored%notifyInterval==0&&videocoins=="红包+1"){
    sy.msg(cookieName,subTile,detail)
@@ -347,46 +337,57 @@ resolve()
 
 
 function init() {
-    isSurge = () => {
-      return undefined === this.$httpClient ? false : true
-    }
-    isQuanX = () => {
-      return undefined === this.$task ? false : true
-    }
-    getdata = (key) => {
-      if (isSurge()) return $persistentStore.read(key)
-      if (isQuanX()) return $prefs.valueForKey(key)
-    }
-    setdata = (key, val) => {
-      if (isSurge()) return $persistentStore.write(key, val)
-      if (isQuanX()) return $prefs.setValueForKey(key, val)
-    }
-    msg = (title, subtitle, body) => {
-      if (isSurge()) $notification.post(title, subtitle, body)
-      if (isQuanX()) $notify(title, subtitle, body)
-    }
-    log = (message) => console.log(message+'\n')
-    get = (url, cb) => {
-      if (isSurge()) {
-        $httpClient.get(url, cb)
-      }
-      if (isQuanX()) {
-        url.method = 'GET'
-        $task.fetch(url).then((resp) => cb(null, {}, resp.body))
-      }
-    }
-    post = (url, cb) => {
-      if (isSurge()) {
-        $httpClient.post(url, cb)
-      }
-      if (isQuanX()) {
-        url.method = 'POST'
-        $task.fetch(url).then((resp) => cb(null, {}, resp.body))
-      }
-    }
-    done = (value = {}) => {
-      $done(value)
-    }
-    return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
+  isSurge = () => {
+    return undefined !== this.$httpClient
   }
-
+  isQuanX = () => {
+    return undefined !== this.$task
+  }
+  getdata = (key) => {
+    if (isSurge()) return $persistentStore.read(key)
+    if (isQuanX()) return $prefs.valueForKey(key)
+  }
+  setdata = (key, val) => {
+    if (isSurge()) return $persistentStore.write(key, val)
+    if (isQuanX()) return $prefs.setValueForKey(key, val)
+  }
+  msg = (title, subtitle = '', body = '') => {
+    if (isSurge()) $notification.post(title, subtitle, body)
+    if (isQuanX()) $notify(title, subtitle, body)
+  }
+  log = (msg) => {
+    console.log(`${msg}\n`)
+  }
+  get = (options, callback) => {
+    if (isQuanX()) {
+      if (typeof options == 'string') options = { url: options }
+      options['method'] = 'GET'
+      return $task.fetch(options).then(
+        (response) => {
+          response['status'] = response.statusCode
+          callback(null, response, response.body)
+        },
+        (reason) => callback(reason.error, null, null)
+      )
+    }
+    if (isSurge()) return $httpClient.get(options, callback)
+  }
+  post = (options, callback) => {
+    if (isQuanX()) {
+      if (typeof options == 'string') options = { url: options }
+      options['method'] = 'POST'
+      $task.fetch(options).then(
+        (response) => {
+          response['status'] = response.statusCode
+          callback(null, response, response.body)
+        },
+        (reason) => callback(reason.error, null, null)
+      )
+    }
+    if (isSurge()) $httpClient.post(options, callback)
+  }
+  done = (value = {}) => {
+    $done(value)
+  }
+  return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
+}
