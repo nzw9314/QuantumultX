@@ -12,11 +12,15 @@ const delay = 8000 //设置两个通知之前的延迟，单位毫秒
 const $ = new cmp()
 const point = "alipays://platformapi/startapp?appId=20000160&url=/www/myPoints.html"
 const mayi = "alipay://platformapi/startapp?appId=60000002"
+const juan = "alipays://platformapi/startapp?appId=2021001162654785"
 
 $.notify("支付宝", "", "领积分啦", point)
 
 setTimeout(() => {
     $.notify("支付宝", "", "收能量啦", mayi)
+}, delay)
+setTimeout(() => {
+    $.notify("支付宝", "", "领劵啦", juan)
 }, delay)
 
 $done()
