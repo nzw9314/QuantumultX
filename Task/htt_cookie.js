@@ -1,15 +1,19 @@
 /*
+作者邀请码:53150681
+nzw9314邀请码: 12773106
+公众号iosrule by红鲤鱼与绿鲤鱼与驴
+
+2020.6.28
+增加小视频和视频奖励ck
+2020.6.30更新获取ck的bug
+点击签到获取ck
 by红鲤鱼与绿鲤鱼与驴
 
-原作者邀请码: 53150681
-
-nzw9314邀请码: 12773106
-
 ====================================
-时段签到, 阅读数据, 小视频和视频 4个cookie
 获取ck完毕可以禁止该js
-
 #惠头条签到获取Qx
+#时段签到, 阅读数据, 小视频和视频 4个cookie
+
 
 https:\/\/api\.cashtoutiao\.com url script-request-body htt_cookie.js
 
@@ -74,7 +78,7 @@ var tt=huitoutiao;
 
 
 console.log(urlval)
-if(urlval.indexOf("frontend/sign")>=0)
+if(urlval.indexOf("frontend/sign?")>=0)
 {
  
 var htt_signurlck=urlval.substring(urlval.indexOf("sign?")+5,urlval.length);

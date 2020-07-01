@@ -1,31 +1,45 @@
 /*
-by红鲤鱼与绿鲤鱼与驴
-原作者邀请码: 53150681
-
-nzw9314邀请码: 12773106
+记得填写我的邀请码:53150681
+稳
+公众号iosrule by红鲤鱼与绿鲤鱼与驴
 2020.6.27
-本版本阉割通知
-为方便上传git库 
+
 #惠头条签到定时执行任务，因为有阅读，视频和小视频三个奖励，建议2分钟以上频率.
 
 1.2020627完成签到奖励,时段奖励,阅读奖励
 2.2020628增加观视频奖励,小视频奖励,首页奖励，每日阅读资讯领金币
+3.20200629修复每日任务的阅读资讯领金币待测试，首页奖励无法代码实现。加关闭任务通知功能。
+4.没有改动界面。对上版本圈叉和loon通用修复,请匹配最新版的htt_cookie.js文件,本次发布在微信撸金币群。
+
+
+
 
 
 问题:如果日志出现提示登录状态失效之类，点阅读软件首页时段奖励按钮获取ck。
 
 
 loon定时格式参考
-cron "0 21,31,50 0-22 * * *" script-path=htt_task.js, tag=惠头条
+cron "0 21,31,50 0-22 * * ?" script-path=htt_task.js, tag=惠头条
 */
 
 
 //以上是配置说明
-const $iosrule = iosrule();//声明必须
+
+
+const Notice=90;//设置运行多少次才通知。
+
+
+
+
+
+
+
 
 
 
 //====================================
+
+const $iosrule = iosrule();//声明必须
 const httid="A";
 const huitoutiao="惠头条";
 
@@ -42,7 +56,7 @@ const htt_smvideo=$iosrule.read(htt_smvideoname);
 
 
 const htt_signurlckname="htt_signurlckname"+httid;
-const htt_signurlck=getUrlParams($iosrule.read(htt_signurlckname));
+const htt_signurlck=$iosrule.read(htt_signurlckname);
 
 
 const htt_signbdname="htt_signbdname"+httid;
@@ -83,7 +97,7 @@ htt_main();
 function htt_main()
 {
 
-//htt_read_smvideo();
+
 htt_coinall();
 
 
@@ -119,7 +133,9 @@ function htt_taskread5()
   {
    var result1="【每日任务阅读奖励】";var result2="";
 var tt=huitoutiao;
-    const llUrl1 = {url:"https://api.cashtoutiao.com/frontend/daily/task/revision/draw?"+htt_signurlck,headers:{"Content-Type":"application/json","User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"},body:htt_signbd,timeout:60};
+var htt_signbd_task=JSON.parse(htt_signbd);
+htt_signbd_task.taskId=5;htt_signbd_task=JSON.stringify(htt_signbd_task);
+    const llUrl1 = {url:"https://api.cashtoutiao.com/frontend/daily/task/revision/draw?"+htt_signurlck,headers:{"Content-Type":"application/json","User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"},body:htt_signbd_task,timeout:60};
  $iosrule.post(llUrl1, function(error, response, data) {
       console.log(data)
     var obj=JSON.parse(data);
@@ -137,7 +153,7 @@ function htt_daysign()
   {
    var result1="";var result2="";
 var tt=huitoutiao;
-const llUrl1 = {url:"https://api.cashtoutiao.com/frontend/sign?"+htt_signurlck,headers:{"Content-Type":"application/json","User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"},body:htt_signbd};var signjs=JSON.parse(htt_signbd);signjs["code"]=sign("%3Dhdfefni");const llUrl2 = {url:"https://api.cashtoutiao.com/frontend/invite?"+htt_signurlck,headers:{"Content-Type":"application/json","User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"},body:signjs};
+const llUrl1 = {url:"https://api.cashtoutiao.com/frontend/sign?"+htt_signurlck,headers:{"Content-Type":"application/json","User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"},body:htt_signbd};var signjs=JSON.parse(htt_signbd);signjs["code"]=sign("%3Dhdfefni");signjs=JSON.stringify(signjs); const llUrl2 = {url:"https://api.cashtoutiao.com/frontend/invite?"+htt_signurlck,headers:{"Content-Type":"application/json","User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"},body:signjs};
  $iosrule.post(llUrl1, function(error, response, data) {
     
     console.log(data)
@@ -280,26 +296,6 @@ htt_msg(result1+"\n"+result2+"\n");
 
 
 
-/**
-* url参数获取
-* @param _params {String} url路径
-* @return {Void} 无
-*/
-function getUrlParams(params) {
-    var url = String(params);
-    var urlIndex = url.lastIndexOf("?");
-    if (urlIndex >= 0) {
-        url = url.substring(urlIndex + 1);
-    }
-    var queryString = {};
-    url.split("&").forEach((item, _index) => {
-        var index = item.indexOf("=");
-        if (index) {
-            queryString[item.substr(0,index)]= item.substr(index + 1);
-        }
-    });
-    return url!=null? url:"";
-}
 
 
 function htt_readtotal()
@@ -329,11 +325,17 @@ var tt=huitoutiao;
 function htt_msg(r)
 {var tt=huitoutiao;
   htt_num++;htt_result+=r;
-  
-  console.log(htt_num)
-  console.log(r)
-  if(htt_num==8)
-  papa(tt,"[签到-时段-视频-阅读]",htt_result);
+ if(htt_num==8)
+  {var loon= $iosrule.read("iosrule");
+ if (typeof(loon) !="undefined")
+    {loon=loon.substring(7,loon.length);
+ loon++;$iosrule.write("iosrule"+loon,"iosrule");}else{loon=1;
+$iosrule.write("iosrule"+loon,"iosrule")
+}     if (loon%Notice==0)
+ {papa(tt,"[签到-时段-视频-阅读]"+"当前运行"+loon+"次",htt_result);loon=0;$iosrule.write("iosrule"+loon,"iosrule");loon=0; htt_result ="";$iosrule.write("iosrule"+loon,"iosrule");
+    
+    }
+  }
 }
 
 function htt_coinall()
@@ -356,15 +358,15 @@ function htt_coinall()
 
 setTimeout(function(){
    htt_read_video();
- }, 40* 1000);
+ }, 35* 1000);
 
 setTimeout(function(){
    htt_read_smvideo();
- }, 80* 1000);
+ }, 70* 1000);
 
 setTimeout(function(){
   htt_readtotal();
- }, 83* 1000);
+ }, 71* 1000);
 
 }
 
@@ -372,7 +374,7 @@ setTimeout(function(){
 
   
 function htt_find(bd) {
-if(!!bd&&JSON.parse(bd).hasOwnProperty("token"))
+if(JSON.parse(bd).hasOwnProperty("token"))
   {bd=JSON.parse(bd);delete bd["token"];bd=JSON.stringify(bd);
 return bd;}
 else
@@ -397,11 +399,15 @@ formatSeconds(value) {
     return res;
   }
 
-/*
+
+  
+  
+
+
 function papa(x,y,z){
 
  $iosrule.notify(x,y,z);}
-*/
+
 function sign(code)  
 {  
    code=unescape(code);  
