@@ -150,7 +150,7 @@ function user_info() {
         if (userInfo.realName) {
           console.log(`助力码sharePin为：：${userInfo.sharePin}`);
           subTitle = `${userInfo.nick}的${userInfo.treeInfo.treeName}`;
-          message += `【我的金国数量】${userInfo.treeInfo.fruit}\n`;
+          message += `【我的金果数量】${userInfo.treeInfo.fruit}\n`;
           message += `【我的金币数量】${userInfo.treeInfo.coin}\n`;
           message += `【距离${userInfo.treeInfo.level + 1}级摇钱树还差】${userInfo.treeInfo.progressLeft}\n`;
           gen.next();
