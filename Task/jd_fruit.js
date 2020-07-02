@@ -149,6 +149,13 @@ function* step() {
             let signResult = yield signForFarm(); //签到
             if (signResult.code == "0") {
                 message += `【签到成功】获得${signResult.amount}g\n`//连续签到${signResult.signDay}天
+                if (signResult.todayGotWaterGoalTask.canPop) {
+                  let goalResult = yield gotWaterGoalTaskForFarm();
+                  console.log(`被水滴砸中奖励:${JSON.stringify(goalResult)}`);
+                  if (goalResult.code === '0') {
+                    message += `【被水滴砸中】获取：${goalResult.addEnergy}g\n`
+                  }
+                }
             } else {
                 message += `签到失败,详询日志\n`
                 console.log(`签到结果:  ${JSON.stringify(signResult)}`);
@@ -158,8 +165,8 @@ function* step() {
             // message += `今天已签到,连续签到${farmTask.signInit.totalSigned},下次签到可得${farmTask.signInit.signEnergyEachAmount}g\n`
         }
         console.log(`签到结束,开始广告浏览任务`);
-        let goalResult = yield gotWaterGoalTaskForFarm();
-        console.log(`被水滴砸中奖励:${JSON.stringify(goalResult)}`);
+        // let goalResult = yield gotWaterGoalTaskForFarm();
+        // console.log('被水滴砸中奖励: ', goalResult);
         if (!farmTask.gotBrowseTaskAdInit.f) {
             let adverts = farmTask.gotBrowseTaskAdInit.userBrowseTaskAds
             let browseReward = 0
