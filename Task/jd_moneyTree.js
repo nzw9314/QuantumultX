@@ -1,3 +1,4 @@
+// 京东摇钱树 ：https://gitee.com/lxk0301/scripts/raw/master/jd_moneyTree2.js
 // 现有功能
 // 1、收金果
 // 2、每日签到（也就是三餐签到）
@@ -5,9 +6,9 @@
 // 4、浏览任务
 // 5、自动领取浏览后的奖励
 // 6、七天签到（连续不间断签到七天）
-// cron */6 * * * *
-//表示每6分钟收取一次，自行设定运行间隔
+// cron 1 */3 * * * *
 // 圈X,Loon,surge均可使用
+const Notice = 2;//设置运行多少次才通知。
 const $hammer = (() => {
   const isRequest = "undefined" != typeof $request,
       isSurge = "undefined" != typeof $httpClient,
@@ -95,17 +96,16 @@ const $hammer = (() => {
 })();
 
 //直接用NobyDa的jd cookie
-const cookie = $hammer.read('CookieJD')
+const cookie = $hammer.read('CookieJD');
+let treeMsgTime = $hammer.read('treeMsgTime') >= Notice ? 0 : $hammer.read('treeMsgTime') || 0;
 const name = '京东摇钱树';
 const JD_API_HOST = 'https://ms.jr.jd.com/gw/generic/uc/h5/m';
-let userInfo = null, taskInfo = [];
+let userInfo = null, taskInfo = [], message = '', subTitle = '';
 let gen = entrance();
 gen.next();
 async function* entrance() {
-  let message = '';
   if (!cookie) {
-    // return $hammer.alert("京东萌宠", '请先获取cookie\n直接使用NobyDa的京东签到获取');
-    message = '请先获取cookie\n直接使用NobyDa的京东签到获取';
+    return $hammer.alert(name, '请先获取cookie\n直接使用NobyDa的京东签到获取');
   }
   yield user_info();
   yield signEveryDay();//每日签到
@@ -125,8 +125,8 @@ async function* entrance() {
     }
   }
   yield harvest(userInfo);//收获
-  message += `收金果,签到,分享任务做完了\n`;
-  // $hammer.alert(name, message);
+  // console.log(`----${treeMsgTime}`)
+  msgControl();
   console.log('任务做完了');
 }
 
@@ -147,8 +147,17 @@ function user_info() {
       if (res.resultData.data) {
         console.log('res.resultData.data有值')
         userInfo = res.resultData.data;
-        gen.next();
-        // dayWork(res.resultData.data)
+        if (userInfo.realName) {
+          console.log(`助力码sharePin为：：${userInfo.sharePin}`);
+          subTitle = `${userInfo.nick}的${userInfo.treeInfo.treeName}`;
+          message += `【我的金国数量】${userInfo.treeInfo.fruit}\n`;
+          message += `【我的金币数量】${userInfo.treeInfo.coin}\n`;
+          message += `【距离${userInfo.treeInfo.level + 1}级摇钱树还差】${userInfo.treeInfo.progressLeft}\n`;
+          gen.next();
+        } else {
+          return $hammer.alert(name, `当前京东账号${userInfo.nick}未实名认证，不可参与此活动`);
+          gen.return();
+        }
       }
     } else {
       console.log('走了else');
@@ -354,6 +363,21 @@ function share(data) {
   //   }, 2000)
   // })
   // await sleep(3);
+}
+function msgControl() {
+  console.log('控制弹窗');
+  console.log(treeMsgTime);
+  // console.log(typeof (treeMsgTime));
+  treeMsgTime++;
+  // console.log(treeMsgTime);
+  $hammer.write(`${treeMsgTime}`, 'treeMsgTime');
+  console.log(`${$hammer.read('treeMsgTime')}`);
+  // console.log(`${typeof (Number($hammer.read('treeMsgTime')))}`)
+  // console.log(`${($hammer.read('treeMsgTime') * 1) === Notice}`)
+  if (($hammer.read('treeMsgTime') * 1) === Notice) {
+    $hammer.alert(name, message, subTitle);
+    $hammer.write('0', 'treeMsgTime');
+  }
 }
 //等待一下
 function sleep(s) {
