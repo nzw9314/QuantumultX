@@ -1,5 +1,5 @@
 //jd免费水果 搬的https://github.com/liuxiaoyucc/jd-helper/blob/a6f275d9785748014fc6cca821e58427162e9336/fruit/fruit.js
-
+// 更新时间：2020-07-03
 // [task_local]
 // #jd免费水果
 // cron "1 0 7,12,18 * * *" script-path=https://raw.githubusercontent.com/iepngs/Script/master/jd/fruit.js,tag=jd免费水果
@@ -133,14 +133,14 @@ function* step() {
     //
     let message = '';
     let subTitle = '';
-
+    let option = {};
     if (!cookie) {
         return $hammer.alert(name, '请先获取cookie\n直接使用NobyDa的京东签到获取');
     }
-    
     let farmInfo = yield initForFarm();
     if (farmInfo.farmUserPro) {
-      subTitle = farmInfo.farmUserPro.nickName + '的' + farmInfo.farmUserPro.name;
+        option['media-url'] = farmInfo.farmUserPro.goodsImage;
+        subTitle = farmInfo.farmUserPro.nickName + '的' + farmInfo.farmUserPro.name;
         console.log('shareCode为: ' + farmInfo.farmUserPro.shareCode);
         farmTask = yield taskInitForFarm();
         // console.log(`当前任务详情: ${JSON.stringify(farmTask)}`);
@@ -459,10 +459,11 @@ function* step() {
         console.log('全部任务结束');
     } else {
         console.log(`初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常,农场初始化数据: ${JSON.stringify(farmInfo)}`);
-        message = '初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常'
-    }
-    let option = {
-      'media-url': farmInfo.farmUserPro.goodsImage
+        if (farmInfo.code && farmInfo.code == '3') {
+          message = `【提示】京东cookie已失效或未登录,请重新获取\n`
+        } else {
+          message = '初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常'
+        }
     }
     $hammer.alert(name, message, subTitle, '', option)
     $hammer.done();
