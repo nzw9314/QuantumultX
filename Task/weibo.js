@@ -106,7 +106,7 @@ function getsign() {
      let result = JSON.parse(data)
      if (result.status == 10000){
          subTitle = `微博签到成功`
-         detail = `【微博签到】连续签到${result.data.continuous}天，获得收益: ${result.data.desc}💰`  
+         detail = `【微博签到】连续签到${result.data.continuous}天，获得收益: ${result.data.desc}💰\n`  
          }  
      else if (result.errno == 30000){
          subTitle = `微博签到: 重复`
