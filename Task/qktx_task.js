@@ -36,7 +36,7 @@ MITM=appv8.qukantianxia.com,appv7.qukantx.com
 
 
 
-const Notice=1;//设置运行多少次才通知。
+const Notice=30;//设置运行多少次才通知。
 const log=1;//设置0关闭日志,1开启日志
 const noNotice=0;//1关闭通知0打开通知.
 
