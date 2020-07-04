@@ -1,7 +1,7 @@
 const $ = new Env('BoxJs')
 $.domain = '8.8.8.8'
 
-$.version = '0.3.4'
+$.version = '0.3.8'
 $.versionType = 'beta'
 $.KEY_sessions = 'chavy_boxjs_sessions'
 $.KEY_versions = 'chavy_boxjs_versions'
@@ -13,7 +13,6 @@ $.json = $.name
 $.html = $.name
 
 !(async () => {
-  // $.setdata('', 'github')
   const path = getPath($request.url)
   // 处理主页请求 => /home
   if (/^\/home/.test(path)) {
@@ -301,7 +300,10 @@ function getAppSubs() {
     const sub = usercfgs.appsubs[subIdx]
     const suburl = sub.url.replace(/[ ]|[\r\n]/g, '')
     const cachedsub = usercfgs.appsubCaches[suburl]
-    if (cachedsub) {
+    if (cachedsub && Array.isArray(cachedsub.apps)) {
+      cachedsub._raw = sub
+      cachedsub.apps.forEach((app) => (app.datas = []))
+      wrapapps(cachedsub.apps)
       appsubs.push(cachedsub)
     } else {
       sub.isErr = true
@@ -447,7 +449,8 @@ async function handleApi() {
       session.datas.forEach((data) => {
         const oldval = $.getdata(data.key)
         const newval = data.val
-        const usesuc = $.setdata(`${newval}`, data.key)
+        const isNull = (val) => [undefined, null, 'null', 'undefined', ''].includes(val)
+        const usesuc = $.setdata(isNull(newval) ? '' : `${newval}`, data.key)
         $.log(`❕ ${$.name}, 替换数据: ${data.key} ${usesuc ? '成功' : '失败'}!`, `旧值: ${oldval}`, `新值: ${newval}`)
       })
       curSessions[session.appId] = session.id
@@ -520,7 +523,8 @@ async function handleApi() {
       const { chavy_boxjs_sessions, chavy_boxjs_sysCfgs, chavy_boxjs_userCfgs, chavy_boxjs_sysApps, ...datas } = bakobj.bak
       $.setdata(JSON.stringify(chavy_boxjs_sessions), $.KEY_sessions)
       $.setdata(JSON.stringify(chavy_boxjs_userCfgs), $.KEY_userCfgs)
-      Object.keys(datas).forEach((datkey) => $.setdata(datas[datkey] ? datas[datkey] : '', datkey))
+      const isNull = (val) => [undefined, null, 'null', 'undefined', ''].includes(val)
+      Object.keys(datas).forEach((datkey) => $.setdata(isNull(datas[datkey]) ? '' : `${datas[datkey]}`, datkey))
       $.subt = '还原备份: 成功'
       $.msg($.name, $.subt, $.desc)
     } else {
@@ -748,6 +752,11 @@ function printHtml(data, curapp = null, curview = 'app') {
               </v-list-item>
               <v-list-item>
                 <v-list-item-content>
+                  <v-switch label="隐藏更新订阅提示" v-model="box.usercfgs.isHideRefreshTip" @change="onUserCfgsChange"></v-switch>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-content>
                   <v-switch label="调试模式 (数据)" v-model="box.usercfgs.isDebugData" @change="onUserCfgsChange"></v-switch>
                 </v-list-item-content>
               </v-list-item>
@@ -934,9 +943,9 @@ function printHtml(data, curapp = null, curview = 'app') {
                   <v-subheader inset>
                     应用订阅 ({{ appsubs.length }})
                     <v-spacer></v-spacer>
-                    <v-tooltip v-model="ui.refreshtip.show" bottom>
+                    <v-tooltip v-model="ui.refreshtip.show && !box.usercfgs.isHideRefreshTip" bottom>
                       <template v-slot:activator="{ on }">
-                        <v-btn v-on="on" icon @click="onRefreshAppSubs"><v-icon>mdi-refresh-circle</v-icon></v-btn>
+                        <v-btn icon @click="onRefreshAppSubs"><v-icon>mdi-refresh-circle</v-icon></v-btn>
                       </template>
                       <span>手动更新订阅</span>
                     </v-tooltip>
@@ -1077,7 +1086,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="grey darken-1" text @click="ui.reloadConfirmDialog.show = false">稍候</v-btn>
-                  <v-btn color="green darken-1" text @click="reload">马上刷新</v-btn>
+                  <v-btn color="green darken-1" text @click="reload">马上刷新 {{ ui.reloadConfirmDialog.sec ? '(' + ui.reloadConfirmDialog.sec + ')' : '' }}</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -1264,7 +1273,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                 refreshtip: { show: false },
                 editProfileDialog: { show: false, bak: '' },
                 impGlobalBakDialog: { show: false, bak: '' },
-                reloadConfirmDialog: { show: false, title: '操作成功', message: '是否马上刷新页面?' },
+                reloadConfirmDialog: { show: false, sec: 0, title: '操作成功', message: '是否马上刷新页面?' },
                 impSessionDialog: { show: false, impval: '' },
                 addAppSubDialog: { show: false, url: '' },
                 versheet: { show: false },
@@ -1395,6 +1404,15 @@ function printHtml(data, curapp = null, curview = 'app') {
                   if (!isFullScreen) {
                     history.pushState(state, '', '/my')
                   }
+                }
+              }
+            },
+            'ui.reloadConfirmDialog.sec': {
+              handler(newval, oldval) {
+                if (newval !== 0) {
+                  setTimeout(() => this.ui.reloadConfirmDialog.sec -= 1, 1000)
+                } else {
+                  this.reload()
                 }
               }
             }
@@ -1530,14 +1548,15 @@ function printHtml(data, curapp = null, curview = 'app') {
               this.onReload()
             },
             onRefreshAppSubs(){
-              axios.post('/api', JSON.stringify({ cmd: 'refreshAppSubs', val: null }))
               this.onReload()
             },
             reload() {
               window.location.reload()
             },
             onReload() {
+              axios.post('/api', JSON.stringify({ cmd: 'refreshAppSubs', val: null }))
               this.ui.reloadConfirmDialog.show = true
+              this.ui.reloadConfirmDialog.sec = 3
             },
             onDelSession(session) {
               axios.post('/api', JSON.stringify({ cmd: 'delSession', val: session }))
