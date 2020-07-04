@@ -13,99 +13,100 @@
  * 2. Loon & Surge
  * domain, steamdb.info, DIRECT
  */
-const games = [
-  {
-    id: 271590,
-    name: "GTA V",
-  },
-  {
-    id: 814380,
-    name: "只狼：影逝二度"
-  },
-  {
-    id: 292030,
-    name: "巫师 3：狂猎"
-  }
+let games = [
+    {
+        id: 271590,
+        name: "GTA V",
+    },
+    {
+        id: 814380,
+        name: "只狼：影逝二度",
+    },
+    {
+        id: 292030,
+        name: "巫师 3：狂猎",
+    },
 ];
 
-const debug = false;
-/******************** 转换器 ********************/
-let q=null!=$task,s=null!=$httpClient;var $task=q?$task:{},$httpClient=s?$httpClient:{},$prefs=q?$prefs:{},$persistentStore=s?$persistentStore:{},$notify=q?$notify:{},$notification=s?$notification:{};if(q){var errorInfo={error:""};$httpClient={get:(t,r)=>{var e;e="string"==typeof t?{url:t}:t,$task.fetch(e).then(t=>{r(void 0,t,t.body)},t=>{errorInfo.error=t.error,r(errorInfo,response,"")})},post:(t,r)=>{var e;e="string"==typeof t?{url:t}:t,t.method="POST",$task.fetch(e).then(t=>{r(void 0,t,t.body)},t=>{errorInfo.error=t.error,r(errorInfo,response,"")})}}}s&&($task={fetch:t=>new Promise((r,e)=>{"POST"==t.method?$httpClient.post(t,(t,e,o)=>{e?(e.body=o,r(e,{error:t})):r(null,{error:t})}):$httpClient.get(t,(t,e,o)=>{e?(e.body=o,r(e,{error:t})):r(null,{error:t})})})}),q&&($persistentStore={read:t=>$prefs.valueForKey(t),write:(t,r)=>$prefs.setValueForKey(t,r)}),s&&($prefs={valueForKey:t=>$persistentStore.read(t),setValueForKey:(t,r)=>$persistentStore.write(t,r)}),q&&($notification={post:(t,r,e)=>{$notify(t,r,e)}}),s&&($notify=function(t,r,e){$notification.post(t,r,e)});
-/******************** 转换器 ********************/
+const $ = API("steam");
+if ($.read('games') !== undefined) {
+    games = JSON.parse($.read('games'));
+}
 
-Promise.all(games.map(async (item) => check(item))).then(() => $done());
+Promise.all(games.map(async (item) => check(item))).then(() => $.done());
 
 async function check(item) {
-  const {id, name} = item;
-  if (debug) {
-    console.log(`正在检查：${item.id}...`);
-  }
-  const headers = {
-    "User-Agent":
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
-  };
-  await $task
-    .fetch({ url: `https://steamdb.info/app/${id}/`, headers })
-    .then((response) => {
-      const html = response.body;
-      const prices = getPrice(html);
-      const info = getInfo(html);
+    const {id, name} = item;
+    $.log(`正在检查：${item.id}...`);
 
-      $notify(
-        `🎮 [Steam 日报] ${name}`,
-        `${info.name}`,
-        `💰 [价格]:\n📉 历史最低:${prices.lowestPrice}元\n📌 当前价格: ${prices.currentPrice}元\n💡 [基本信息]:\n🎩 发行商: ${info.publisher}\n❤️ 评分: ${info.rating}\n🤖 在线人数: ${info.inGame}`
-      );
-    });
+    const headers = {
+        "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
+    };
+    await $.get({url: `https://steamdb.info/app/${id}/`, headers}).then(
+        (response) => {
+            const html = response.body;
+            const prices = getPrice(html);
+            const info = getInfo(html);
+
+            $.notify(
+                `🎮 [Steam 日报] ${name}`,
+                `${info.name}`,
+                `💰 [价格]:\n📉 历史最低:${prices.lowestPrice}元\n📌 当前价格: ${prices.currentPrice}元\n💡 [基本信息]:\n🎩 发行商: ${info.publisher}\n❤️ 评分: ${info.rating}\n🤖 在线人数: ${info.inGame}`
+            );
+        }
+    );
 }
 
 function getPrice(html) {
-  try {
-    const regexp = new RegExp(
-      /<tr class="table-prices-current">([\s\S]+?)<\/tr>/
-    );
-    const row = html.match(regexp)[1];
-    const prices = row.match(/¥ \d+/g);
-    const currentPrice = prices[0];
-    const lowestPrice = prices[1];
-    const discount = row.match(/-\d+%/)[0];
-    if (debug) {
-      console.log({ currentPrice, lowestPrice, discount });
+    try {
+        const regexp = new RegExp(
+            /<tr class="table-prices-current">([\s\S]+?)<\/tr>/
+        );
+        const row = html.match(regexp)[1];
+        const prices = row.match(/¥ \d+/g);
+        const currentPrice = prices[0];
+        const lowestPrice = prices[1];
+        const discount = row.match(/-\d+%/)[0];
+        $.log({currentPrice, lowestPrice, discount});
+        return {
+            currentPrice,
+            lowestPrice,
+            discount,
+        };
+    } catch (e) {
+        $.error("❌ 无法获取游戏信息 " + e);
     }
-    return {
-      currentPrice,
-      lowestPrice,
-      discount,
-    };
-  } catch (e) {
-    console.error("❌ 无法获取游戏信息 " + e);
-  }
 }
 
 function getInfo(html) {
-  try {
-    const name = html.match(/<td itemprop=\"name\">([\s\S]+?)<\/td>/)[1];
-    const publisher = html.match(
-      /<span itemprop=\"publisher\">([\s\S]+?)<\/span>/
-    )[1];
-    const header = Array.from(
-      html.matchAll(
-        /<div class=\"header-thing-number header-thing-good\">([\s\S]+?)<\/div/g
-      ),
-      (m) => m[1]
-    );
-    const rating = header[0];
-    const inGame = header[1];
-    if (debug) {
-      console.log({ name, publisher, rating, inGame });
+    try {
+        const name = html.match(/<td itemprop=\"name\">([\s\S]+?)<\/td>/)[1];
+        const publisher = html.match(
+            /<span itemprop=\"publisher\">([\s\S]+?)<\/span>/
+        )[1];
+        const header = Array.from(
+            html.matchAll(
+                /<div class=\"header-thing-number header-thing-good\">([\s\S]+?)<\/div/g
+            ),
+            (m) => m[1]
+        );
+        const rating = header[0];
+        const inGame = header[1];
+        $.log({name, publisher, rating, inGame});
+        return {
+            name,
+            publisher,
+            rating,
+            inGame,
+        };
+    } catch (e) {
+        $.error("❌ 无法获取游戏信息 " + e);
     }
-    return {
-      name,
-      publisher,
-      rating,
-      inGame,
-    };
-  } catch (e) {
-    console.error("❌ 无法获取游戏信息 " + e);
-  }
 }
+
+// prettier-ignore
+/*********************************** API *************************************/
+function API(t="untitled",s=!1){return new class{constructor(t,s){this.name=t,this.debug=s,this.isQX="undefined"!=typeof $task,this.isLoon="undefined"!=typeof $loon,this.isSurge="undefined"!=typeof $httpClient&&!this.isLoon,this.isNode="function"==typeof require,this.isJSBox=this.isNode&&"undefined"!=typeof $jsbox,this.node=(()=>this.isNode?{request:"undefined"!=typeof $request?void 0:require("request"),fs:require("fs")}:null)(),this.cache=this.initCache(),this.log(`INITIAL CACHE:\n${JSON.stringify(this.cache)}`),Promise.prototype.delay=function(t){return this.then(function(s){return((t,s)=>new Promise(function(e){setTimeout(e.bind(null,s),t)}))(t,s)})}}get(t){return this.isQX?("string"==typeof t&&(t={url:t,method:"GET"}),$task.fetch(t)):new Promise((s,e)=>{this.isLoon||this.isSurge?$httpClient.get(t,(t,i,o)=>{t?e(t):s({status:i.status,headers:i.headers,body:o})}):this.node.request(t,(t,i,o)=>{t?e(t):s({...i,status:i.statusCode,body:o})})})}post(t){return this.isQX?("string"==typeof t&&(t={url:t}),t.method="POST",$task.fetch(t)):new Promise((s,e)=>{this.isLoon||this.isSurge?$httpClient.post(t,(t,i,o)=>{t?e(t):s({status:i.status,headers:i.headers,body:o})}):this.node.request.post(t,(t,i,o)=>{t?e(t):s({...i,status:i.statusCode,body:o})})})}initCache(){if(this.isQX)return JSON.parse($prefs.valueForKey(this.name)||"{}");if(this.isLoon||this.isSurge)return JSON.parse($persistentStore.read(this.name)||"{}");if(this.isNode){const t=`${this.name}.json`;return this.node.fs.existsSync(t)?JSON.parse(this.node.fs.readFileSync(`${this.name}.json`)):(this.node.fs.writeFileSync(t,JSON.stringify({}),{flag:"wx"},t=>console.log(t)),{})}}persistCache(){const t=JSON.stringify(this.cache);this.log(`FLUSHING DATA:\n${t}`),this.isQX&&$prefs.setValueForKey(t,this.name),(this.isLoon||this.isSurge)&&$persistentStore.write(t,this.name),this.isNode&&this.node.fs.writeFileSync(`${this.name}.json`,t,{flag:"w"},t=>console.log(t))}write(t,s){this.log(`SET ${s} = ${JSON.stringify(t)}`),this.cache[s]=t,this.persistCache()}read(t){return this.log(`READ ${t} ==> ${JSON.stringify(this.cache[t])}`),this.cache[t]}delete(t){this.log(`DELETE ${t}`),delete this.cache[t],this.persistCache()}notify(t,s,e,i){const o="string"==typeof i?i:void 0,n=e+(null==o?"":`\n${o}`);this.isQX&&(void 0!==o?$notify(t,s,e,{"open-url":o}):$notify(t,s,e,i)),this.isSurge&&$notification.post(t,s,n),this.isLoon&&$notification.post(t,s,e),this.isNode&&(this.isJSBox?require("push").schedule({title:t,body:s?s+"\n"+e:e}):console.log(`${t}\n${s}\n${n}\n\n`))}log(t){this.debug&&console.log(t)}info(t){console.log(t)}error(t){console.log("ERROR: "+t)}wait(t){return new Promise(s=>setTimeout(s,t))}done(t={}){this.isQX||this.isLoon||this.isSurge?$done(t):this.isNode&&!this.isJSBox&&"undefined"!=typeof $context&&($context.headers=t.headers,$context.statusCode=t.statusCode,$context.body=t.body)}}(t,s)}
+/*****************************************************************************/
+

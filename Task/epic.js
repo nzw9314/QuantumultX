@@ -26,7 +26,7 @@ async function checkUpdate() {
             "media-url": imgurl
         }
         let time = item.match(/<pubDate>([\s\S]*?)<\/pubDate>/)[1];
-        let { description, publisher } = await fetchGameInfo(url);
+        let {description, publisher} = await fetchGameInfo(url);
         $.notify(
             `🎮 [Epic 限免]  ${name}`,
             `⏰ 发布时间: ${formatTime(time)}`,
@@ -37,9 +37,9 @@ async function checkUpdate() {
 }
 
 async function fetchGameInfo(url) {
-    const html = await $.get({ url }).then((resp) => resp.body);
+    const html = await $.get({url}).then((resp) => resp.body);
     const description = html.match(/"og:description" content="([\s\S]*?)"/)[1];
-    const publisher = html.match();
+    const publisher = "";
     return {
         description,
         publisher
