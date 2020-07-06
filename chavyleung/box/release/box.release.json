@@ -1,6 +1,97 @@
 {
   "releases": [
     {
+      "version": "0.3.8",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["刷新窗口增加 3 秒倒数自动刷新", "添加订阅能马上刷新订阅", "刷新窗口弹出时会顺便发起更新应用订阅", "可以隐藏手动更新订阅的提示"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.7",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下导入空数据产生的问题 (如: 京东没有账号2, 导入后提示账号 2 签到失败问题)"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.6",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下当前会话变双份问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.5",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["获取会话、应用会话、清空会话不生效问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.4",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["页面渲染时会先出现一串代码问题", "进入应用订阅页面提示手动刷新", "可以隐藏|显示`我的`标题"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.3",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["Loon环境判断错误问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.2",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "调整",
+          "descs": ["应用订阅启用缓存机制 (需要手动更新)"]
+        }
+      ]
+    },
+    {
       "version": "0.3.1",
       "tags": ["beta"],
       "author": "@chavyleung",
