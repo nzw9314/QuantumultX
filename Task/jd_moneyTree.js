@@ -1,5 +1,5 @@
 // 京东摇钱树 ：https://gitee.com/lxk0301/scripts/raw/master/jd_moneyTree2.js
-// 更新时间:2020-07-03
+// 更新时间:2020-07-06，可兼容iOS 10设备，优化未初始化摇钱树时候的弹窗提醒
 // 现有功能
 // 1、收金果
 // 2、每日签到（也就是三餐签到）
@@ -103,10 +103,10 @@ const cookie = $hammer.read('CookieJD');
 let treeMsgTime = $hammer.read('treeMsgTime') >= Notice ? 0 : $hammer.read('treeMsgTime') || 0;
 const name = '京东摇钱树';
 const JD_API_HOST = 'https://ms.jr.jd.com/gw/generic/uc/h5/m';
-let userInfo = null, taskInfo = [], message = '', subTitle = '';
+let userInfo = null, taskInfo = [], message = '', subTitle = '', fruitTotal = 0;
 let gen = entrance();
 gen.next();
-async function* entrance() {
+function* entrance() {
   if (!cookie) {
     return $hammer.alert(name, '请先获取cookie\n直接使用NobyDa的京东签到获取');
   }
@@ -115,27 +115,23 @@ async function* entrance() {
   yield dayWork();//做任务
   console.log('开始做浏览任务了')
   console.log(`浏览任务列表：：${JSON.stringify(taskInfo)}`);
-  for (let task of taskInfo) {
-    if (task.mid && task.workStatus === 0) {
-      console.log('开始做浏览任务');
-      yield setUserLinkStatus(task.mid);
-    } else if (task.mid && task.workStatus === 1){
-      console.log(`开始领取浏览后的奖励:mid:${task.mid}`);
-      let receiveAwardRes = await receiveAward(task.mid);
-      console.log(`领取浏览任务奖励成功：${JSON.stringify(receiveAwardRes)}`)
-    } else if (task.mid && task.workStatus === 2) {
-      console.log('所有的浏览任务都做完了')
-    }
-  }
-  let harvestRes = await harvest(userInfo);//收获
-  if (harvestRes.resultCode === 0 && harvestRes.resultData.code === '200') {
-    let data = harvestRes.resultData.data;
-    message += `【距离${data.treeInfo.level + 1}级摇钱树还差】${data.treeInfo.progressLeft}\n`;
-    if (data.treeInfo.fruit > 380) {
-      //金果数量大于380，才可以卖出
-      let sellRes = await sell();
-      console.log(`卖出金果结果:${JSON.stringify(sellRes)}\n`)
-    }
+  // for (let task of taskInfo) {
+  //   if (task.mid && task.workStatus === 0) {
+  //     console.log('开始做浏览任务');
+  //     yield setUserLinkStatus(task.mid);
+  //   } else if (task.mid && task.workStatus === 1){
+  //     console.log(`开始领取浏览后的奖励:mid:${task.mid}`);
+  //     let receiveAwardRes = await receiveAward(task.mid);
+  //     console.log(`领取浏览任务奖励成功：${JSON.stringify(receiveAwardRes)}`)
+  //   } else if (task.mid && task.workStatus === 2) {
+  //     console.log('所有的浏览任务都做完了')
+  //   }
+  // }
+  yield harvest(userInfo);//收获
+
+  if (fruitTotal > 380) {
+    //金果数量大于380，才可以卖出
+    yield sell();
   }
   yield myWealth();
   // console.log(`----${treeMsgTime}`)
@@ -168,7 +164,7 @@ function user_info() {
           // message += `【距离${userInfo.treeInfo.level + 1}级摇钱树还差】${userInfo.treeInfo.progressLeft}\n`;
           gen.next();
         } else {
-          return $hammer.alert(name, `当前京东金融账号${userInfo.nick}未实名认证，不可参与此活动`);
+          return $hammer.alert(name, `请先去京东app参加摇钱树活动(我的->游戏与互动->查看更多->摇钱树)`);
           gen.return();
         }
       }
@@ -241,6 +237,20 @@ async function dayWork() {
       }
     }
   }
+  for (let task of taskInfo) {
+    if (task.mid && task.workStatus === 0) {
+      console.log('开始做浏览任务');
+      // yield setUserLinkStatus(task.mid);
+      let aa = await setUserLinkStatus(task.mid);
+      console.log(`aaa${JSON.stringify(aa)}`);
+    } else if (task.mid && task.workStatus === 1){
+      console.log(`workStatus === 1开始领取浏览后的奖励:mid:${task.mid}`);
+      let receiveAwardRes = await receiveAward(task.mid);
+      console.log(`领取浏览任务奖励成功：${JSON.stringify(receiveAwardRes)}`)
+    } else if (task.mid && task.workStatus === 2) {
+      console.log('所有的浏览任务都做完了')
+    }
+  }
   // console.log(`浏览任务列表：：${JSON.stringify(taskInfo)}`);
   // for (let task of taskInfo) {
   //   if (task.mid && task.workStatus === 0) {
@@ -261,12 +271,20 @@ function harvest(userInfo) {
     "userId": userInfo.userInfo,
     "userToken": userInfo.userToken
   }
-  return new Promise((rs, rj) => {
-    request('harvest', data).then((response) => {
-      console.log(`收获金果结果:${JSON.stringify(response)}`);
-      rs(response)
-      // gen.next();
-    })
+  // return new Promise((rs, rj) => {
+  //   request('harvest', data).then((response) => {
+  //     console.log(`收获金果结果:${JSON.stringify(response)}`);
+  //     rs(response)
+  //     // gen.next();
+  //   })
+  // })
+  request('harvest', data).then((harvestRes) => {
+    if (harvestRes.resultCode === 0 && harvestRes.resultData.code === '200') {
+      let data = harvestRes.resultData.data;
+      message += `【距离${data.treeInfo.level + 1}级摇钱树还差】${data.treeInfo.progressLeft}\n`;
+      fruitTotal = data.treeInfo.fruit;
+      gen.next();
+    }
   })
 }
 //卖出金果，得到金币
@@ -276,10 +294,14 @@ function sell() {
     "riskDeviceParam":{"eid":"","dt":"","ma":"","im":"","os":"","osv":"","ip":"","apid":"","ia":"","uu":"","cv":"","nt":"","at":"1","fp":"","token":""}
   }
   params.riskDeviceParam = JSON.stringify(params.riskDeviceParam);//这一步，不可省略，否则提交会报错（和login接口一样）
-  return new Promise((rs, rj) => {
-    request('sell', params).then(response => {
-      rs(response);
-    })
+  // return new Promise((rs, rj) => {
+  //   request('sell', params).then(response => {
+  //     rs(response);
+  //   })
+  // })
+  request('sell', params).then((sellRes) => {
+    console.log(`卖出金果结果:${JSON.stringify(sellRes)}\n`)
+    gen.next();
   })
 }
 //获取金币和金果数量
@@ -389,7 +411,10 @@ async function setUserLinkStatus(missionId) {
   console.log('开始领取浏览后的奖励');
   let receiveAwardRes = await receiveAward(missionId);
   console.log(`领取浏览任务奖励成功：${JSON.stringify(receiveAwardRes)}`)
-  gen.next();
+  return new Promise((resolve, reject) => {
+    resolve(receiveAwardRes);
+  })
+  // gen.next();
 }
 // 领取浏览后的奖励
 function receiveAward(mid) {
