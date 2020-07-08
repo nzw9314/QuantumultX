@@ -1,5 +1,5 @@
 //京东萌宠助手 搬得https://github.com/liuxiaoyucc/jd-helper/blob/master/pet/pet.js
-
+// 2020-07-08更新：新增冰淇淋会场任务（可得8g狗粮），有些人京东app看不到，但是微信小程序京东有
 const $hammer = (() => {
     const isRequest = "undefined" != typeof $request,
         isSurge = "undefined" != typeof $httpClient,
@@ -286,7 +286,7 @@ async function petSport() {
         times++;
     } while (resultCode == 0 && code == 0)
     if (times > 1) {
-        message += '已完成十次遛狗\n';
+        message += '【十次遛狗】已完成\n';
     }
     gen.next();
 
@@ -313,7 +313,7 @@ async function slaveHelp() {
         }
     }
     if (helpPeoples && helpPeoples.length > 0) {
-        message += `已成功给${helpPeoples}助力\n`;
+        message += `【您助力的好友】${helpPeoples}\n`;
     }
 
     gen.next();
@@ -357,7 +357,24 @@ function browseSingleShopInit() {
         gen.next();
     })
 }
-
+// 临时新增任务--冰淇淋会场
+function browseSingleShopInit2() {
+  console.log('准备浏览指定店铺--冰淇淋会场');
+  const body = {"index":1,"version":1,"type":1};
+  const body2 = {"index":1,"version":1,"type":2}
+  request("getSingleShopReward", body).then(response => {
+    console.log(`①点击浏览指定店铺结果: ${JSON.stringify(response)}`);
+    if (response.code === '0' && response.resultCode === '0') {
+      request("getSingleShopReward", body2).then(response2 => {
+        console.log(`②浏览指定店铺结果: ${JSON.stringify(response2)}`);
+        if (response2.code === '0' && response2.resultCode === '0') {
+          message += `【冰淇淋会场】获取狗粮${response2.result.reward}g\n`;
+        }
+        gen.next();
+      })
+    }
+  })
+}
 // 三餐签到, 每天三段签到时间
 function threeMealInit() {
     console.log('准备三餐签到');
@@ -431,19 +448,33 @@ function inviteFriendsInit() {
 async function masterHelpInit() {
   let res = await request(arguments.callee.name.toString());
   console.log('助力信息: ' , res);
-  if (res.code === '0' && res.resultCode === '0' && (res.result.masterHelpPeoples && res.result.masterHelpPeoples.length >= 5)) {
-    if(!res.result.addedBonusFlag) {
-      console.log("开始领取额外奖励");
-      let getHelpAddedBonusResult = await getHelpAddedBonus();
-      console.log(`领取30g额外奖励结果：【${getHelpAddedBonusResult.message}】`);
-      message += `【额外奖励${getHelpAddedBonusResult.result.reward}领取】${getHelpAddedBonusResult.message}\n`;
+  if (res.code === '0' && res.resultCode === '0') {
+    if (res.result.masterHelpPeoples && res.result.masterHelpPeoples.length >= 5) {
+      if(!res.result.addedBonusFlag) {
+        console.log("开始领取额外奖励");
+        let getHelpAddedBonusResult = await getHelpAddedBonus();
+        console.log(`领取30g额外奖励结果：【${getHelpAddedBonusResult.message}】`);
+        message += `【额外奖励${getHelpAddedBonusResult.result.reward}领取】${getHelpAddedBonusResult.message}\n`;
+      } else {
+        console.log("已经领取过5好友助力额外奖励");
+        message += `【额外奖励】已领取\n`;
+      }
     } else {
-      console.log("已经领取过5好友助力额外奖励");
-      message += `【5好友助力额外奖励】已领取\n`;
+      console.log("助力好友未达到5个")
+      message += `【额外奖励领取失败】原因：助力好友未达5个\n`;
     }
-  } else {
-    console.log("助力好友未达到5个")
-    message += `【额外奖励领取失败】原因：助力好友未达5个\n`;
+    if (res.result.masterHelpPeoples && res.result.masterHelpPeoples.length > 0) {
+      console.log('帮您助力的好友的名单开始')
+      let str = '';
+      res.result.masterHelpPeoples.map((item, index) => {
+        if (index === (res.result.masterHelpPeoples.length - 1)) {
+          str += item.nickName || "匿名用户";
+        } else {
+          str += (item.nickName || "匿名用户") + '，';
+        }
+      })
+      message += `【助力您的好友】${str}\n`;
+    }
   }
   gen.next();
 }
@@ -459,7 +490,8 @@ function getHelpAddedBonus() {
 // 初始化任务, 可查询任务完成情况
 function taskInit() {
     console.log('开始任务初始化');
-    request(arguments.callee.name.toString()).then(response => {
+    const body = {"version":1};
+    request(arguments.callee.name.toString(), body).then(response => {
         if (response.resultCode === '9999' || !response.result) {
             console.log('初始化任务异常, 请稍后再试');
             gen.return();
