@@ -1,7 +1,7 @@
 /*
 "115" app 自动摇一摇获取空间，支持 Quantumult X（理论上也支持 Surge、Loon，未尝试）。
 请先按下述方法进行配置，进入"115"并摇一摇，若弹出"首次写入115 Cookie 成功"即可正常食用，其他提示或无提示请发送日志信息至 issue。
-到 cron 设定时间自动签到时，若弹出"115 - 签到成功"即完成签到，其他提示或无提示请发送日志信息至 issue。
+到 cron 设定时间自动摇一摇时，若弹出"115 - 摇一摇成功"即完成摇一摇，其他提示或无提示请发送日志信息至 issue。
 
 ⚠️免责声明：
 1. 此脚本仅用于学习研究，不保证其合法性、准确性、有效性，请根据情况自行判断，本人对此不承担任何保证责任。
@@ -43,7 +43,7 @@ const app_ver = '23.5.1'
 const CookieName = '115'
 const CookieKey = 'wp115'
 const UIDKey = 'uid115'
-const reg = /^https?:\/\/proapi\.115\.com\/ios\/user\/takespc\?(.*)&user_id=(\d+)$/
+const reg = /^https?:\/\/proapi\.115\.com\/ios\/user\/takespc\?(.*)user_id=(\d+)/
 const UTC8 = new Date(new Date().getTime() + new Date().getTimezoneOffset()*60*1000 + 8*60*60*1000)
 const today = UTC8.getFullYear() + "-" + ("00" + Number(UTC8.getMonth() + 1)).substr(-2) + "-" + ("00" + UTC8.getDate()).substr(-2)
 const $cmp = compatibility()
@@ -121,23 +121,24 @@ function Checkin() {
                 subTitle += 'Cookie 失效❗'
                 detail += '请按照脚本开头注释配置后重新获取。'
             } else if (result && result.error_code == 10022) {
-                subTitle += '重复签到！🤏'
+                subTitle += '重复摇一摇！🤏'
                 detail += result.error
             } else if (result && result.state == true) {
                 let getspace = result.data.take_state ? result.data.take_size_last : result.data.space
                 let get_time = result.data.take_state ? new Date(result.data.take_time_last * 1000) : false
                 let shaketime = get_time ? ('00' + get_time.getHours()).substr(-2) + ':' + ('00' + get_time.getMinutes()).substr(-2) : false
                 detail += shaketime ? '今天您在 ' + shaketime + ' 摇奖' : ''
-                subTitle += '签到成功！🎉'
+                subTitle += result.data.take_state ? '重复摇一摇！🕸' : '摇一摇成功！🎉'
                 detail += '获得空间 ' + getspace + ' MB！🤏'
                 $cmp.log("wp115 succeed data : \n" + JSON.stringify(result.data))
+                $cmp.log(JSON.stringify(data))
             } else {
                 subTitle += '未知错误，详情请见日志。'
                 detail += result.error
                 $cmp.log("wp115 failed response : \n" + JSON.stringify(result) + "\n" + data)
             }
         } else {
-            subTitle += '签到接口请求失败，详情请见日志。'
+            subTitle += '摇一摇接口请求失败，详情请见日志。'
             detail += error
             $cmp.log("wp115 failed response : \n" + error)
         }
