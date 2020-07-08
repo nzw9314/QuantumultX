@@ -393,9 +393,9 @@ if (setdongwo){
 for (i=1;i<result.data.data.length;i++){
     detail  += `\n`+result.data.data[i].arrive_time +'--'+result.data.data[i].start_time+ '  '+result.data.data[i].station_name
 }
-const title = traincode+ "次列车时刻🚄"
+const title = traincode+ "次列车"
 const subTitle = '始发站: '+startstation+ '--终点站: '+endstation
- $notify(title+ " / 出行日期 " +leftdate, subTitle, detail)
+ $notify(title+ " - 出行日期: " +leftdate, subTitle, detail)
   console.log(traincode+'次列车  \n'+detail)
   }
 } catch (e){

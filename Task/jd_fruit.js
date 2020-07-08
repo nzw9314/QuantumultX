@@ -1,18 +1,19 @@
 //jd免费水果 搬的https://github.com/liuxiaoyucc/jd-helper/blob/a6f275d9785748014fc6cca821e58427162e9336/fruit/fruit.js
-
+// 更新时间：2020-07-03
 // [task_local]
 // #jd免费水果
 // cron "1 0 7,12,18 * * *" script-path=https://raw.githubusercontent.com/iepngs/Script/master/jd/fruit.js,tag=jd免费水果
-
+//兼容surge和Loon等软件功能 by@iepngs
+//新增和维护功能 by@lxk0301
 const $hammer = (() => {
     const isRequest = "undefined" != typeof $request,
         isSurge = "undefined" != typeof $httpClient,
         isQuanX = "undefined" != typeof $task;
 
     const log = (...n) => { for (let i in n) console.log(n[i]) };
-    const alert = (title, body = "", subtitle = "", link = "") => {
+    const alert = (title, body = "", subtitle = "", link = "", option) => {
         if (isSurge) return $notification.post(title, subtitle, body, link);
-        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body));
+        if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body), option);
         log("==============📣系统通知📣==============");
         log("title:", title, "subtitle:", subtitle, "body:", body, "link:", link);
     };
@@ -104,6 +105,24 @@ var shareCodes = [ // 这个列表填入你要助力的好友的shareCode
     '61ff5c624949454aa88561f2cd721bf6',
     '40dbf12bb7ea4b8eb772741afe2125da'
 ]
+// 添加box功能
+// 【用box订阅的好处】
+// 1️⃣脚本也可以远程挂载了。助力功能只需在box里面设置助力码。
+// 2️⃣所有脚本的cookie都可以备份，方便你迁移到其他支持box的软件。
+let isBox = false //默认没有使用box
+const boxShareCodeArr = ['jd_fruit1', 'jd_fruit2', 'jd_fruit3', 'jd_fruit4'];
+isBox = boxShareCodeArr.some((item) => {
+  const boxShareCode = $hammer.read(item);
+  return (boxShareCode !== undefined && boxShareCode !== null && boxShareCode !== '');
+});
+if (isBox) {
+  shareCodes = [];
+  for (const item of boxShareCodeArr) {
+    if ($hammer.read(item)) {
+      shareCodes.push($hammer.read(item));
+    }
+  }
+}
 var Task = step();
 Task.next();
 
@@ -114,14 +133,14 @@ function* step() {
     //
     let message = '';
     let subTitle = '';
-
+    let option = {};
     if (!cookie) {
         return $hammer.alert(name, '请先获取cookie\n直接使用NobyDa的京东签到获取');
     }
-    
     let farmInfo = yield initForFarm();
     if (farmInfo.farmUserPro) {
-      subTitle = farmInfo.farmUserPro.nickName + '的' + farmInfo.farmUserPro.name;
+        option['media-url'] = farmInfo.farmUserPro.goodsImage;
+        subTitle = farmInfo.farmUserPro.nickName + '的' + farmInfo.farmUserPro.name;
         console.log('shareCode为: ' + farmInfo.farmUserPro.shareCode);
         farmTask = yield taskInitForFarm();
         // console.log(`当前任务详情: ${JSON.stringify(farmTask)}`);
@@ -130,6 +149,13 @@ function* step() {
             let signResult = yield signForFarm(); //签到
             if (signResult.code == "0") {
                 message += `【签到成功】获得${signResult.amount}g\n`//连续签到${signResult.signDay}天
+                if (signResult.todayGotWaterGoalTask.canPop) {
+                  let goalResult = yield gotWaterGoalTaskForFarm();
+                  console.log(`被水滴砸中奖励:${JSON.stringify(goalResult)}`);
+                  if (goalResult.code === '0') {
+                    message += `【被水滴砸中】获取：${goalResult.addEnergy}g\n`
+                  }
+                }
             } else {
                 message += `签到失败,详询日志\n`
                 console.log(`签到结果:  ${JSON.stringify(signResult)}`);
@@ -216,7 +242,7 @@ function* step() {
         // masterHelpTaskInitForFarm
         console.log('开始助力好友')
         let salveHelpAddWater = 0;
-        let remainTimes = null;//今日剩余助力次数
+        let remainTimes = 4;//今日剩余助力次数,默认4次（京东农场每人每天4次助力机会）。
         let helpSuccessPeoples = '';//成功助力好友
         for (let code of shareCodes) {
             if (code == farmInfo.farmUserPro.shareCode) {
@@ -300,6 +326,36 @@ function* step() {
             }
         } else if (farmTask.totalWaterTaskInit.totalWaterTaskTimes < farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
             message += `【十次浇水奖励】任务未完成，今日浇水${farmTask.totalWaterTaskInit.totalWaterTaskTimes}次\n`
+        }
+        // 水滴雨
+        if (!farmTask.waterRainInit.f) {
+          console.log(`水滴雨任务，每天两次，最多可得10g水滴`);
+          console.log(`两次水滴雨任务是否全部完成：${farmTask.waterRainInit.f ? '是' : '否'}`);
+          if (farmTask.waterRainInit.winTimes === 0) {
+            console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
+            let waterRain = yield waterRainForFarm();
+            console.log('水滴雨waterRain', waterRain);
+            if (waterRain.code === '0') {
+              console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
+              message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
+            }
+          } else {
+            //执行了第一次水滴雨。需等待3小时候才能再次执行
+            if (new Date().getTime()  > (farmTask.waterRainInit.lastTime + 3 * 60 * 60 *1000)) {
+              console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
+              let waterRain = yield waterRainForFarm();
+              console.log('水滴雨waterRain', waterRain);
+              if (waterRain.code === '0') {
+                console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
+                message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
+              }
+            } else {
+              console.log(`【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`)
+              message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`
+            }
+          }
+        } else {
+          message += `【当天两次水滴雨任务】已全部完成，获得20g水滴\n`
         }
         console.log('finished 水果任务完成!');
 
@@ -403,9 +459,13 @@ function* step() {
         console.log('全部任务结束');
     } else {
         console.log(`初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常,农场初始化数据: ${JSON.stringify(farmInfo)}`);
-        message = '初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常'
+        if (farmInfo.code && farmInfo.code == '3') {
+          message = `【提示】京东cookie已失效或未登录,请重新获取\n`
+        } else {
+          message = '初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常'
+        }
     }
-    $hammer.alert(name, message, subTitle)
+    $hammer.alert(name, message, subTitle, '', option)
     $hammer.done();
 }
 
@@ -515,7 +575,16 @@ function initForFarm() {
     request(functionId);
 }
 
-
+/**
+ * 水滴雨
+ * @param function_id
+ * @param body
+ */
+function waterRainForFarm() {
+  let functionId = arguments.callee.name.toString();
+  let body = {"type":1,"hongBaoTimes":100,"version":3};
+  request(functionId, body);
+}
 function request(function_id, body = {}) {
     $hammer.request('GET', taskurl(function_id, body), (error, response) => {
         error ? $hammer.log("Error:", error) : sleep(JSON.parse(response.body));
@@ -526,7 +595,7 @@ function sleep(response) {
     console.log('休息一下');
     setTimeout(() => {
         $hammer.log('休息结束');
-        $hammer.log(response)
+        // $hammer.log(response)
         Task.next(response)
     }, 2000);
 }
@@ -541,13 +610,12 @@ function taskurl(function_id, body = {}) {
     }
 }
 
-function taskposturl(function_id, body = {}) {
+function taskPostUrl(function_id, body = {}) {
     return {
         url: JD_API_HOST,
         body: `functionId=${function_id}&body=${JSON.stringify(body)}&appid=wh5`,
         headers: {
             Cookie: cookie,
-        },
-        method: "POST",
+        }
     }
 }
