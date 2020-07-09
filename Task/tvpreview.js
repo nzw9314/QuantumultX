@@ -28,113 +28,9 @@ cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/
 
 By Macsuny                   
 */
-const c = 'cctv8'  //修改电视台
-
-let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
-let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
-// http请求
-var $task = isQuantumultX ? $task : {};
-var $httpClient = isSurge ? $httpClient : {};
-
-// 消息通知
-var $notify = isQuantumultX ? $notify : {};
-var $notification = isSurge ? $notification : {};
-// #endregion 固定头部
-
-// #region 网络请求专用转换
-if (isQuantumultX) {
-    var errorInfo = {
-        error: ''
-    };
-    $httpClient = {
-        get: (url, cb) => {
-            var urlObj;
-            if (typeof (url) == 'string') {
-                urlObj = {
-                    url: url
-                }
-            } else {
-                urlObj = url;
-            }
-            $task.fetch(urlObj).then(response => {
-                cb(undefined, response, response.body)
-            }, reason => {
-                errorInfo.error = reason.error;
-                cb(errorInfo, response, '')
-            })
-        },
-        post: (url, cb) => {
-            var urlObj;
-            if (typeof (url) == 'string') {
-                urlObj = {
-                    url: url
-                }
-            } else {
-                urlObj = url;
-            }
-            url.method = 'POST';
-            $task.fetch(urlObj).then(response => {
-                cb(undefined, response, response.body)
-            }, reason => {
-                errorInfo.error = reason.error;
-                cb(errorInfo, response, '')
-            })
-        }
-    }
-}
-if (isSurge) {
-    $task = {
-        fetch: url => {
-            //为了兼容qx中fetch的写法,所以永不reject
-            return new Promise((resolve, reject) => {
-                if (url.method == 'POST') {
-                    $httpClient.post(url, (error, response, data) => {
-                        if (response) {
-                            response.body = data;
-                            resolve(response, {
-                                error: error
-                            });
-                        } else {
-                            resolve(null, {
-                                error: error
-                            })
-                        }
-                    })
-                } else {
-                    $httpClient.get(url, (error, response, data) => {
-                        if (response) {
-                            response.body = data;
-                            resolve(response, {
-                                error: error
-                            });
-                        } else {
-                            resolve(null, {
-                                error: error
-                            })
-                        }
-                    })
-                }
-            })
-
-        }
-    }
-}
-// #endregion 网络请求专用转换
-
-// #region 消息通知
-if (isQuantumultX) {
-    $notification = {
-        post: (title, subTitle, detail) => {
-            $notify(title, subTitle, detail);
-        }
-    }
-}
-if (isSurge) {
-    $notify = function (title, subTitle, detail) {
-        $notification.post(title, subTitle, detail);
-    }
-}
-
+const c = "cctv1"  //修改电视台
+const sy = init()
+const tvnum = sy.getdata(c)
 const method = "GET"
        d = new Date();
        M = d.getMonth()+1, D = d.getDate();
@@ -150,35 +46,80 @@ const method = "GET"
       weekday[6]="星期六";
   n = weekday[d.getDay()]
 const wurl = {
-    url: "http://api.cntv.cn/epg/epginfo?serviceId=cbox&c="+c,
+    url: "http://api.cntv.cn/epg/epginfo?serviceId=cbox&c="+tvnum,
+    headers: {'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'}
 }
-   $task.fetch(wurl).then(response => {    
+   sy.get(wurl, (error,response, data) => {    
    try { 
-      let result = JSON.parse(response.body)                              
-const title = `${result[`${c}`].channelName}频道节目  ` + M +'月'+ D +'日' + n + h +':'+ m
-      detail = `正在播出: ${result[`${c}`].isLive}\n${result[`${c}`].program[0].showTime} ${result[`${c}`].program[0].t}`
-      for (i = 1; i < result[`${c}`].program.length; i++)
+      let result = JSON.parse(data)                              
+const title = `${result[`${tvnum}`].channelName}频道节目  ` + M +'月'+ D +'日' + n + h +':'+ m
+      detail = `正在播出: ${result[`${tvnum}`].isLive}\n${result[`${tvnum}`].program[0].showTime} ${result[`${tvnum}`].program[0].t}`
+      for (i = 1; i < result[`${tvnum}`].program.length; i++)
        {      
-         detail += `\n${result[`${c}`].program[i].showTime} ${result[`${c}`].program[i].t}`
+         detail += `\n${result[`${tvnum}`].program[i].showTime} ${result[`${tvnum}`].program[i].t}`
        }
-      var l = result[`${c}`].program.length
+      var l = result[`${tvnum}`].program.length
       if (l > 1) {
-       for (i = 0; i < l && result[`${c}`].program[i].showTime.split(':')[0] < result[`${c}`].program[l-1].showTime.split(':')[0]; i++)
+       for (i = 0; i < l && result[`${tvnum}`].program[i].showTime.split(':')[0] < result[`${tvnum}`].program[l-1].showTime.split(':')[0]; i++)
        { 
-        if (result[`${c}`].liveSt == result[`${c}`].program[i].st)
+        if (result[`${tvnum}`].liveSt == result[`${tvnum}`].program[i].st)
          {   
-         subTitle = `即将播出: ${result[`${c}`].program[i+1].t}`
+         subTitle = `即将播出: ${result[`${tvnum}`].program[i+1].t}`
          } 
         }
       }
     else {
       subTitle = ``
        }      
-    $notify(title, subTitle, detail)
+   sy.msg(title, subTitle, detail)
    console.log(title+`\n`+subTitle+`\n`+detail)
   } catch(err) { 
-      $notify("无此频道节目信息或者台号错误❌", "请检查后重试", err)
+     sy.msg("无此频道节目信息或者台号错误❌", "请检查后重试", err)
      console.log(err)
     }
 $done()
  })
+function init() {
+  isSurge = () => {
+    return undefined === this.$httpClient ? false : true
+  }
+  isQuanX = () => {
+    return undefined === this.$task ? false : true
+  }
+  getdata = (key) => {
+    if (isSurge()) return $persistentStore.read(key)
+    if (isQuanX()) return $prefs.valueForKey(key)
+  }
+  setdata = (key, val) => {
+    if (isSurge()) return $persistentStore.write(key, val)
+    if (isQuanX()) return $prefs.setValueForKey(key, val)
+  }
+  msg = (title, subtitle, body) => {
+    if (isSurge()) $notification.post(title, subtitle, body)
+    if (isQuanX()) $notify(title, subtitle, body)
+  }
+  log = (message) => console.log(message)
+  get = (url, cb) => {
+    if (isSurge()) {
+      $httpClient.get(url, cb)
+    }
+    if (isQuanX()) {
+      url.method = 'GET'
+      $task.fetch(url).then((resp) => cb(null, resp, resp.body))
+    }
+  }
+  post = (url, cb) => {
+    if (isSurge()) {
+      $httpClient.post(url, cb)
+    }
+    if (isQuanX()) {
+      url.method = 'POST'
+      $task.fetch(url).then((resp) => cb(null, resp, resp.body))
+    }
+  }
+  done = (value = {}) => {
+    $done(value)
+  }
+  return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
+}
+

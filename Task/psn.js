@@ -31,7 +31,7 @@ function parse(products) {
         description = description.replace(/br|\\r|\\n/g, '');
         description = description.replace(/\w*&\w*?;/g, '');
         description = description.replace(/\w+\s{0,1}\w+="\w+"/g, '')
-        const name = item.name.trim().match(/《([\s\Sz]+?)》/)[1];
+        const name = item.name.trim();
         $.notify(
             `🎮 [PSN会免] ${name}`,
             `🗓 时间：${getTime()}`,

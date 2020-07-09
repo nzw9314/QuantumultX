@@ -1,7 +1,7 @@
 const $ = new Env('BoxJs')
 $.domain = '8.8.8.8'
 
-$.version = '0.3.9'
+$.version = '0.4.0'
 $.versionType = 'beta'
 $.KEY_sessions = 'chavy_boxjs_sessions'
 $.KEY_versions = 'chavy_boxjs_versions'
@@ -249,7 +249,7 @@ function getSystemApps() {
 }
 
 function getUserCfgs() {
-  const defcfgs = { favapps: [], appsubs: [], appsubCaches: {} }
+  const defcfgs = { favapps: [], appsubs: [], appsubCaches: {}, refreshsecs: 3 }
   const userCfgsStr = $.getdata($.KEY_userCfgs)
   return userCfgsStr ? Object.assign(defcfgs, JSON.parse(userCfgsStr)) : defcfgs
 }
@@ -401,6 +401,32 @@ async function handleApi() {
     const session = data.val
     const sessions = getSessions()
     sessions.push(session)
+    const savesuc = $.setdata(JSON.stringify(sessions), $.KEY_sessions)
+    $.subt = `保存会话: ${savesuc ? '成功' : '失败'} (${session.appName})`
+    $.desc = []
+    $.desc.push(`会话名称: ${session.name}`, `应用名称: ${session.appName}`, `会话编号: ${session.id}`, `应用编号: ${session.appId}`, `数据: ${JSON.stringify(session)}`)
+    $.msg($.name, $.subt, $.desc.join('\n'))
+  }
+  // 保存至指定会话
+  else if (data.cmd === 'saveSessionTo') {
+    const { fromapp, toSession } = data.val
+    const sessions = getSessions()
+    const session = sessions.find((s) => s.id === toSession.id)
+    session.datas = fromapp.datas
+    const savesuc = $.setdata(JSON.stringify(sessions), $.KEY_sessions)
+    $.subt = `保存会话: ${savesuc ? '成功' : '失败'} (${session.appName})`
+    $.desc = []
+    $.desc.push(`会话名称: ${session.name}`, `应用名称: ${session.appName}`, `会话编号: ${session.id}`, `应用编号: ${session.appId}`, `数据: ${JSON.stringify(session)}`)
+    $.msg($.name, $.subt, $.desc.join('\n'))
+  }
+  // 修改指定会话
+  else if (data.cmd === 'onModSession') {
+    const sessiondat = data.val
+    const sessions = getSessions()
+    const session = sessions.find((s) => s.id === sessiondat.id)
+    $.log(JSON.stringify(session))
+    session.name = sessiondat.name
+    session.datas = sessiondat.datas
     const savesuc = $.setdata(JSON.stringify(sessions), $.KEY_sessions)
     $.subt = `保存会话: ${savesuc ? '成功' : '失败'} (${session.appName})`
     $.desc = []
@@ -684,7 +710,7 @@ function printHtml(data, curapp = null, curview = 'app') {
               <v-btn fab small color="indigo" @click="ui.impGlobalBakDialog.show = true">
                 <v-icon>mdi-database-import</v-icon>
               </v-btn>
-              <v-btn fab small color="green" @click="" v-clipboard:copy="JSON.stringify(boxdat)" v-clipboard:success="onCopy">
+              <v-btn fab small color="green" v-clipboard:copy="JSON.stringify(boxdat)" v-clipboard:success="onCopy">
                 <v-icon>mdi-export-variant</v-icon>
               </v-btn>
               <v-btn fab small color="orange" @click="reload">
@@ -704,6 +730,12 @@ function printHtml(data, curapp = null, curview = 'app') {
                 </v-list-item-content>
               </v-list-item>
               <v-divider></v-divider>
+              <v-list-item>
+                <v-list-item-content>
+                  <v-slider desen label="刷新等待" hide-details ticks="always" min="0" max="5" tick-size="1" v-model="box.usercfgs.refreshsecs" @change="onUserCfgsChange"></v-slider>
+                </v-list-item-content>
+                <v-list-item-action>{{ box.usercfgs.refreshsecs }} 秒</v-list-item-action>
+              </v-list-item>
               <v-list-item>
                 <v-list-item-content>
                   <v-switch label="透明图标" v-model="box.usercfgs.isTransparentIcons" @change="onUserCfgsChange"></v-switch>
@@ -868,7 +900,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                       <v-btn icon v-on="on"><v-icon>mdi-dots-vertical</v-icon></v-btn>
                     </template>
                     <v-list dense>
-                      <v-list-item @click="" v-clipboard:copy="JSON.stringify(ui.curapp)" v-clipboard:success="onCopy">
+                      <v-list-item v-clipboard:copy="JSON.stringify(ui.curapp)" v-clipboard:success="onCopy">
                         <v-list-item-title>复制会话</v-list-item-title>
                       </v-list-item>
                       <v-list-item @click="ui.impSessionDialog.show = true">
@@ -891,12 +923,33 @@ function printHtml(data, curapp = null, curview = 'app') {
                 <v-divider></v-divider>
                 <v-card-actions>
                   <v-spacer></v-spacer>
+                  <v-menu bottom left v-if="ui.curappSessions && ui.curappSessions.length > 0">
+                    <template v-slot:activator="{ on }">
+                      <v-btn v-on="on" small text color="success">保存至</v-btn>
+                    </template>
+                    <v-list dense>
+                      <v-list-item v-for="(session, sessionIdx) in ui.curappSessions" :key="session.id" @click="onSaveSessionTo(session)">
+                        <v-list-item-title>{{ session.name }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                   <v-btn small text color="success" @click="onSaveSession">保存会话</v-btn>
                 </v-card-actions>
               </v-card>
               <v-card class="ml-10 mt-4" v-for="(session, sessionIdx) in ui.curappSessions" :key="session.id">
                 <v-subheader>
                   #{{ sessionIdx + 1 }} {{ session.name }}
+                  <v-spacer></v-spacer>
+                  <v-menu bottom left>
+                    <template v-slot:activator="{ on }">
+                      <v-btn icon v-on="on"><v-icon>mdi-dots-vertical</v-icon></v-btn>
+                    </template>
+                    <v-list dense>
+                      <v-list-item @click="ui.modSessionDialog.show = true, ui.modSessionDialog.session = JSON.parse(JSON.stringify(session))">
+                        <v-list-item-title>修改会话</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </v-subheader>
                 <v-list-item two-line dense v-for="(data, dataIdx) in session.datas" :key="dataIdx">
                   <v-list-item-content>
@@ -928,11 +981,29 @@ function printHtml(data, curapp = null, curview = 'app') {
                   </v-card-text>
                   <v-divider></v-divider>
                   <v-card-actions>
-                    <v-btn text small @click="" v-clipboard:copy="ui.impSessionDialog.impval" v-clipboard:success="onCopy">复制</v-btn>
+                    <v-btn text small v-clipboard:copy="ui.impSessionDialog.impval" v-clipboard:success="onCopy">复制</v-btn>
                     <v-btn text small @click="onImpSessionPaste">粘粘</v-btn>
                     <v-spacer></v-spacer>
                     <v-btn text small color="grey darken-1" text @click="ui.impSessionDialog.show = false">取消</v-btn>
                     <v-btn text small color="success darken-1" text @click="onImpSession">导入</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+              <v-dialog v-model="ui.modSessionDialog.show">
+                <v-card v-if="ui.modSessionDialog.session">
+                  <v-card-title>
+                    修改会话
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text>
+                    <v-text-field class="mt-4" v-model="ui.modSessionDialog.session.name" label="会话名称"></v-text-field>
+                    <v-text-field v-for="(data, dataIdx) in ui.modSessionDialog.session.datas" :key="dataIdx" v-model="data.val" :label="data.key"></v-text-field>
+                  </v-card-text>
+                  <v-divider></v-divider>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn text small color="grey darken-1" text @click="ui.modSessionDialog.show = false, ui.modSessionDialog.session = null">取消</v-btn>
+                    <v-btn text small color="success darken-1" text @click="onModSession">保存</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
@@ -951,7 +1022,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                     </v-tooltip>
                     <v-btn icon @click="ui.addAppSubDialog.show = true"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
                   </v-subheader>
-                  <v-list-item two-line dense v-for="(sub, subIdx) in appsubs" :key="sub.id" @click="">
+                  <v-list-item two-line dense v-for="(sub, subIdx) in appsubs" :key="sub.id">
                     <v-list-item-avatar v-if="sub.icon"><v-img :src="sub.icon"></v-img></v-list-item-avatar>
                     <v-list-item-avatar v-else color="grey"><v-icon dark>mdi-account</v-icon></v-list-item-avatar>
                     <v-list-item-content>
@@ -969,7 +1040,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                           <v-btn icon v-on="on"><v-icon>mdi-dots-vertical</v-icon></v-btn>
                         </template>
                         <v-list dense>
-                          <v-list-item @click="" v-clipboard:copy="sub._raw.url" v-clipboard:success="onCopy">
+                          <v-list-item v-clipboard:copy="sub._raw.url" v-clipboard:success="onCopy">
                             <v-list-item-title>复制</v-list-item-title>
                           </v-list-item>
                           <v-divider></v-divider>
@@ -996,7 +1067,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                   </v-card-text>
                   <v-divider></v-divider>
                   <v-card-actions>
-                    <v-btn text small @click="" v-clipboard:copy="ui.addAppSubDialog.url" v-clipboard:success="onCopy">复制</v-btn>
+                    <v-btn text small v-clipboard:copy="ui.addAppSubDialog.url" v-clipboard:success="onCopy">复制</v-btn>
                     <v-btn text small @click="onAddAppSubPaste">粘粘</v-btn>
                     <v-spacer></v-spacer>
                     <v-btn text small color="grey darken-1" text @click="ui.addAppSubDialog.show = false">取消</v-btn>
@@ -1030,7 +1101,7 @@ function printHtml(data, curapp = null, curview = 'app') {
               <v-card class="mx-auto mt-4">
                 <template v-for="(bak, bakIdx) in box.globalbaks">
                   <v-divider v-if="bakIdx>0"></v-divider>
-                  <v-list-item three-line dense @click="">
+                  <v-list-item three-line dense>
                     <v-list-item-content>
                       <v-list-item-title>{{ bak.name }}</v-list-item-title>
                       <v-list-item-subtitle>{{ bak.createTime}}</v-list-item-subtitle>
@@ -1044,7 +1115,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                           <v-btn icon v-on="on"><v-icon>mdi-dots-vertical</v-icon></v-btn>
                         </template>
                         <v-list dense>
-                          <v-list-item @click="" v-clipboard:copy="JSON.stringify(boxdat)" v-clipboard:success="onCopy">
+                          <v-list-item v-clipboard:copy="JSON.stringify(boxdat)" v-clipboard:success="onCopy">
                             <v-list-item-title>复制</v-list-item-title>
                           </v-list-item>
                           <v-divider></v-divider>
@@ -1107,7 +1178,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
-                  <v-btn text small @click="" v-clipboard:copy="ui.impGlobalBakDialog.bak" v-clipboard:success="onCopy">复制</v-btn>
+                  <v-btn text small v-clipboard:copy="ui.impGlobalBakDialog.bak" v-clipboard:success="onCopy">复制</v-btn>
                   <v-btn text small @click="onImpGlobalBakPaste">粘粘</v-btn>
                   <v-spacer></v-spacer>
                   <v-btn text small color="grey darken-1" text @click="ui.impGlobalBakDialog.show = false">取消</v-btn>
@@ -1275,6 +1346,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                 overlay: { show: false },
                 autocomplete: { curapp: null },
                 refreshtip: { show: false },
+                modSessionDialog: { show: false, session: null },
                 editProfileDialog: { show: false, bak: '' },
                 impGlobalBakDialog: { show: false, bak: '' },
                 reloadConfirmDialog: { show: false, sec: 0, title: '操作成功', message: '是否马上刷新页面?' },
@@ -1424,7 +1496,6 @@ function printHtml(data, curapp = null, curview = 'app') {
           methods: {
             moment(date) {
               return timeago.format(date, 'zh_CN');
-              // return moment(date).format('YYYY-MM-DD HH:mm:ss')
             },
             appfilter(item, queryText, itemText) {
               return item.id.includes(queryText) || item.name.includes(queryText)
@@ -1480,6 +1551,18 @@ function printHtml(data, curapp = null, curview = 'app') {
             onClearCurAppSessionData(app, datas, data) {
               data.val = ''
               axios.post('/api', JSON.stringify({ cmd: 'saveCurAppSession', val: app }))
+              this.onReload()
+            },
+            onSaveSessionTo(session) {
+              const val = {
+                fromapp: this.ui.curapp,
+                toSession: session
+              }
+              axios.post('/api', JSON.stringify({ cmd: 'saveSessionTo', val }))
+              this.onReload()
+            },
+            onModSession () {
+              axios.post('/api', JSON.stringify({ cmd: 'onModSession', val: this.ui.modSessionDialog.session }))
               this.onReload()
             },
             onSaveSession() {
@@ -1559,8 +1642,14 @@ function printHtml(data, curapp = null, curview = 'app') {
             },
             onReload() {
               axios.post('/api', JSON.stringify({ cmd: 'refreshAppSubs', val: null }))
-              this.ui.reloadConfirmDialog.show = true
-              this.ui.reloadConfirmDialog.sec = 3
+              const refreshsecs = this.box.usercfgs.refreshsecs
+              const sec = [undefined, null, 'null', 'undefined', ''].includes(refreshsecs) ? 3 : refreshsecs * 1
+              if (sec === 0) {
+                this.reload()
+              } else {
+                this.ui.reloadConfirmDialog.show = true
+                this.ui.reloadConfirmDialog.sec = sec
+              }
             },
             onDelSession(session) {
               axios.post('/api', JSON.stringify({ cmd: 'delSession', val: session }))
@@ -1626,6 +1715,12 @@ function printHtml(data, curapp = null, curview = 'app') {
             showRefreshTip() {
               this.ui.refreshtip.show = true
               setTimeout(() => this.ui.refreshtip.show = false, 2000)
+            },
+            compareVersion(v1, v2) {
+              var _v1 = v1.split('.'),
+                _v2 = v2.split('.'),
+                _r = _v1[0] - _v2[0]
+              return _r == 0 && v1 != v2 ? compareVersion(_v1.splice(1).join('.'), _v2.splice(1).join('.')) : _r
             }
           },
           mounted: function () {
@@ -1646,7 +1741,7 @@ function printHtml(data, curapp = null, curview = 'app') {
             }
             if (curver && Array.isArray(vers)) {
               const lastestVer = vers[0].version
-              if (curver < lastestVer) {
+              if (this.compareVersion(lastestVer, curver) > 0) {
                 this.ui.versheet.show = true
               }
             }

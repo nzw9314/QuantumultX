@@ -2,7 +2,7 @@
 
 京东多合一签到脚本
 
-更新时间: 2020.7.05 14:55 v1.22
+更新时间: 2020.7.08 15:00 v1.26
 有效接口: 24+
 脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
 电报频道: @NobyDa 
@@ -23,6 +23,7 @@ var DualKey = ''; //如需双账号签到,此处单引号内填写抓取的"账�
    注2: 双账号用户抓取"账号1"Cookie后, 请勿点击退出账号(可能会导致Cookie失效), 需清除浏览器资料或更换浏览器登录"账号2"抓取.
    注3: 如果复制的Cookie开头为"Cookie: "请把它删除后填入.
    注4: 如果使用QX,Surge,Loon并获取Cookie后, 再重复填写以上选项, 则签到优先读取以上Cookie.
+   注5: 如果使用Node.js, 需自行安装'request'模块. 例: npm install request -g
 
 *************************
 【 QX, Surge, Loon 说明 】 :
@@ -86,7 +87,7 @@ hostname = api.m.jd.com
 
 var LogDetails = false; //是否开启响应日志, true则开启
 
-var stop = 0; //自定义延迟签到,单位毫秒. 默认并发无延迟. (延迟作用于每个签到接口, 如填入延迟则切换顺序签到. Surge用户请注意在UI界面调整脚本超时)
+var stop = 0; //自定义延迟签到,单位毫秒. 默认分批并发无延迟. (延迟作用于每个签到接口, 如填入延迟则切换顺序签到. Surge用户请注意在UI界面调整脚本超时) 注: QX用户将强制使用顺序签到 (即默认stop=1)
 
 var DeleteCookie = false; //是否清除Cookie, true则开启
 
@@ -120,36 +121,41 @@ let acData = {
 };
 
 async function all() {
-  await JingDongSpeedUp(stop); //京东天天加速
   if (stop == 0) {
     await Promise.all([
+      JingDongSpeedUp(stop), //京东天天加速
       JingDongBean(stop), //京东京豆
       JingRongBean(stop), //金融京豆
       JingRongDoll(stop), //金融抓娃娃
       JingRongSteel(stop), //金融钢镚
       JingDongTurn(stop), //京东转盘
-      JDUserSignPre(stop, 'JDGStore', '京东商城-超市'), //京东超市
-      JDUserSignPre(stop, 'JDPet', '京东商城-宠物'), //京东宠物馆
       JDFlashSale(stop), //京东闪购
       JDOverseas(stop), //京东国际
-      JDUserSignPre(stop, 'JDBook', '京东商城-图书'), //京东图书
-      JDUserSignPre(stop, 'JDShand', '京东拍拍-二手'), //京东拍拍二手
-      JDUserSignPre(stop, 'JDMakeup', '京东商城-美妆'), //京东美妆馆
-      JDUserSignPre(stop, 'JDWomen', '京东商城-女装'), //京东女装馆
-      JDUserSignPre(stop, 'JDVege', '京东商城-菜场'), //京东菜场
       JingDongCash(stop), //京东现金红包
-      JDUserSignPre(stop, 'JDFood', '京东商城-美食'), //京东美食馆
       // JingRSeeAds(stop), //金融看广告
       // JingRongGame(stop), //金融游戏大厅
-      JDUserSignPre(stop, 'JDClean', '京东商城-清洁'), //京东清洁馆
-      JDUserSignPre(stop, 'JDCare', '京东商城-个护'), //京东个人护理馆
-      JDUserSignPre(stop, 'JDJewels', '京东商城-珠宝'), //京东珠宝馆
       // JDMagicCube(stop), //京东小魔方
       JingDongPrize(stop), //京东抽大奖
       JingDongSubsidy(stop), //京东金贴
       JingDongShake(stop) //京东摇一摇
-    ])
+    ]);
+    await Promise.all([
+      JDUserSignPre(stop, 'JDVege', '京东商城-菜场'), //京东菜场
+      JDUserSignPre(stop, 'JDFood', '京东商城-美食'), //京东美食馆
+      JDUserSignPre(stop, 'JDClean', '京东商城-清洁'), //京东清洁馆
+      JDUserSignPre(stop, 'JDCare', '京东商城-个护'), //京东个人护理馆
+      JDUserSignPre(stop, 'JDJewels', '京东商城-珠宝'), //京东珠宝馆
+      JDUserSignPre(stop, 'JDShand', '京东拍拍-二手') //京东拍拍二手
+    ]);
+    await Promise.all([
+      JDUserSignPre(stop, 'JDWomen', '京东商城-女装'), //京东女装馆
+      JDUserSignPre(stop, 'JDGStore', '京东商城-超市'), //京东超市
+      JDUserSignPre(stop, 'JDPet', '京东商城-宠物'), //京东宠物馆
+      JDUserSignPre(stop, 'JDBook', '京东商城-图书'), //京东图书
+      JDUserSignPre(stop, 'JDMakeup', '京东商城-美妆') //京东美妆馆
+    ]);
   } else {
+    await JingDongSpeedUp(stop); //京东天天加速
     await JingDongBean(stop); //京东京豆
     await JingRongBean(stop); //金融京豆
     await JingRongDoll(stop); //金融抓娃娃
@@ -244,6 +250,7 @@ function notify() {
 function ReadCookie() {
   initial()
   DualAccount = true;
+  if ($nobyda.isQuanX && stop === 0) stop = 1;
   if (DeleteCookie) {
     if ($nobyda.isJSBox) {
       if ($file.exists("shared://JD_Cookie.txt")) {
@@ -753,6 +760,16 @@ function JingDongShake(s) {
 }
 
 function JDUserSignPre(s, key, title) {
+  if ($nobyda.isNode) {
+    return JDUserSignPre1(s, key, title);
+  } else if (key == 'JDWomen' || $nobyda.isJSBox) {
+    return JDUserSignPre2(s, key, title);
+  } else {
+    return JDUserSignPre1(s, key, title);
+  }
+}
+
+function JDUserSignPre1(s, key, title) {
   return new Promise((resolve, reject) => {
     //setTimeout(() => {
       const JDUrl = {
@@ -763,7 +780,6 @@ function JDUserSignPre(s, key, title) {
         },
         body: `body={"activityId":"${acData[key]}"}`
       };
-      if (!$nobyda.isJSBox && !$nobyda.isNode && key == "JDWomen") return reject(key)
       $nobyda.post(JDUrl, function(error, response, data) {
         try {
           if (error) {
@@ -806,9 +822,7 @@ function JDUserSignPre(s, key, title) {
     if (out) setTimeout(reject, out + s)
   }).then(data=>{
     return JDUserSign(s, key, title, encodeURIComponent(JSON.stringify(data)));
-  }).catch(er => {
-    if (er == "JDWomen") return JDUserSignPre2(s, key, title)
-    });
+  },()=>{});
 }
 
 function JDUserSignPre2(s, key, title) {
@@ -2185,6 +2199,7 @@ function nobyda() {
     isRequest,
     isJSBox,
     isSurge,
+    isQuanX,
     isLoon,
     isNode,
     notify,
