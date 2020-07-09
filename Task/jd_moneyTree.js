@@ -1,5 +1,5 @@
 // 京东摇钱树 ：https://gitee.com/lxk0301/scripts/raw/master/jd_moneyTree2.js
-// 更新时间:2020-07-06，可兼容iOS 10设备，优化未初始化摇钱树时候的弹窗提醒
+// 更新时间:2020-07-06，可兼容iOS 10设备
 // 现有功能
 // 1、收金果
 // 2、每日签到（也就是三餐签到）
@@ -107,6 +107,7 @@ let userInfo = null, taskInfo = [], message = '', subTitle = '', fruitTotal = 0;
 let gen = entrance();
 gen.next();
 function* entrance() {
+  const startTime = Date.now();
   if (!cookie) {
     return $hammer.alert(name, '请先获取cookie\n直接使用NobyDa的京东签到获取');
   }
@@ -136,6 +137,8 @@ function* entrance() {
   yield myWealth();
   // console.log(`----${treeMsgTime}`)
   msgControl();
+  const end = ((Date.now() - startTime) / 1000).toFixed(2);
+  console.log(`\n完成${name}脚本耗时:  ${end} 秒\n`);
   console.log('任务做完了');
 }
 
@@ -170,6 +173,9 @@ function user_info() {
       }
     } else {
       console.log('走了else');
+      if (res.resultCode === 3) {
+        return $hammer.alert(name, '\n【提示】京东cookie已失效,请重新登录获取\n');
+      }
       gen.return();
     }
   });

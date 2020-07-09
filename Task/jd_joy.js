@@ -101,7 +101,9 @@ var Task = step();
 Task.next();
 
 function* step() {
-    let message = ''
+    const startTime = Date.now();
+    let message = '';
+    let subTitle = '';
     if (cookie) {
         //获取任务信息
         let petTaskConfig = yield getPetTaskConfig()
@@ -140,10 +142,10 @@ function* step() {
                 for (let market of scanMarketTask.scanMarketList) {
                     if (!market.status) {
                         // 解决部分商品market.marketLink为空的时候，浏览不到的bug
-                        let clickResult = yield click(market.marketLink || market.marketLinkH5)
+                        let clickResult = yield click(market.marketLinkH5)
                         console.log(`逛会场点击${market.marketName}结果${JSON.stringify(clickResult)}`)
                         
-                        let scanMarketResult = yield ScanMarket(market.marketLink)
+                        let scanMarketResult = yield ScanMarket(market.marketLinkH5)
                         console.log(`逛会场${market.marketName}结果${JSON.stringify(scanMarketResult)}`)
                     }
                 }
@@ -195,6 +197,7 @@ function* step() {
             let enterRoomResult = yield enterRoom()
             console.log(`喂养状态${JSON.stringify(enterRoomResult)}`)
             message = `现有积分: ${enterRoomResult.data.petCoin}\n现有狗粮: ${enterRoomResult.data.petFood}\n喂养次数: ${enterRoomResult.data.feedCount}\n宠物等级: ${enterRoomResult.data.petLevel}`
+            subTitle = `【用户名】${enterRoomResult.data.pin}`
         } else {
             console.log(`任务信息${JSON.stringify(petTaskConfig)}`)
             message = petTaskConfig.errorMessage
@@ -202,7 +205,9 @@ function* step() {
     } else {
         message = '请先获取cookie\n直接使用NobyDa的京东签到获取'
     }
-    $hammer.alert(name, message, '')
+    const end = ((Date.now() - startTime) / 1000).toFixed(2);
+    console.log(`\n完成${name}脚本耗时:  ${end} 秒\n`);
+    $hammer.alert(name, message, subTitle)
 }
 
 function click(marketLink) {
