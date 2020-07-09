@@ -4,6 +4,7 @@
 // cron 1 */3 * * *
 // 建议3小时运行一次，打卡时间间隔是6小时
 //有bug来我这提Issue反馈 https://gitee.com/lxk0301/scripts
+// 感谢@iepngs的兼容代码
 const $hammer = (() => {
   const isRequest = "undefined" != typeof $request,
       isSurge = "undefined" != typeof $httpClient,
@@ -104,7 +105,8 @@ let destination = null;
 let source_id = null;
 let done_distance = null;
 let task_status = null, able_energeProp_list = [], spaceEvents = [], energePropUsale = [];
-async function* entrance() {
+function* entrance() {
+  const startTime = Date.now();
   if (!cookie) {
     return $hammer.alert(name, '请先获取cookie\n直接使用NobyDa的京东签到获取');
   }
@@ -116,34 +118,26 @@ async function* entrance() {
   } else if (task_status === 1) {
     console.log(`任务进行中：${JSON.stringify(destination)}`);
   }
+
+  yield spaceEvent_list();//检查太空特殊事件
+  console.log(`可处理的特殊事件信息:${JSON.stringify(spaceEvents)}`);
+  if (spaceEvents && spaceEvents.length > 0) {
+    yield spaceEvent();//处理太空特殊事件
+  } else {
+    console.log('没有可处理的特殊事件')
+  }
   console.log('开始检查可领取燃料')
   yield energyPropList();
   console.log(`可领取燃料::${JSON.stringify(able_energeProp_list)}`)
   if (able_energeProp_list && able_energeProp_list.length > 0) {
-    //开始领取燃料
-    for (let i of able_energeProp_list) {
-      let memberTaskCenterRes =  await _energyProp_gain(i.id);
-      console.log(`领取燃料结果：：：${JSON.stringify(memberTaskCenterRes)}`)
-    }
+    yield receiveeEergyProp();
   } else {
     console.log('没有可领取的燃料')
   }
-  yield spaceEvent_list();
-  console.log(`可处理的特殊事件信息:${JSON.stringify(spaceEvents)}`);
-  if (spaceEvents && spaceEvents.length > 0) {
-    for (let item of spaceEvents) {
-      let spaceEventRes = await spaceEventHandleEvent(item.id, item.value);
-      console.log(`处理特殊事件的结果：：${JSON.stringify(spaceEventRes)}`)
-    }
-  } else {
-    console.log('没有可处理的特殊事件')
-  }
-  yield energePropUsaleList();
+  yield energePropUsaleList();//检查剩余可用的燃料
+  console.log(`可使用燃料${JSON.stringify(energePropUsale)}`)
   if (energePropUsale && energePropUsale.length > 0) {
-    for (let i of energePropUsale) {
-      let _energyProp_use = await energyPropUse(i.id);
-      console.log(`使用燃料的结果：：${JSON.stringify(_energyProp_use)}`)
-    }
+    yield useEnergy();
   } else {
     console.log('暂无可用燃料')
   }
@@ -151,10 +145,20 @@ async function* entrance() {
   yield flyTask_state();
   if (task_status === 0) {
     console.log(`开启新任务：${JSON.stringify(destination)}`);
-    yield flyTask_start(source_id)
+    yield flyTask_start(source_id);
+    // fix bug ，开启新任务后，再次检查可用的燃料，如果有可用的，继续使用
+    yield energePropUsaleList();//检查剩余可用的燃料
+    console.log(`可使用燃料${JSON.stringify(energePropUsale)}`)
+    if (energePropUsale && energePropUsale.length > 0) {
+      yield useEnergy();
+    } else {
+      console.log('暂无可用燃料')
+    }
   } else if (task_status === 1) {
     console.log(`任务进行中：${JSON.stringify(destination)}`);
   }
+  const end = ((Date.now() - startTime) / 1000).toFixed(2);
+  console.log(`\n完成${name}脚本耗时:  ${end} 秒\n`);
   $hammer.alert(name, message, subTitle);
 }
 //开始新的任务
@@ -187,7 +191,16 @@ function energyPropList() {
     gen.next();
   })
 }
-// 领取燃料
+
+async function receiveeEergyProp() {
+  //开始领取燃料
+  for (let i of able_energeProp_list) {
+    let memberTaskCenterRes =  await _energyProp_gain(i.id);
+    console.log(`领取燃料结果：：：${JSON.stringify(memberTaskCenterRes)}`)
+  }
+  gen.next();
+}
+// 领取燃料调用的api
 function _energyProp_gain(energy_id) {
   console.log('energy_id', energy_id)
   if (!energy_id) return;
@@ -225,6 +238,15 @@ function spaceEvent_list() {
     gen.next();
   })
 }
+// 处理太空特殊事件
+async function spaceEvent() {
+  for (let item of spaceEvents) {
+    let spaceEventRes = await spaceEventHandleEvent(item.id, item.value);
+    console.log(`处理特殊事件的结果：：${JSON.stringify(spaceEventRes)}`)
+  }
+  gen.next();
+}
+//处理太空特殊事件调用的api
 function spaceEventHandleEvent(id, value) {
   if (!id && !value) return;
   const body = {
@@ -243,7 +265,7 @@ function energePropUsaleList() {
     "source":"game"
   };
   request('energyProp_usalbeList', body).then(res => {
-    console.log(`检查剩余燃料${JSON.stringify(res)}`)
+    console.log(`检查剩余燃料`)
     if (res.code === 0 && res.data && res.data.length > 0) {
       res.data.map(item => {
         energePropUsale.push(item)
@@ -252,6 +274,20 @@ function energePropUsaleList() {
     gen.next();
   });
 }
+
+//使用能源
+async function useEnergy() {
+  for (let i of energePropUsale) {
+    let _energyProp_use = await energyPropUse(i.id);
+    console.log(`使用燃料的结果：：${JSON.stringify(_energyProp_use)}`)
+    if (_energyProp_use.code != 0) {
+      console.log(`${_energyProp_use.message},跳出循环`)
+      break
+    }
+  }
+  gen.next();
+}
+//使用能源调用的api
 function energyPropUse(id) {
   if (!id) return
   const body = {
@@ -273,6 +309,9 @@ function flyTask_state() {
     console.log(`初始化信息flyTask_state:${JSON.stringify(res)}`)
     if (res.code === 0) {
       console.log('走了if--code=0')
+      if (res.info.isLogin === 0) {
+        return $hammer.alert(name, '\n【提示】京东cookie已失效,请重新登录获取\n');
+      }
       let data = res.data;
       if (data.beans_num) {
         beans_num = data.beans_num
@@ -281,9 +320,11 @@ function flyTask_state() {
         done_distance = data.done_distance
         source_id = data.source_id//根据source_id 启动flyTask_start()
         task_status = data.task_status //0,没开始；1，已开始
-        subTitle = `【奖励】：${beans_num}京豆`
+        subTitle = `【奖励】${beans_num}京豆`
         if (indexState === 1) {
-          message += `【空间站】 ${destination}`;
+          message += `【空间站】 ${destination}\n`;
+          message += `【结束时间】 ${data['end_time']}\n`;
+          message += `【进度】 ${new Number(data.done_distance/data.distance).toFixed(2) * 100}%\n`;
         }
         indexState++;
       }

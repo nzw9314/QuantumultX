@@ -2,6 +2,7 @@
 种豆得豆 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
 更新时间：2020-07-06，新增完成低价包邮的任务，优化弹窗信息
 会自动关注任务中的店铺跟商品
+互助码shareCode请先手动运行脚本查看打印可看到
 // quantumultx
 [task_local]
 1 7-21/2 * * * jd_plantBean.js
@@ -138,11 +139,15 @@ Task.next();
 function* step() {
     //
     let message = '', subTitle = '';
+    const startTime = Date.now();
     if (cookie) {
         console.log(`获取任务及基本信息`)
         let plantBeanIndexResult = yield plantBeanIndex()
         if (plantBeanIndexResult.code != "0") {
             console.log(`plantBeanIndexResult:${JSON.stringify(plantBeanIndexResult)}`)
+            if (plantBeanIndexResult.code === '3') {
+              return $hammer.alert(name, '\n【提示】京东cookie已失效,请重新登录获取\n');
+            }
             //todo
             return
         }
@@ -166,8 +171,9 @@ function* step() {
         message += `【本期成长值】${roundList[1].growth}\n`;
         let shareUrl = plantBeanIndexResult.data.jwordShareInfo.shareUrl
         let myPlantUuid = getParam(shareUrl, 'plantUuid')
-        console.log(`你的plantUuid为${myPlantUuid}`)
-        for (let task of plantBeanIndexResult.data.taskList) {
+        // console.log(`你的plantUuid为${myPlantUuid}`)
+        console.log(`\n【您的互助码plantUuid】 ${myPlantUuid}\n`);
+      for (let task of plantBeanIndexResult.data.taskList) {
             console.log(`开始【${task.taskName}】任务`)
             if (task.taskType == 7 || task.taskType == 17 || task.taskType == 18) {
                 //具体每个人可能不一样
@@ -367,6 +373,8 @@ function* step() {
     } else {
         message = '请先获取cookie\n直接使用NobyDa的京东签到获取'
     }
+    const end = ((Date.now() - startTime) / 1000).toFixed(2);
+    console.log(`\n完成${name}脚本耗时:  ${end} 秒\n`);
     $hammer.alert(name, message, subTitle);
 }
 
