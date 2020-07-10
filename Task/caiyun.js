@@ -44,8 +44,11 @@
 
 /********************** SCRIPT START *********************************/
 const $ = API("caiyun");
+$.write("", "weather");
+$.write("", "address");
 
 const ERR = MYERR();
+const display_location = JSON.parse($.read("display_location") || "false");
 
 if (typeof $request !== 'undefined') {
   // get location from request url
@@ -62,7 +65,7 @@ if (typeof $request !== 'undefined') {
   if (!$.read("location")) {
     $.notify("[彩云天气]", "", "🎉🎉🎉 获取定位成功。");
   }
-  if ($.read("display_location") == true) {
+  if (display_location) {
     $.info(`成功获取当前位置：纬度 ${location.latitude} 经度 ${location.longitude}`);
   }
   $.write(location, "location");
@@ -97,14 +100,11 @@ async function scheduler() {
   realtimeWeather();
   // hourlyForcast();
   // dailyForcast();
+
 }
 
 async function query() {
   const now = new Date();
-  // check last updated time
-  const STABLE_UPDATE_TIME = (5 + Math.random()) * 60 * 1000;
-  const updated = $.read("updated");
-  if (updated === undefined || now - new Date(updated) > STABLE_UPDATE_TIME) {
     // query API
     const url = `https://api.caiyunapp.com/v2.5/${$.read("token").caiyun}/${$.read("location").longitude},${$.read("location").latitude}/weather?lang=zh_CN&dailystart=0&hourlysteps=384&dailysteps=16&alert=true`;
 
@@ -118,7 +118,7 @@ async function query() {
     }).then(resp => {
       const body = JSON.parse(resp.body);
       if (body.status === 'failed') {
-        throw new ERR.TokenError(`❌ 无效的彩云天气Token: ${$.read("token").caiyun}`);
+        throw new Error(body.error);
       }
       return body;
     }).catch(err => {
@@ -126,6 +126,7 @@ async function query() {
     });
 
     $.log("Query location...");
+    await $.wait(Math.random()*2000);
     const address =
       await $
         .get(`https://apis.map.qq.com/ws/geocoder/v1/?key=${$.read("token").tencent}&location=${$.read("location").latitude},${$.read("location").longitude}`)
@@ -138,19 +139,18 @@ async function query() {
         }).catch(err => {
           throw err;
         });
-    $.write(new Date().getTime(), "updated");
-    $.write(weather, "weather");
 
-    if ($.read("display_location") == true) {
+    $.weather = weather;
+
+    if (display_location == true) {
       $.info(JSON.stringify(address));
     }
-    $.write(address, "address");
-  }
+    $.address = address;
 }
 
 function weatherAlert() {
-  const data = $.read("weather").result.alert;
-  const address = $.read("address");
+  const data = $.weather.result.alert;
+  const address = $.address;
   const alerted = $.read("alerted") || [];
 
   if (data.status === 'ok') {
@@ -170,8 +170,8 @@ function weatherAlert() {
 }
 
 function realtimeWeather() {
-  const data = $.read("weather").result;
-  const address = $.read("address");
+  const data = $.weather.result;
+  const address = $.address;
 
   const alert = data.alert;
   const alertInfo = alert.content.length == 0 ? "" : alert.content.reduce((acc, curr) => {

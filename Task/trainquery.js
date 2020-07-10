@@ -31,138 +31,11 @@ cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/
 const leftstation ='北京'  //出发地
 const tostation = '上海'   //目的地
 const purpose = 'ADULT'   //乘客类型，'ADULT'是成人，'0X00'是学生
-const leftdate = '2020-06-30' //出发日期
+const leftdate = '2020-07-29' //出发日期
 const K = ' 1 '  //车次序号!!
+//const traincode = ""
+const $sy = init()
 
-let isQuantumultX = $task != undefined; //判断当前运行环境是否是qx
-let isSurge = $httpClient != undefined; //判断当前运行环境是否是surge
-// http请求
-var $task = isQuantumultX ? $task : {};
-var $httpClient = isSurge ? $httpClient : {};
-// cookie读写
-var $prefs = isQuantumultX ? $prefs : {};
-var $persistentStore = isSurge ? $persistentStore : {};
-// 消息通知
-var $notify = isQuantumultX ? $notify : {};
-var $notification = isSurge ? $notification : {};
-// #endregion 固定头部
-
-// #region 网络请求专用转换
-if (isQuantumultX) {
-    var errorInfo = {
-        error: ''
-    };
-    $httpClient = {
-        get: (url, cb) => {
-            var urlObj;
-            if (typeof (url) == 'string') {
-                urlObj = {
-                    url: url
-                }
-            } else {
-                urlObj = url;
-            }
-            $task.fetch(urlObj).then(response => {
-                cb(undefined, response, response.body)
-            }, reason => {
-                errorInfo.error = reason.error;
-                cb(errorInfo, response, '')
-            })
-        },
-        post: (url, cb) => {
-            var urlObj;
-            if (typeof (url) == 'string') {
-                urlObj = {
-                    url: url
-                }
-            } else {
-                urlObj = url;
-            }
-            url.method = 'POST';
-            $task.fetch(urlObj).then(response => {
-                cb(undefined, response, response.body)
-            }, reason => {
-                errorInfo.error = reason.error;
-                cb(errorInfo, response, '')
-            })
-        }
-    }
-}
-if (isSurge) {
-    $task = {
-        fetch: url => {
-            //为了兼容qx中fetch的写法,所以永不reject
-            return new Promise((resolve, reject) => {
-                if (url.method == 'POST') {
-                    $httpClient.post(url, (error, response, data) => {
-                        if (response) {
-                            response.body = data;
-                            resolve(response, {
-                                error: error
-                            });
-                        } else {
-                            resolve(null, {
-                                error: error
-                            })
-                        }
-                    })
-                } else {
-                    $httpClient.get(url, (error, response, data) => {
-                        if (response) {
-                            response.body = data;
-                            resolve(response, {
-                                error: error
-                            });
-                        } else {
-                            resolve(null, {
-                                error: error
-                            })
-                        }
-                    })
-                }
-            })
-
-        }
-    }
-}
-// #endregion 网络请求专用转换
-
-// #region cookie操作
-if (isQuantumultX) {
-    $persistentStore = {
-        read: key => {
-            return $prefs.valueForKey(key);
-        },
-        write: (val, key) => {
-            return $prefs.setValueForKey(val, key);
-        }
-    }
-}
-if (isSurge) {
-    $prefs = {
-        valueForKey: key => {
-            return $persistentStore.read(key);
-        },
-        setValueForKey: (val, key) => {
-            return $persistentStore.write(val, key);
-        }
-    }
-}
-// #endregion
-
-// #region 消息通知
-if (isQuantumultX) {
-    $notification = {
-        post: (title, subTitle, detail) => {
-            $notify(title, subTitle, detail);
-        }
-    }
-}
-if (isSurge) {
-    $notify = function (title, subTitle, detail) {
-        $notification.post(title, subTitle, detail);
-    }
-}
 
 all()
 async function all() 
@@ -214,6 +87,7 @@ function trainscheck() {
     method: 'GET',
     headers: {'Cookie' : 'JSESSIONID=1B1CEADF1B9F831C25E71D7F2D996294'}
 };
+
 $task.fetch(myRequest).then(response => {
   //console.log('余票信息' + "\n\n" + response.body);
   let ress = JSON.parse(response.body)
@@ -286,10 +160,11 @@ else {
 }
 function prize() {
  return new Promise((resolve, reject) =>{
- setTimeout(() => {
+  setTimeout(() => {
    const myRequest = {
     url: `https://kyfw.12306.cn/otn/leftTicket/queryTicketPrice?train_no=${trainno}&from_station_no=${fromstationno}&to_station_no=${tostationno}&seat_types=${seattypes}&train_date=${leftdate}`,
     method: 'GET',
+    headers: {'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'}
 }
 $task.fetch(myRequest).then(response => {
  try {
@@ -333,7 +208,7 @@ $task.fetch(myRequest).then(response => {
    }
 }
 catch (e){
-  $notify('列车票价查询失败‼️', '无'+traincode+'列车票价信息', e)
+  //$notify('列车票价查询失败‼️', '无'+traincode+'列车票价信息', e)
    }
 resolve()
   })
@@ -347,6 +222,7 @@ function traintime() {
     url: `https://kyfw.12306.cn/otn/czxx/queryByTrainNo?train_no=${trainno}&from_station_telecode=${fromstation}&to_station_telecode=${endstation}&depart_date=${leftdate}`,
     method: 'GET',
 }
+
 $task.fetch(myRequest).then(response => {
  try {
     //console.log(response.statusCode + "\n\n" + response.body);
@@ -389,7 +265,7 @@ if (setruanwopro){
 if (setdongwo){
   detail += '动卧: '+setdongwo
   }
-  detail +='\n'+leftstation+'到达目的地'+tostation+'历时'+totaltime+'\n'+arrivetime +'--'+starttime+ '  '+stationname
+  detail +=' (如票价无显示请重试)\n'+leftstation+'到达目的地'+tostation+'历时'+totaltime+'\n'+arrivetime +'--'+starttime+ '  '+stationname
 for (i=1;i<result.data.data.length;i++){
     detail  += `\n`+result.data.data[i].arrive_time +'--'+result.data.data[i].start_time+ '  '+result.data.data[i].station_name
 }
@@ -406,3 +282,22 @@ const subTitle = '始发站: '+startstation+ '--终点站: '+endstation
 $done()
  })
 }
+
+
+function init(){isSurge=()=>{return undefined===this.$httpClient?false:true}
+isQuanX=()=>{return undefined===this.$task?false:true}
+getdata=(key)=>{if(isSurge())return $persistentStore.read(key)
+if(isQuanX())return $prefs.valueForKey(key)}
+setdata=(key,val)=>{if(isSurge())return $persistentStore.write(key,val)
+if(isQuanX())return $prefs.setValueForKey(key,val)}
+msg=(title,subtitle,body)=>{if(isSurge())$notification.post(title,subtitle,body)
+if(isQuanX())$notify(title,subtitle,body)}
+log=(message)=>console.log(message)
+get=(url,cb)=>{if(isSurge()){$httpClient.get(url,cb)}
+if(isQuanX()){url.method='GET'
+$task.fetch(url).then((resp)=>cb(null,resp,resp.body))}}
+post=(url,cb)=>{if(isSurge()){$httpClient.post(url,cb)}
+if(isQuanX()){url.method='POST'
+$task.fetch(url).then((resp)=>cb(null,resp,resp.body))}}
+done=(value={})=>{$done(value)}
+return{isSurge,isQuanX,msg,log,getdata,setdata,get,post,done}}

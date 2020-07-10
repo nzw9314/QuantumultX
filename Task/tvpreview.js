@@ -1,12 +1,14 @@
 /* 
-本脚本为电视节目预告
+本脚本为电视节目预告  兼容chavyleung大佬的boxjs订阅优先生效
+本仓库boxjs订阅地址: https://raw.githubusercontent.com/Sunert/Scripts/master/Task/sunert.boxjs.json
+
 1.数据从电视家数据库获取
 2.常用卫视代码
-北京: btv1 | 湖南: hunan | 浙江: zhejiang
-河南: henan| 江苏: jiangsu|广东: guangdong
+北京: btv1 | 湖南: hunan | 浙江: zhejiang | 
+河南: henan| 江苏: jiangsu| 广东: guangdong
 更多电视台请参加电视家网络列表
-3.需要更换电视台的，建议本地使用
-4.借鉴sazs34大佬的smart脚本
+3.需要更换电视台的，建议本地使用或者使用boxjs订阅修改
+4.借鉴chavyleung大佬的api脚本
 ～～～～～～～～～～～～～～～～
 QX 1.0.6+ :
 
@@ -28,11 +30,13 @@ cron "04 00 * * *" script-path=https://raw.githubusercontent.com/Sunert/Scripts/
 
 By Macsuny                   
 */
-const c = "cctv1"  //修改电视台
+const tv = "cctv8"   //修改电视台
+
 const sy = init()
-const tvnum = sy.getdata(c)
-const method = "GET"
-       d = new Date();
+
+const tvnum = sy.getdata("c")||`${tv}`
+
+const  d = new Date();
        M = d.getMonth()+1, D = d.getDate();
        h = ("0" + (d.getHours())).slice(-2);            
        m = ("0" + (d.getMinutes())).slice(-2);
@@ -47,7 +51,7 @@ const method = "GET"
   n = weekday[d.getDay()]
 const wurl = {
     url: "http://api.cntv.cn/epg/epginfo?serviceId=cbox&c="+tvnum,
-    headers: {'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'}
+    headers: {'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'},
 }
    sy.get(wurl, (error,response, data) => {    
    try { 
@@ -79,47 +83,20 @@ const title = `${result[`${tvnum}`].channelName}频道节目  ` + M +'月'+ D +'
     }
 $done()
  })
-function init() {
-  isSurge = () => {
-    return undefined === this.$httpClient ? false : true
-  }
-  isQuanX = () => {
-    return undefined === this.$task ? false : true
-  }
-  getdata = (key) => {
-    if (isSurge()) return $persistentStore.read(key)
-    if (isQuanX()) return $prefs.valueForKey(key)
-  }
-  setdata = (key, val) => {
-    if (isSurge()) return $persistentStore.write(key, val)
-    if (isQuanX()) return $prefs.setValueForKey(key, val)
-  }
-  msg = (title, subtitle, body) => {
-    if (isSurge()) $notification.post(title, subtitle, body)
-    if (isQuanX()) $notify(title, subtitle, body)
-  }
-  log = (message) => console.log(message)
-  get = (url, cb) => {
-    if (isSurge()) {
-      $httpClient.get(url, cb)
-    }
-    if (isQuanX()) {
-      url.method = 'GET'
-      $task.fetch(url).then((resp) => cb(null, resp, resp.body))
-    }
-  }
-  post = (url, cb) => {
-    if (isSurge()) {
-      $httpClient.post(url, cb)
-    }
-    if (isQuanX()) {
-      url.method = 'POST'
-      $task.fetch(url).then((resp) => cb(null, resp, resp.body))
-    }
-  }
-  done = (value = {}) => {
-    $done(value)
-  }
-  return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
-}
-
+function init(){isSurge=()=>{return undefined===this.$httpClient?false:true}
+isQuanX=()=>{return undefined===this.$task?false:true}
+getdata=(key)=>{if(isSurge())return $persistentStore.read(key)
+if(isQuanX())return $prefs.valueForKey(key)}
+setdata=(key,val)=>{if(isSurge())return $persistentStore.write(key,val)
+if(isQuanX())return $prefs.setValueForKey(key,val)}
+msg=(title,subtitle,body)=>{if(isSurge())$notification.post(title,subtitle,body)
+if(isQuanX())$notify(title,subtitle,body)}
+log=(message)=>console.log(message)
+get=(url,cb)=>{if(isSurge()){$httpClient.get(url,cb)}
+if(isQuanX()){url.method='GET'
+$task.fetch(url).then((resp)=>cb(null,resp,resp.body))}}
+post=(url,cb)=>{if(isSurge()){$httpClient.post(url,cb)}
+if(isQuanX()){url.method='POST'
+$task.fetch(url).then((resp)=>cb(null,resp,resp.body))}}
+done=(value={})=>{$done(value)}
+return{isSurge,isQuanX,msg,log,getdata,setdata,get,post,done}}
