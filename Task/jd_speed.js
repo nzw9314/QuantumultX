@@ -265,7 +265,8 @@ function energePropUsaleList() {
     "source":"game"
   };
   request('energyProp_usalbeList', body).then(res => {
-    console.log(`检查剩余燃料`)
+    console.log(`检查剩余燃料`);
+    energePropUsale = [];
     if (res.code === 0 && res.data && res.data.length > 0) {
       res.data.map(item => {
         energePropUsale.push(item)

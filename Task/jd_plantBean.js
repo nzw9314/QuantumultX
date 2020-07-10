@@ -288,6 +288,12 @@ function* step() {
                 let plantReceiveNutrientsTaskRes = yield plantReceiveNutrientsTask();
                 console.log(`${task.taskName}获取营养液：：${plantReceiveNutrientsTaskRes.data && plantReceiveNutrientsTaskRes.data.nutrNum}`)
               }
+            } else if (task.taskType == 20) {
+              // 助力高考
+              if (task.isFinished !== 1) {
+                let plantReceiveNutrientsTaskRes = yield receiveNutrientsTask(task.taskType);
+                console.log(`${task.taskName}获取营养液：：${plantReceiveNutrientsTaskRes.data && plantReceiveNutrientsTaskRes.data.nutrNum}`)
+              }
             } else if (task.taskType == 1) {
                 console.log('跳过签到，NobyDa的会签')
                 // console.log(`【${task.taskName}】未开发${task.awardType},${task.taskType}`)
