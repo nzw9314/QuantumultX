@@ -105,47 +105,47 @@ async function scheduler() {
 
 async function query() {
   const now = new Date();
-    // query API
-    const url = `https://api.caiyunapp.com/v2.5/${$.read("token").caiyun}/${$.read("location").longitude},${$.read("location").latitude}/weather?lang=zh_CN&dailystart=0&hourlysteps=384&dailysteps=16&alert=true`;
+  // query API
+  const url = `https://api.caiyunapp.com/v2.5/${$.read("token").caiyun}/${$.read("location").longitude},${$.read("location").latitude}/weather?lang=zh_CN&dailystart=0&hourlysteps=384&dailysteps=16&alert=true`;
 
-    $.log("Query weather...");
+  $.log("Query weather...");
 
-    const weather = await $.get({
-      url,
-      headers: {
-        'User-Agent': 'ColorfulCloudsPro/5.0.10 (iPhone; iOS 14.0; Scale/3.00)'
-      }
-    }).then(resp => {
-      const body = JSON.parse(resp.body);
-      if (body.status === 'failed') {
-        throw new Error(body.error);
-      }
-      return body;
-    }).catch(err => {
-      throw err;
-    });
-
-    $.log("Query location...");
-    await $.wait(Math.random()*2000);
-    const address =
-      await $
-        .get(`https://apis.map.qq.com/ws/geocoder/v1/?key=${$.read("token").tencent}&location=${$.read("location").latitude},${$.read("location").longitude}`)
-        .then(resp => {
-          const body = JSON.parse(resp.body);
-          if (body.status !== 0) {
-            throw new ERR.TokenError("❌ 腾讯地图Token错误");
-          }
-          return body.result.address_component;
-        }).catch(err => {
-          throw err;
-        });
-
-    $.weather = weather;
-
-    if (display_location == true) {
-      $.info(JSON.stringify(address));
+  const weather = await $.get({
+    url,
+    headers: {
+      'User-Agent': 'ColorfulCloudsPro/5.0.10 (iPhone; iOS 14.0; Scale/3.00)'
     }
-    $.address = address;
+  }).then(resp => {
+    const body = JSON.parse(resp.body);
+    if (body.status === 'failed') {
+      throw new Error(body.error);
+    }
+    return body;
+  }).catch(err => {
+    throw err;
+  });
+
+  $.log("Query location...");
+  await $.wait(Math.random() * 2000);
+  const address =
+    await $
+      .get(`https://apis.map.qq.com/ws/geocoder/v1/?key=${$.read("token").tencent}&location=${$.read("location").latitude},${$.read("location").longitude}`)
+      .then(resp => {
+        const body = JSON.parse(resp.body);
+        if (body.status !== 0) {
+          throw new ERR.TokenError("❌ 腾讯地图Token错误");
+        }
+        return body.result.address_component;
+      }).catch(err => {
+        throw err;
+      });
+
+  $.weather = weather;
+
+  if (display_location == true) {
+    $.info(JSON.stringify(address));
+  }
+  $.address = address;
 }
 
 function weatherAlert() {
@@ -177,9 +177,9 @@ function realtimeWeather() {
   const alertInfo = alert.content.length == 0 ? "" : alert.content.reduce((acc, curr) => {
     if (curr.status === '预警中') {
       return acc + "\n" + mapAlertCode(curr.code) + "预警";
-    } else{
+    } else {
       return acc;
-    } 
+    }
   }, "[预警]") + "\n\n";
 
   const realtime = data.realtime;
@@ -193,19 +193,23 @@ function realtimeWeather() {
     const dt = new Date(skycon.datetime);
     const now = dt.getHours() + 1;
     dt.setHours(dt.getHours() + 1)
-    hourlySkycon += `${now}-${dt.getHours() + 1}时 ${mapSkycon(skycon.value)}` + (i == 2 ? "" : "\n")
+    hourlySkycon += `${now}-${dt.getHours() + 1}时 ${mapSkycon(skycon.value)[0]}` + (i == 2 ? "" : "\n")
   }
 
   $.notify(
     `[彩云天气] ${address.city} ${address.district} ${address.street}`,
-    `${mapSkycon(realtime.skycon)} ${realtime.apparent_temperature} ℃  🌤 空气质量 ${realtime.air_quality.description.chn}`,
+    `${mapSkycon(realtime.skycon)[0]} ${realtime.apparent_temperature} ℃  🌤 空气质量 ${realtime.air_quality.description.chn}`,
     `${keypoint}
-🌡 体感${realtime.life_index.comfort.desc} ${realtime.temperature} ℃  💧 湿度 ${realtime.humidity.toFixed(2) * 100}%
+🌡 体感${realtime.life_index.comfort.desc} ${realtime.temperature} ℃  💧 湿度 ${(realtime.humidity * 100).toFixed(0)}%
 🌞 紫外线 ${realtime.life_index.ultraviolet.desc} 
 💨 风力 ${mapWind(realtime.wind.speed, realtime.wind.direction)}
 
 ${alertInfo}${hourlySkycon}
-`);
+`,
+    {
+      "media-url": `${mapSkycon(realtime.skycon)[1]}`
+    }
+  );
 }
 
 function dailyForcast() {
@@ -273,20 +277,21 @@ function mapWind(speed, direction) {
 }
 
 // 天气状况 --> 自然语言描述
+// icon来源：https://dribbble.com/kel
 function mapSkycon(skycon) {
   const map = {
-    "CLEAR_DAY": "☀️ 日间晴朗",
+    "CLEAR_DAY": ["☀️ 日间晴朗", "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/CLEAR_DAY.mp4?raw=true"],
     "CLEAR_NIGHT": "✨ 夜间晴朗",
-    "PARTLY_CLOUDY_DAY": "⛅️ 日间多云",
+    "PARTLY_CLOUDY_DAY": ["⛅️ 日间多云", "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/CLOUDY_DAY.mp4?raw=true"],
     "PARTLY_CLOUDY_NIGHT": "☁️ 夜间多云",
     "CLOUDY": "☁️ 阴",
     "LIGHT_HAZE": "😤 轻度雾霾",
     "MODERATE_HAZE": "😤 中度雾霾",
     "HEAVY_HAZE": "😤 重度雾霾",
-    "LIGHT_RAIN": "💧 小雨",
-    "MODERATE_RAIN": "💦 中雨",
-    "HEAVY_RAIN": "🌧 大雨",
-    "STORM_RAIN": "⛈ 暴雨",
+    "LIGHT_RAIN": ["💧 小雨", "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/RAIN.mp4?raw=true"],
+    "MODERATE_RAIN": ["💦 中雨", "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/RAIN.mp4?raw=true"],
+    "HEAVY_RAIN": ["🌧 大雨", "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/HEAVY_RAIN.mp4?raw=true"],
+    "STORM_RAIN": ["⛈ 暴雨", "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/HEAVY_RAIN.mp4?raw=true"],
     "LIGHT_SNOW": "🌨 小雪",
     "MODERATE_SNOW": "❄️ 中雪",
     "HEAVY_SNOW": "☃️ 大雪",

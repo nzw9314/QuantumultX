@@ -1,6 +1,75 @@
 {
   "releases": [
     {
+      "version": "0.4.6",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["透明图标处理"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.5",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下内置应用不显示问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.4",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["应用分类可以收纳"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.3",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["删除&导入会话时 Loading 动画不能自动消失问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.2",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下保存数据不生效问题 (实验)", "Rewrite正则 (注意更新正则)"]
+        },
+        {
+          "name": "移除",
+          "descs": ["修复VPN断连设置项", "自动更新订阅 (可手动更新)"]
+        }
+      ]
+    },
+    {
       "version": "0.4.1",
       "tags": ["beta"],
       "author": "@chavyleung",
