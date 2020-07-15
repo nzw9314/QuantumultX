@@ -1,10 +1,16 @@
-// 京东天天加速活动 国内gitee链接：https://gitee.com/lxk0301/scripts/raw/master/jd_speed.js
-// 每天4京豆，再小的苍蝇也是肉
-// 从 https://github.com/Zero-S1/JD_tools/blob/master/JD_speed.py 改写来的
-// cron 1 */3 * * *
-// 建议3小时运行一次，打卡时间间隔是6小时
-//有bug来我这提Issue反馈 https://gitee.com/lxk0301/scripts
-// 感谢@iepngs的兼容代码
+/*
+京东天天加速活动 国内gitee链接：https://gitee.com/lxk0301/scripts/raw/master/jd_speed.js
+每天4京豆，再小的苍蝇也是肉
+从 https://github.com/Zero-S1/JD_tools/blob/master/JD_speed.py 改写来的
+建议3小时运行一次，打卡时间间隔是6小时
+*/
+// quantumultx
+// [task_local]
+// #天天加速
+// 8 */3 * * * https://gitee.com/lxk0301/scripts/raw/master/jd_speed.js, tag=京东天天加速, img-url=https://raw.githubusercontent.com/znz1992/Gallery/master/jdttjs.png, enabled=true
+// Loon
+// [Script]
+// cron "8 */3 * * *" script-path=https://gitee.com/lxk0301/scripts/raw/master/jd_speed.js,tag=京东天天加速
 const $hammer = (() => {
   const isRequest = "undefined" != typeof $request,
       isSurge = "undefined" != typeof $httpClient,

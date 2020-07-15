@@ -1,10 +1,17 @@
-//jd宠汪汪 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
-
-//0 */3 * * * jd_joy.js  #每隔三小时运行一次，加快升级
-//feedCount:自定义 每次喂养数量; 等级只和喂养次数有关，与数量无关
-//推荐每次投喂10个，积累狗粮，然后去聚宝盆赌每小时的幸运奖，据观察，投入3000-6000中奖概率大，超过7000基本上注定亏本，即使是第一名
-//Combine from Zero-S1/JD_tools(https://github.com/Zero-S1/JD_tools)
-//2020。07.02 解决部分商品market.marketLink为空的时候，浏览不到的bug，解决浏览商品奖励积分api接口返回空值导致脚本报错的bug
+/*
+jd宠汪汪 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
+feedCount:自定义 每次喂养数量; 等级只和喂养次数有关，与数量无关
+推荐每次投喂10个，积累狗粮，然后去聚宝盆赌每小时的幸运奖，据观察，投入3000-6000中奖概率大，超过7000基本上注定亏本，即使是第一名
+Combine from Zero-S1/JD_tools(https://github.com/Zero-S1/JD_tools)
+2020。07.02 解决部分商品market.marketLink为空的时候，浏览不到的bug，解决浏览商品奖励积分api接口返回空值导致脚本报错的bug
+*/
+// quantumultx
+// [task_local]
+// #京东宠汪汪
+// 15 */3 * * * https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task/jd_joy.js, tag=京东宠汪汪, img-url=https://raw.githubusercontent.com/znz1992/Gallery/master/jdww.png, enabled=true
+// Loon
+// [Script]
+// cron "15 */3 * * *" script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task/jd_joy.js,tag=京东宠汪汪
 const FEED_NUM = 10   // [10,20,40,80]
 
 const $hammer = (() => {

@@ -1,16 +1,14 @@
-// 京东摇钱树 ：https://gitee.com/lxk0301/scripts/raw/master/jd_moneyTree2.js
-// 更新时间:2020-07-06，可兼容iOS 10设备
-// 现有功能
-// 1、收金果
-// 2、每日签到（也就是三餐签到）
-// 3、分享
-// 4、浏览任务
-// 5、自动领取浏览后的奖励
-// 6、七天签到（连续不间断签到七天）
-// 8、七天签到后，自动领取店铺优惠券
-// 9、把金果卖出，换成金币
-// cron 1 */3 * * * *
-// 圈X,Loon,surge均可使用
+/*
+京东摇钱树 ：https://gitee.com/lxk0301/scripts/raw/master/jd_moneyTree.js
+更新时间:2020-07-06，可兼容iOS 10设备
+*/
+// quantumultx
+// [task_local]
+// #京东摇钱树
+// 3 */2 * * * https://gitee.com/lxk0301/scripts/raw/master/jd_moneyTree.js, tag=京东摇钱树, img-url=https://raw.githubusercontent.com/znz1992/Gallery/master/moneyTree.png, enabled=true
+// Loon
+// [Script]
+// cron "3 */2 * * *" script-path=https://gitee.com/lxk0301/scripts/raw/master/jd_moneyTree.js,tag=京东摇钱树
 const Notice = 2;//设置运行多少次才通知。
 const $hammer = (() => {
   const isRequest = "undefined" != typeof $request,

@@ -1,7 +1,16 @@
-//京东萌宠助手 搬得https://github.com/liuxiaoyucc/jd-helper/blob/master/pet/pet.js
-// 2020-07-08更新：新增冰淇淋会场任务（可得8g狗粮），有些人京东app看不到，但是微信小程序京东有
-// cron 5 7-17/5 * * *
-// 互助码shareCode请先手动运行脚本查看打印可看到
+/*
+京东萌宠助手 搬得https://github.com/liuxiaoyucc/jd-helper/blob/master/pet/pet.js
+2020-07-08更新：新增冰淇淋会场任务（可得8g狗粮），有些人京东app看不到，但是微信小程序京东有
+// quantumultx
+[task_local]
+#东东萌宠
+5 6-18/6 * * * https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task/jd_pet.js, tag=东东萌宠, img-url=https://raw.githubusercontent.com/znz1992/Gallery/master/jdmc.png, enabled=true
+// Loon
+[Script]
+cron "5 6-18/6 * * *" script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task/jd_pet.js,tag=东东萌宠
+互助码shareCode请先手动运行脚本查看打印可看到
+一天只能帮助5个人。多出的助力码无效
+*/
 const $hammer = (() => {
     const isRequest = "undefined" != typeof $request,
         isSurge = "undefined" != typeof $httpClient,
@@ -333,10 +342,17 @@ async function browseShopsInit() {
 // 浏览指定店铺 任务
 function browseSingleShopInit() {
     console.log('准备浏览指定店铺');
-    request("getSingleShopReward").then(response => {
-        console.log(`浏览指定店铺结果: ${JSON.stringify(response)}`);
-        message += '【浏览指定店铺】成功,获取狗粮8g\n';
-        gen.next();
+    const body = {"index":1,"version":1,"type":1};
+    request("getSingleShopReward", body).then(response => {
+        if (response.code === '0' && response.resultCode === '0') {
+            const body2 = {"index":1,"version":1,"type":2};
+            request("getSingleShopReward", body2).then(response2 => {
+                if (response2.code === '0' && response2.resultCode === '0') {
+                    message += `【浏览指定店铺】获取${response2.result.reward}g\n`;
+                }
+                gen.next();
+            })
+        }
     })
 }
 // 临时新增任务--冰淇淋会场
@@ -398,7 +414,10 @@ function initPetTown() {
         console.log(`初始化萌宠信息${JSON.stringify(response)}`)
         if (response.code === '0' && response.resultCode === '0' && response.message === 'success') {
             petInfo = response.result;
-            goodsUrl = response.result.goodsInfo.goodsUrl;
+            if (petInfo.userStatus === 0) {
+              return $hammer.alert(name, '\n【提示】此账号萌宠活动未开始，请手动去京东APP开启活动\n');
+            }
+            goodsUrl = response.result.goodsInfo && response.result.goodsInfo.goodsUrl;
             console.log(`初始化萌宠信息完成: ${JSON.stringify(petInfo)}`);
             console.log(`\n【您的互助码shareCode】 ${petInfo.shareCode}\n`);
           gen.next();
@@ -451,9 +470,24 @@ function secondInitPetTown() {
 // 邀请新用户
 function inviteFriendsInit() {
     console.log('邀请新用户功能未实现');
-    setTimeout(() => {
+    if (taskInfo.inviteFriendsInit.status == 1 && taskInfo.inviteFriendsInit.inviteFriendsNum > 0) {
+      // 如果有邀请过新用户,自动领取60gg奖励
+      request('getInviteFriendsReward').then((res) => {
+        try {
+          if (res.code == 0 && res.resultCode == 0) {
+            console.log(`领取邀请新用户奖励成功,获得狗粮现有狗粮${taskInfo.inviteFriendsInit.reward}g，${res.result.foodAmount}g`);
+            message += `【邀请新用户】获取${taskInfo.inviteFriendsInit.reward}g\n`;
+          }
+          gen.next();
+        } catch (e) {
+          console.log('领取邀请新用户奖励失败')
+        }
+      });
+    } else {
+      setTimeout(() => {
         gen.next();
-    }, 2000);
+      }, 2000);
+    }
 }
 
 // 好友助力信息
