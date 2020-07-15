@@ -1,7 +1,7 @@
 const $ = new Env('BoxJs')
 $.domain = '8.8.8.8'
 
-$.version = '0.4.6'
+$.version = '0.4.7'
 $.versionType = 'beta'
 $.KEY_sessions = 'chavy_boxjs_sessions'
 $.KEY_versions = 'chavy_boxjs_versions'
@@ -272,7 +272,7 @@ async function refreshAppSubs() {
           if (Array.isArray(respsub.apps)) {
             respsub._raw = sub
             respsub.updateTime = new Date()
-            wrapapps(respsub.apps)
+            // wrapapps(respsub.apps)
             usercfgs.appsubCaches[suburl] = respsub
             console.log(`更新订阅, 成功! ${suburl}`)
           }
