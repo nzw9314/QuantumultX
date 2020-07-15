@@ -163,7 +163,7 @@ function* step() {
         //定时领取--放到前面执行收取自动生产的营养液
         if (plantBeanIndexResult.data.timeNutrientsRes.state == 1 && plantBeanIndexResult.data.timeNutrientsRes.nutrCount > 0) {
           console.log(`开始领取定时产生的营养液`)
-          let receiveNutrientsResult = yield receiveNutrients(plantBeanRound.roundId)
+          let receiveNutrientsResult = yield receiveNutrients(currentRoundId)
           console.log(`receiveNutrientsResult:${JSON.stringify(receiveNutrientsResult)}`)
         }
         if (roundList[0].beanState == 4 && roundList[0].awardState == 4) {
