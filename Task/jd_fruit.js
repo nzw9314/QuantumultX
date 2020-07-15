@@ -1,11 +1,18 @@
-//jd免费水果 搬的https://github.com/liuxiaoyucc/jd-helper/blob/a6f275d9785748014fc6cca821e58427162e9336/fruit/fruit.js
-// 更新时间：2020-07-03
-// [task_local]
-// #jd免费水果
-// cron "1 0 7,12,18 * * *" script-path=https://raw.githubusercontent.com/iepngs/Script/master/jd/fruit.js,tag=jd免费水果
-//兼容surge和Loon等软件功能 by@iepngs
-//新增和维护功能 by@lxk0301
-// 互助码shareCode请先手动运行脚本查看打印可看到
+/*
+jd免费水果 搬的https://github.com/liuxiaoyucc/jd-helper/blob/a6f275d9785748014fc6cca821e58427162e9336/fruit/fruit.js
+更新时间：2020-07-03
+// quantumultx
+[task_local]
+#jd免费水果
+5 6-18/6 * * * https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task/jd_fruit.js, tag=东东农场, img-url=https://raw.githubusercontent.com/znz1992/Gallery/master/jdsg.png, enabled=true
+// Loon
+[Script]
+cron "5 6-18/6 * * *" script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task/jd_fruit.js,tag=东东农场
+兼容surge和Loon等软件功能 by@iepngs
+新增和维护功能 by@lxk0301
+互助码shareCode请先手动运行脚本查看打印可看到
+一天只能帮助4个人。多出的助力码无效
+*/
 const $hammer = (() => {
     const isRequest = "undefined" != typeof $request,
         isSurge = "undefined" != typeof $httpClient,
@@ -285,7 +292,37 @@ function* step() {
             }
           }
         }
-        console.log('\n开始打卡领水活动（签到，关注，领券）\n')
+        console.log('\n开始打卡领水活动（签到，关注，领券）结束\n');
+      // 水滴雨
+      if (!farmTask.waterRainInit.f) {
+        console.log(`水滴雨任务，每天两次，最多可得10g水滴`);
+        console.log(`两次水滴雨任务是否全部完成：${farmTask.waterRainInit.f ? '是' : '否'}`);
+        if (farmTask.waterRainInit.winTimes === 0) {
+          console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
+          let waterRain = yield waterRainForFarm();
+          console.log('水滴雨waterRain', waterRain);
+          if (waterRain.code === '0') {
+            console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
+            message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
+          }
+        } else {
+          //执行了第一次水滴雨。需等待3小时候才能再次执行
+          if (new Date().getTime()  > (farmTask.waterRainInit.lastTime + 3 * 60 * 60 *1000)) {
+            console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
+            let waterRain = yield waterRainForFarm();
+            console.log('水滴雨waterRain', waterRain);
+            if (waterRain.code === '0') {
+              console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
+              message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
+            }
+          } else {
+            console.log(`【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`)
+            message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`
+          }
+        }
+      } else {
+        message += `【当天两次水滴雨任务】已全部完成，获得20g水滴\n`
+      }
         const masterHelpResult = yield masterHelpTaskInitForFarm();
         console.log("初始化助力信息", masterHelpResult);
         if (masterHelpResult.code === '0') {
@@ -295,7 +332,7 @@ function* step() {
                     const masterGotFinished = yield masterGotFinishedTaskForFarm();
                     if (masterGotFinished.code === '0') {
                       console.log(`已成功领取好友助力奖励：【${masterGotFinished.amount}】g水`);
-                      message += `【好友助力额外奖励】:${masterGotFinished.amount}g水领取成功\n`;
+                      message += `【好友助力额外奖励】${masterGotFinished.amount}g水领取成功\n`;
                     }
                 } else {
                     console.log("已经领取过5好友助力额外奖励");
@@ -384,6 +421,7 @@ function* step() {
                     isFruitFinished = waterResult.finished;
                     break
                   }
+                  break;
                 }
             }
             if (isFruitFinished) {
@@ -417,36 +455,6 @@ function* step() {
         } else if (farmTask.totalWaterTaskInit.totalWaterTaskTimes < farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
             message += `【十次浇水奖励】任务未完成，今日浇水${farmTask.totalWaterTaskInit.totalWaterTaskTimes}次\n`
         }
-        // 水滴雨
-        if (!farmTask.waterRainInit.f) {
-          console.log(`水滴雨任务，每天两次，最多可得10g水滴`);
-          console.log(`两次水滴雨任务是否全部完成：${farmTask.waterRainInit.f ? '是' : '否'}`);
-          if (farmTask.waterRainInit.winTimes === 0) {
-            console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
-            let waterRain = yield waterRainForFarm();
-            console.log('水滴雨waterRain', waterRain);
-            if (waterRain.code === '0') {
-              console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
-              message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
-            }
-          } else {
-            //执行了第一次水滴雨。需等待3小时候才能再次执行
-            if (new Date().getTime()  > (farmTask.waterRainInit.lastTime + 3 * 60 * 60 *1000)) {
-              console.log(`开始水滴雨任务,这是第${farmTask.waterRainInit.winTimes + 1}次，剩余${2 - (farmTask.waterRainInit.winTimes + 1)}次`);
-              let waterRain = yield waterRainForFarm();
-              console.log('水滴雨waterRain', waterRain);
-              if (waterRain.code === '0') {
-                console.log('水滴雨任务执行成功，获得水滴：' + waterRain.addEnergy + 'g');
-                message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】获得${waterRain.addEnergy}g水滴\n`
-              }
-            } else {
-              console.log(`【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`)
-              message += `【第${farmTask.waterRainInit.winTimes + 1}次水滴雨任务】未到时间，请稍后再试\n`
-            }
-          }
-        } else {
-          message += `【当天两次水滴雨任务】已全部完成，获得20g水滴\n`
-        }
         console.log('finished 水果任务完成!');
 
         farmInfo = yield initForFarm();
@@ -469,6 +477,7 @@ function* step() {
                 isFruitFinished = res.finished;
                 break
               }
+              break;
             }
           }
           if (isFruitFinished) {
@@ -478,7 +487,7 @@ function* step() {
           console.log("目前剩余水滴：【" + farmInfo.farmUserPro.totalEnergy + "】g,不再继续浇水,保留100g水滴用于完成第二天任务")
         }
         farmInfo = yield initForFarm();
-        message += `【水果进度】已浇水${farmInfo.farmUserPro.treeEnergy / 10}次,还需${(farmInfo.farmUserPro.treeTotalEnergy - farmInfo.farmUserPro.treeEnergy) / 10}次\n`
+        message += `【水果进度】${((farmInfo.farmUserPro.treeEnergy / farmInfo.farmUserPro.treeTotalEnergy) * 100).toFixed(2)}%，已浇水${farmInfo.farmUserPro.treeEnergy / 10}次,还需${(farmInfo.farmUserPro.treeTotalEnergy - farmInfo.farmUserPro.treeEnergy) / 10}次\n`
         if (farmInfo.toFlowTimes > (farmInfo.farmUserPro.treeEnergy / 10)) {
             message += `【开花进度】再浇水${farmInfo.toFlowTimes - farmInfo.farmUserPro.treeEnergy / 10}次开花\n`
         } else if (farmInfo.toFruitTimes > (farmInfo.farmUserPro.treeEnergy / 10)) {
