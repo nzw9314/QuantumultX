@@ -1,6 +1,6 @@
 /*
 种豆得豆 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
-更新时间：2020-07-06，新增完成低价包邮的任务，优化弹窗信息
+更新时间：2020-07-015，新增种豆天天扭蛋功能
 会自动关注任务中的店铺跟商品
 互助码shareCode请先手动运行脚本查看打印可看到
 // quantumultx
