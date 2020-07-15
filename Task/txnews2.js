@@ -308,8 +308,9 @@ return new Promise((resolve, reject) => {
 function showmsg() {
  return new Promise((resolve, reject) => {
   if(readnum&&videonum){
-   detail = signinfo+redpackres + `【文章阅读】已读/再读: `+ readnum +`/`+readtitle+` 篇\n`+`【阅读红包】已开/总计: `+openreadred+`/`+readredtotal+` 个🧧\n`+ `【观看视频】已看/再看: `+ videonum +`/`+videotitle+` 分钟\n`+`【视频红包】已开/总计: `+openvideored+`/`+videoredtotal+` 个🧧\n【每日一句】`+Dictum
+   detail = signinfo+`` + `【文章阅读】已读/再读: `+ readnum +`/`+readtitle+` 篇\n`+`【阅读红包】已开/总计: `+openreadred+`/`+readredtotal+` 个🧧\n`+ `【观看视频】已看/再看: `+ videonum +`/`+videotitle+` 分钟\n`+`【视频红包】已开/总计: `+openvideored+`/`+videoredtotal+` 个🧧\n【每日一句】`+Dictum
   }
+  sy.log(subTile+`\n`+detail)
    if
 (openvideored%notifyInterval==0&&videocoins=="红包+1"){
    sy.msg(cookieName,subTile,detail)
@@ -320,7 +321,6 @@ function showmsg() {
    else if(notifyInterval==1){
    sy.msg(cookieName,subTile,detail)
   }
-  sy.log(subTile+`\n`+detail)
  })
 resolve()
 }
