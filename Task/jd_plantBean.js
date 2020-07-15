@@ -1,6 +1,6 @@
 /*
 种豆得豆 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f883f483f907120a75d925a693e/Script/jd_joy.js
-更新时间：2020-07-06，新增完成低价包邮的任务，优化弹窗信息
+更新时间：2020-07-15，新增种豆天天扭蛋功能
 会自动关注任务中的店铺跟商品
 互助码shareCode请先手动运行脚本查看打印可看到
 // quantumultx
@@ -163,7 +163,7 @@ function* step() {
         //定时领取--放到前面执行收取自动生产的营养液
         if (plantBeanIndexResult.data.timeNutrientsRes.state == 1 && plantBeanIndexResult.data.timeNutrientsRes.nutrCount > 0) {
           console.log(`开始领取定时产生的营养液`)
-          let receiveNutrientsResult = yield receiveNutrients(plantBeanRound.roundId)
+          let receiveNutrientsResult = yield receiveNutrients(currentRoundId)
           console.log(`receiveNutrientsResult:${JSON.stringify(receiveNutrientsResult)}`)
         }
         if (roundList[0].beanState == 4 && roundList[0].awardState == 4) {
