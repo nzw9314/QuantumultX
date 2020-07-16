@@ -12,10 +12,11 @@ const url = "https://testflight.apple.com/join/";
  * 填入要监测的appkey。从testfligt地址获取。
  * 例如"VCIvwk2g,wArXdacJ,2vnRvOTX,LzjySbQx,IdFRwmNy,qDkBu2ur,4Qt2lIm5,ZzqOu8tX,ftCqFe6D,fy7LvHVA,QKqitFwc"
 */
-const appkey = "VCIvwk2g,1SyedSId";
+//const appkey = "VCIvwk2g,1SyedSId";
+const appkey=getdata('appkey');
 
 //是否在没有tf位置的时候仍然弹出通知，默认不弹出,防止过多无用通知。
-var isNOtify = false;
+var isNOtify = getdata('testflight_isnotify');
 const fullstr = /(此 Beta 版本的测试员已满)|(此 Beta 版本目前不接受任何新测试员)/;
 const appnamereg = /<title>加入 Beta 版“(.+)” - TestFlight - Apple<\/title>/;
 var proarray = new Array();
@@ -82,11 +83,10 @@ function getResult() {
             }
         }
         if (resultstr) {
-           
-            sy.msgt('', '', hastr+nostr);
+            sy.msg('', '', hastr+nostr);
         }
         else{
-            if(isNOtify){
+            if(isNOtify=="true"){
                 sy.msg('', '', hastr+nostr);
             }
         }

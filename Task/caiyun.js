@@ -68,6 +68,10 @@ if (typeof $request !== 'undefined') {
   if (display_location) {
     $.info(`成功获取当前位置：纬度 ${location.latitude} 经度 ${location.longitude}`);
   }
+  
+  $.write(res[1], "#latitude");
+  $.write(res[2], "#longitude");
+
   $.write(location, "location");
   $.done({ body: $request.body });
 } else {
