@@ -94,7 +94,7 @@ function* entrance() {
       "media-url" : goodsUrl
     }
 
-    if (!jdNotify) {
+    if (!jdNotify || jdNotify === 'false') {
       $.msg(name, subTitle, message, option);
     }
     // $notify(name, subTitle, message);
