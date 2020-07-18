@@ -38,9 +38,9 @@ async function fetchInfo(sub) {
         url: sub.link,
         headers
     }).then(resp => {
-        const userinfo =
-            resp.headers["Subscription-Userinfo"] ||
-            resp.headers["subscription-userinfo"];
+        const headers = resp.headers;
+        const subkey = Object.keys(headers).filter(k => /SUBSCRIPTION-USERINFO/i.test(k))[0];
+        const userinfo = headers[subkey];
         const KEY_o_now = "o_now" + sub.name;
         const KEY_today_flow = "today_flow" + sub.name;
         $.log(userinfo);

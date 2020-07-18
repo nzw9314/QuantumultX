@@ -1,7 +1,7 @@
 const $ = new Env('BoxJs')
 $.domain = '8.8.8.8'
 
-$.version = '0.4.8'
+$.version = '0.4.11'
 $.versionType = 'beta'
 $.KEY_sessions = 'chavy_boxjs_sessions'
 $.KEY_versions = 'chavy_boxjs_versions'
@@ -146,14 +146,6 @@ function getSystemApps() {
       author: '@NobyDa',
       repo: 'https://github.com/NobyDa/Script/blob/master/iQIYI-DailyBonus/iQIYI.js',
       icons: ['https://raw.githubusercontent.com/Orz-3/mini/master/iQIYI.png', 'https://raw.githubusercontent.com/Orz-3/task/master/iQIYI.png']
-    },
-    {
-      id: 'JD',
-      name: '京东',
-      keys: ['CookieJD', 'CookieJD2'],
-      author: '@NobyDa',
-      repo: 'https://github.com/NobyDa/Script/blob/master/JD-DailyBonus/JD_DailyBonus.js',
-      icons: ['https://raw.githubusercontent.com/Orz-3/mini/master/jd.png', 'https://raw.githubusercontent.com/Orz-3/task/master/jd.png']
     },
     {
       id: 'JD618',
@@ -343,6 +335,8 @@ function wrapapps(apps) {
           setting.val = val === null ? setting.val : val === 'true'
         } else if (setting.type === 'int') {
           setting.val = val * 1 || setting.val
+        } else if (setting.type === 'checkboxes') {
+          setting.val = val ? val.split(',') : null || setting.val
         } else {
           setting.val = val || setting.val
         }
@@ -464,10 +458,10 @@ async function handleApi() {
     if (Array.isArray(settings)) {
       settings.forEach((setting) => {
         const oldval = $.getdata(setting.id)
-        const newval = setting.val
-        const usesuc = $.setdata(`${newval}`, setting.id)
+        const newval = `${setting.val}`
+        const usesuc = $.setdata(newval, setting.id)
         $.log(`❕ ${$.name}, 保存设置: ${setting.id} ${usesuc ? '成功' : '失败'}!`, `旧值: ${oldval}`, `新值: ${newval}`)
-        $.setdata(`${newval}`, setting.id)
+        $.setdata(newval, setting.id)
       })
       $.subt = `保存设置: 成功! `
       $.msg($.name, $.subt, '')
@@ -581,7 +575,7 @@ async function handleApi() {
 }
 
 async function getBoxData() {
-  return {
+  const box = {
     sessions: getSessions(),
     versions: await getVersions(),
     sysapps: getSystemApps(),
@@ -592,6 +586,11 @@ async function getBoxData() {
     globalbaks: getGlobalBaks(),
     colors: getSystemThemes()
   }
+  const apps = []
+  apps.push(...box.sysapps)
+  box.appsubs.forEach((sub) => apps.push(...sub.apps))
+  box.usercfgs.favapps = box.usercfgs.favapps.filter((favappId) => apps.find((app) => app.id === favappId))
+  return box
 }
 
 async function handleHome() {
@@ -917,10 +916,17 @@ function printHtml(data, curapp = null, curview = 'app') {
                   </v-subheader>
                   <v-form class="pl-4 pr-4">
                     <template v-for="(setting, settingIdx) in ui.curapp.settings">
-                    <v-slider :label="setting.name" v-model="setting.val" :hint="setting.desc" :min="setting.min" :max="setting.max" thumb-label="always" :placeholder="setting.placeholder" v-if="setting.type === 'slider'"></v-slider>
-                    <v-switch :label="setting.name" v-model="setting.val" :hint="setting.desc" :placeholder="setting.placeholder" v-else-if="setting.type === 'boolean'"></v-switch>
-                    <v-textarea :label="setting.name" v-model="setting.val" :hint="setting.desc" :auto-grow="setting.autoGrow" :placeholder="setting.placeholder" v-else-if="setting.type === 'textarea'"></v-textarea>
-                    <v-text-field :label="setting.name" v-model="setting.val" :hint="setting.desc" :placeholder="setting.placeholder" v-else="setting.type === 'text'"></v-text-field>
+                      <v-slider :label="setting.name" v-model="setting.val" :hint="setting.desc" :min="setting.min" :max="setting.max" thumb-label="always" :placeholder="setting.placeholder" v-if="setting.type === 'slider'"></v-slider>
+                      <v-switch :label="setting.name" v-model="setting.val" :hint="setting.desc" :placeholder="setting.placeholder" v-else-if="setting.type === 'boolean'"></v-switch>
+                      <v-textarea :label="setting.name" v-model="setting.val" :hint="setting.desc" :auto-grow="setting.autoGrow" :placeholder="setting.placeholder" v-else-if="setting.type === 'textarea'"></v-textarea>
+                      <v-radio-group :label="setting.name" v-model="setting.val" :hint="setting.desc" :placeholder="setting.placeholder" v-else-if="setting.type === 'radios'">
+                        <v-radio :class="itemIdx === 0 ? 'mt-2' : ''" v-for="(item, itemIdx) in setting.items" :label="item.label" :value="item.key" :key="item.key"></v-radio>
+                      </v-radio-group>
+                      <template v-else-if="setting.type === 'checkboxes'">
+                        <label>{{ setting.name }}</label>
+                        <v-checkbox class="mt-0" :hide-details="itemIdx + 1 !== setting.items.length" v-model="setting.val" :label="item.label" :value="item.key" v-for="(item, itemIdx) in setting.items" :key="item.key" multiple></v-checkbox>
+                      </template>
+                      <v-text-field :label="setting.name" v-model="setting.val" :hint="setting.desc" :placeholder="setting.placeholder" v-else="setting.type === 'text'"></v-text-field>
                     </template>
                   </v-form>
                   <v-divider></v-divider>
@@ -1714,15 +1720,6 @@ function printHtml(data, curapp = null, curview = 'app') {
             },
             onReload() {
               window.location.reload()
-              // const refreshsecs = this.box.usercfgs.refreshsecs
-              // const sec = [undefined, null, 'null', 'undefined', ''].includes(refreshsecs) ? 3 : refreshsecs * 1
-              // if (sec === 0) {
-              //   this.reload()
-              // } else {
-              //   this.ui.overlay.show = false
-              //   this.ui.reloadConfirmDialog.show = true
-              //   this.ui.reloadConfirmDialog.sec = sec
-              // }
             },
             onDelSession(session) {
               this.ui.overlay.show = true
