@@ -67,190 +67,193 @@ $ = new Env("微博超话")
 $.delete_cookie = false //若需要清空cookie，请把它置为true。清空完毕后，请重新置为false.
 $.msg_max_num = 30 //一个通知显示30个超话的签到情况
 $.time = 700 //【签到间隔，单位ms】，若超话过多，建议填1000ms以上。
-
-if ($.getdata('wb_delete_cookie') != undefined) {
-    if ($.getdata('wb_delete_cookie') == true || $.getdata('wb_delete_cookie') == 'true')
-        $.delete_cookie = true
-    else
-        $.delete_cookie = false
-}
-if ($.getdata('wb_msg_max_num') != undefined) {
-    if($.getdata('wb_msg_max_num') != "")
-        $.msg_max_num = $.getdata('wb_msg_max_num') * 1
-}
-if ($.getdata('wb_request_time') != undefined) {
-    if($.getdata('wb_request_time') != "")
-        $.time = $.getdata('wb_request_time') * 1
-}
-
 debug = false
-const tokenurl = "evil_tokenurl";
-const tokencheckinurl = "evil_tokencheckinurl";
-const tokenheaders = "evil_tokenheaders";
-const tokencheckinheaders = "evil_tokencheckinheaders";
-const tokenurl2 = "evil_tokenurl2";
-const tokencheckinurl2 = "evil_tokencheckinurl2";
-const tokenheaders2 = "evil_tokenheaders2";
-const tokencheckinheaders2 = "evil_tokencheckinheaders2";
-
-
-var listurl = $.getdata(tokenurl);
-var listheaders = $.getdata(tokenheaders);
-var checkinurl = $.getdata(tokencheckinurl);
-var checkinheaders = $.getdata(tokencheckinheaders);
-
-var listurl2 = $.getdata(tokenurl2);
-var listheaders2 = $.getdata(tokenheaders2);
-var checkinurl2 = $.getdata(tokencheckinurl2);
-var checkinheaders2 = $.getdata(tokencheckinheaders2);
 
 !(async () => {
-  if ($.delete_cookie) {
-    deleteCookie()
-    $.done()
-    return
-  }
-  $.count_num = 0;
-  //判断当前是几个账号
-  if (listurl == undefined || listurl == "" ||
-    listheaders == undefined || listheaders == "" ||
-    checkinurl == undefined || checkinurl == "" ||
-    checkinheaders == undefined || checkinheaders == "") {
-    $.msg($.name, "🚫cookie不完整 或 没有cookie", "🚫请认真阅读配置，按流程获取cookie。\n🔍若仍无法解决，请先清空cookie再获取。\n🔍如何清空？\n1️⃣本地文件：将文件内delete_cookie置为true。\n2️⃣远程文件：使用boxjs，在box内打开清空cookie开关")
-    $.done()
-    return
-  } else {
-    $.count_num = 1
-  }
-  if (!(listurl2 == undefined || listurl2 == "" ||
-      listheaders2 == undefined || listheaders2 == "" ||
-      checkinurl2 == undefined || checkinurl2 == "" ||
-      checkinheaders2 == undefined || checkinheaders2 == "")) {
-    $.count_num = 2;
-  }
-  console.log(`🌟 账号数 = ${$.count_num}`)
-  for (var current = 1; current <= $.count_num; ++current) {
-    init_env(current)
-    await getnumber();
-    for (var i = 1; i <= $.pagenumber; i++) {
-      await getid(i);
+    if(!get_setting()) return
+    if(!get_counts()) return
+    console.log(`🌟 账号数 = ${$.count_num}`)
+    for (var current = 1; current <= $.count_num; ++current) {
+        init_env(current)
+        await get_page_number();
+        for (var i = 1; i <= $.pagenumber; i++) {
+            await get_talk_id(i);
+        }
+        for (var i in $.name_list) {
+            await checkin($.id_list[i], $.name_list[i]);
+            $.wait($.time);
+            if($.stopNum != 0){
+                console.log(`🚨检测到Cookie失效，脚本已自动停止`);
+                $.msg($.name, `🚨检测到Cookie失效，脚本已自动停止`,"");      
+                return
+            }
+        }
+        output(current)
     }
-    for (var i in $.name_list) {
-      await checkin($.id_list[i], $.name_list[i]);
-      $.wait($.time)
-    }
-    output(current)
-  }
 })()
 .catch((e) => {
     $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
-  })
-  .finally(() => {
+})
+.finally(() => {
     $.done()
-  })
+})
 
-function init_env(current) {
-  console.log(`🌟 清空环境，开始账号 ${current}`)
-  $.message = [];
-  $.name_list = []
-  $.id_list = []
-  $.val_list = []
-  $.successNum = 0
-  $.failNum = 0
-  $.allnumber = 0;
-  $.pagenumber = 0;
-  if (current == 2) {
-    listurl = listurl2
-    listheaders = listheaders2
-    checkinurl = checkinurl2
-    checkinheaders = checkinheaders2
-  }
+function get_setting() {
+    $.delete_cookie = JSON.parse($.getdata('wb_delete_cookie') || $.delete_cookie)
+    $.msg_max_num = $.getdata('wb_msg_max_num') * 1 || $.msg_max_num
+    $.time = $.getdata('wb_request_time') * 1 || $.time 
+
+    $.listurl = $.getdata("evil_tokenurl");
+    $.listheaders = $.getdata("evil_tokenheaders");
+    $.checkinurl = $.getdata("evil_tokencheckinurl");
+    $.checkinheaders = $.getdata("evil_tokencheckinheaders");
+
+    $.listurl2 = $.getdata("evil_tokenurl2");
+    $.listheaders2 = $.getdata("evil_tokenheaders2");
+    $.checkinurl2 = $.getdata("evil_tokencheckinurl2");
+    $.checkinheaders2 = $.getdata("evil_tokencheckinheaders2");
+    if ($.delete_cookie) {
+        $.setdata("", "evil_tokenurl")
+        $.setdata("", "evil_tokenheaders")
+        $.setdata("", "evil_tokencheckinurl")
+        $.setdata("", "evil_tokencheckinheaders")
+
+        $.setdata("", "evil_tokenurl2")
+        $.setdata("", "evil_tokenheaders2")
+        $.setdata("", "evil_tokencheckinurl2")
+        $.setdata("", "evil_tokencheckinheaders2")
+        $.msg($.name, "", "✅已清空cookie。请将文件内delete_cookie置为false。\n🔍然后，按流程获取cookie。")
+        return false;
+    }
+    return true;
 }
 
-function deleteCookie() {
-  $.setdata("", tokenurl)
-  $.setdata("", tokenheaders)
-  $.setdata("", tokenurl2)
-  $.setdata("", tokenheaders2)
-  $.setdata("", tokencheckinurl)
-  $.setdata("", tokencheckinheaders)
-  $.setdata("", tokencheckinurl2)
-  $.setdata("", tokencheckinheaders2)
-  $.msg($.name, "", "✅已清空cookie。请将文件内delete_cookie置为false。\n🔍然后，按流程获取cookie。")
+function get_counts() {
+    $.count_num = 0;
+    if ($.listurl == undefined || $.listurl == "" ||
+        $.listheaders == undefined || $.listheaders == "" ||
+        $.checkinurl == undefined || $.checkinurl == "" ||
+        $.checkinheaders == undefined || $.checkinheaders == "") {
+        $.msg($.name, "🚫cookie不完整 或 没有cookie", "🚫请认真阅读配置，按流程获取cookie。\n🔍若仍无法解决，请先清空cookie再获取。\n🔍如何清空？\n1️⃣本地文件：将文件内delete_cookie置为true。\n2️⃣远程文件：使用boxjs，在box内打开清空cookie开关")
+        return false;
+    } else {
+        $.count_num = 1
+    }
+    if (!($.listurl2 == undefined || $.listurl2 == "" ||
+            $.listheaders2 == undefined || $.listheaders2 == "" ||
+            $.checkinurl2 == undefined || $.checkinurl2 == "" ||
+            $.checkinheaders2 == undefined || $.checkinheaders2 == "")) {
+        $.count_num = 2;
+    }
+    return true;
+}
+
+function init_env(current) {
+    console.log(`🌟 清空环境，开始账号 ${current}`)
+    $.message = [];
+    $.name_list = []
+    $.id_list = []
+    $.val_list = []
+    $.successNum = 0
+    $.failNum = 0
+    $.allnumber = 0;
+    $.pagenumber = 0;
+    $.stopNum = 0;
+    if (current == 2) {
+        $.listurl = $.listurl2
+        $.listheaders = $.listheaders2
+        $.checkinurl = $.checkinurl2
+        $.checkinheaders = $.checkinheaders2
+    }
 }
 
 function output(current) {
-  $.this_msg = ""
-  for (var i = 1; i <= $.message.length; ++i) {
-    if (i % ($.msg_max_num) == 0) {
-      $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${Math.ceil(i/$.msg_max_num)}页 ，共${Math.ceil($.message.length/$.msg_max_num)}页`, $.this_msg)
-      $.this_msg = ""
+    $.this_msg = ""
+    for (var i = 1; i <= $.message.length; ++i) {
+        if (i % ($.msg_max_num) == 0) {
+            $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${Math.ceil(i/$.msg_max_num)}页 ，共${Math.ceil($.message.length/$.msg_max_num)}页`, $.this_msg)
+            $.this_msg = ""
+        }
+        $.this_msg += `${$.message[i-1]}\n`
     }
-    $.this_msg += `${$.message[i-1]}\n`
-  }
-  if ($.message.length % $.msg_max_num != 0) {
-    $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`,  `当前第${Math.ceil((i-1)/$.msg_max_num)}页 ，共${Math.ceil($.message.length/$.msg_max_num)}页`, $.this_msg)
-  }
+    if ($.message.length % $.msg_max_num != 0) {
+        $.msg(`${$.name}${$.count_num==1?"":(current==1?"[账号一]":"[账号二]")}:  成功${$.successNum}个，失败${$.failNum}`, `当前第${Math.ceil((i-1)/$.msg_max_num)}页 ，共${Math.ceil($.message.length/$.msg_max_num)}页`, $.this_msg)
+    }
 }
 
-function getnumber() {
-  return new Promise((resove) => {
-    var idrequest = {
-      url: listurl,
-      header: listheaders
-    };
-    // console.log(idrequest)
-    $.get(idrequest, (error, response, data) => {
-      var body = response.body;
-      var obj = JSON.parse(body);
-      // console.log(obj);
-      $.allnumber = obj.cardlistInfo.total;
-      console.log("当前已关注超话" + $.allnumber + "个");
-      //  $.message.push(`当前已关注超话${allnumber}个`);
-      $.pagenumber = Math.ceil($.allnumber / 20);
-      //$notify("超话","",JSON.stringify($.message))
-      resove();
+function get_page_number() {
+    return new Promise((resolve) => {
+        var idrequest = {
+            url: $.listurl,
+            header: $.listheaders
+        };
+        $.get(idrequest, (error, response, data) => {
+            if (error) {
+                throw new Error(error)
+            }
+            var body = response.body;
+            var obj = JSON.parse(body);
+            if (obj.hasOwnProperty('errmsg')) {
+                $.msg($.name, "🚨获取页数出现错误", `⚠️微博原话：${obj.errmsg}\n🧑🏻‍💻作者：账号过期了，清空cookie吧，重新获取。`)
+                $.pagenumber = 0
+                resolve()
+                return
+            }
+            $.allnumber = obj.cardlistInfo.total;
+            console.log("当前已关注超话" + $.allnumber + "个");
+            //  $.message.push(`当前已关注超话${allnumber}个`);
+            $.pagenumber = Math.ceil($.allnumber / 20);
+            //$notify("超话","",JSON.stringify($.message))
+            resolve();
+        });
     });
-  });
 }
 
 //获取超话签到id
-function getid(page) {
-  var getlisturl = listurl.replace(
-    new RegExp("&page=.*?&"),
-    "&page=" + page + "&"
-  );
-  //console.log(getlisturl);
-  var idrequest = {
-    url: getlisturl,
-    header: listheaders
-  };
-  // console.log(idrequest)
-  return new Promise((resove) => {
-    $.get(idrequest, (error, response, data) => {
-      var body = response.body;
-      var obj = JSON.parse(body);
-      var group = obj.cards[0]["card_group"];
-      number = group.length;
-      for (i = 0; i < number; i++) {
-        var name = group[i]["title_sub"];
-        $.name_list.push(name)
+function get_talk_id(page) {
+    var getlisturl = $.listurl.replace(
+        new RegExp("&page=.*?&"),
+        "&page=" + page + "&"
+    );
+    //console.log(getlisturl);
+    var idrequest = {
+        url: getlisturl,
+        header: $.listheaders
+    };
+    // console.log(idrequest)
+    return new Promise((resove) => {
+        $.get(idrequest, (error, response, data) => {
+            if (error) {
+                throw new Error(error)
+            }
+            var body = response.body;
+            var obj = JSON.parse(body);
+            if (obj.hasOwnProperty('errmsg')) {
+                $.msg($.name, "🚨获取超话ID出现错误", `⚠️微博原话：${obj.errmsg}\n`)
+                resolve()
+                return
+            }
+            var group = obj.cards[0]["card_group"];
+            number = group.length;
+            for (i = 0; i < number; i++) {
+                var name = group[i]["title_sub"];
+                $.name_list.push(name)
 
-        var val = group[i].desc;
-        $.val_list.push(val)
+                var val = group[i].desc;
+                $.val_list.push(val)
 
-        var id = group[i].scheme.slice(33, 71);
-        $.id_list.push(id)
-        if (debug) {
-          console.log(name)
-          console.log(val)
-          console.log(id)
-        }
-        // checkin(id, name, val, time);
-      }
-      resove()
+                var id = group[i].scheme.slice(33, 71);
+                $.id_list.push(id)
+                if (debug) {
+                    console.log(name)
+                    console.log(val)
+                    console.log(id)
+                }
+                // checkin(id, name, val, time);
+            }
+            resove()
+        })
     })
-  })
 }
 
 
@@ -259,93 +262,105 @@ function getid(page) {
 //签到
 function checkin(id, name) {
 
-  var sendcheckinurl = checkinurl
-    .replace(new RegExp("&fid=.*?&"), "&fid=" + id + "&")
-    .replace(new RegExp("pageid%3D.*?%26"), "pageid%3D" + id + "%26");
-  var checkinrequest = {
-    url: sendcheckinurl,
-    header: checkinheaders
-  };
+    var sendcheckinurl = $.checkinurl
+        .replace(new RegExp("&fid=.*?&"), "&fid=" + id + "&")
+        .replace(new RegExp("pageid%3D.*?%26"), "pageid%3D" + id + "%26");
+    var checkinrequest = {
+        url: sendcheckinurl,
+        header: $.checkinheaders
+    };
 
-  return new Promise(resolve => {
-    $.get(checkinrequest, (error, response, data) => {
-      //console.log(response)
-      name = name.replace(/超话/, "")
-      if ((response.statusCode == 418)) {
-        $.failNum += 1
-        $.message.push(`【${name}】："签到太频繁啦，请稍后再试"`);
-        console.log(`【${name}】："签到太频繁啦，请稍后再试"`);
-        if (debug) console.log(response)
-      } else {
-        var body = response.body;
-        var obj = JSON.parse(body);
-        //console.log(obj);
-        var result = obj.result;
-        //console.log(result);
-        if (result == 1) {
-          $.successNum += 1;
-        } else {
-          $.failNum += 1;
-        }
-        if (result == 1) {
-          $.message.push(`【${name}】：✅${obj.button.name}`)
-          console.log(`【${name}】：${obj.button.name}`);
-        } else if (result == 382004) {
-          $.message.push(`【${name}】：✨今天已签到`);
-          console.log(`【${name}】：${obj.error_msg}`);
-        } else if (result == 388000) {
-          $.message.push(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
-          console.log(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
-          if (debug) console.log(response)
-        } else if (result == 382010) {
-          $.message.push(`\n【${name}】："超话不存在⚠️"`);
-          console.log(`【${name}】："超话不存在⚠️"`);
-          if (debug) console.log(response)
-        } else {
-          $.message.push(`【${name}】："未知错误⚠️"`);
-          console.log(`【${name}】："未知错误⚠️ 该请求的返回情况如下"`);
-          console.log(response)
-        }
-      }
-      resolve();
+    return new Promise(resolve => {
+        $.get(checkinrequest, (error, response, data) => {
+            if (error) {
+                throw new Error(error)
+            }
+            name = name.replace(/超话/, "")
+            if ((response.statusCode == 418)) {
+                $.failNum += 1
+                $.message.push(`【${name}】："签到太频繁啦，请稍后再试"`);
+                console.log(`【${name}】："签到太频繁啦，请稍后再试"`);
+                if (debug) console.log(response)
+            } else if (response.statusCode == 511) {
+                $.failNum += 1;
+                $.message.push(`【${name}】："需要身份验证，请稍后再试"`);
+                console.log(`【${name}】："需要身份验证，请稍后再试"`);
+            } else {
+                var body = response.body;
+                var obj = JSON.parse(body);
+                //console.log(obj);
+                var result = obj.result;
+                //console.log(result);
+                if (result == 1 || result == 382004) {
+                    $.successNum += 1;
+                } else {
+                    $.failNum += 1;
+                }
+                if (result == 1) {
+                    $.message.push(`【${name}】：✅${obj.button.name}`)
+                    console.log(`【${name}】：${obj.button.name}`);
+                } else if (result == 382004) {
+                    $.message.push(`【${name}】：✨今天已签到`);
+                    console.log(`【${name}】：${obj.error_msg}`);
+                } else if (result == 388000) {
+                    $.message.push(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
+                    console.log(`【${name}】："需要拼图验证⚠️请加大签到间隔"`);
+                    if (debug) console.log(response)
+                } else if (result == 382010) {
+                    $.message.push(`\n【${name}】："超话不存在⚠️"`);
+                    console.log(`【${name}】："超话不存在⚠️"`);
+                    if (debug) console.log(response)
+                } else if (obj["errno"] == -100) {
+                    $.stopNum += 1;
+                    $.message.push(`【${name}】：签到失败，请重新签到获取Cookie⚠️`);
+                    console.log(
+                        `【${name}】执行签到：签到失败，请重新签到获取Cookie⚠️`
+                    );
+                } else {
+                    $.message.push(`【${name}】："未知错误⚠️"`);
+                    console.log(`【${name}】："未知错误⚠️ 该请求的返回情况如下"`);
+                    console.log(response)
+                }
+            }
+            resolve();
+        })
+
     })
-
-  })
 }
 
 //@Chavy
 function Env(s) {
-  this.name = s, this.data = null, this.logs = [], this.isSurge = (() => "undefined" != typeof $httpClient), this.isQuanX = (() => "undefined" != typeof $task), this.isNode = (() => "undefined" != typeof module && !!module.exports), this.log = ((...s) => {
-    this.logs = [...this.logs, ...s], s ? console.log(s.join("\n")) : console.log(this.logs.join("\n"))
-  }), this.msg = ((s = this.name, t = "", i = "") => {
-    this.isSurge() && $notification.post(s, t, i), this.isQuanX() && $notify(s, t, i);
-    const e = ["", "==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];
-    s && e.push(s), t && e.push(t), i && e.push(i), console.log(e.join("\n"))
-  }), this.getdata = (s => {
-    if (this.isSurge()) return $persistentStore.read(s);
-    if (this.isQuanX()) return $prefs.valueForKey(s);
-    if (this.isNode()) {
-      const t = "box.dat";
-      return this.fs = this.fs ? this.fs : require("fs"), this.fs.existsSync(t) ? (this.data = JSON.parse(this.fs.readFileSync(t)), this.data[s]) : null
-    }
-  }), this.setdata = ((s, t) => {
-    if (this.isSurge()) return $persistentStore.write(s, t);
-    if (this.isQuanX()) return $prefs.setValueForKey(s, t);
-    if (this.isNode()) {
-      const i = "box.dat";
-      return this.fs = this.fs ? this.fs : require("fs"), !!this.fs.existsSync(i) && (this.data = JSON.parse(this.fs.readFileSync(i)), this.data[t] = s, this.fs.writeFileSync(i, JSON.stringify(this.data)), !0)
-    }
-  }), this.wait = ((s, t = s) => i => setTimeout(() => i(), Math.floor(Math.random() * (t - s + 1) + s))), this.get = ((s, t) => this.send(s, "GET", t)), this.post = ((s, t) => this.send(s, "POST", t)), this.send = ((s, t, i) => {
-    if (this.isSurge()) {
-      const e = "POST" == t ? $httpClient.post : $httpClient.get;
-      e(s, (s, t, e) => {
-        t && (t.body = e, t.statusCode = t.status), i(s, t, e)
-      })
-    }
-    this.isQuanX() && (s.method = t, $task.fetch(s).then(s => {
-      s.status = s.statusCode, i(null, s, s.body)
-    }, s => i(s.error, s, s))), this.isNode() && (this.request = this.request ? this.request : require("request"), s.method = t, s.gzip = !0, this.request(s, (s, t, e) => {
-      t && (t.status = t.statusCode), i(null, t, e)
-    }))
-  }), this.done = ((s = {}) => this.isNode() ? null : $done(s))
+    this.name = s, this.data = null, this.logs = [], this.isSurge = (() => "undefined" != typeof $httpClient), this.isQuanX = (() => "undefined" != typeof $task), this.isNode = (() => "undefined" != typeof module && !!module.exports), this.log = ((...s) => {
+        this.logs = [...this.logs, ...s], s ? console.log(s.join("\n")) : console.log(this.logs.join("\n"))
+    }), this.msg = ((s = this.name, t = "", i = "") => {
+        this.isSurge() && $notification.post(s, t, i), this.isQuanX() && $notify(s, t, i);
+        const e = ["", "==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];
+        s && e.push(s), t && e.push(t), i && e.push(i), console.log(e.join("\n"))
+    }), this.getdata = (s => {
+        if (this.isSurge()) return $persistentStore.read(s);
+        if (this.isQuanX()) return $prefs.valueForKey(s);
+        if (this.isNode()) {
+            const t = "box.dat";
+            return this.fs = this.fs ? this.fs : require("fs"), this.fs.existsSync(t) ? (this.data = JSON.parse(this.fs.readFileSync(t)), this.data[s]) : null
+        }
+    }), this.setdata = ((s, t) => {
+        if (this.isSurge()) return $persistentStore.write(s, t);
+        if (this.isQuanX()) return $prefs.setValueForKey(s, t);
+        if (this.isNode()) {
+            const i = "box.dat";
+            return this.fs = this.fs ? this.fs : require("fs"), !!this.fs.existsSync(i) && (this.data = JSON.parse(this.fs.readFileSync(i)), this.data[t] = s, this.fs.writeFileSync(i, JSON.stringify(this.data)), !0)
+        }
+    }), this.wait = ((s, t = s) => i => setTimeout(() => i(), Math.floor(Math.random() * (t - s + 1) + s))), this.get = ((s, t) => this.send(s, "GET", t)), this.post = ((s, t) => this.send(s, "POST", t)), this.send = ((s, t, i) => {
+        if (this.isSurge()) {
+            const e = "POST" == t ? $httpClient.post : $httpClient.get;
+            e(s, (s, t, e) => {
+                t && (t.body = e, t.statusCode = t.status), i(s, t, e)
+            })
+        }
+        this.isQuanX() && (s.method = t, $task.fetch(s).then(s => {
+            s.status = s.statusCode, i(null, s, s.body)
+        }, s => i(s.error, s, s))), this.isNode() && (this.request = this.request ? this.request : require("request"), s.method = t, s.gzip = !0, this.request(s, (s, t, e) => {
+            t && (t.status = t.statusCode), i(null, t, e)
+        }))
+    }), this.done = ((s = {}) => this.isNode() ? null : $done(s))
 }

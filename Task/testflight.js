@@ -17,7 +17,7 @@ const appkey=getdata('appkey');
 
 //是否在没有tf位置的时候仍然弹出通知，默认不弹出,防止过多无用通知。
 var isNOtify = getdata('testflight_isnotify');
-const fullstr = /(此 Beta 版本的测试员已满)|(此 Beta 版本目前不接受任何新测试员)/;
+const fullstr = /(此 Beta 版本的测试员已满)|(此 Beta 版本目前不接受任何新测试员)｜This beta is full/;
 const appnamereg = /<title>加入 Beta 版“(.+)” - TestFlight - Apple<\/title>/;
 var proarray = new Array();
 getResult();
