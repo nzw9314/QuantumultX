@@ -1,6 +1,83 @@
 {
   "releases": [
     {
+      "version": "0.4.21",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["颜色主题可跟随系统 (明亮主题下强制使用彩色图标)"]
+        },
+        {
+          "name": "修复",
+          "descs": ["有新版本但没有提示问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.20",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["明暗主题切换"]
+        },
+        {
+          "name": "优化",
+          "descs": ["页面渲染资源"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.19",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["v0.4.18 白屏问题 (百果园空图标导致)"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.18",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["仓库协作者&贡献者信息 (带跳转)", "点击订阅可以跳转至作者仓库"]
+        },
+        {
+          "name": "修复",
+          "descs": ["删除多余日志输出"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.17",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["Loon升级教程字眼错误问题"]
+        }
+      ]
+    },
+    {
       "version": "0.4.16",
       "tags": ["beta"],
       "author": "@chavyleung",
