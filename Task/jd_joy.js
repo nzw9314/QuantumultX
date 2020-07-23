@@ -142,7 +142,9 @@ function* step() {
             message = petTaskConfig.errorMessage
         }
     } else {
-        message = '请先获取cookie\n直接使用NobyDa的京东签到获取'
+      $.msg(name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });
+      $.done();
+      return
     }
     if (!jdNotify || jdNotify === 'false') {
       $.msg(name, subTitle, message);
