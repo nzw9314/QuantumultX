@@ -1,6 +1,6 @@
 /*
 京东萌宠助手 搬得https://github.com/liuxiaoyucc/jd-helper/blob/master/pet/pet.js
-更新时间:2020-07-20
+更新时间:2020-07-22
 // quantumultx
 [task_local]
 #东东萌宠
@@ -69,7 +69,9 @@ gen.next();
  */
 function* entrance() {
     if (!cookie) {
-      return $.msg(name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });
+      $.msg(name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });
+      $.done();
+      return
     }
     console.log('任务开始');
     yield initPetTown(); //初始化萌宠
@@ -336,7 +338,9 @@ function initPetTown() {
         if (response.code === '0' && response.resultCode === '0' && response.message === 'success') {
             petInfo = response.result;
             if (petInfo.userStatus === 0) {
-              return $.msg(name, '【提示】此账号萌宠活动未开始，请手动去京东APP开启活动\n入口：我的->游戏与互动->查看更多', '', { "open-url": "openapp.jdmoble://" });
+              $.msg(name, '【提示】此账号萌宠活动未开始，请手动去京东APP开启活动\n入口：我的->游戏与互动->查看更多', '', { "open-url": "openapp.jdmoble://" });
+              $.done();
+              return
             }
             goodsUrl = response.result.goodsInfo && response.result.goodsInfo.goodsUrl;
             // console.log(`初始化萌宠信息完成: ${JSON.stringify(petInfo)}`);
@@ -344,8 +348,8 @@ function initPetTown() {
           gen.next();
         } else if (response.code === '0' && response.resultCode === '2001'){
             console.log(`初始化萌宠失败:  ${response.message}`);
-            return $.msg(name, '【提示】京东cookie已失效,请重新登录获取', 'https://bean.m.jd.com/', {"open-url": "https://bean.m.jd.com/"});
-            gen.return();
+            $.msg(name, '【提示】京东cookie已失效,请重新登录获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });
+            $.done();
         }
     })
 

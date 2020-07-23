@@ -65,7 +65,9 @@ function* step() {
         if (plantBeanIndexResult.code != "0") {
             console.log(`plantBeanIndexResult:${JSON.stringify(plantBeanIndexResult)}`)
             if (plantBeanIndexResult.code === '3') {
-              return $.msg(name, '【提示】京东cookie已失效,请重新登录获取', 'https://bean.m.jd.com/', {"open-url": "https://bean.m.jd.com/"});
+              $.msg(name, '【提示】京东cookie已失效,请重新登录获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });
+              $.done();
+              return
             }
             //todo
             return
@@ -318,7 +320,9 @@ function* step() {
         }
         console.log('结束')
     } else {
-      return $.msg(name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });
+      $.msg(name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });
+      $.done();
+      return
     }
     if (!jdNotify || jdNotify === 'false') {
       $.msg(name, subTitle, message);
