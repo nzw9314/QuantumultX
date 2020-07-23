@@ -51,7 +51,7 @@ if (typeof $request !== "undefined") {
   const res =
     url.match(/weather\/.*?\/(.*)\/(.*)\?/) ||
     url.match(/geocode\/([0-9.]*)\/([0-9.]*)\//) ||
-    url.match(/geocode=([0-9.]*),([0-9.]*)\//);
+    url.match(/geocode=([0-9.]*),([0-9.]*)/);
   if (res === null) {
     $.notify(
       "[彩云天气]",
