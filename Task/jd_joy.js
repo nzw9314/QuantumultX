@@ -4,7 +4,7 @@ feedCount:自定义 每次喂养数量; 等级只和喂养次数有关，与数�
 推荐每次投喂10个，积累狗粮，然后去聚宝盆赌每小时的幸运奖，据观察，投入3000-6000中奖概率大，超过7000基本上注定亏本，即使是第一名
 Combine from Zero-S1/JD_tools(https://github.com/Zero-S1/JD_tools)
 更新时间:2020-07-20
-注：如果使用Node.js, 需自行安装'got'模块. 例: npm install got -g
+注：如果使用Node.js, 需自行安装'crypto-js,got,http-server,tough-cookie'模块. 例: npm install crypto-js http-server tough-cookie got --save
 */
 // quantumultx
 // [task_local]
@@ -139,7 +139,14 @@ function* step() {
             subTitle = `【用户名】${enterRoomResult.data.pin}`
         } else {
             console.log(`任务信息${JSON.stringify(petTaskConfig)}`)
-            message = petTaskConfig.errorMessage
+          if (petTaskConfig.errorCode === 'B0001') {
+            $.setdata('', 'CookieJD');//cookie失效，故清空cookie。
+            $.msg(name, '【提示】京东cookie已失效,请重新登录获取', 'https://bean.m.jd.com/', {"open-url": "https://bean.m.jd.com/"});
+            $.done();
+            return
+          } else {
+            message += `${petTaskConfig.errorMessage}`;
+          }
         }
     } else {
       $.msg(name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });

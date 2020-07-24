@@ -10,7 +10,7 @@
 [Script]
 cron "1 7-21/2 * * *" script-path=https://github.com/nzw9314/QuantumultX/raw/master/Task/jd_plantBean.js,tag=京东种豆得豆
 一天只能帮助3个人。多出的助力码无效
-注：如果使用Node.js, 需自行安装'got'模块. 例: npm install got -g
+注：如果使用Node.js, 需自行安装'crypto-js,got,http-server,tough-cookie'模块. 例: npm install crypto-js http-server tough-cookie got --save
 */
 
 const name = '京东种豆得豆';
@@ -65,6 +65,7 @@ function* step() {
         if (plantBeanIndexResult.code != "0") {
             console.log(`plantBeanIndexResult:${JSON.stringify(plantBeanIndexResult)}`)
             if (plantBeanIndexResult.code === '3') {
+              $.setdata('', 'CookieJD');//cookie失效，故清空cookie。
               $.msg(name, '【提示】京东cookie已失效,请重新登录获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });
               $.done();
               return
@@ -256,9 +257,9 @@ function* step() {
             }
             console.log(`开始助力好友: ${plantUuid}`);
             let helpResult = yield helpShare(plantUuid)
-            if (helpResult.code == 0) {
+            if (helpResult.code === '0') {
                 console.log(`助力好友结果: ${JSON.stringify(helpResult.data.helpShareRes)}`);
-                if (helpResult.data.helpShareRes.state === '2') {
+                if (helpResult.data.helpShareRes && helpResult.data.helpShareRes.state === '2') {
                   console.log('今日助力机会已耗尽，跳出助力');
                   break;
                 }
