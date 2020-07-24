@@ -4,7 +4,7 @@
 每天4京豆，再小的苍蝇也是肉
 从 https://github.com/Zero-S1/JD_tools/blob/master/JD_speed.py 改写来的
 建议3小时运行一次，打卡时间间隔是6小时
-注：如果使用Node.js, 需自行安装'got'模块. 例: npm install got -g
+注：如果使用Node.js, 需自行安装'crypto-js,got,http-server,tough-cookie'模块. 例: npm install crypto-js http-server tough-cookie got --save
 */
 // quantumultx
 // [task_local]
@@ -234,6 +234,7 @@ function flyTask_state() {
     // console.log(`初始化信息flyTask_state:${JSON.stringify(res)}`)
     if (res.code === 0) {
       if (res.info.isLogin === 0) {
+        $.setdata('', 'CookieJD');//cookie失效，故清空cookie。
         $.msg(name, '【提示】京东cookie已失效,请重新登录获取', 'https://bean.m.jd.com/', {"open-url": "https://bean.m.jd.com/"});
         $.done();
         return
