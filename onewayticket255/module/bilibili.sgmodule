@@ -1,9 +1,8 @@
 #!name= BiliBili
-#!desc= Remove BiliBili Ads (BiliBili Version:6.2.0)
+#!desc= Remove BiliBili Ads (BiliBili Version:6.2.1)
 #!system=ios
 
 [Rule]
-DOMAIN,data.bilibili.com,REJECT 
 URL-REGEX,https://app.bilibili.com/x/v2/(splash|search/(defaultword|square)),REJECT
 URL-REGEX,https://api.bilibili.com/x/v2/dm/ad,REJECT
 

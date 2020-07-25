@@ -20,6 +20,13 @@ Author: zZPiglet
 
 ----------
 更新日志：
+- 2020/07/10：
+更新接口 v1 -> v2。
+账户接口地址更新。
+
+- 2020/06/22：
+更新接口 v2 -> v1。
+
 - 2020/04/15：
 更新任务接口。
 修改部分细节。
@@ -92,7 +99,7 @@ const exchangeMoney = 50 //5, 20, 0
 const mainURL = 'https://api-hdcj.9w9.com/v2/'
 const CheckinURL = mainURL + 'sign/sign'
 const CheckindataURL = mainURL + 'sign'
-const DataURL = mainURL + 'informations'
+const DataURL = mainURL + 'index/informations'
 const IndexURL = mainURL + 'index?type=0&gzh_number='
 const Index2URL = mainURL + 'index?type=1'
 const LotteryURL = mainURL + 'lotteries/'
@@ -151,6 +158,8 @@ function GetToken() {
                 } else {
                     $cmp.notify("更新" + TokenName + " Token 成功 🎉", "", "")
                 }
+            }else{
+                $cmp.notify(TokenName, "已存在相同cookie，未更新", "")
             }
         } else {
             var token = $cmp.write(TokenKeyValue, TokenKey);

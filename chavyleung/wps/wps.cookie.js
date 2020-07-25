@@ -1,65 +1,22 @@
-const chavy = init()
-const cookieName = 'WPS'
-const KEY_signhomeurl = 'chavy_signhomeurl_wps'
-const KEY_signhomeheader = 'chavy_signhomeheader_wps'
-const KEY_signwxurl = 'chavy_signwxurl_wps'
-const KEY_signwxheader = 'chavy_signwxheader_wps'
+const $ = new Env('WPS')
 
-if ($request && $request.method != 'OPTIONS' && $request.url.match(/act_list/)) {
-  const VAL_signhomeurl = $request.url
-  const VAL_signhomeheader = JSON.stringify($request.headers)
-  if (VAL_signhomeurl) chavy.setdata(VAL_signhomeurl, KEY_signhomeurl)
-  if (VAL_signhomeheader) chavy.setdata(VAL_signhomeheader, KEY_signhomeheader)
-  chavy.msg(cookieName, `获取Cookie: 成功 (APP)`, ``)
-} else if ($request && $request.method != 'OPTIONS' && $request.url.match(/sign_up/)) {
-  const VAL_signwxurl = $request.url
-  const VAL_signwxheader = JSON.stringify($request.headers)
-  if (VAL_signwxurl) chavy.setdata(VAL_signwxurl, KEY_signwxurl)
-  if (VAL_signwxheader) chavy.setdata(VAL_signwxheader, KEY_signwxheader)
-  chavy.msg(cookieName, `获取Cookie: 成功 (小程序)`, ``)
-}
+!(async () => {
+  $.log('', `🔔 ${$.name}, 获取会话: 开始!`, '')
+  const VAL_url = $request.url
+  const VAL_headers = JSON.stringify($request.headers)
+  $.log('', `❕ ${$.name}`, `url: ${$request.url}`, `headers: ${JSON.stringify($request.headers)}`, '')
+  $.setdata(VAL_url, 'chavy_signhomeurl_wps')
+  $.setdata(VAL_headers, 'chavy_signhomeheader_wps')
+  $.subt = '获取会话: 成功!'
+})()
+  .catch((e) => {
+    $.subt = '获取会话: 失败!'
+    $.desc = `原因: ${e}`
+    $.log(`❌ ${$.name}, 获取会话: 失败! 原因: ${e}!`)
+  })
+  .finally(() => {
+    $.msg($.name, $.subt, $.desc), $.log('', `🔔 ${$.name}, 获取会话: 结束!`, ''), $.done()
+  })
 
-function init() {
-  isSurge = () => {
-    return undefined === this.$httpClient ? false : true
-  }
-  isQuanX = () => {
-    return undefined === this.$task ? false : true
-  }
-  getdata = (key) => {
-    if (isSurge()) return $persistentStore.read(key)
-    if (isQuanX()) return $prefs.valueForKey(key)
-  }
-  setdata = (key, val) => {
-    if (isSurge()) return $persistentStore.write(key, val)
-    if (isQuanX()) return $prefs.setValueForKey(key, val)
-  }
-  msg = (title, subtitle, body) => {
-    if (isSurge()) $notification.post(title, subtitle, body)
-    if (isQuanX()) $notify(title, subtitle, body)
-  }
-  log = (message) => console.log(message)
-  get = (url, cb) => {
-    if (isSurge()) {
-      $httpClient.get(url, cb)
-    }
-    if (isQuanX()) {
-      url.method = 'GET'
-      $task.fetch(url).then((resp) => cb(null, {}, resp.body))
-    }
-  }
-  post = (url, cb) => {
-    if (isSurge()) {
-      $httpClient.post(url, cb)
-    }
-    if (isQuanX()) {
-      url.method = 'POST'
-      $task.fetch(url).then((resp) => cb(null, {}, resp.body))
-    }
-  }
-  done = (value = {}) => {
-    $done(value)
-  }
-  return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
-}
-chavy.done()
+// prettier-ignore
+function Env(s){this.name=s,this.data=null,this.logs=[],this.isSurge=(()=>"undefined"!=typeof $httpClient),this.isQuanX=(()=>"undefined"!=typeof $task),this.isNode=(()=>"undefined"!=typeof module&&!!module.exports),this.log=((...s)=>{this.logs=[...this.logs,...s],s?console.log(s.join("\n")):console.log(this.logs.join("\n"))}),this.msg=((s=this.name,t="",i="")=>{this.isSurge()&&$notification.post(s,t,i),this.isQuanX()&&$notify(s,t,i);const e=["","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];s&&e.push(s),t&&e.push(t),i&&e.push(i),console.log(e.join("\n"))}),this.getdata=(s=>{if(this.isSurge())return $persistentStore.read(s);if(this.isQuanX())return $prefs.valueForKey(s);if(this.isNode()){const t="box.dat";return this.fs=this.fs?this.fs:require("fs"),this.fs.existsSync(t)?(this.data=JSON.parse(this.fs.readFileSync(t)),this.data[s]):null}}),this.setdata=((s,t)=>{if(this.isSurge())return $persistentStore.write(s,t);if(this.isQuanX())return $prefs.setValueForKey(s,t);if(this.isNode()){const i="box.dat";return this.fs=this.fs?this.fs:require("fs"),!!this.fs.existsSync(i)&&(this.data=JSON.parse(this.fs.readFileSync(i)),this.data[t]=s,this.fs.writeFileSync(i,JSON.stringify(this.data)),!0)}}),this.wait=((s,t=s)=>i=>setTimeout(()=>i(),Math.floor(Math.random()*(t-s+1)+s))),this.get=((s,t)=>this.send(s,"GET",t)),this.post=((s,t)=>this.send(s,"POST",t)),this.send=((s,t,i)=>{if(this.isSurge()){const e="POST"==t?$httpClient.post:$httpClient.get;e(s,(s,t,e)=>{t&&(t.body=e,t.statusCode=t.status),i(s,t,e)})}this.isQuanX()&&(s.method=t,$task.fetch(s).then(s=>{s.status=s.statusCode,i(null,s,s.body)},s=>i(s.error,s,s))),this.isNode()&&(this.request=this.request?this.request:require("request"),s.method=t,s.gzip=!0,this.request(s,(s,t,e)=>{t&&(t.status=t.statusCode),i(null,t,e)}))}),this.done=((s={})=>this.isNode()?null:$done(s))}

@@ -1,5 +1,5 @@
 /*
-更新时间: 2020-06-08 20:45
+更新时间: 2020-07-05 18:45
 
 赞赏:中青邀请码`46308484`,农妇山泉 -> 有点咸，万分感谢
 
@@ -12,7 +12,7 @@
 下，
 2.进入app，进入任务中心或者签到一次,即可获取Cookie. 阅读一篇文章，获取阅读请求body，并获取阅读时长，在阅读文章最下面有个惊喜红包，点击获取惊喜红包请求
 3.可随时获取Cookie.
-4.增加转盘抽奖通知间隔，为了照顾新用户，前五次会有通知，以后默认每10次转盘抽奖通知一次，可自行修改❗️ 转盘完成后通知会一直开启
+4.增加转盘抽奖通知间隔，为了照顾新用户，前三次会有通知，以后默认每10次转盘抽奖通知一次，可自行修改❗️ 转盘完成后通知会一直开启
 5.非专业人士制作，欢迎各位大佬提出宝贵意见和指导
 6.更新日志: 
  31/05 v1.01 取消激励视频Cookie，添加阅读时长
@@ -66,7 +66,7 @@ hostname = *.youth.cn, ios.baertt.com
 ~~~~~~~~~~~~~~~~
 
 */
-const notifyInterval = `10`  //通知间隔，默认抽奖每10次通知一次
+const notifyInterval = 50  //通知间隔，默认抽奖每50次通知一次，如需关闭全部通知请设为0
 const logs = 0;   //0为关闭日志，1为开启
 const CookieName = "中青看点"
 const signheaderKey = 'youthheader_zq'
@@ -134,7 +134,7 @@ async function all()
 }
 
 function sign() {      
-  return new Promise((resolve, reject) =>
+ return new Promise((resolve, reject) =>
    {
     const signurl = { 
       url: 'https://kd.youth.cn/TaskCenter/sign', 
@@ -151,8 +151,14 @@ function sign() {
           signresult = `【签到信息】重复`
           detail= ``
          }
+        else if(signres.status == 2){
+         signresult = `签到失败，Cookie已失效‼️`
+         detail= ``
+         sy.msg(CookieName,signresult,detail)
+         return
+         }
+       resolve()
        })
-    resolve()
      })
   }
       
@@ -181,19 +187,34 @@ function signInfo() {
   }
 
 function Invitant() {      
-  return new Promise((resolve, reject) => {
-   CookieVal = JSON.parse(signheaderVal)['Cookie']
-    const url = { 
-      url: `https://kandian.youth.cn/user/mmsp/5625d269c769a5b3dc1087b7957910d0?avatar=share_reward_sign=0&code=021koBJS0F7XW12X5vLS08kCJS0koBJm&state=46308484`, 
-     headers: {Cookie: CookieVal},
+ return new Promise((resolve, reject) => {
+   const url = { 
+     url: `https://kd.youth.cn/WebApi/User/fillCode`, 
+     headers: JSON.parse(signheaderVal),
+     body: `{"code": "46308484"}`,
 }
-  sy.get(url, (error, response, data) =>
+   sy.post(url, (error, response, data) =>
  {
    //sy.log(`Invitdata:${data}`)
  })
+  aticleshare()
   resolve()
  })
 }
+
+function aticleshare() {      
+ return new Promise((resolve, reject) => {
+     shareurl = { 
+      url: `https://kd.youth.cn/n/27043840?46746961.html`, 
+      headers: {Cookie: JSON.parse(signheaderVal)['Cookie']},
+}
+   sy.get(shareurl, (error, response, data) =>{
+   //sy.log(`data:${data}`)
+   })
+resolve()
+ })
+}
+
 
 //看视频奖励
 function getAdVideo() {      
@@ -215,7 +236,7 @@ resolve()
 // 点我激励视频奖励
 function gameVideo() {      
  return new Promise((resolve, reject) => {
-    const url = { 
+   const url = { 
       url: `https://ios.baertt.com/v5/Game/GameVideoReward.json`, 
       body: articlebodyVal,
 }
@@ -567,8 +588,8 @@ function readTime() {
     else if(timeres.error_code==200001){
      detail += `【阅读时长】 ❎  未获取阅读时长Cookie\n`  
        }
-     })
-   resolve()
+    resolve()
+   })
  })
 }
 
@@ -585,30 +606,30 @@ function earningsInfo() {
    infores = JSON.parse(data)
    if (infores.status==0){
      detail += `<收益统计>：\n`  
-       }
-   for     (i=0;i<infores.history[0].group.length;i++)
+     for     (i=0;i<infores.history[0].group.length;i++)
 {
-    detail += '【'+infores.history[0].group[i].name+'】  '+ infores.history[0].group[i].money+'个青豆\n'
-     }
-    detail += '<今日合计>： '+infores.history[0].score+" 青豆"
+     detail += '【'+infores.history[0].group[i].name+'】  '+ infores.history[0].group[i].money+'个青豆\n'
+      }
+     detail += '<今日合计>： '+infores.history[0].score+" 青豆"
+      }
     resolve()
+    sy.log(CookieName+" "+nick+"  \n"+subTitle+detail)
      })
    })
  })
 }
 
 function showmsg() {  
-    if (rotaryres.status==1&&rotaryres.data.remainTurn>=95){
-     sy.msg(CookieName+" "+nick,subTitle,detail)
+    if (rotaryres.status==1&&rotaryres.data.remainTurn>=97){
+     sy.msg(CookieName+" "+nick,subTitle,detail)  //默认前三次为通知
      }
     else if (rotaryres.status==1&&rotaryres.data.remainTurn%notifyInterval==0)    {
-   sy.msg(CookieName+" "+nick,subTitle,detail)
+   sy.msg(CookieName+" "+nick,subTitle,detail)//转盘次数/间隔整除时通知
       }
-  else if (rotaryres.code==10010){
+  else if (rotaryres.code==10010&&notifyInterval!=0){
     rotarynum = ` 转盘${rotaryres.msg}🎉`
-   sy.msg(CookieName+" "+nick+"  "+rotarynum,subTitle,detail)
-      }    
-    sy.log(CookieName+" "+nick+"  \n"+subTitle+detail)
+   sy.msg(CookieName+" "+nick+"  "+rotarynum,subTitle,detail)//任务全部完成且通知间隔不为0时通知
+      }  
 }
 
 function init() {

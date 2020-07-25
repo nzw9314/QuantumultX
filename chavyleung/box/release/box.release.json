@@ -1,0 +1,651 @@
+{
+  "releases": [
+    {
+      "version": "0.5.8",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["明亮主题下收藏按钮样式问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.5.7",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["Rewrite 地址换成 Gitee (更新 BoxJs 后注意重启)"]
+        },
+        {
+          "name": "教程",
+          "descs": ["QuanX 购买超 (90 > 30) 天即可一键更新"]
+        }
+      ]
+    },
+    {
+      "version": "0.5.6",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["版本判断地址调整为 Gitee"]
+        }
+      ]
+    },
+    {
+      "version": "0.5.4",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["版本刷新速度"]
+        }
+      ]
+    },
+    {
+      "version": "0.5.2",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["可以单独更新订阅"]
+        }
+      ]
+    },
+    {
+      "version": "0.5.1",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["版本判断速度 (jsdelivr)"]
+        }
+      ]
+    },
+    {
+      "version": "0.5.0",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["抹掉数据: https://8.8.8.8/revert (更新完需要重启代理)", "出现问题时可单独访问页面抹掉数据"]
+        },
+        {
+          "name": "调整",
+          "descs": ["迁移内置应用至订阅: https://raw.githubusercontent.com/chavyleung/scripts/master/box/chavy.boxjs.json (需要手动更新订阅)"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.23",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["侧栏样式 (紧凑化)"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.22",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["后台日志报 illegal 问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.21",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["颜色主题可跟随系统 (明亮主题下强制使用彩色图标)"]
+        },
+        {
+          "name": "修复",
+          "descs": ["有新版本但没有提示问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.20",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["明暗主题切换"]
+        },
+        {
+          "name": "优化",
+          "descs": ["页面渲染资源"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.19",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["v0.4.18 白屏问题 (百果园空图标导致)"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.18",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["仓库协作者&贡献者信息 (带跳转)", "点击订阅可以跳转至作者仓库"]
+        },
+        {
+          "name": "修复",
+          "descs": ["删除多余日志输出"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.17",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["Loon升级教程字眼错误问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.16",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["iPhone X 底栏样式优化 (避免 bar 遮挡)"]
+        },
+        {
+          "name": "修复",
+          "descs": ["多行文本控件 rows 属性无效问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.15",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["多选组控件全部取消时会恢复到默认问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.14",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增 (面向开发者)",
+          "descs": ["数字控件 (number)"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.13",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "性能",
+          "descs": ["优化订阅刷新性能 (并行)"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.12",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下刷新&添加订阅无效问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.11",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["收藏应用排序异常问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.10",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "调整",
+          "descs": ["京东, 请使用野比大佬的订阅: https://raw.githubusercontent.com/NobyDa/Script/master/NobyDa_BoxJs.json"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.9",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增 (面向开发者)",
+          "descs": ["单选组控件", "多选组控件"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.8",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["添加&刷新订阅的消息通知"]
+        },
+        {
+          "name": "修复",
+          "descs": ["添加订阅时显示格式错误", "刷新订阅有时不生效"]
+        },
+        {
+          "name": "移除",
+          "descs": ["刷新等待秒数"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.7",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下无法清空会话数值问题 (更新脚本后, 需要手动刷新下订阅)"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.6",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["透明图标处理"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.5",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下内置应用不显示问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.4",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["应用分类可以收纳"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.3",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["删除&导入会话时 Loading 动画不能自动消失问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.2",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下保存数据不生效问题 (实验)", "Rewrite正则 (注意更新正则)"]
+        },
+        {
+          "name": "移除",
+          "descs": ["修复VPN断连设置项", "自动更新订阅 (可手动更新)"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.1",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "增加",
+          "descs": ["修复VPN断连设置项 (实验)"]
+        }
+      ]
+    },
+    {
+      "version": "0.4.0",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["可以修改已保存的会话"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.10",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["可以把当前会话保存至指定会话 (注意先保存设置再使用`保存至`)", "可以设置刷新等待秒数 (为 0 时直接刷新不弹窗)"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.9",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["可以复制单个应用订阅地址", "增加底部间距避免界面被悬浮按钮遮挡"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.8",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["刷新窗口增加 3 秒倒数自动刷新", "添加订阅能马上刷新订阅", "刷新窗口弹出时会顺便发起更新应用订阅", "可以隐藏手动更新订阅的提示"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.7",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下导入空数据产生的问题 (如: 京东没有账号2, 导入后提示账号 2 签到失败问题)"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.6",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["部分情况下当前会话变双份问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.5",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["获取会话、应用会话、清空会话不生效问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.4",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["页面渲染时会先出现一串代码问题", "进入应用订阅页面提示手动刷新", "可以隐藏|显示`我的`标题"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.3",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["Loon环境判断错误问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.2",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "调整",
+          "descs": ["应用订阅启用缓存机制 (需要手动更新)"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.1",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["手动切换会话会导致自动切换顺序错误问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.3.0",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["全局搜索"]
+        }
+      ]
+    },
+    {
+      "version": "0.2.4",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["帮助页面样式", "订阅链接多余空格&换行等字符"]
+        }
+      ]
+    },
+    {
+      "version": "0.2.2",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["悬浮按钮刷新不用确认", "侧栏可以隐藏帮助按钮"]
+        }
+      ]
+    },
+    {
+      "version": "0.2.1",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["可以设置悬浮按钮的位置"]
+        }
+      ]
+    },
+    {
+      "version": "0.2.0",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["版本更新提醒", "BoxJs升级教程"]
+        }
+      ]
+    },
+    {
+      "version": "0.1.3",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["长文本控件", "读写表达式"]
+        }
+      ]
+    }
+  ]
+}
