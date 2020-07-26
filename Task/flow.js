@@ -32,7 +32,7 @@ Promise.all(subscriptions.map(async sub => await fetchInfo(sub)))
 async function fetchInfo(sub) {
     const headers = {
         "User-Agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"
+            "Quantumult/1.0.13 (iPhone10,3; iOS 14.0)"
     };
     $.get({
         url: sub.link,
@@ -41,6 +41,9 @@ async function fetchInfo(sub) {
         const headers = resp.headers;
         const subkey = Object.keys(headers).filter(k => /SUBSCRIPTION-USERINFO/i.test(k))[0];
         const userinfo = headers[subkey];
+        if (!userinfo) {
+            $.notify("🚀 [机场流量]", `❌ 机场：${sub.name} 未提供流量信息！`);
+        }
         const KEY_o_now = "o_now" + sub.name;
         const KEY_today_flow = "today_flow" + sub.name;
         $.log(userinfo);
