@@ -1,3 +1,5 @@
+![Anurag’s github stats](https://github-readme-stats.vercel.app/api?username=nzw9314&show_icons=true&theme=merko)
+
 ### 说明 :
 
 * 只是搬运和同步更新大佬脚本.
@@ -82,3 +84,8 @@
 * [@sazs34](https://github.com/sazs34)
 
 * [@uniqueque](https://github.com/uniqueque)
+
+
+## License
+
+[GPLv3](LICENSE)
