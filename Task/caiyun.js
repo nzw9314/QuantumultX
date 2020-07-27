@@ -264,8 +264,7 @@ function realtimeWeather() {
 🌡 体感${realtime.life_index.comfort.desc} ${
       realtime.apparent_temperature
     } ℃  💧 湿度 ${(realtime.humidity * 100).toFixed(0)}%
-🌞 紫外线 ${realtime.life_index.ultraviolet.desc} 
-💨 风力 ${mapWind(realtime.wind.speed, realtime.wind.direction)}
+🌞 紫外线 ${realtime.life_index.ultraviolet.desc} 💨 风力 ${mapWind(realtime.wind.speed, realtime.wind.direction)}
 
 ${alertInfo}${hourlySkycon}
 `,
@@ -342,44 +341,26 @@ function mapWind(speed, direction) {
 // icon来源：https://dribbble.com/kel
 function mapSkycon(skycon) {
   const map = {
-    CLEAR_DAY: [
-      "☀️ 日间晴朗",
-      "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/CLEAR_DAY.mp4?raw=true",
-    ],
-    CLEAR_NIGHT: ["✨ 夜间晴朗"],
-    PARTLY_CLOUDY_DAY: [
-      "⛅️ 日间多云",
-      "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/CLOUDY_DAY.mp4?raw=true",
-    ],
-    PARTLY_CLOUDY_NIGHT: ["☁️ 夜间多云"],
-    CLOUDY: ["☁️ 阴"],
-    LIGHT_HAZE: ["😤 轻度雾霾"],
-    MODERATE_HAZE: ["😤 中度雾霾"],
-    HEAVY_HAZE: ["😤 重度雾霾"],
-    LIGHT_RAIN: [
-      "💧 小雨",
-      "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/RAIN.mp4?raw=true",
-    ],
-    MODERATE_RAIN: [
-      "💦 中雨",
-      "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/RAIN.mp4?raw=true",
-    ],
-    HEAVY_RAIN: [
-      "🌧 大雨",
-      "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/HEAVY_RAIN.mp4?raw=true",
-    ],
-    STORM_RAIN: [
-      "⛈ 暴雨",
-      "https://github.com/Peng-YM/QuanX/blob/master/assets/caiyun/HEAVY_RAIN.mp4?raw=true",
-    ],
-    LIGHT_SNOW: ["🌨 小雪"],
-    MODERATE_SNOW: ["❄️ 中雪"],
-    HEAVY_SNOW: ["☃️ 大雪"],
-    STORM_SNOW: ["⛄️暴雪"],
-    DUST: ["💨 浮尘"],
-    SAND: ["💨 沙尘"],
-    WIND: ["🌪 大风"],
-  };
+    "CLEAR_DAY": ["☀️ 日间晴朗", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/CLEAR_DAY.gif"],
+    "CLEAR_NIGHT": ["✨ 夜间晴朗", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/CLEAR_NIGHT.gif"],
+    "PARTLY_CLOUDY_DAY": ["⛅️ 日间多云", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/PARTLY_CLOUDY_DAY.gif"],
+    "PARTLY_CLOUDY_NIGHT": ["☁️ 夜间多云", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/PARTLY_CLOUDY_NIGHT.gif"],
+    "CLOUDY": ["☁️ 阴", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/CLOUDY.gif"],
+    "LIGHT_HAZE": ["😤 轻度雾霾", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HAZE.gif"],
+    "MODERATE_HAZE": ["😤 中度雾霾", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HAZE.gif"],
+    "HEAVY_HAZE": ["😤 重度雾霾", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HAZE.gif"],
+    "LIGHT_RAIN": ["💧 小雨", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/LIGHT.gif"],
+    "MODERATE_RAIN": ["💦 中雨", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/MODERATE_RAIN.gif"],
+    "HEAVY_RAIN": ["🌧 大雨", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/STORM_RAIN.gif"],
+    "STORM_RAIN": ["⛈ 暴雨", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/STORM_RAIN.gif"],
+    "LIGHT_SNOW": ["🌨 小雪", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/LIGHT_SNOW.gif"],
+    "MODERATE_SNOW": ["❄️ 中雪", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/MODERATE_SNOW.gif"],
+    "HEAVY_SNOW": ["☃️ 大雪", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HEAVY_SNOW.gif"],
+    "STORM_SNOW": ["⛄️暴雪", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HEAVY_SNOW"],
+    "DUST": ["💨 浮尘"],
+    "SAND": ["💨 沙尘"],
+    "WIND": ["🌪 大风"]
+  }
   return map[skycon];
 }
 
