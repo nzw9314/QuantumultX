@@ -3,7 +3,7 @@ jd宠汪汪 搬的https://github.com/uniqueque/QuantumultX/blob/4c1572d93d4d4f88
 feedCount:自定义 每次喂养数量; 等级只和喂养次数有关，与数量无关
 推荐每次投喂10个，积累狗粮，然后去聚宝盆赌每小时的幸运奖，据观察，投入3000-6000中奖概率大，超过7000基本上注定亏本，即使是第一名
 Combine from Zero-S1/JD_tools(https://github.com/Zero-S1/JD_tools)
-更新时间:2020-07-20
+更新时间:2020-07-28
 注：如果使用Node.js, 需自行安装'crypto-js,got,http-server,tough-cookie'模块. 例: npm install crypto-js http-server tough-cookie got --save
 */
 // quantumultx
@@ -13,9 +13,9 @@ Combine from Zero-S1/JD_tools(https://github.com/Zero-S1/JD_tools)
 // Loon
 // [Script]
 // cron "15 */3 * * *" script-path=https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task/jd_joy.js,tag=京东宠汪汪
-const FEED_NUM = 10   //每次喂养数量 [10,20,40,80]
 const name = '京东宠汪汪';
 const $ = new Env(name);
+const FEED_NUM = ($.getdata('joyFeedCount') * 1) || 10   //每次喂养数量 [10,20,40,80]
 const Key = '';//单引号内自行填写您抓取的京东Cookie
 //直接用NobyDa的jd cookie
 const cookie =  Key ? Key : $.getdata('CookieJD');
@@ -113,22 +113,22 @@ function* step() {
                 console.log(`浏览商品奖励积分返回结果${JSON.stringify(deskGoodDetails)}`)
             }
             // 看激励视频得狗粮
-            let taskVideoRes = yield taskVideo();
-            console.log(`视频激--任务列表--${JSON.stringify(taskVideoRes)}`);
-            if (taskVideoRes.success) {
-              let taskArr = {};
-              for (let item of taskVideoRes.datas) {
-                if (item.ViewVideo) {
-                  taskArr = item;
-                }
-              }
-              let joinedCount = taskArr.joinedCount || 0;
-              for (let i = 0; i < new Array(taskArr.taskChance - joinedCount).fill('').length; i++) {
-                console.log(`开始第${i+1}次看激励视频`);
-                  let sanVideoRes = yield sanVideo();
-                console.log(`看视频激励结果--${JSON.stringify(sanVideoRes)}`);
-              }
-            }
+            // let taskVideoRes = yield taskVideo();
+            // console.log(`视频激--任务列表--${JSON.stringify(taskVideoRes)}`);
+            // if (taskVideoRes.success) {
+            //   let taskArr = {};
+            //   for (let item of taskVideoRes.datas) {
+            //     if (item.ViewVideo) {
+            //       taskArr = item;
+            //     }
+            //   }
+            //   let joinedCount = taskArr.joinedCount || 0;
+            //   for (let i = 0; i < new Array(taskArr.taskChance - joinedCount).fill('').length; i++) {
+            //     console.log(`开始第${i+1}次看激励视频`);
+            //       let sanVideoRes = yield sanVideo();
+            //     console.log(`看视频激励结果--${JSON.stringify(sanVideoRes)}`);
+            //   }
+            // }
             // 喂食
             let feedPetsResult = yield feedPets()
             console.log(`喂食结果${JSON.stringify(feedPetsResult)}`)
@@ -153,6 +153,8 @@ function* step() {
       $.done();
       return
     }
+    console.log(`jdNotify${jdNotify}`)
+    console.log(`jdNotify${jdNotify === 'false'}`)
     if (!jdNotify || jdNotify === 'false') {
       $.msg(name, subTitle, message);
     }
@@ -225,56 +227,93 @@ function sanVideo() {
   }
   requestPost('https://draw.jdfcloud.com//pet/scan', body, 'application/json', 'weapp')
 }
-function request(url, reqSource) {
-    console.log("request url:", url);
+function request(url) {
+    console.log(`\n request url:：：${url}\n`);
     const option =  {
         url: url,
         headers: {
             Cookie: cookie,
-            reqSource: reqSource || 'h5',
+            reqSource: 'h5',
+          'Host': 'jdjoy.jd.com',
+          'Connection': 'keep-alive',
+          'Content-Type': 'application/json',
+          'Referer': 'https://jdjoy.jd.com/pet/index?un_area=5_274_49707_49973&lng=116.8439659502069&lat=39.95722551778479',
+          'User-Agent': 'jdapp;iPhone;8.5.8;13.4.1;9b812b59e055cd226fd60ebb5fd0981c4d0d235d;network/wifi;supportApplePay/3;hasUPPay/0;pushNoticeIsOpen/0;model/iPhone9,2;addressid/138109592;hasOCPay/0;appBuild/167169;supportBestPay/0;jdSupportDarkMode/0;pv/200.75;apprpd/MyJD_Main;ref/MyJdMTAManager;psq/29;ads/;psn/9b812b59e055cd226fd60ebb5fd0981c4d0d235d|608;jdv/0|direct|-|none|-|1587263154256|1587263330;adk/;app_device/IOS;pap/JA2015_311210|8.5.8|IOS 13.4.1;Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1',
+          'Accept-Language': 'zh-cn',
+          'Accept-Encoding': 'gzip, deflate, br',
         }
     };
     $.get(option, (err, resp, data) => {
-      if (err) {
-        console.log("=== request error -s--");
-        console.log("=== request error -e--");
-      } else {
-        try {
+      try {
+        if (err) {
+          console.log('\n京东宠汪汪: API查询请求失败 ‼️‼️')
+        } else {
           data = JSON.parse(data);
-        } catch (e) {
-          console.log(e);
-        } finally {
-          sleep(data);
         }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        sleep(data);
       }
+      // if (err) {
+      //   console.log("\n京东宠汪汪: API查询请求失败 ‼️‼️")
+      //   $.msg('京东宠汪汪', `脚本执行中断`, `京东宠汪汪: API查询请求失败 ‼️‼️`);
+      //   $.done();
+      // } else {
+      //   try {
+      //     data = JSON.parse(data);
+      //   } catch (e) {
+      //     console.log(e);
+      //   } finally {
+      //     sleep(data);
+      //   }
+      // }
     })
 }
 
-function requestPost(url, body, ContentType, reqSource) {
-    console.log("request url:", url, "body:", body, "ContetentType:", ContentType);
+function requestPost(url, body, ContentType) {
+    console.log(`\n request url:：：${url}\n`);
+    console.log(`request body:${body}\n`);
+    console.log(`request ContentType:${ContentType}\n`);
     const options = {
         url: url,
         body: body,
         headers: {
             Cookie: cookie,
         UserAgent: `Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1`,
-            reqSource: reqSource || 'h5',
+            reqSource: 'h5',
             'Content-Type': ContentType,
+          'Host': 'jdjoy.jd.com',
+          'Referer': 'https://jdjoy.jd.com/pet/index?un_area=5_274_49707_49973&lng=116.8439659502069&lat=39.95722551778479',
+          'Accept-Language': 'zh-cn',
+          'Accept-Encoding': 'gzip, deflate, br',
         }
     };
     $.post(options, (err, resp, data) => {
-      if (err) {
-        console.log("=== request error -s--");
-        console.log("=== request error -e--");
-      } else {
-        try {
+      try {
+        if (err) {
+          console.log('\n京东宠汪汪: API查询请求失败 ‼️‼️')
+        } else {
           data = JSON.parse(data);
-        } catch (e) {
-          console.log(e);
-        } finally {
-          sleep(data);
         }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        sleep(data);
       }
+      // if (err) {
+      //   console.log("\n京东宠汪汪: API查询请求失败 ‼️‼️")
+      //   $.msg('京东宠汪汪', `${err.name}`, `京东宠汪汪: API查询请求失败 ‼️‼️`);
+      //   $.done();
+      // } else {
+      //   try {
+      //     data = JSON.parse(data);
+      //   } catch (e) {
+      //     console.log(e);
+      //   } finally {
+      //     sleep(data);
+      //   }
+      // }
     })
 }
 
@@ -283,7 +322,7 @@ function sleep(response) {
     setTimeout(() => {
         console.log('休息结束');
         Task.next(response)
-    }, 3000);
+    }, 1000);
 }
 
 // https://jdjoy.jd.com/pet/getPetTaskConfig?reqSource=h5
