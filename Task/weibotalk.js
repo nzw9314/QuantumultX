@@ -193,7 +193,7 @@ function get_page_number() {
             }
             var body = response.body;
             var obj = JSON.parse(body);
-            if (obj.hasOwnProperty('errmsg')) {
+            if (obj.hasOwnProperty('errmsg')||obj.cardlistInfo.total==undefined||obj.cardlistInfo.total==null) {
                 $.msg($.name, "🚨获取页数出现错误", `⚠️微博原话：${obj.errmsg}\n🧑🏻‍💻作者：账号过期了，清空cookie吧，重新获取。`)
                 $.pagenumber = 0
                 resolve()
@@ -228,7 +228,7 @@ function get_talk_id(page) {
             }
             var body = response.body;
             var obj = JSON.parse(body);
-            if (obj.hasOwnProperty('errmsg')) {
+            if (obj.hasOwnProperty('errmsg')||obj.cards==undefined||obj.cards==null) {
                 $.msg($.name, "🚨获取超话ID出现错误", `⚠️微博原话：${obj.errmsg}\n`)
                 resolve()
                 return
@@ -238,10 +238,8 @@ function get_talk_id(page) {
             for (i = 0; i < number; i++) {
                 var name = group[i]["title_sub"];
                 $.name_list.push(name)
-
                 var val = group[i].desc;
                 $.val_list.push(val)
-
                 var id = group[i].scheme.slice(33, 71);
                 $.id_list.push(id)
                 if (debug) {
@@ -261,7 +259,6 @@ function get_talk_id(page) {
 
 //签到
 function checkin(id, name) {
-
     var sendcheckinurl = $.checkinurl
         .replace(new RegExp("&fid=.*?&"), "&fid=" + id + "&")
         .replace(new RegExp("pageid%3D.*?%26"), "pageid%3D" + id + "%26");
@@ -269,7 +266,6 @@ function checkin(id, name) {
         url: sendcheckinurl,
         header: $.checkinheaders
     };
-
     return new Promise(resolve => {
         $.get(checkinrequest, (error, response, data) => {
             if (error) {
