@@ -74,8 +74,9 @@ if ($.client == 'Safari') {
 
 $.interval = Number($.read('interval') || 1000)
 
-$.update = $.debug ? 0 : $.read('update') || 0
-$.log('update time:' + $.update)
+$.update = $.debug ? 0 : Number($.read('update') || 0)
+$.log('debug update time: ' + $.update)
+$.info('update time: ' + $.read('update'))
 
 if ($.isRequest) {
     GetCookie()
@@ -125,15 +126,15 @@ function checkCookie() {
 
 function ParseWeibo(obj) {
     let wbs = obj.data.statuses
-    //for (let i = wbs.length - 1; i >= 0; i--) { // 试图改变时间线顺序，都是混乱的
-    for (let i = 0; i< wbs.length; i++) {
+    for (let i = wbs.length - 1; i >= 0; i--) { // 试图改变时间线顺序，都是混乱的
+//  for (let i = 0; i< wbs.length; i++) {
         $.wait($.interval).then(()=>{
             let Title = '@' + wbs[i].user.screen_name
-            let releaseTime = new Date(wbs[i].created_at)
-            let subTitile = '⌚️ ' + releaseTime.Format("MM/dd hh:mm:ss")
+            let releaseTime = new Date(wbs[i].created_at).getTime()
+            let subTitile = '⌚️ ' + new Date(wbs[i].created_at).Format("MM/dd hh:mm:ss")
             let open = $.openlink + wbs[i].bid
+            let showimg = wbs[i].user.profile_image_url
             let detail = ''
-            let showimg = ''
             let newlineReg = /<br \/>/g
             let ignoreReg = /<[^>]+>/g
             detail += wbs[i].text.replace(newlineReg, '\n').replace(ignoreReg, '').trim()

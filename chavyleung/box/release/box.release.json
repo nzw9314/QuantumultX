@@ -1,6 +1,104 @@
 {
   "releases": [
     {
+      "version": "0.6.11",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "优化",
+          "descs": ["底栏颜色会跟随主题色调"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.10",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "调整",
+          "descs": ["内置应用 偏好设置、切换会话 图标"]
+        },
+        {
+          "name": "感谢",
+          "descs": ["感谢 @Orz-3 制作图标"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.9",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["内置应用: 偏好设置", "可以设置多个 http-api (设置完后在侧栏选择)", "可以分别设置暗黑、明亮主题下的主色调"]
+        },
+        {
+          "name": "控件",
+          "descs": ["拾色器: colorpicker"]
+        },
+        {
+          "name": "注意",
+          "descs": ["设置多个 http-api 时, 建议以逗号开头, 侧栏中选择空白的那个就是走 eval() 方案"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.8",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "调整",
+          "descs": ["运行按钮位置"]
+        },
+        {
+          "name": "新增",
+          "descs": ["可以显示当前切换至哪个会话", "应用可以设定多个运行脚本 scripts: {name: '', script: ''}", "示例: https://gist.githubusercontent.com/chavyleung/9d53fc4809eb41dca5f5923790ec5554/raw/4d8b140ba149c33aa1fc622e93c4035ae74a73bb/chavy.app.sub.simple.json"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.7",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "重写",
+          "descs": ["BoxJs Surge 的重写超时改为 120 秒 (避免手动运行脚本容易超时)"]
+        },
+        {
+          "name": "调整",
+          "descs": ["迁移 吾爱破解、爱奇艺 至原作者订阅: @NobyDa (野比)", "https://raw.githubusercontent.com/NobyDa/Script/master/NobyDa_BoxJs.json"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.6",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "调整",
+          "descs": ["迁移 腾讯新闻 至原作者订阅: @Sunert", "https://raw.githubusercontent.com/Sunert/Scripts/master/Task/sunert.boxjs.json"]
+        }
+      ]
+    },
+    {
       "version": "0.6.5",
       "tags": ["beta"],
       "author": "@chavyleung",

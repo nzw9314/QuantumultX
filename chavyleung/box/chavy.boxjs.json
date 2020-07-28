@@ -63,7 +63,8 @@
       "keys": ["chavy_sign_pagoda"],
       "author": "@chavyleung",
       "script": "https://raw.githubusercontent.com/chavyleung/scripts/master/pagoda/pagoda.js",
-      "repo": "https://github.com/chavyleung/scripts/blob/master/pagoda"
+      "repo": "https://github.com/chavyleung/scripts/blob/master/pagoda",
+      "icons": ["https://raw.githubusercontent.com/58xinian/icon/master/pagoda_mini.png", "https://raw.githubusercontent.com/58xinian/icon/master/pagoda.png"]
     },
     {
       "id": "dbsj",
@@ -202,6 +203,15 @@
       "repo": "https://github.com/chavyleung/scripts/tree/master/wanda",
       "script": "https://raw.githubusercontent.com/chavyleung/scripts/master/wanda/wanda.js",
       "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/wanda.png", "https://raw.githubusercontent.com/Orz-3/task/master/wanda.png"]
+    },
+    {
+      "id": "ithome",
+      "name": "IT之家",
+      "keys": ["senku_ithome_userHash"],
+      "author": "@GideonSenku",
+      "repo": "https://github.com/chavyleung/scripts/tree/master/ithome",
+      "script": "https://raw.githubusercontent.com/chavyleung/scripts/master/ithome/ithome.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/ithome.png", "https://raw.githubusercontent.com/Orz-3/task/master/ithome.png"]
     },
     {
       "id": "NeteaseNews",
