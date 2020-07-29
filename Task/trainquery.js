@@ -129,6 +129,7 @@ if(reg.test(K) && K== ress.data.result[i].split("|")[3]){
 }
 if (K<=ress.data.result.length){
 info = ress.data.result[K-1].split("|")
+      //console.log(info)
       traincode = info[3]
       trainno = info[2]
       fromstationno = info[16]
@@ -171,8 +172,7 @@ for (y=0;y<ress.data.result.length;y++){
 
 function prize() {
  return new Promise((resolve, reject) =>{
-  setTimeout(() => {
-   const myRequest = {
+   const prizeurl = {
     url: `https://kyfw.12306.cn/otn/leftTicket/queryTicketPrice?train_no=${trainno}&from_station_no=${fromstationno}&to_station_no=${tostationno}&seat_types=${seattypes}&train_date=${leftdate}`,
     method: 'GET',
     headers: {
@@ -182,14 +182,14 @@ function prize() {
 'Accept' : `*/*`,
 'Accept-Language' : `zh-cn`}
 }
-//console.log(myRequest)
- $.get(myRequest, (err, resp, data) => {
- try {
-    //console.log('票价信息: ' + data+'\n');
-   if ( data==-1){
+//console.log(prizeurl)
+ $.get(prizeurl, (err, resp, data) => {
+    //console.log('票价信息: 响应码: ' +resp.statusCode+" \n"+ data+'\n');
+    if ( data == -1||resp.statusCode == 404){
 $.msg('列车查询失败‼️', '该'+traincode+'次列车车票暂停发售', '')
-  return
-}
+     return
+    }
+try {
    let result = JSON.parse(data)
    if (result.data.M){
    setyideng += `(${result.data.M})  `
@@ -229,10 +229,10 @@ $.msg('列车查询失败‼️', '该'+traincode+'次列车车票暂停发售',
    }
 }
 catch (e){
+    prize()
   //$.msg('列车票价查询失败‼️', '无'+traincode+'列车票价信息', e)
    }
 resolve()
-  })
   })
  })
 }
@@ -297,7 +297,7 @@ else {
 for (i=1;i<result.data.data.length;i++){
     detail  += `\n`+result.data.data[i].arrive_time +'--'+result.data.data[i].start_time+ '  '+result.data.data[i].station_name
   }
-  const openurl = encodeURI(`https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc&fs=${leftstation},${fromstation}&ts=${tostation},${endstation}&date=${leftdate}&flag=N,N,Y`)
+  const openurl = encodeURI(`https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc&fs=${leftstation},${fromstation}&ts=${tostation},${tostationcode}&date=${leftdate}&flag=N,N,Y`)
 const title = traincode+ "次列车"
 const subTitle = '始发站: '+startstation+ '--终点站: '+edstation
   console.log(traincode+'次列车  \n'+detail)
