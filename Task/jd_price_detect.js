@@ -53,7 +53,7 @@
  
  function env_detect() {
      if ($.detect_url.length == 0) {
-         $.msg($.name, "", "🚫客官，请前往BoxJs进行配置。")
+         $.msg($.name, "", "🚫客官，你还没有设置需要检测的商品，请前往BoxJs进行配置。")
          return false;
      }
      if ($.detect_url.length != $.target_price.length) {
@@ -144,23 +144,26 @@
                  //为了更容易识别，使用 今天、昨天。有个BUG，跨月份的问题，晚点再修。
                  day_alias = current_day - price_day == 0 ? "今天" : (current_day - price_day == 1 ? "昨天" : new Date(price_status[0]).toJSON().substr(5, 5)+" ")
                  result = `💰价格：${price_status[1]}元，检测时间：${day_alias}${new Date(price_status[0]).toJSON().replace("T", " ").substr(11, 5)}\n`
-                 result += `✨状态：${price_status[1] <= target_price ? "已低于" : "没有低于"}目标价格${target_price}元\n`
+                 result += `✨状态：${price_status[1] < target_price ? "已低于" : "没有低于"}目标价格${target_price}元\n`
                  if ($.debug) console.log(price_status)
                  if (price_status[2] != "") result += `✨优惠：${price_status[2]}\n`
  
                  //2020年07月15日02:09 新增 最近优惠
                  lastest_info = data.recentlyZK
+                 has_recentZK = false
                  if ($.debug) console.log(lastest_info)
-                 youhui_price = lastest_info.spprice.replace(/<\/?p><\/?p>/g, "，").replace(/<\/?p>/g, "")
-                 current_price = lastest_info.currentprice
-                 goods_time = parseInt(lastest_info.dt.match(/(\d+)\+/)[1])
-                 goods_time += 8 * 3600 * 1000
-                 price_day = new Date(goods_time).toJSON().substr(5, 5).replace('-', '') //获取价格的月日
-                 day_alias = current_day - price_day == 0 ? "今天" : (current_day - price_day == 1 ? "昨天" : new Date(goods_time).toJSON().substr(5, 5)+" ")
-                 result_2 = `💰价格：${current_price}元，检测时间：${day_alias}${new Date(goods_time).toJSON().replace("T", " ").substr(11, 5)}\n`
-                 result_2 += `✨状态：${current_price <= target_price ? "已低于" : "没有低于"}目标价格${target_price}元\n`
-                 result_2 += `✨其他说明：${youhui_price}\n`
- 
+                 if(lastest_info.hasOwnProperty('spprice')){
+                    has_recentZK = true
+                    youhui_price = lastest_info.spprice.replace(/<\/?p><\/?p>/g, "，").replace(/<\/?p>/g, "")
+                    current_price = lastest_info.currentprice
+                    goods_time = parseInt(lastest_info.dt.match(/(\d+)\+/)[1])
+                    goods_time += 8 * 3600 * 1000
+                    price_day = new Date(goods_time).toJSON().substr(5, 5).replace('-', '') //获取价格的月日
+                    day_alias = current_day - price_day == 0 ? "今天" : (current_day - price_day == 1 ? "昨天" : new Date(goods_time).toJSON().substr(5, 5)+" ")
+                    result_2 = `💰价格：${current_price}元，检测时间：${day_alias}${new Date(goods_time).toJSON().replace("T", " ").substr(11, 5)}\n`
+                    result_2 += `✨状态：${current_price < target_price ? "已低于" : "没有低于"}目标价格${target_price}元\n`
+                    result_2 += `✨其他说明：${youhui_price}\n`
+                }
                  //2020年07月18日01:36 查询该优惠之前是否已展示给用户
                  console.log(`\n🛒商品检测结果如下`)
                  is_price_show = false //最新价格状态
@@ -168,15 +171,18 @@
                  //1、 检查最新价格 和 最新优惠，是否展示过
                  if ($.cache_list.hasOwnProperty(goods_url) && $.cache_list[goods_url].hasOwnProperty('price_time') && $.cache_list[goods_url]['price_time'] == price_status[0]) {
                      is_price_show = true;
-                     $.log(`\n--------start--------\n💢以下价格数据之前已展示给用户，不做2次提醒\n${title}\n${result}--------end--------\n`)
+                     $.log(`\n--------start--------\n💢以下价格数据之前已用过，不做2次提醒\n${title}\n${result}--------end--------\n`)
                  }
-                 if ($.cache_list.hasOwnProperty(goods_url) && $.cache_list[goods_url].hasOwnProperty('youhui_time') && $.cache_list[goods_url]['youhui_time'] == goods_time) {
+                 if(!has_recentZK){//如果没有优惠，那么不用展示
+                     is_youhui_showed = true
+                 }
+                 else if ($.cache_list.hasOwnProperty(goods_url) && $.cache_list[goods_url].hasOwnProperty('youhui_time') && $.cache_list[goods_url]['youhui_time'] == goods_time) {
                      is_youhui_showed = true;
-                     $.log(`\n--------start--------\n💢以下优惠之前已展示给用户，不做2次提醒\n${title}\n${result_2}--------end--------\n`)
+                     $.log(`\n--------start--------\n💢以下优惠之前已用过，不做2次提醒\n${title}\n${result_2}--------end--------\n`)
                  }
                  is_notify = false;
                  //2. 开始通知。 只提醒 未展示过的低价
-                 if (price_status[1] <= target_price) {
+                 if (price_status[1] < target_price) {
                      final_result = ""
                      if (is_price_show == false && is_youhui_showed == false) {
                          final_result = result + "\n最近优惠:\n" + result_2
@@ -188,7 +194,7 @@
                          $.msg($.name, `${title}`, final_result, goods_url)
                      }
                  }
-                 else if (current_price <= target_price) {
+                 else if (has_recentZK && current_price < target_price) {
                     final_result = ""
                     if (is_youhui_showed == false) {
                         final_result = result_2
@@ -203,7 +209,7 @@
                  }
                  $.cache_list[goods_url] = {
                      'price_time': price_status[0],
-                     'youhui_time': goods_time
+                     'youhui_time': has_recentZK? goods_time : 0
                  }
                  resolve()
              })
