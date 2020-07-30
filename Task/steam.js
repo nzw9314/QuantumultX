@@ -39,79 +39,42 @@ async function check(item) {
     const { id, name } = item;
     $.log(`正在检查：${item.id}...`);
 
-    const headers = {
-        "User-Agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36",
-    };
-    await $.get({ url: `https://steamdb.info/app/${id}/`, headers }).then(
+    await $.get({ url: `https://api.xiaoheihe.cn/game/get_game_detail/?&steam_appid=${id}` }).delay(1000).then(
         (response) => {
-            const html = response.body;
-            const prices = getPrice(html);
-            const info = getInfo(html);
+            const obj = JSON.parse(response.body);
+            if (obj.status == 'ok') {
+                let name_en = obj.result.name_en;
+                let prices = obj.result.price;
+                let publisher = obj.result.publishers[0].value;
+                let rating = obj.result.positive_desc;
+                let inGame = obj.result.user_num.game_data[0].value;
+                let desc = obj.result.about_the_game;
 
-            $.log(info);
+                $.log(JSON.stringify(response.body));
 
-            $.notify(
-                `🎮 [Steam 日报] ${name}`,
-                `${info.name}`,
-                `💰 [价格]:\n📉 历史最低:${prices.lowestPrice}元\n📌 当前价格: ${prices.currentPrice}元\n💡 [基本信息]:\n🎩 发行商: ${info.publisher}\n❤️ 评分: ${info.rating}\n🤖 在线人数: ${info.inGame}`,
-                {
-                    'media-url': info.coverURL,
-                    'open-url': `https://store.steampowered.com/app/${id}`
-                }
-            );
+                $.notify(
+                    `🎮 [Steam 日报] ${name}`,
+                    `${name_en}`,
+                    `💰 [价格]：\n📉 历史最低：${prices.lowest_price}元\n📌 当前价格：${prices.current}元\n💡 [基本信息]：\n🎩 发行商：${publisher}\n❤️ ${rating}\n🤖 在线人数：${inGame}\n📝 简介：${desc}...`,
+                    {
+                        'media-url': obj.result.image,
+                        'open-url': `https://store.steampowered.com/app/${id}`
+                    }
+                );
+            } else {
+                $.log(JSON.stringify(response.body));
+
+                $.notify(
+                    `🎮 [Steam 日报] ${name}`,
+                    '获取失败',
+                    JSON.stringify(response.body)
+                );
+            }
+            
         }
     );
 }
 
-function getPrice(html) {
-    try {
-        const regexp = new RegExp(
-            /<tr class="table-prices-current">([\s\S]+?)<\/tr>/
-        );
-        const row = html.match(regexp)[1];
-        const prices = row.match(/¥ \d+/g);
-        const currentPrice = prices[0];
-        const lowestPrice = prices[1];
-        const discount = row.match(/-\d+%/)[0];
-        $.log({ currentPrice, lowestPrice, discount });
-        return {
-            currentPrice,
-            lowestPrice,
-            discount,
-        };
-    } catch (e) {
-        $.error("❌ 无法获取游戏信息 " + e);
-    }
-}
-
-function getInfo(html) {
-    try {
-        const name = html.match(/<h1 itemprop=\"name\">([\s\S]+?)<\/h1>/)[1];
-        const coverURL = html.match(/<img src="(.*?)" class="app-logo"/)[1];
-        const publisher = html.match(
-            /<span itemprop=\"publisher\">([\s\S]+?)<\/span>/
-        )[1];
-        const header = Array.from(
-            html.matchAll(
-                /<div class=\"header-thing-number header-thing-good\">([\s\S]+?)<\/div/g
-            ),
-            (m) => m[1]
-        );
-        const rating = header[0];
-        const inGame = header[1];
-        $.log({ name, publisher, rating, inGame });
-        return {
-            name,
-            publisher,
-            rating,
-            inGame,
-            coverURL
-        };
-    } catch (e) {
-        $.error("❌ 无法获取游戏信息 " + e);
-    }
-}
 
 // prettier-ignore
 /*********************************** API *************************************/

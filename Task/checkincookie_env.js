@@ -102,12 +102,12 @@ function checkin(url, cookie) {
   let checkinPath =
     url.indexOf("auth/login") != -1 ? "user/checkin" : "user/_checkin.php";
   var checkinurl = url.replace(/(auth|user)\/login(.php)*/g, "") + checkinPath;
-  console.log("签到url：" + checkinurl + "\n签到cookie：" + cookie);
-  var checkinreqest = {
-    url: "https://cccat.io/user/_checkin.php",
+  var checkinrequest = {
+    url: checkinurl,
     headers: { Cookie: cookie }
   };
-  $.post(checkinreqest, (error, response, data) => {
+  console.log(checkinrequest);
+  $.post(checkinrequest, (error, response, data) => {
     if (error) {
       console.log(error);
       $.msg("机场签到Cookie版", "签到失败", error);
@@ -127,7 +127,7 @@ function dataResults(url, cookie, checkinMsg) {
   let userPath = url.indexOf("auth/login") != -1 ? "user" : "user/index.php";
   var datarequest = {
     url: url.replace(/(auth|user)\/login(.php)*/g, "") + userPath,
-    header: cookie
+    header: { Cookie: cookie }
   };
   $.get(datarequest, (error, response, data) => {
     let resultData = "";
@@ -190,7 +190,7 @@ function flowFormat(data) {
 function getCookie() {
   if ($request && $request.method != "OPTIONS" && $request.url.match(/check/)) {
     const sicookie = $request.headers["Cookie"];
-    $.log(sicookie);
+    console.log(sicookie);
     $.setdata(sicookie, signcookie);
     $.msg("机场签到Cookie版", "", "获取Cookie成功🎉");
   }
