@@ -195,8 +195,8 @@ function Env(name, opts) {
           if (!err && resp) {
             resp.body = body
             resp.statusCode = resp.status
-            callback(err, resp, body)
           }
+          callback(err, resp, body)
         })
       } else if (this.isQuanX()) {
         $task.fetch(opts).then(
@@ -319,10 +319,12 @@ function Env(name, opts) {
           return undefined
         }
       }
-      if (this.isSurge() || this.isLoon()) {
-        $notification.post(title, subt, desc, toEnvOpts(opts))
-      } else if (this.isQuanX()) {
-        $notify(title, subt, desc, toEnvOpts(opts))
+      if (!$.isMute) {
+        if (this.isSurge() || this.isLoon()) {
+          $notification.post(title, subt, desc, toEnvOpts(opts))
+        } else if (this.isQuanX()) {
+          $notify(title, subt, desc, toEnvOpts(opts))
+        }
       }
       this.logs.push('', '==============📣系统通知📣==============')
       this.logs.push(title)
@@ -341,7 +343,7 @@ function Env(name, opts) {
     logErr(err, msg) {
       const isPrintSack = !this.isSurge() && !this.isQuanX() && !this.isLoon()
       if (!isPrintSack) {
-        $.log('', `❗️${this.name}, 错误!`, err.message)
+        $.log('', `❗️${this.name}, 错误!`, err)
       } else {
         $.log('', `❗️${this.name}, 错误!`, err.stack)
       }

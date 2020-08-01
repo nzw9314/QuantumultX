@@ -1,7 +1,7 @@
 /*
 "小黑盒" app 自动签到，支持 Quantumult X（理论上也支持 Surge、Loon，未尝试）。
-请先按下述方法进行配置，进入"小黑盒" - "我"，若弹出"首次写入heybox Cookie 成功"即可正常食用，其他提示或无提示请发送日志信息至 issue。
-到 cron 设定时间自动签到时，若弹出"小黑盒 - 签到成功"即完成签到，其他提示或无提示请发送日志信息至 issue。
+请先按下述方法进行配置，进入"小黑盒" - "我"，若弹出"首次写入 heybox Cookie 成功"即可正常食用，其他提示或无提示请发送日志信息至 issue。
+到 cron 设定时间自动签到时，若弹出"小黑盒 - 签到成功"即完成签到，其中「✓」表示成功，「○」表示重复，「✗」表示失败，其他提示或无提示请发送日志信息至 issue。
 
 小黑盒签到及任务获取的奖励积攒之后可以兑换 steam 游戏，您可以使用我的邀请码进行注册：
 https://api.xiaoheihe.cn/game/invite_friend_web_share/?heybox_id=21530787
@@ -24,13 +24,13 @@ Quantumult X:
 0 * * * * https://raw.githubusercontent.com/zZPiglet/Task/master/heybox/heybox.js, tag=小黑盒
 
 [rewrite_local]
-^https:\/\/api\.xiaoheihe\.cn\/account\/home_v2\/\? url script-request-header https://raw.githubusercontent.com/zZPiglet/Task/master/heybox/heybox.js
+^https:\/\/api\.xiaoheihe\.cn\/account\/home_v\d\/\? url script-request-header https://raw.githubusercontent.com/zZPiglet/Task/master/heybox/heybox.js
 
 
 Surge & Loon:
 [Script]
 cron "0 * * * *" script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/heybox/heybox.js
-http-request ^https:\/\/api\.xiaoheihe\.cn\/account\/home_v2\/\? script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/heybox/heybox.js
+http-request ^https:\/\/api\.xiaoheihe\.cn\/account\/home_v\d\/\? script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/heybox/heybox.js
 
 All app:
 [mitm]
@@ -42,16 +42,251 @@ hostname = api.xiaoheihe.cn
 const $ = new API('heybox')
 $.debug = [true, 'true'].includes($.read('debug')) || false
 const mainURL = 'https://api.xiaoheihe.cn'
-const urlreg = /https:\/\/api\.xiaoheihe\.cn\/account\/home_v2\/\?lang=(.*)&os_type=(.*)&os_version=(.*)&_time=\d{10}&version=(.*)&device_id=(.*)&heybox_id=(\d+)&hkey=/
+const urlreg = /https:\/\/api\.xiaoheihe\.cn\/account\/home_v\d\/\?lang=(.*)&os_type=(.*)&os_version=(.*)&_time=\d{10}&version=(.*)&device_id=(.*)&heybox_id=(\d+)&hkey=/
 const cookiereg = /pkey=(.*);/
+$.subTitle = ''
+$.detail = ''
+$.errmsg = '\n'
 
 if ($.isRequest) {
     GetCookie()
-    $.done
+    $.done({ body: $request.body })
 } else {
-    Checkin()
-    $.done
+    !(async () => {
+        $.pkey = $.read('pkey')
+        $.lang = $.read('lang')
+        $.os_t = $.read('os_t')
+        $.os_v = $.read('os_v')
+        $.v = $.read('v')
+        $.d_id = $.read('d_id')
+        $.h_id = $.read('h_id')
+        if (!$.pkey || !$.lang || !$.os_t || !$.os_v || !$.v || !$.d_id || !$.h_id) {
+            throw new ERR.CookieError("❌ 未获取或填写Cookie")
+        } else {
+            await Sign()
+            await Sharenormal()
+            await Sharecomment()
+            await Getnews()
+            await Award()
+            await Tasklist()
+            await $.notify('小黑盒 🎮', $.subTitle, $.detail + $.errmsg)
+        }
+    })().catch((err) => {
+        if (err instanceof ERR.CookieError) {
+            $.notify("小黑盒 - Cookie 错误", "", err.message, 'heybox://')
+        } else {
+            $.notify("小黑盒 - 出现错误", "", err.message)
+            $.error(err)
+        }
+    }).finally($.done())
 }
+
+function Sign() {
+    let path = '/task/sign'
+    let time = Math.round(new Date().getTime()/1000).toString()
+    let hkey = hex_md5(hex_md5(path + '/bfhdkud_time=' + time).replace(/a|0/g, 'app')).substr(0,10)
+    let param = '/?lang=' + $.lang + '&os_type=' + $.os_t + '&os_version=' + $.os_v + '&_time=' + time + '&version=' + $.v + '&device_id=' + $.d_id + '&heybox_id=' + $.h_id + '&hkey=' + hkey
+    $.log('Cookie: pkey=' + $.pkey)
+    $.log('sign: ' + mainURL + path + param)
+    return $.get({
+        url: mainURL + path + param,
+        headers: {
+            'Cookie': 'pkey=' + $.pkey,
+            'Referer': 'http://api.maxjia.com/'
+        }
+    })
+        .then((resp) => {
+            $.log('Sign: ' + JSON.stringify(resp.body))
+            let obj = JSON.parse(resp.body)
+            $.signStatus = obj.status == 'ok' ? true : false
+            $.signMsg = obj.msg
+        })
+        .catch((err) => {
+            throw err
+        })
+}
+
+function Sharenormal() {
+    let path = '/task/shared'
+    let normal = '&share_plat=WechatSession&shared_type=normal'
+    let time = Math.round(new Date().getTime()/1000).toString()
+    let hkey = hex_md5(hex_md5(path + '/bfhdkud_time=' + time).replace(/a|0/g, 'app')).substr(0,10)
+    let param = '/?lang=' + $.lang + '&os_type=' + $.os_t + '&os_version=' + $.os_v + '&_time=' + time + '&version=' + $.v + '&device_id=' + $.d_id + '&heybox_id=' + $.h_id + '&hkey=' + hkey
+    $.log('sharenormal: ' + mainURL + path + param + normal)
+    return $.get({
+        url: mainURL + path + param + normal,
+        headers: {
+            'Cookie': 'pkey=' + $.pkey,
+            'Referer': 'http://api.maxjia.com/'
+        }
+    })
+        .then((resp) => {
+            $.log('Sharenormal: ' + JSON.stringify(resp.body))
+            let obj = JSON.parse(resp.body)
+            $.sharenormalStatus = obj.status == 'ok' ? true : false
+            $.sharenormalMsg = obj.msg
+        })
+        .catch((err) => {
+            throw err
+        })
+}
+
+function Sharecomment() {
+    let path = '/task/shared'
+    let comment = '&share_plat=WechatSession&shared_type=BBSComment'
+    let time = Math.round(new Date().getTime()/1000).toString()
+    let hkey = hex_md5(hex_md5(path + '/bfhdkud_time=' + time).replace(/a|0/g, 'app')).substr(0,10)
+    let param = '/?lang=' + $.lang + '&os_type=' + $.os_t + '&os_version=' + $.os_v + '&_time=' + time + '&version=' + $.v + '&device_id=' + $.d_id + '&heybox_id=' + $.h_id + '&hkey=' + hkey
+    $.log('sharecomment: ' + mainURL + path + param + comment)
+    return $.get({
+        url: mainURL + path + param + comment,
+        headers: {
+            'Cookie': 'pkey=' + $.pkey,
+            'Referer': 'http://api.maxjia.com/'
+        }
+    })
+        .then((resp) => {
+            $.log('Sharecomment: ' + JSON.stringify(resp.body))
+            let obj = JSON.parse(resp.body)
+            $.sharecommentStatus = obj.status == 'ok' ? true : false
+            $.sharecommentMsg = obj.msg
+        })
+        .catch((err) => {
+            throw err
+        })
+}
+
+function Getnews() {
+    let path = '/bbs/app/feeds/news'
+    let time = Math.round(new Date().getTime()/1000).toString()
+    let hkey = hex_md5(hex_md5(path + '/bfhdkud_time=' + time).replace(/a|0/g, 'app')).substr(0,10)
+    let param = '?lang=' + $.lang + '&os_type=' + $.os_t + '&os_version=' + $.os_v + '&_time=' + time + '&version=' + $.v + '&device_id=' + $.d_id + '&heybox_id=' + $.h_id + '&hkey=' + hkey
+    $.log('getnews: ' + mainURL + path + param)
+    return $.get({
+        url: mainURL + path + param,
+        headers: {
+            'Cookie': 'pkey=' + $.pkey,
+            'Referer': 'http://api.maxjia.com/'
+        }
+    })
+        .then((resp) => {
+            $.log('Getnews: ' + JSON.stringify(resp.body))
+            let obj = JSON.parse(resp.body)
+            if (obj.status == 'ok') {
+                let links = obj.result.links
+                $.linkids = []
+                for (let l = 1; l < 6; l++) {
+                    $.linkids.push(links[l].linkid)
+                }
+                
+            } else {
+                $.errmsg += '\n文章拉取失败：' + obj.msg
+            }
+        })
+        .catch((err) => {
+            throw err
+        })
+}
+
+async function Award() {
+    $.log($.linkids)
+    if ($.linkids) {
+        let path = '/bbs/app/profile/award/link'
+        let time = Math.round(new Date().getTime()/1000).toString()
+        let hkey = hex_md5(hex_md5(path + '/bfhdkud_time=' + time).replace(/a|0/g, 'app')).substr(0,10)
+        let param = '?lang=' + $.lang + '&os_type=' + $.os_t + '&os_version=' + $.os_v + '&_time=' + time + '&version=' + $.v + '&device_id=' + $.d_id + '&heybox_id=' + $.h_id + '&hkey=' + hkey
+        $.log('award: ' + mainURL + path + param)
+        $.awardMsg = ''
+        for (let l = 0; l < 5; l++) {
+            await $.post({
+                url: mainURL + path + param,
+                headers: {
+                    'Cookie': 'pkey=' + $.pkey,
+                    'Referer': 'http://api.maxjia.com/'
+                },
+                body: 'award_type=1&link_id=' + $.linkids[l]
+            })
+                .then((resp) => {
+                    $.log('Award [' + $.linkids[l] + ']: ' + JSON.stringify(resp.body))
+                    let obj = JSON.parse(resp.body)
+                    if (obj.msg) $.awardMsg += '\n点赞完成失败：[' + $.linkids[l] + '] ' + obj.msg
+                })
+                .catch((err) => {
+                    throw err
+                })
+        }
+    }
+}
+
+function Tasklist() {
+    let path = '/task/list'
+    let time = Math.round(new Date().getTime()/1000).toString()
+    let hkey = hex_md5(hex_md5(path + '/bfhdkud_time=' + time).replace(/a|0/g, 'app')).substr(0,10)
+    let param = '/?lang=' + $.lang + '&os_type=' + $.os_t + '&os_version=' + $.os_v + '&_time=' + time + '&version=' + $.v + '&device_id=' + $.d_id + '&heybox_id=' + $.h_id + '&hkey=' + hkey
+    $.log('tasklist: ' + mainURL + path + param)
+    return $.get({
+        url: mainURL + path + param,
+        headers: {
+            'Cookie': 'pkey=' + $.pkey,
+            'Referer': 'http://api.maxjia.com/'
+        }
+    })
+        .then((resp) => {
+            $.log('Tasklist: ' + JSON.stringify(resp.body))
+            let obj = JSON.parse(resp.body)
+            if (obj.status == 'ok') {
+                let all_coin = obj.result.level_info.coin
+                let exp_diff = Number(obj.result.level_info.max_exp) - Number(obj.result.level_info.exp)
+                let level = Number(obj.result.level_info.level) + 1
+                let tasklist = obj.result.task_list[0].tasks
+                if (tasklist[0].state == 'finish') {
+                    $.subTitle += $.signStatus ? '签到[✓]、' : '签到[○]、'
+                    let sign_day = tasklist[0].sign_in_streak
+                    let award_coin = tasklist[0].award_coin
+                    let award_exp = tasklist[0].award_exp
+                    $.detail += '连续签到 ' + sign_day + ' 天。\n每日签到获得 ' + award_coin+ ' H 币及 ' + award_exp + ' 经验。'
+                } else {
+                    $.subTitle += '签到[✗]、'
+                    $.errmsg += $.signMsg ? '\n每日签到失败：' + $.signMsg : ''
+                }
+                if (tasklist[1].state == 'finish') {
+                    $.subTitle += $.sharenormalStatus ? '头条[✓]、' : '头条[○]、'
+                    let award_coin = tasklist[1].award_coin
+                    let award_exp = tasklist[1].award_exp
+                    $.detail += '\n头条分享获得 ' + award_coin+ ' H 币及 ' + award_exp + ' 经验。'
+                } else {
+                    $.subTitle += '头条[✗]、'
+                    $.errmsg += $.sharenormalMsg ? '\n头条分享失败：' + $.sharenormalMsg : ''
+                }
+                if (tasklist[2].state == 'finish') {
+                    $.subTitle += $.sharecommentStatus ? '评论[✓]、' : '评论[○]、'
+                    let award_coin = tasklist[2].award_coin
+                    let award_exp = tasklist[2].award_exp
+                    $.detail += '\n评论分享获得 ' + award_coin+ ' H 币及 ' + award_exp + ' 经验。'
+                } else {
+                    $.subTitle += '评论[✗]、'
+                    $.errmsg += $.sharecommentMsg ? '\n评论分享失败：' + $.sharecommentMsg : ''
+                }
+                if (tasklist[3].state == 'finish') {
+                    $.subTitle += '点赞[✓]'
+                    let award_coin = tasklist[3].award_coin
+                    let award_exp = tasklist[3].award_exp
+                    $.detail += '\n点赞完成获得 ' + award_coin+ ' H 币及 ' + award_exp + ' 经验。'
+                } else {
+                    let degree = tasklist[3].title.substr(-4,3) 
+                    $.subTitle += '点赞[' + degree + ']'
+                    $.errmsg += $.awardMsg ? $.awardMsg : '' 
+                }
+                $.detail += '\n账户共有 ' + all_coin + ' H 币，还需 ' + exp_diff + ' 经验升至 ' + level + ' 级。'
+            }  else {
+                $.errmsg += '\n通知拉取失败：' + obj.msg
+            }
+        })
+        .catch((err) => {
+            throw err
+        })
+}
+
 
 function GetCookie() {
     if (cookiereg.exec($request.headers['Cookie'])[1]) {
@@ -86,47 +321,6 @@ function GetCookie() {
     } else {
         $.notify("写入" + $.name + "Cookie 失败‼️", "", "配置错误, 无法读取请求头, ")
     }
-}
-
-function Checkin() {
-    let time = Math.round(new Date().getTime()/1000).toString()
-    let sign = '/task/sign'
-    let hkey = hex_md5(hex_md5(sign + '/bfhdkud_time=' + time).replace(/a|0/g, 'app')).substr(0,10)
-    let signURL = mainURL + sign + '?lang=' + $.read('lang') + '&os_type=' + $.read('os_t') + '&os_version=' + $.read('os_v') + '&_time=' + time + '&version=' + $.read('v') + '&device_id=' + $.read('d_id') + '&heybox_id=' + $.read('h_id') + '&hkey=' + hkey
-    $.log(signURL)
-    $.get({
-        url: signURL,
-        headers: {
-            'Cookie': 'pkey=' + $.read('pkey'),
-            'Referer': 'http://api.maxjia.com/'
-        }
-    })
-        .then((resp) => {
-            $.log(resp.body)
-            let obj = JSON.parse(resp.body)
-            let subTitle = ''
-            let detail = ''
-            if (obj.status == 'ok') {
-                let all_coin = obj.result.coin
-                let sign_coin = obj.result.sign_in_coin
-                let sign_exp = obj.result.sign_in_exp
-                subTitle += '签到成功 🎮'
-                detail += '签到获得 ' + sign_coin + ' H 币及 ' + sign_exp + ' 经验。账户共有 ' + all_coin + ' H 币。'
-            } else if (obj.status == 'ignore') {
-                subTitle += '重复签到 🤹‍♀️'
-            } else if (obj.status == 'failed') {
-                subTitle += '签到失败 😭'
-                detail += obj.msg
-            } else {
-                subTitle += '签到失败 😭'
-                detail += JSON.stringify(resp.body)
-            }
-            $.notify('小黑盒', subTitle, detail)
-        })
-        .catch((err) => {
-            $.notify("小黑盒 - 出现错误", "", err.message)
-            $.error(err)
-        })
 }
 
 // md5

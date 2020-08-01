@@ -118,7 +118,7 @@ if(reg.test(K) && K== ress.data.result[i].split("|")[3]){
   }
 }
 if (K<=ress.data.result.length){
-info = ress.data.result[K-1].split("|")
+ info = ress.data.result[K-1].split("|")
       //console.log(info)
       traincode = info[3]  //列车车次
       trainno = info[2]    //列车编码
@@ -152,7 +152,7 @@ for (y=0;y<ress.data.result.length;y++){
 }
 }catch(e){
       $.msg(`火车查询错误❌`,"无此方向列车经过,请检查后重试",e)
-     resolve()
+      resolve()
       return 
      }
    })
@@ -174,14 +174,12 @@ function prize() {
 'User-Agent' : `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/604.3.5 (KHTML, like Gecko) Version/13.0 Safari/604.1`,
 'Accept-Language' : `zh-cn` }
 }
-//console.log(prizeurl)
  $.get(prizeurl, (err, resp, data) => {
     //console.log('票价信息: 响应码: ' +resp.statusCode+" \n"+ data+'\n');
     if ( data == -1){
-$.msg('列车查询失败‼️', '该'+traincode+'次列车车票暂停发售或者查询失败,请重试', err)
+    $.msg('列车查询失败‼️', '该'+traincode+'次列车车票暂停发售或者查询失败,请重试', err)
      return
     }
-try {
    let result = JSON.parse(data)
    if (result.data.M){
    setyideng += `(${result.data.M})  `
@@ -219,12 +217,8 @@ try {
    if (result.data.AJ){
    setyingwo += `(${result.data.AJ})  `
    }
-}
-catch (e){
-  //$.msg('列车票价查询失败‼️', '无'+traincode+'列车票价信息', e)
-   }
-resolve()
   })
+resolve()
  })
 }
 
@@ -235,10 +229,9 @@ function traintime() {
     method: 'GET',
 }
  $.get(myRequest, (err, resp, data) => {
- try {
+   var detail = ""
     //console.log(response.statusCode + "\n\n" + data);
    let result = JSON.parse(data)
-  var detail = ""
    if (result.status == true) {
 const traincode = result.data.data[0].station_train_code
 const arrivetime = result.data.data[0].arrive_time
@@ -283,24 +276,23 @@ if (purpose=='0X00'){
 else {
   purpose = '成人票 '
 }
-
-  detail +='\n'+purpose+ ' (如票价无显示请重试)\n'+leftstation+'到达目的地'+tostation+'历时'+totaltime+'\n'+arrivetime +'--'+starttime+ '  '+stationname
+  if(detail==""){
+    detail += "该列车车票暂停发售或已停运,点击打开详情页查看"
+  }
+else{
+     detail +="\n"+leftstation+'到达目的地'+tostation+'历时'+totaltime+'\n'+arrivetime +'--'+starttime+ '  '+stationname
+}
 for (i=1;i<result.data.data.length;i++){
     detail  += `\n`+result.data.data[i].arrive_time +'--'+result.data.data[i].start_time+ '  '+result.data.data[i].station_name
   }
   const openurl = encodeURI(`https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc&fs=${leftstation},${leftstationcode}&ts=${tostation},${tostationcode}&date=${leftdate}&flag=N,N,Y`)
 const title = traincode+ "次列车"
-const subTitle = '始发站: '+startstation+ '--终点站: '+edstation
-
+const subTitle = '始发站: '+startstation+ '--终点站: '+edstation+' ('+purpose+ ')'
   $.msg(title+ " - 出行日期: " +leftdate, subTitle, detail, { "open-url": `${openurl}`})
-  console.log(traincode+'次列车  \n'+detail)
+  //console.log(traincode+'次列车  \n'+detail)
   }
-} catch (e){
-   console.log(traincode)
-  $.msg('列车查询失败‼️', '无'+traincode+'列车信息', e)
-}
+  resolve()
   })
-   resolve()
  })
 }
 

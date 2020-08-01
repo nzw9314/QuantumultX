@@ -1,6 +1,6 @@
 const $ = new Env('BoxJs')
 
-$.version = '0.6.15'
+$.version = '0.6.18'
 $.versionType = 'beta'
 $.KEY_sessions = 'chavy_boxjs_sessions'
 $.KEY_versions = 'chavy_boxjs_versions'
@@ -12,6 +12,9 @@ $.json = $.name
 $.html = $.name
 
 !(async () => {
+  // 勿扰模式
+  $.isMute = [true, 'true'].includes($.getdata('@chavy_boxjs_userCfgs.isMute'))
+
   const path = getPath($request.url)
   // 处理主页请求 => / 或 /home
   if (/(^\/home|^\/?$)/.test(path)) {
@@ -95,6 +98,7 @@ function getSystemApps() {
     {
       id: 'BoxSetting',
       name: '偏好设置',
+      descs: ['可设置 http-api 地址 & 超时时间 (Surge TF)', '可设置明暗两种主题下的主色调'],
       keys: ['@chavy_boxjs_userCfgs.httpapi', '@chavy_boxjs_userCfgs.color_dark_primary', '@chavy_boxjs_userCfgs.color_light_primary'],
       settings: [
         { id: '@chavy_boxjs_userCfgs.httpapis', name: 'HTTP-API (Surge TF)', val: '', type: 'textarea', placeholder: ',examplekey@127.0.0.1:6166', autoGrow: true, rows: 2, desc: '示例: ,examplekey@127.0.0.1:6166! 注意: 以逗号开头, 逗号分隔多个地址, 可加回车' },
@@ -109,6 +113,7 @@ function getSystemApps() {
     {
       id: 'BoxSwitcher',
       name: '会话切换',
+      desc: '打开静默运行后, 切换会话将不再发出系统通知 \n注: 不影响日志记录',
       keys: [],
       settings: [{ id: 'CFG_BoxSwitcher_isSilent', name: '静默运行', val: false, type: 'boolean', desc: '切换会话时不发出系统通知!' }],
       author: '@chavyleung',
@@ -510,7 +515,7 @@ async function handleHome() {
   const box = await getBoxData()
   $.html = printHtml(JSON.stringify(box))
   if (box.usercfgs.isDebugFormat) {
-    console.log(printHtml(`'\${data}'`, `'\${curapp}'`, `\${curview}`))
+    console.log(printHtml(`'\${data}'`, `'\${appId}'`, `\${curview}`))
   } else if (box.usercfgs.isDebugData) {
     console.log($.html)
   }
@@ -528,9 +533,9 @@ async function handleApp(appId) {
   if (curapp.script && $.isSurge()) {
     await $.getScript(curapp.script).then((script) => (curapp.script_text = script))
   }
-  $.html = printHtml(JSON.stringify(box), JSON.stringify(curapp), 'appsession')
+  $.html = printHtml(JSON.stringify(box), appId)
   if (box.usercfgs.isDebugFormat) {
-    console.log(printHtml(`'\${data}'`, `'\${curapp}'`, `\${curview}`))
+    console.log(printHtml(`'\${data}'`, `'\${appId}'`, `\${curview}`))
   } else if (box.usercfgs.isDebugData) {
     console.log($.html)
   }
@@ -540,7 +545,7 @@ async function handleSub() {
   const box = await getBoxData()
   $.html = printHtml(JSON.stringify(box), null, 'sub')
   if (box.usercfgs.isDebugFormat) {
-    console.log(printHtml(`'\${data}'`, `'\${curapp}'`, `\${curview}`))
+    console.log(printHtml(`'\${data}'`, `'\${appId}'`, `\${curview}`))
   } else if (box.usercfgs.isDebugData) {
     console.log($.html)
   }
@@ -550,7 +555,7 @@ async function handleMy() {
   const box = await getBoxData()
   $.html = printHtml(JSON.stringify(box), null, 'my')
   if (box.usercfgs.isDebugFormat) {
-    console.log(printHtml(`'\${data}'`, `'\${curapp}'`, `\${curview}`))
+    console.log(printHtml(`'\${data}'`, `'\${appId}'`, `\${curview}`))
   } else if (box.usercfgs.isDebugData) {
     console.log($.html)
   }
@@ -711,7 +716,7 @@ function printRevertHtml() {
   `
 }
 
-function printHtml(data, curapp = null, curview = 'app') {
+function printHtml(data, appId = '', curview = 'app') {
   return `
   <!DOCTYPE html>
   <html lang="zh-CN">
@@ -734,6 +739,9 @@ function printHtml(data, curapp = null, curview = 'app') {
         body {
           padding-top: constant(safe-area-inset-top) !important;
           padding-top: env(safe-area-inset-top);
+        }
+        .text-pre-wrap {
+          white-space: pre-wrap !important;
         }
         .v-app-bar,
         .v-navigation-drawer__content {
@@ -912,6 +920,13 @@ function printHtml(data, curapp = null, curview = 'app') {
                 </v-btn>
               </v-list-item>
               <v-list-item class="mt-4">
+                <v-switch dense class="mt-0" hide-details label="勿扰模式" v-model="box.usercfgs.isMute" @change="onUserCfgsChange"></v-switch>
+                <v-spacer></v-spacer>
+                <v-btn fab small text>
+                  <v-avatar size="32"><v-icon>mdi-volume-off</v-icon></v-avatar>
+                </v-btn>
+              </v-list-item>
+              <v-list-item class="mt-4">
                 <v-switch dense class="mt-0" hide-details label="隐藏帮助按钮" v-model="box.usercfgs.isHideHelp" @change="onUserCfgsChange"></v-switch>
                 <v-spacer></v-spacer>
                 <v-btn fab small text @click="onLink(box.syscfgs.boxjs.repo)">
@@ -1044,6 +1059,14 @@ function printHtml(data, curapp = null, curview = 'app') {
                 <v-spacer></v-spacer>
                 <v-btn v-if="ui.curapp.script" icon @click="onRunScript(ui.curapp.script, ui.curapp.script_timeout)"><v-icon color="primary">mdi-play-circle</v-icon></v-btn>
               </v-subheader>
+              <v-card flat class="mx-auto mb-4" color="transparent" v-if="ui.curapp.desc || ui.curapp.descs || ui.curapp.desc_html || ui.curapp.descs_html">
+                <v-card-text class="py-2">
+                  <p v-if="ui.curapp.desc" v-text="ui.curapp.desc" class="body-2 text-pre-wrap"></p>
+                  <p v-for="(desc, descIdx) in ui.curapp.descs" v-text="desc" :class="ui.curapp.descs.length === descIdx + 1 ? 'body-2 text-pre-wrap' : 'mb-0 body-2 text-pre-wrap'"></p>
+                  <p v-if="ui.curapp.desc_html" v-html="ui.curapp.desc_html"></p>
+                  <div v-for="(desc_html, desc_htmlIdx) in ui.curapp.descs_html" v-html="desc_html"></div>
+                </v-card-text>
+              </v-card>
               <v-card class="mx-auto mb-4">
                 <template v-if="Array.isArray(ui.curapp.scripts)">
                   <v-subheader>
@@ -1554,6 +1577,7 @@ function printHtml(data, curapp = null, curview = 'app') {
       <script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/vue-clipboard2@0.3.1/dist/vue-clipboard.min.js"></script>
       <script>
+        const boxdat = ${data}
         new Vue({
           el: '#app',
           vuetify: new Vuetify({ theme: { dark: true } }),
@@ -1563,7 +1587,8 @@ function printHtml(data, curapp = null, curview = 'app') {
                 scrollY: 0,
                 bfview: 'app',
                 curview: '${curview}',
-                curapp: ${curapp},
+                appId: '${appId}',
+                curapp: null,
                 curappTabs: { curtab: 'sessions' },
                 curappSessions: null,
                 overlay: { show: false, val: 60 },
@@ -1589,7 +1614,7 @@ function printHtml(data, curapp = null, curview = 'app') {
                 drawer: { show: false },
                 icons: ['https://raw.githubusercontent.com/Orz-3/mini/master/appstore.png', 'https://raw.githubusercontent.com/Orz-3/task/master/appstore.png']
               },
-              box: ${data}
+              box: boxdat
             }
           },
           computed: {
@@ -1866,7 +1891,7 @@ function printHtml(data, curapp = null, curview = 'app') {
             },
             onClearCurAppSessionData(app, datas, data) {
               this.ui.overlay.show = true
-              const setting = app.settings.find((setting) => setting.id === data.key)
+              const setting = app.settings && app.settings.find((setting) => setting.id === data.key)
               if (setting) {
                 data.val = setting.defval ? setting.defval : ''
                 setting.val = data.val
@@ -1918,23 +1943,15 @@ function printHtml(data, curapp = null, curview = 'app') {
             },
             onSaveSettings() {
               this.ui.overlay.show = true
-              axios
-                .post(
-                  '/api',
-                  JSON.stringify({
-                    cmd: 'saveSettings',
-                    val: this.ui.curapp.settings
-                  })
-                )
-                .finally(() => {
-                  this.ui.curapp.settings.forEach((setting) => {
-                    const data = this.ui.curapp.datas.find((dat) => dat.key === setting.id)
-                    if (data) {
-                      data.val = setting.val
-                    }
-                  })
-                  this.ui.overlay.show = false
+              axios.post('/api', JSON.stringify({ cmd: 'saveSettings', val: this.ui.curapp.settings })).finally(() => {
+                this.ui.curapp.settings.forEach((setting) => {
+                  const data = this.ui.curapp.datas.find((dat) => dat.key === setting.id)
+                  if (data) {
+                    data.val = setting.val
+                  }
                 })
+                this.ui.overlay.show = false
+              })
             },
             onImpSessionPaste() {
               navigator.clipboard.readText().then((text) => {
@@ -2111,13 +2128,6 @@ function printHtml(data, curapp = null, curview = 'app') {
             },
             onRunScript(script_url, script_timeout) {
               this.ui.overlay.show = true
-  
-              // const [key, addr] = this.box.usercfgs.httpapi.split('@')
-              // const apiurl = 'http://' + addr + '/v1/scripting/evaluate'
-              // const body = { script_text: this.ui.curapp.script_text, mock_type: 'cron', timeout: 5 }
-              // const opts = {headers: { 'X-Key': key, 'Accept': '*/*' }}
-              // axios.post(apiurl, body, opts)
-              
               const opts = { script_url, script_timeout }
               axios.post('/api', JSON.stringify({ cmd: 'runScript', val: opts })).finally(() => {
                 this.ui.overlay.show = false
@@ -2129,10 +2139,15 @@ function printHtml(data, curapp = null, curview = 'app') {
                 this.box.usercfgs.subapppanel = []
                 this.box.usercfgs.sysapppanel = []
                 this.onUserCfgsChange()
+                this.$vuetify.goTo(0, { duration: 0, offset: 0 })
               } else if (this.ui.curview === 'sub') {
                 this.onRefreshAppSubs()
+                this.$vuetify.goTo(0, { duration: 0, offset: 0 })
+              } else if (this.ui.curview === 'appsession') {
+                this.ui.curview = 'app'
+              } else {
+                this.$vuetify.goTo(0, { duration: 0, offset: 0 })
               }
-              this.$vuetify.goTo(0, { duration: 0, offset: 0 })
             }
           },
           beforeMount: function () {
@@ -2144,7 +2159,8 @@ function printHtml(data, curapp = null, curview = 'app') {
             this.getContributors()
             this.ui.navi.show = true
             this.ui.box.show = true
-            if (this.ui.curapp) {
+            if (this.ui.appId) {
+              this.ui.curapp = this.apps.find((app) => app.id === this.ui.appId)
               this.goAppSessionView(this.ui.curapp)
             }
             if (this.ui.curview === 'sub') {
@@ -2158,7 +2174,7 @@ function printHtml(data, curapp = null, curview = 'app') {
       </script>
     </body>
   </html>
-  
+
   `
 }
 
@@ -2167,4 +2183,4 @@ function printJson() {
 }
 
 // prettier-ignore
-function Env(t,s){return new class{constructor(t,s){this.name=t,this.data=null,this.dataFile="box.dat",this.logs=[],this.logSeparator="\n",this.startTime=(new Date).getTime(),Object.assign(this,s),this.log("",`\ud83d\udd14${this.name}, \u5f00\u59cb!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient&&"undefined"==typeof $loon}isLoon(){return"undefined"!=typeof $loon}getScript(t){return new Promise(s=>{$.get({url:t},(t,e,i)=>s(i))})}runScript(t,s){return new Promise(e=>{let i=this.getdata("@chavy_boxjs_userCfgs.httpapi");i=i?i.replace(/\n/g,"").trim():i;let o=this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");o=o?1*o:20,o=s&&s.timeout?s.timeout:o;const[h,a]=i.split("@"),r={url:`http://${a}/v1/scripting/evaluate`,body:{script_text:t,mock_type:"cron",timeout:o},headers:{"X-Key":h,Accept:"*/*"}};$.post(r,(t,s,i)=>e(i))}).catch(t=>this.logErr(t))}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s);if(!e&&!i)return{};{const i=e?t:s;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s),o=JSON.stringify(this.data);e?this.fs.writeFileSync(t,o):i?this.fs.writeFileSync(s,o):this.fs.writeFileSync(t,o)}}lodash_get(t,s,e){const i=s.replace(/\[(\d+)\]/g,".$1").split(".");let o=t;for(const t of i)if(o=Object(o)[t],void 0===o)return e;return o}lodash_set(t,s,e){return Object(t)!==t?t:(Array.isArray(s)||(s=s.toString().match(/[^.[\]]+/g)||[]),s.slice(0,-1).reduce((t,e,i)=>Object(t[e])===t[e]?t[e]:t[e]=Math.abs(s[i+1])>>0==+s[i+1]?[]:{},t)[s[s.length-1]]=e,t)}getdata(t){let s=this.getval(t);if(/^@/.test(t)){const[,e,i]=/^@(.*?)\.(.*?)$/.exec(t),o=e?this.getval(e):"";if(o)try{const t=JSON.parse(o);s=t?this.lodash_get(t,i,""):s}catch(t){s=""}}return s}setdata(t,s){let e=!1;if(/^@/.test(s)){const[,i,o]=/^@(.*?)\.(.*?)$/.exec(s),h=this.getval(i),a=i?"null"===h?null:h||"{}":"{}";try{const s=JSON.parse(a);this.lodash_set(s,o,t),e=this.setval(JSON.stringify(s),i)}catch(s){const h={};this.lodash_set(h,o,t),e=this.setval(JSON.stringify(h),i)}}else e=$.setval(t,s);return e}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,s){return this.isSurge()||this.isLoon()?$persistentStore.write(t,s):this.isQuanX()?$prefs.setValueForKey(t,s):this.isNode()?(this.data=this.loaddata(),this.data[s]=t,this.writedata(),!0):this.data&&this.data[s]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,s=(()=>{})){t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon()?$httpClient.get(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status,s(t,e,i))}):this.isQuanX()?$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)):this.isNode()&&(this.initGotEnv(t),this.got(t).on("redirect",(t,s)=>{try{const e=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();this.ckjar.setCookieSync(e,null),s.cookieJar=this.ckjar}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)))}post(t,s=(()=>{})){if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),delete t.headers["Content-Length"],this.isSurge()||this.isLoon())$httpClient.post(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status),s(t,e,i)});else if(this.isQuanX())t.method="POST",$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t));else if(this.isNode()){this.initGotEnv(t);const{url:e,...i}=t;this.got.post(e,i).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t))}}time(t){let s={"M+":(new Date).getMonth()+1,"d+":(new Date).getDate(),"H+":(new Date).getHours(),"m+":(new Date).getMinutes(),"s+":(new Date).getSeconds(),"q+":Math.floor(((new Date).getMonth()+3)/3),S:(new Date).getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,((new Date).getFullYear()+"").substr(4-RegExp.$1.length)));for(let e in s)new RegExp("("+e+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?s[e]:("00"+s[e]).substr((""+s[e]).length)));return t}msg(s=t,e="",i="",o){const h=t=>!t||!this.isLoon()&&this.isSurge()?t:"string"==typeof t?this.isLoon()?t:this.isQuanX()?{"open-url":t}:void 0:"object"==typeof t&&(t["open-url"]||t["media-url"])?this.isLoon()?t["open-url"]:this.isQuanX()?t:void 0:void 0;this.isSurge()||this.isLoon()?$notification.post(s,e,i,h(o)):this.isQuanX()&&$notify(s,e,i,h(o)),this.logs.push("","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="),this.logs.push(s),e&&this.logs.push(e),i&&this.logs.push(i)}log(...t){t.length>0?this.logs=[...this.logs,...t]:console.log(this.logs.join(this.logSeparator))}logErr(t,s){const e=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();e?$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.stack):$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.message)}wait(t){return new Promise(s=>setTimeout(s,t))}done(t={}){const s=(new Date).getTime(),e=(s-this.startTime)/1e3;this.log("",`\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${e} \u79d2`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,s)}
+function Env(t,s){return new class{constructor(t,s){this.name=t,this.data=null,this.dataFile="box.dat",this.logs=[],this.logSeparator="\n",this.startTime=(new Date).getTime(),Object.assign(this,s),this.log("",`\ud83d\udd14${this.name}, \u5f00\u59cb!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient&&"undefined"==typeof $loon}isLoon(){return"undefined"!=typeof $loon}getScript(t){return new Promise(s=>{$.get({url:t},(t,e,i)=>s(i))})}runScript(t,s){return new Promise(e=>{let i=this.getdata("@chavy_boxjs_userCfgs.httpapi");i=i?i.replace(/\n/g,"").trim():i;let o=this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");o=o?1*o:20,o=s&&s.timeout?s.timeout:o;const[h,a]=i.split("@"),r={url:`http://${a}/v1/scripting/evaluate`,body:{script_text:t,mock_type:"cron",timeout:o},headers:{"X-Key":h,Accept:"*/*"}};$.post(r,(t,s,i)=>e(i))}).catch(t=>this.logErr(t))}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s);if(!e&&!i)return{};{const i=e?t:s;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s),o=JSON.stringify(this.data);e?this.fs.writeFileSync(t,o):i?this.fs.writeFileSync(s,o):this.fs.writeFileSync(t,o)}}lodash_get(t,s,e){const i=s.replace(/\[(\d+)\]/g,".$1").split(".");let o=t;for(const t of i)if(o=Object(o)[t],void 0===o)return e;return o}lodash_set(t,s,e){return Object(t)!==t?t:(Array.isArray(s)||(s=s.toString().match(/[^.[\]]+/g)||[]),s.slice(0,-1).reduce((t,e,i)=>Object(t[e])===t[e]?t[e]:t[e]=Math.abs(s[i+1])>>0==+s[i+1]?[]:{},t)[s[s.length-1]]=e,t)}getdata(t){let s=this.getval(t);if(/^@/.test(t)){const[,e,i]=/^@(.*?)\.(.*?)$/.exec(t),o=e?this.getval(e):"";if(o)try{const t=JSON.parse(o);s=t?this.lodash_get(t,i,""):s}catch(t){s=""}}return s}setdata(t,s){let e=!1;if(/^@/.test(s)){const[,i,o]=/^@(.*?)\.(.*?)$/.exec(s),h=this.getval(i),a=i?"null"===h?null:h||"{}":"{}";try{const s=JSON.parse(a);this.lodash_set(s,o,t),e=this.setval(JSON.stringify(s),i)}catch(s){const h={};this.lodash_set(h,o,t),e=this.setval(JSON.stringify(h),i)}}else e=$.setval(t,s);return e}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,s){return this.isSurge()||this.isLoon()?$persistentStore.write(t,s):this.isQuanX()?$prefs.setValueForKey(t,s):this.isNode()?(this.data=this.loaddata(),this.data[s]=t,this.writedata(),!0):this.data&&this.data[s]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,s=(()=>{})){t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon()?$httpClient.get(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status),s(t,e,i)}):this.isQuanX()?$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)):this.isNode()&&(this.initGotEnv(t),this.got(t).on("redirect",(t,s)=>{try{const e=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();this.ckjar.setCookieSync(e,null),s.cookieJar=this.ckjar}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)))}post(t,s=(()=>{})){if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),delete t.headers["Content-Length"],this.isSurge()||this.isLoon())$httpClient.post(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status),s(t,e,i)});else if(this.isQuanX())t.method="POST",$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t));else if(this.isNode()){this.initGotEnv(t);const{url:e,...i}=t;this.got.post(e,i).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t))}}time(t){let s={"M+":(new Date).getMonth()+1,"d+":(new Date).getDate(),"H+":(new Date).getHours(),"m+":(new Date).getMinutes(),"s+":(new Date).getSeconds(),"q+":Math.floor(((new Date).getMonth()+3)/3),S:(new Date).getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,((new Date).getFullYear()+"").substr(4-RegExp.$1.length)));for(let e in s)new RegExp("("+e+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?s[e]:("00"+s[e]).substr((""+s[e]).length)));return t}msg(s=t,e="",i="",o){const h=t=>!t||!this.isLoon()&&this.isSurge()?t:"string"==typeof t?this.isLoon()?t:this.isQuanX()?{"open-url":t}:void 0:"object"==typeof t&&(t["open-url"]||t["media-url"])?this.isLoon()?t["open-url"]:this.isQuanX()?t:void 0:void 0;$.isMute||(this.isSurge()||this.isLoon()?$notification.post(s,e,i,h(o)):this.isQuanX()&&$notify(s,e,i,h(o))),this.logs.push("","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="),this.logs.push(s),e&&this.logs.push(e),i&&this.logs.push(i)}log(...t){t.length>0?this.logs=[...this.logs,...t]:console.log(this.logs.join(this.logSeparator))}logErr(t,s){const e=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();e?$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.stack):$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t)}wait(t){return new Promise(s=>setTimeout(s,t))}done(t={}){const s=(new Date).getTime(),e=(s-this.startTime)/1e3;this.log("",`\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${e} \u79d2`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,s)}
