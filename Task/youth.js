@@ -1,5 +1,5 @@
 /*
-更新时间: 2020-07-05 18:45
+更新时间: 2020-07-31 19:15
 
 赞赏:中青邀请码`46308484`,农妇山泉 -> 有点咸，万分感谢
 
@@ -66,72 +66,75 @@ hostname = *.youth.cn, ios.baertt.com
 ~~~~~~~~~~~~~~~~
 
 */
-const notifyInterval = 50  //通知间隔，默认抽奖每50次通知一次，如需关闭全部通知请设为0
-const logs = 0;   //0为关闭日志，1为开启
+const setnotify = 50  //通知间隔，默认抽奖每50次通知一次，如需关闭全部通知请设为0
+const resplogs = 0;   //0为关闭日志，1为开启
+
 const CookieName = "中青看点"
+const $ = new Env(CookieName)
+let notifyInterval = $.getdata("notifytimes")||setnotify
+let logs = $.getdata("zqlogs")||resplogs
+
 const signheaderKey = 'youthheader_zq'
 const articlebodyKey = 'read_zq'
 const redpbodyKey = 'red_zq'
 const timebodyKey = 'readtime_zq'
-const sy = init()
-const signheaderVal = sy.getdata(signheaderKey)
-const redpbodyVal = sy.getdata(redpbodyKey)
-const articlebodyVal = sy.getdata(articlebodyKey)
-const timebodyVal = sy.getdata(timebodyKey)
+const signheaderVal = $.getdata(signheaderKey)
+const redpbodyVal = $.getdata(redpbodyKey)
+const articlebodyVal = $.getdata(articlebodyKey)
+const timebodyVal = $.getdata(timebodyKey)
 let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
    GetCookie()
 } else {
-   all()
+ !(async () => {
+  await sign(),
+  await signInfo(),
+  await Invitant(),
+  await getAdVideo(),
+  await gameVideo(),
+  await Articlered(),
+  await rotary(),
+  await rotaryCheck(),
+  await punchCard(),
+  await endCard(),
+  await Cardshare(),
+  await openbox(),
+  await share(),
+  await readArticle(),
+  await readTime(),
+  await earningsInfo(),
+  await showmsg()
+})()
+  .catch((e) => $.logErr(e))
+  .finally(() => $.done())
 }
 
 function GetCookie() {
    if ($request && $request.method != `OPTIONS`&& $request.url.match(/\/TaskCenter\/(sign|getSign)/)) {
    const signheaderVal = JSON.stringify($request.headers)
-    if (signheaderVal)        sy.setdata(signheaderVal,signheaderKey)
-    sy.log(`[${CookieName}] 获取Cookie: 成功,signheaderVal: ${signheaderVal}`)
-    sy.msg(CookieName, `获取Cookie: 成功🎉`, ``)
+    if (signheaderVal)        $.setdata(signheaderVal,signheaderKey)
+    $.log(`[${CookieName}] 获取Cookie: 成功,signheaderVal: ${signheaderVal}`)
+    $.msg(CookieName, `获取Cookie: 成功🎉`, ``)
   }
 else if ($request && $request.method != `OPTIONS`&& $request.url.match(/\/article\/complete/)) {
    const articlebodyVal = $request.body
-    if (articlebodyVal)        sy.setdata(articlebodyVal,articlebodyKey)
-    sy.log(`[${CookieName}] 获取阅读: 成功,articlebodyVal: ${articlebodyVal}`)
-    sy.msg(CookieName, `获取阅读请求: 成功🎉`, ``)
+    if (articlebodyVal)        $.setdata(articlebodyVal,articlebodyKey)
+    $.log(`[${CookieName}] 获取阅读: 成功,articlebodyVal: ${articlebodyVal}`)
+    $.msg(CookieName, `获取阅读请求: 成功🎉`, ``)
   }
 else if ($request && $request.method != `OPTIONS`&& $request.url.match(/\/v5\/user\/app_stay/)) {
    const timebodyVal = $request.body
-    if (timebodyVal)        sy.setdata(timebodyVal,timebodyKey)
-    sy.log(`[${CookieName}] 获取阅读: 成功,timebodyVal: ${timebodyVal}`)
-    sy.msg(CookieName, `获取阅读时长: 成功🎉`, ``)
+    if (timebodyVal)        $.setdata(timebodyVal,timebodyKey)
+    $.log(`[${CookieName}] 获取阅读: 成功,timebodyVal: ${timebodyVal}`)
+    $.msg(CookieName, `获取阅读时长: 成功🎉`, ``)
   }
 else if ($request && $request.method != `OPTIONS`&& $request.url.match(/\/article\/red_packet/)) {
    const redpbodyVal = $request.body
-    if (redpbodyVal)        sy.setdata(redpbodyVal,redpbodyKey)
-    sy.log(`[${CookieName}] 获取惊喜红包: 成功,redpbodyVal: ${redpbodyVal}`)
-    sy.msg(CookieName, `获取惊喜红包请求: 成功🎉`, ``)
+    if (redpbodyVal)        $.setdata(redpbodyVal,redpbodyKey)
+    $.log(`[${CookieName}] 获取惊喜红包: 成功,redpbodyVal: ${redpbodyVal}`)
+    $.msg(CookieName, `获取惊喜红包请求: 成功🎉`, ``)
   }
  }
- 
-async function all() 
-{ 
-  await sign();
-  await signInfo();
-  await Invitant();
-  await getAdVideo();
-  await gameVideo();
-  await Articlered();
-  await rotary();
-  await rotaryCheck();
-  await punchCard();
-  await endCard();
-  await Cardshare();
-  await openbox();
-  await share();
-  await readArticle();
-  await readTime();
-  await earningsInfo();
-  await showmsg();
-}
 
 function sign() {      
  return new Promise((resolve, reject) =>
@@ -140,8 +143,8 @@ function sign() {
       url: 'https://kd.youth.cn/TaskCenter/sign', 
       headers: JSON.parse(signheaderVal),
 }
-     sy.post(signurl, (error, response, data) =>{
-      if(logs) sy.log(`${CookieName}, data: ${data}`)
+     $.post(signurl, (error, response, data) =>{
+      if(logs==true? true:false) $.log(`${CookieName}, data: ${data}`)
        signres =JSON.parse(data)
        if (signres.status == 1){
           signresult = `【签到信息】成功`
@@ -154,7 +157,7 @@ function sign() {
         else if(signres.status == 2){
          signresult = `签到失败，Cookie已失效‼️`
          detail= ``
-         sy.msg(CookieName,signresult,detail)
+         $.msg(CookieName,signresult,detail)
          return
          }
        resolve()
@@ -168,9 +171,9 @@ function signInfo() {
       url: 'https://kd.youth.cn/TaskCenter/getSign', 
       headers: JSON.parse(signheaderVal),
 }
-   sy.post(infourl, (error, response, data) =>
+   $.post(infourl, (error, response, data) =>
  {
-   if(logs) sy.log(`${CookieName}, 签到信息: ${data}`)
+if(logs=="true" ? true: false)$.log(`${CookieName}, 签到信息: ${data}`)
       signinfo =JSON.parse(data)
       if (signinfo.status == 1){
          subTitle = `【收益总计】${signinfo.data.user.score}青豆  现金约${signinfo.data.user.money}元`
@@ -193,9 +196,9 @@ function Invitant() {
      headers: JSON.parse(signheaderVal),
      body: `{"code": "46308484"}`,
 }
-   sy.post(url, (error, response, data) =>
+   $.post(url, (error, response, data) =>
  {
-   //sy.log(`Invitdata:${data}`)
+   //$.log(`Invitdata:${data}`)
  })
   aticleshare()
   resolve()
@@ -208,13 +211,12 @@ function aticleshare() {
       url: `https://kd.youth.cn/n/27043840?46746961.html`, 
       headers: {Cookie: JSON.parse(signheaderVal)['Cookie']},
 }
-   sy.get(shareurl, (error, response, data) =>{
-   //sy.log(`data:${data}`)
+   $.get(shareurl, (error, response, data) =>{
+   //$.log(`data:${data}`)
    })
 resolve()
  })
 }
-
 
 //看视频奖励
 function getAdVideo() {      
@@ -224,8 +226,8 @@ function getAdVideo() {
       headers: JSON.parse(signheaderVal),
       body: 'type=taskCenter'
 }
-   sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`视频广告:${data}`)
+   $.post(url, (error, response, data) =>{
+   if(logs=="true"||0 ? true: false) $.log(`视频广告:${data}`)
    adVideores = JSON.parse(data)
    if (adVideores.status==1){
       detail += `【观看视频】  +${adVideores.score}个青豆\n` }
@@ -240,9 +242,9 @@ function gameVideo() {
       url: `https://ios.baertt.com/v5/Game/GameVideoReward.json`, 
       body: articlebodyVal,
 }
-   sy.post(url, (error, response, data) =>
+   $.post(url, (error, response, data) =>
  {
-    if(logs) sy.log(`激励视频:${data}`)
+    if(logs=="true" ? true: false) $.log(`激励视频:${data}`)
    gameres = JSON.parse(data)
    if (gameres.success==true){
      detail += `【激励视频】  ${gameres.items.score}\n`}
@@ -258,9 +260,9 @@ function readArticle() {
       url: `https://ios.baertt.com/v5/article/complete.json`, 
       body: articlebodyVal,
 }
-   sy.post(url, (error, response, data) =>
+   $.post(url, (error, response, data) =>
  {
-   if(logs) sy.log(`阅读奖励:${data}`)
+  if(logs=="true" ? true: false) $.log(`阅读奖励:${data}`)
    readres = JSON.parse(data)
     if (readres.items.max_notice == '\u770b\u592a\u4e45\u4e86\uff0c\u63621\u7bc7\u8bd5\u8bd5'){
      //detail += ` \u770b\u592a\u4e45\u4e86\uff0c\u63621\u7bc7\u8bd5\u8bd5，`
@@ -279,8 +281,8 @@ function Articlered() {
       url: `https://ios.baertt.com/v5/article/red_packet.json`, 
       body: redpbodyVal,
 }
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`阅读附加:${data}`)
+  $.post(url, (error, response, data) =>{
+if(logs=="true" ? true: false)$.log(`阅读附加:${data}`)
    redres = JSON.parse(data)
    if (redres.success==true){
      detail += `【惊喜红包】  +${redres.items.score}个青豆\n`  
@@ -300,8 +302,8 @@ function rotary() {
       headers: JSON.parse(signheaderVal),
       body: rotarbody
 }
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`转盘抽奖:${data}`)
+  $.post(url, (error, response, data) =>{
+ if(logs=="true"||0 ? true: false)$.log(`转盘抽奖:${data}`)
    rotaryres = JSON.parse(data)
    if (rotaryres.status==1){
      detail += `【转盘抽奖】  +${rotaryres.data.score}个青豆 剩余${rotaryres.data.remainTurn}次\n`  
@@ -320,111 +322,32 @@ function rotary() {
 
 //转盘宝箱判断
 function rotaryCheck() { 
- if (rotaryres.code==10010){
-  }
-  else if (100-rotaryres.data.remainTurn==rotaryres.data.chestOpen[0].times){
-    rotary1() 
-  }  
-  else if(100-rotaryres.data.remainTurn==rotaryres.data.chestOpen[1].times){
-    rotary2() 
-  }
-  else if(100-rotaryres.data.remainTurn==rotaryres.data.chestOpen[2].times){
-    rotary3() 
-  }
-  else if(100-rotaryres.data.remainTurn==rotaryres.data.chestOpen[3].times){
-    rotary4() 
-  }
-  else {
-  }
-}
-//开启宝箱1
-function rotary1() {      
- return new Promise((resolve, reject) => {
-  setTimeout(() =>  {
-const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]+'&num=1'
- const time = new Date().getTime()
-    const url = { 
+ return new Promise((resolve) => {
+    time = new Date().getTime();   
+    rotar = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]+'&num='
+  if(rotaryres.code!=10010){
+for (i=0;i<4;i++){
+   if(100-rotaryres.data.remainTurn==rotaryres.data.chestOpen[i].times){
+   rotarbody = rotar+i+1
+   const url = { 
       url: `https://kd.youth.cn/WebApi/RotaryTable/chestReward?_=${time}`, 
       headers: JSON.parse(signheaderVal),
       body: rotarbody
 }
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`转盘宝箱1抽奖:${data}`)
+  $.post(url, (error, response, data) =>{
+    $.log(`转盘宝箱抽奖:${data}`)
    rotaryres1 = JSON.parse(data)
    if (rotaryres1.status==1){
-     detail += `【转盘宝箱1】  +${rotaryres4.data.score}个青豆\n`
+     detail += `【转盘宝箱】  +${rotaryres4.data.score}个青豆\n`
        }
      })
-   resolve()
-   })
+    }
+   }
+  }
+  resolve()
  })
 }
-//开启宝箱2
-function rotary2() {      
- return new Promise((resolve, reject) => {
-  setTimeout(() =>  {
-const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]+'&num=2'
- const time = new Date().getTime()
-    const url = { 
-      url: `https://kd.youth.cn/WebApi/RotaryTable/chestReward?_=${time}`, 
-      headers: JSON.parse(signheaderVal),
-      body: rotarbody
-}
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`转盘宝箱2抽奖:${data}`)
-   rotaryres2 = JSON.parse(data)
-   if (rotaryres2.status==1){
-     detail +=  `【转盘宝箱2】  +${rotaryres4.data.score}个青豆\n`
-       }
-     })
-   resolve()
-   })
- })
-}
-//开启宝箱3
-function rotary3() {      
- return new Promise((resolve, reject) => {
-  setTimeout(() =>  {
-const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]+'&num=3'
- const time = new Date().getTime()
-    const url = { 
-      url: `https://kd.youth.cn/WebApi/RotaryTable/chestReward?_=${time}`, 
-      headers: JSON.parse(signheaderVal),
-      body: rotarbody
-}
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`转盘宝箱3抽奖:${data}`)
-   rotaryres3 = JSON.parse(data)
-   if (rotaryres3.status==1){
-     detail += `【转盘宝箱3】  +${rotaryres4.data.score}个青豆\n` 
-       }
-     })
-   resolve()
-   })
- })
-}
-//开启宝箱4
-function rotary4() {      
- return new Promise((resolve, reject) => {
-  setTimeout(() =>  {
-const rotarbody = signheaderVal.split("&")[15]+'&'+signheaderVal.split("&")[8]+'&num=4'
- const time = new Date().getTime()
-    const url = { 
-      url: `https://kd.youth.cn/WebApi/RotaryTable/chestReward?_=${time}`, 
-      headers: JSON.parse(signheaderVal),
-      body: rotarbody
-}
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`转盘宝箱4抽奖:${data}`)
-   rotaryres4 = JSON.parse(data)
-   if (rotaryres4.status==1){
-     detail += `【转盘宝箱4】  +${rotaryres4.data.score}个青豆\n`  
-       }
-     })
-   resolve()
-   })
- })
-}
+
 //开启打卡
 function punchCard() {      
  return new Promise((resolve, reject) => {
@@ -433,8 +356,8 @@ function punchCard() {
       url: `https://kd.youth.cn/WebApi/PunchCard/signUp?`, 
       headers: JSON.parse(signheaderVal),
 }
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`每日开启打卡:${data}`)
+  $.post(url, (error, response, data) =>{
+   if(logs=="true"||0 ? true: false) $.log(`每日开启打卡:${data}`)
    punchcardstart = JSON.parse(data)
    if (punchcardstart.code==1){
      detail += `【打卡报名】  开启打卡${punchcardstart.msg} ✅ \n`  
@@ -456,8 +379,8 @@ function endCard() {
       url: `https://kd.youth.cn/WebApi/PunchCard/doCard?`, 
       headers: JSON.parse(signheaderVal),
 }
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`打卡结果:${data}`)
+  $.post(url, (error, response, data) =>{
+   if(logs=="true"||0 ? true: false) $.log(`打卡结果:${data}`)
    punchcardend = JSON.parse(data)
    if (punchcardend.code==1){
      detail += `【早起打卡】  ${punchcardend.msg}打卡时间: ${punchcardend.data.card_time} ✅`  
@@ -479,8 +402,8 @@ const starturl = {
       url: `https://kd.youth.cn/WebApi/PunchCard/shareStart?`, 
       headers: JSON.parse(signheaderVal),
 }
-  sy.post(starturl, (error, response, data) =>{
-   if(logs) sy.log(`打卡分享开启:${data}`)
+  $.post(starturl, (error, response, data) =>{
+   if(logs=="true"||0 ? true: false) $.log(`打卡分享开启:${data}`)
    sharestart = JSON.parse(data)
    if (sharestart.code==1){
      //detail += `分享${shareres.msg}`  
@@ -489,8 +412,8 @@ const starturl = {
       url: `https://kd.youth.cn/WebApi/PunchCard/shareEnd?`, 
       headers: JSON.parse(signheaderVal),
      }
-  sy.post(endurl, (error, response, data) =>{
-   if(logs) sy.log(`打卡分享:${data}`)
+  $.post(endurl, (error, response, data) =>{
+   if(logs=="true"||0 ? true: false) $.log(`打卡分享:${data}`)
    shareres = JSON.parse(data)
    if (shareres.code==1){
      detail += `【手机分享】  +${shareres.data.score}个青豆\n`  
@@ -512,8 +435,8 @@ function openbox() {
       url: `https://kd.youth.cn/WebApi/invite/openHourRed`, 
       headers: JSON.parse(signheaderVal),
 }
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`时段开启宝箱:${data}`)
+  $.post(url, (error, response, data) =>{
+   if(logs=="true"||0 ? true: false) $.log(`时段开启宝箱:${data}`)
    boxres = JSON.parse(data)
    if (boxres.code==1){
      detail += `【开启宝箱】  +${boxres.data.score}个青豆 下次奖励${boxres.data.time/60}分钟\n`  
@@ -535,8 +458,8 @@ function share() {
       url: `https://kd.youth.cn/WebApi/invite/shareEnd`, 
       headers: JSON.parse(signheaderVal),
 }
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`宝箱分享:${data}`)
+  $.post(url, (error, response, data) =>{
+   if(logs=="true"||0 ? true: false) $.log(`宝箱分享:${data}`)
    shareres = JSON.parse(data)
    if (shareres.code==1){
      detail += `【宝箱分享】  +${shareres.data.score}个青豆\n`  
@@ -561,8 +484,8 @@ function TurnDouble() {
       headers: JSON.parse(signheaderVal),
       body: rotarbody
 }
-  sy.post(url, (error, response, data) =>{
-   if(logs) sy.log(`转盘双倍奖励:${data}`)
+  $.post(url, (error, response, data) =>{
+   if(logs=="true"||0 ? true: false) $.log(`转盘双倍奖励:${data}`)
    Doubleres = JSON.parse(data)
    if(Doubleres.status==1){
      detail += `【转盘双倍】  +${Doubleres.data.score1}个青豆 剩余${rotaryres.data.doubleNum}次\n`};
@@ -578,8 +501,8 @@ function readTime() {
       url: `https://ios.baertt.com/v5/user/stay.json`, 
       body: timebodyVal,
 }
-  sy.post(url, (error, response, data) =>{
-    if(logs) sy.log(`阅读时长:${data}`)
+  $.post(url, (error, response, data) =>{
+    if(logs=="true"||0 ? true: false) $.log(`阅读时长:${data}`)
     let timeres = JSON.parse(data)
    if (timeres.error_code==0){
      readtimes = timeres.time/60
@@ -601,8 +524,8 @@ function earningsInfo() {
       url: `https://kd.youth.cn/wap/user/balance?${token}`, 
       headers: signheaderVal,
 }
-  sy.get(url, (error, response, data) =>{
-   if(logs) sy.log(`收益信息:${data}`)
+  $.get(url, (error, response, data) =>{
+   //if(logs=="true"||0 ? true: false) $.log(`收益信息:${data}`)
    infores = JSON.parse(data)
    if (infores.status==0){
      detail += `<收益统计>：\n`  
@@ -613,7 +536,6 @@ function earningsInfo() {
      detail += '<今日合计>： '+infores.history[0].score+" 青豆"
       }
     resolve()
-    sy.log(CookieName+" "+nick+"  \n"+subTitle+detail)
      })
    })
  })
@@ -621,58 +543,16 @@ function earningsInfo() {
 
 function showmsg() {  
     if (rotaryres.status==1&&rotaryres.data.remainTurn>=97){
-     sy.msg(CookieName+" "+nick,subTitle,detail)  //默认前三次为通知
+     $.msg(CookieName+" "+nick,subTitle,detail)  //默认前三次为通知
      }
     else if (rotaryres.status==1&&rotaryres.data.remainTurn%notifyInterval==0)    {
-   sy.msg(CookieName+" "+nick,subTitle,detail)//转盘次数/间隔整除时通知
+   $.msg(CookieName+" "+nick,subTitle,detail)//转盘次数/间隔整除时通知
       }
   else if (rotaryres.code==10010&&notifyInterval!=0){
     rotarynum = ` 转盘${rotaryres.msg}🎉`
-   sy.msg(CookieName+" "+nick+"  "+rotarynum,subTitle,detail)//任务全部完成且通知间隔不为0时通知
+   $.msg(CookieName+" "+nick+"  "+rotarynum,subTitle,detail)//任务全部完成且通知间隔不为0时通知
       }  
 }
 
-function init() {
-  isSurge = () => {
-      return undefined === this.$httpClient ? false : true
-    }
-    isQuanX = () => {
-      return undefined === this.$task ? false : true
-    }
-    getdata = (key) => {
-      if (isSurge()) return $persistentStore.read(key)
-      if (isQuanX()) return $prefs.valueForKey(key)
-    }
-    setdata = (key, val) => {
-      if (isSurge()) return $persistentStore.write(key, val)
-      if (isQuanX()) return $prefs.setValueForKey(key, val)
-    }
-    msg = (title, subtitle, body) => {
-      if (isSurge()) $notification.post(title, subtitle, body)
-      if (isQuanX()) $notify(title, subtitle, body)
-    }
-    log = (message) => console.log(message)
-    get = (url, cb) => {
-      if (isSurge()) {
-        $httpClient.get(url, cb)
-      }
-      if (isQuanX()) {
-        url.method = `GET`
-        $task.fetch(url).then((resp) => cb(null, {}, resp.body))
-      }
-    }
-    post = (url, cb) => {
-      if (isSurge()) {
-        $httpClient.post(url, cb)
-      }
-      if (isQuanX()) {
-        url.method = 'POST'
-        $task.fetch(url).then((resp) => cb(null, {}, resp.body))
-      }
-    }
-    done = (value = {}) => {
-      $done(value)
-    }
-    return { isSurge, isQuanX, msg, log, getdata, setdata, get, post, done }
-  }
-
+// prettier-ignore
+function Env(t,s){return new class{constructor(t,s){this.name=t,this.data=null,this.dataFile="box.dat",this.logs=[],this.logSeparator="\n",this.startTime=(new Date).getTime(),Object.assign(this,s),this.log("",`\ud83d\udd14${this.name}, \u5f00\u59cb!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient}isLoon(){return"undefined"!=typeof $loon}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.exists$nc(t),i=!e&&this.fs.exists$nc(s);if(!e&&!i)return{};{const i=e?t:s;try{return JSON.parse(this.fs.readFile$nc(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.exists$nc(t),i=!e&&this.fs.exists$nc(s),o=JSON.stringify(this.data);e?this.fs.writeFile$nc(t,o):i?this.fs.writeFile$nc(s,o):this.fs.writeFile$nc(t,o)}}lodash_get(t,s,e){const i=s.replace(/\[(\d+)\]/g,".$1").split(".");let o=t;for(const t of i)if(o=Object(o)[t],void 0===o)return e;return o}lodash_set(t,s,e){return Object(t)!==t?t:(Array.isArray(s)||(s=s.toString().match(/[^.[\]]+/g)||[]),s.slice(0,-1).reduce((t,e,i)=>Object(t[e])===t[e]?t[e]:t[e]=Math.abs(s[i+1])>>0==+s[i+1]?[]:{},t)[s[s.length-1]]=e,t)}getdata(t){let s=this.getval(t);if(/^@/.test(t)){const[,e,i]=/^@(.*?)\.(.*?)$/.exec(t),o=e?this.getval(e):"";if(o)try{const t=JSON.parse(o);s=t?this.lodash_get(t,i,""):s}catch(t){s=""}}return s}setdata(t,s){let e=!1;if(/^@/.test(s)){const[,i,o]=/^@(.*?)\.(.*?)$/.exec(s),h=this.getval(i),a=i?"null"===h?null:h||"{}":"{}";try{const s=JSON.parse(a);this.lodash_set(s,o,t),e=this.setval(JSON.stringify(s),i),console.log(`${i}: ${JSON.stringify(s)}`)}catch(s){const h={};this.lodash_set(h,o,t),e=this.setval(JSON.stringify(h),i),console.log(`${i}: ${JSON.stringify(h)}`)}}else e=$.setval(t,s);return e}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,s){return this.isSurge()||this.isLoon()?$persistentStore.write(t,s):this.isQuanX()?$prefs.setValueForKey(t,s):this.isNode()?(this.data=this.loaddata(),this.data[s]=t,this.writedata(),!0):this.data&&this.data[s]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,s=(()=>{})){t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon()?$httpClient.get(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status,s(t,e,i))}):this.isQuanX()?$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)):this.isNode()&&(this.initGotEnv(t),this.got(t).on("redirect",(t,s)=>{try{const e=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();this.ckjar.setCookie$nc(e,null),s.cookieJar=this.ckjar}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)))}post(t,s=(()=>{})){if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),this.isSurge()||this.isLoon())$httpClient.post(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status),s(t,e,i)});else if(this.isQuanX())t.method="POST",$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t));else if(this.isNode()){this.initGotEnv(t);const{url:e,...i}=t;this.got.post(e,i).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t))}}msg(s=t,e="",i="",o){const h=t=>!t||!this.isLoon()&&this.isSurge()?t:"string"==typeof t?this.isLoon()?t:this.isQuanX()?{"open-url":t}:void 0:"object"==typeof t&&(t["open-url"]||t["media-url"])?this.isLoon()?t["open-url"]:this.isQuanX()?t:void 0:void 0;this.isSurge()||this.isLoon()?$notification.post(s,e,i,h(o)):this.isQuanX()&&$notify(s,e,i,h(o)),this.logs.push("","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="),this.logs.push(s),e&&this.logs.push(e),i&&this.logs.push(i)}log(...t){t.length>0?this.logs=[...this.logs,...t]:console.log(this.logs.join(this.logSeparator))}logErr(t,s){const e=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();e?$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.stack):$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.message)}wait(t){return new Promise(s=>setTimeout(s,t))}done(t={}){const s=(new Date).getTime(),e=(s-this.startTime)/1e3;this.log("",`\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${e} \u79d2`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,s)}

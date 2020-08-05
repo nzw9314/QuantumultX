@@ -90,8 +90,8 @@ if ($request && $request.method != 'OPTIONS' && $request.url.match(/\/video\/mac
 async function all() 
 { 
   await getsign(),
-  await doCard(),
-  await Judgment()
+  await doCard()
+  await paysign()
 }
 
 
@@ -148,17 +148,6 @@ function doCard() {
   })
 }
 
-function Judgment() {
-  if (payheaderVal !== undefined|null)
-     {  
-    paysign()  
-   }
-else {
-   subTitle += `  微博钱包未获取Cookie❌`
-   sy.msg(CookieName+nickname, subTitle, detail)
-   return
-   }
-}
 
 // 钱包签到
 function paysign() {
@@ -186,9 +175,12 @@ sy.post(payurl, (error, response, data) => {
        sy.msg(CookieName+nickname, subTitle, detail)
         }
     catch(e){
-         sy.msg(CookieName+nickname, subTitle+`  钱包Cookie失效 ❎`, detail)
+       sy.msg(CookieName+nickname, subTitle+`  钱包Cookie失效 ❎`, detail)
        }
      })
+    }
+    else {
+sy.msg(CookieName+nickname, subTitle+`  未获取钱包Cookie ❎`, detail)
     }
   resolve()
   })

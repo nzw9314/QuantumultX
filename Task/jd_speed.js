@@ -1,97 +1,24 @@
-// 京东天天加速活动 国内gitee链接：https://gitee.com/lxk0301/scripts/raw/master/jd_speed.js
-// 每天4京豆，再小的苍蝇也是肉
-// 从 https://github.com/Zero-S1/JD_tools/blob/master/JD_speed.py 改写来的
-// cron 1 */3 * * *
-// 建议3小时运行一次，打卡时间间隔是6小时
-//有bug来我这提Issue反馈 https://gitee.com/lxk0301/scripts
-const $hammer = (() => {
-  const isRequest = "undefined" != typeof $request,
-      isSurge = "undefined" != typeof $httpClient,
-      isQuanX = "undefined" != typeof $task;
-
-  const log = (...n) => { for (let i in n) console.log(n[i]) };
-  const alert = (title, body = "", subtitle = "", link = "") => {
-    if (isSurge) return $notification.post(title, subtitle, body, link);
-    if (isQuanX) return $notify(title, subtitle, (link && !body ? link : body));
-    log("==============📣系统通知📣==============");
-    log("title:", title, "subtitle:", subtitle, "body:", body, "link:", link);
-  };
-  const read = key => {
-    if (isSurge) return $persistentStore.read(key);
-    if (isQuanX) return $prefs.valueForKey(key);
-  };
-  const write = (val, key) => {
-    if (isSurge) return $persistentStore.write(val, key);
-    if (isQuanX) return $prefs.setValueForKey(val, key);
-  };
-  const request = (method, params, callback) => {
-    /**
-     *
-     * params(<object>): {url: <string>, headers: <object>, body: <string>} | <url string>
-     *
-     * callback(
-     *      error,
-     *      <response-body string>?,
-     *      {status: <int>, headers: <object>, body: <string>}?
-     * )
-     *
-     */
-    let options = {};
-    if (typeof params == "string") {
-      options.url = params;
-    } else {
-      options.url = params.url;
-      if (typeof params == "object") {
-        params.headers && (options.headers = params.headers);
-        params.body && (options.body = params.body);
-      }
-    }
-    method = method.toUpperCase();
-
-    const writeRequestErrorLog = function (m, u) {
-      return err => {
-        log("=== request error -s--");
-        log(`${m} ${u}`, err);
-        log("=== request error -e--");
-      };
-    }(method, options.url);
-
-    if (isSurge) {
-      const _runner = method == "GET" ? $httpClient.get : $httpClient.post;
-      return _runner(options, (error, response, body) => {
-        if (error == null || error == "") {
-          response.body = body;
-          callback("", body, response);
-        } else {
-          writeRequestErrorLog(error);
-          callback(error);
-        }
-      });
-    }
-    if (isQuanX) {
-      options.method = method;
-      $task.fetch(options).then(
-          response => {
-            response.status = response.statusCode;
-            delete response.statusCode;
-            callback("", response.body, response);
-          },
-          reason => {
-            writeRequestErrorLog(reason.error);
-            callback(reason.error);
-          }
-      );
-    }
-  };
-  const done = (value = {}) => {
-    if (isQuanX) return isRequest ? $done(value) : null;
-    if (isSurge) return isRequest ? $done(value) : $done();
-  };
-  return { isRequest, isSurge, isQuanX, log, alert, read, write, request, done };
-})();
-//直接用NobyDa的jd cookie
-const cookie = $hammer.read('CookieJD')
+/*
+京东天天加速活动 国内gitee链接：https://gitee.com/lxk0301/scripts/raw/master/jd_speed.js
+更新时间:2020-07-21
+每天4京豆，再小的苍蝇也是肉
+从 https://github.com/Zero-S1/JD_tools/blob/master/JD_speed.py 改写来的
+建议3小时运行一次，打卡时间间隔是6小时
+注：如果使用Node.js, 需自行安装'crypto-js,got,http-server,tough-cookie'模块. 例: npm install crypto-js http-server tough-cookie got --save
+*/
+// quantumultx
+// [task_local]
+// #天天加速
+// 8 */3 * * * https://gitee.com/lxk0301/scripts/raw/master/jd_speed.js, tag=京东天天加速, img-url=https://raw.githubusercontent.com/znz1992/Gallery/master/jdttjs.png, enabled=true
+// Loon
+// [Script]
+// cron "8 */3 * * *" script-path=https://gitee.com/lxk0301/scripts/raw/master/jd_speed.js,tag=京东天天加速
 const name = '天天加速';
+const $ = new Env(name);
+const Key = '';//单引号内自行填写您抓取的京东Cookie
+//直接用NobyDa的jd cookie
+const cookie =  Key ? Key : $.getdata('CookieJD');
+let jdNotify = $.getdata('jdSpeedNotify');
 const JD_API_HOST = 'https://api.m.jd.com/';
 let gen = entrance();
 gen.next();
@@ -104,71 +31,68 @@ let destination = null;
 let source_id = null;
 let done_distance = null;
 let task_status = null, able_energeProp_list = [], spaceEvents = [], energePropUsale = [];
-async function* entrance() {
+function* entrance() {
   if (!cookie) {
-    return $hammer.alert(name, '请先获取cookie\n直接使用NobyDa的京东签到获取');
+    $.msg(name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', { "open-url": "https://bean.m.jd.com/" });
+    $.done();
+    return
   }
   console.log(`start...`);
   yield flyTask_state();
+  console.log(`task_status::${task_status}`)
   if (task_status === 0) {
     console.log(`开启新任务：${JSON.stringify(destination)}`);
     yield flyTask_start(source_id)
   } else if (task_status === 1) {
     console.log(`任务进行中：${JSON.stringify(destination)}`);
+  } else if (task_status === 2) {
+    $.msg(name, subTitle, '天天加速2个京豆已到账');
+    yield flyTask_state();
+    console.log(`task_status::${task_status}`)
+    console.log(`开启新任务：${JSON.stringify(destination)}`);
+    yield flyTask_start(source_id);
+  }
+
+  yield spaceEvent_list();//检查太空特殊事件
+  console.log(`可处理的太空特殊事件信息:${spaceEvents.length}个`);
+  if (spaceEvents && spaceEvents.length > 0) {
+    yield spaceEvent();//处理太空特殊事件
   }
   console.log('开始检查可领取燃料')
   yield energyPropList();
-  console.log(`可领取燃料::${JSON.stringify(able_energeProp_list)}`)
+  console.log(`可领取燃料::${able_energeProp_list.length}个`)
   if (able_energeProp_list && able_energeProp_list.length > 0) {
-    //开始领取燃料
-    for (let i of able_energeProp_list) {
-      let memberTaskCenterRes =  await _energyProp_gain(i.id);
-      console.log(`领取燃料结果：：：${JSON.stringify(memberTaskCenterRes)}`)
-    }
-  } else {
-    console.log('没有可领取的燃料')
+    yield receiveeEergyProp();
   }
-  yield spaceEvent_list();
-  console.log(`可处理的特殊事件信息:${JSON.stringify(spaceEvents)}`);
-  if (spaceEvents && spaceEvents.length > 0) {
-    for (let item of spaceEvents) {
-      let spaceEventRes = await spaceEventHandleEvent(item.id, item.value);
-      console.log(`处理特殊事件的结果：：${JSON.stringify(spaceEventRes)}`)
-    }
-  } else {
-    console.log('没有可处理的特殊事件')
-  }
-  yield energePropUsaleList();
+  yield energePropUsaleList();//检查剩余可用的燃料
+  console.log(`可使用燃料${energePropUsale.length}个`)
   if (energePropUsale && energePropUsale.length > 0) {
-    for (let i of energePropUsale) {
-      let _energyProp_use = await energyPropUse(i.id);
-      console.log(`使用燃料的结果：：${JSON.stringify(_energyProp_use)}`)
-    }
-  } else {
-    console.log('暂无可用燃料')
+    yield useEnergy();
   }
   //执行上面操作后，再进行一次检测
   yield flyTask_state();
   if (task_status === 0) {
     console.log(`开启新任务：${JSON.stringify(destination)}`);
-    yield flyTask_start(source_id)
+    yield flyTask_start(source_id);
+    // fix bug ，开启新任务后，再次检查可用的燃料，如果有可用的，继续使用
+    yield energePropUsaleList();//检查剩余可用的燃料
+    console.log(`可使用燃料${energePropUsale.length}个`)
+    if (energePropUsale && energePropUsale.length > 0) {
+      yield useEnergy();
+    }
   } else if (task_status === 1) {
     console.log(`任务进行中：${JSON.stringify(destination)}`);
+  } else if (task_status === 2) {
+    $.msg(name, subTitle, '天天加速2个京豆已到账');
+    yield flyTask_state();
+    console.log(`task_status::${task_status}`)
+    console.log(`开启新任务：${JSON.stringify(destination)}`);
+    yield flyTask_start(source_id);
   }
-  $hammer.alert(name, message, subTitle);
-}
-//开始新的任务
-function flyTask_start(source_id) {
-  if (!source_id) return;
-  const functionId = arguments.callee.name.toString();
-  const body = {
-    "source":"game",
-    "source_id": source_id
+  if (!jdNotify || jdNotify === 'false') {
+    $.msg(name, subTitle, message);
   }
-  request(functionId, body).then(res => {
-    console.log(`开启新的任务:${JSON.stringify(res)}`);
-    gen.next();
-  })
+  $.done();
 }
 //检查燃料
 function energyPropList() {
@@ -187,7 +111,16 @@ function energyPropList() {
     gen.next();
   })
 }
-// 领取燃料
+
+async function receiveeEergyProp() {
+  //开始领取燃料
+  for (let i of able_energeProp_list) {
+    let memberTaskCenterRes =  await _energyProp_gain(i.id);
+    console.log(`领取燃料结果：：：${memberTaskCenterRes.message}`)
+  }
+  gen.next();
+}
+// 领取燃料调用的api
 function _energyProp_gain(energy_id) {
   console.log('energy_id', energy_id)
   if (!energy_id) return;
@@ -225,6 +158,15 @@ function spaceEvent_list() {
     gen.next();
   })
 }
+// 处理太空特殊事件
+async function spaceEvent() {
+  for (let item of spaceEvents) {
+    let spaceEventRes = await spaceEventHandleEvent(item.id, item.value);
+    console.log(`处理特殊事件的结果：：${JSON.stringify(spaceEventRes)}`)
+  }
+  gen.next();
+}
+//处理太空特殊事件调用的api
 function spaceEventHandleEvent(id, value) {
   if (!id && !value) return;
   const body = {
@@ -243,7 +185,8 @@ function energePropUsaleList() {
     "source":"game"
   };
   request('energyProp_usalbeList', body).then(res => {
-    console.log(`检查剩余燃料${JSON.stringify(res)}`)
+    console.log(`检查剩余燃料`);
+    energePropUsale = [];
     if (res.code === 0 && res.data && res.data.length > 0) {
       res.data.map(item => {
         energePropUsale.push(item)
@@ -252,6 +195,21 @@ function energePropUsaleList() {
     gen.next();
   });
 }
+
+//使用能源
+async function useEnergy() {
+  for (let i of energePropUsale) {
+    let _energyProp_use = await energyPropUse(i.id);
+    console.log(`使用燃料的结果：：${_energyProp_use.message}`)
+    if (_energyProp_use.code !== 0) {
+      console.log(`${_energyProp_use.message},跳出循环`);
+      $.msg($.name, '', "【上轮太空旅行】2 🐶京豆已到账");
+      break
+    }
+  }
+  gen.next();
+}
+//使用能源调用的api
 function energyPropUse(id) {
   if (!id) return
   const body = {
@@ -264,15 +222,33 @@ function energyPropUse(id) {
     })
   })
 }
+//开始新的任务
+function flyTask_start(source_id) {
+  if (!source_id) return;
+  const functionId = arguments.callee.name.toString();
+  const body = {
+    "source":"game",
+    "source_id": source_id
+  }
+  request(functionId, body).then(res => {
+    console.log(`新的任务结束时间:${res.data.end_time}`);
+    gen.next();
+  })
+}
 function flyTask_state() {
   const functionId = arguments.callee.name.toString();
   const body = {
     "source":"game"
   }
   request(functionId, body).then((res) => {
-    console.log(`初始化信息flyTask_state:${JSON.stringify(res)}`)
+    // console.log(`初始化信息flyTask_state:${JSON.stringify(res)}`)
     if (res.code === 0) {
-      console.log('走了if--code=0')
+      if (res.info.isLogin === 0) {
+        $.setdata('', 'CookieJD');//cookie失效，故清空cookie。
+        $.msg(name, '【提示】京东cookie已失效,请重新登录获取', 'https://bean.m.jd.com/', {"open-url": "https://bean.m.jd.com/"});
+        $.done();
+        return
+      }
       let data = res.data;
       if (data.beans_num) {
         beans_num = data.beans_num
@@ -281,48 +257,41 @@ function flyTask_state() {
         done_distance = data.done_distance
         source_id = data.source_id//根据source_id 启动flyTask_start()
         task_status = data.task_status //0,没开始；1，已开始
-        subTitle = `【奖励】：${beans_num}京豆`
+        subTitle = `【奖励】${beans_num}京豆`
         if (indexState === 1) {
-          message += `【空间站】 ${destination}`;
+          message += `【空间站】 ${destination}\n`;
+          message += `【结束时间】 ${data['end_time']}\n`;
+          message += `【进度】 ${((res.data.done_distance / res.data.distance) * 100).toFixed(2)}%\n`;
         }
         indexState++;
       }
       gen.next();
     } else {
-      console.log('else????');
       gen.return()
     }
   })
 }
 
 async function request(function_id, body = {}) {
-  // $hammer.request('GET', taskurl(function_id, body), (error, response) => {
-  //   // error ? $hammer.log("Error:", error) : sleep(JSON.parse(response));
-  //   if(error){
-  //     $hammer.log("Error:", error);
-  //   }else{
-  //     sleep(JSON.parse(_jsonpToJson(response)));
-  //   }
-  // });
-  await sleep(2);
+  await $.wait(300);//延迟两秒
   return new Promise((resolve, reject) => {
-    $hammer.request('GET', taskurl(function_id, body), (error, response) => {
-      if(error){
-        $hammer.log("Error:", error);
-      }else{
-        resolve(JSON.parse(_jsonpToJson(response)));
+    $.get(taskurl(function_id, body), (err, resp, data) => {
+      if (err) {
+        console.log("=== request error -s--");
+        console.log("=== request error -e--");
+      } else {
+        try {
+          data = JSON.parse(_jsonpToJson(data))
+        } catch (e) {
+          console.log(e)
+        } finally {
+          resolve(data)
+        }
       }
     })
   })
 }
 
-function sleep(s) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve();
-    }, s * 1000);
-  })
-}
 function _jsonpToJson(v) {
   return v.match(/{.*}/)[0]
 }
@@ -347,3 +316,5 @@ function taskurl(function_id, body) {
     }
   }
 }
+// prettier-ignore
+function Env(t,s){return new class{constructor(t,s){this.name=t,this.data=null,this.dataFile="box.dat",this.logs=[],this.logSeparator="\n",this.startTime=(new Date).getTime(),Object.assign(this,s),this.log("",`\ud83d\udd14${this.name}, \u5f00\u59cb!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient}isLoon(){return"undefined"!=typeof $loon}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s);if(!e&&!i)return{};{const i=e?t:s;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s),o=JSON.stringify(this.data);e?this.fs.writeFileSync(t,o):i?this.fs.writeFileSync(s,o):this.fs.writeFileSync(t,o)}}lodash_get(t,s,e){const i=s.replace(/\[(\d+)\]/g,".$1").split(".");let o=t;for(const t of i)if(o=Object(o)[t],void 0===o)return e;return o}lodash_set(t,s,e){return Object(t)!==t?t:(Array.isArray(s)||(s=s.toString().match(/[^.[\]]+/g)||[]),s.slice(0,-1).reduce((t,e,i)=>Object(t[e])===t[e]?t[e]:t[e]=Math.abs(s[i+1])>>0==+s[i+1]?[]:{},t)[s[s.length-1]]=e,t)}getdata(t){let s=this.getval(t);if(/^@/.test(t)){const[,e,i]=/^@(.*?)\.(.*?)$/.exec(t),o=e?this.getval(e):"";if(o)try{const t=JSON.parse(o);s=t?this.lodash_get(t,i,""):s}catch(t){s=""}}return s}setdata(t,s){let e=!1;if(/^@/.test(s)){const[,i,o]=/^@(.*?)\.(.*?)$/.exec(s),h=this.getval(i),a=i?"null"===h?null:h||"{}":"{}";try{const s=JSON.parse(a);this.lodash_set(s,o,t),e=this.setval(JSON.stringify(s),i),console.log(`${i}: ${JSON.stringify(s)}`)}catch(s){const h={};this.lodash_set(h,o,t),e=this.setval(JSON.stringify(h),i),console.log(`${i}: ${JSON.stringify(h)}`)}}else e=$.setval(t,s);return e}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,s){return this.isSurge()||this.isLoon()?$persistentStore.write(t,s):this.isQuanX()?$prefs.setValueForKey(t,s):this.isNode()?(this.data=this.loaddata(),this.data[s]=t,this.writedata(),!0):this.data&&this.data[s]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,s=(()=>{})){t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon()?$httpClient.get(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status,s(t,e,i))}):this.isQuanX()?$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)):this.isNode()&&(this.initGotEnv(t),this.got(t).on("redirect",(t,s)=>{try{const e=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();this.ckjar.setCookieSync(e,null),s.cookieJar=this.ckjar}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)))}post(t,s=(()=>{})){if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),delete t.headers["Content-Length"],this.isSurge()||this.isLoon())$httpClient.post(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status),s(t,e,i)});else if(this.isQuanX())t.method="POST",$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t));else if(this.isNode()){this.initGotEnv(t);const{url:e,...i}=t;this.got.post(e,i).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t))}}msg(s=t,e="",i="",o){const h=t=>!t||!this.isLoon()&&this.isSurge()?t:"string"==typeof t?this.isLoon()?t:this.isQuanX()?{"open-url":t}:void 0:"object"==typeof t&&(t["open-url"]||t["media-url"])?this.isLoon()?t["open-url"]:this.isQuanX()?t:void 0:void 0;this.isSurge()||this.isLoon()?$notification.post(s,e,i,h(o)):this.isQuanX()&&$notify(s,e,i,h(o)),this.logs.push("","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="),this.logs.push(s),e&&this.logs.push(e),i&&this.logs.push(i)}log(...t){t.length>0?this.logs=[...this.logs,...t]:console.log(this.logs.join(this.logSeparator))}logErr(t,s){const e=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();e?$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.stack):$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.message)}wait(t){return new Promise(s=>setTimeout(s,t))}done(t={}){const s=(new Date).getTime(),e=(s-this.startTime)/1e3;this.log("",`\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${e} \u79d2`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,s)}
