@@ -33,18 +33,21 @@ function Env(name, opts) {
       })
     }
 
-    runScript(script) {
+    runScript(script, runOpts) {
       return new Promise((resolve) => {
         let httpapi = this.getdata('@chavy_boxjs_userCfgs.httpapi')
         httpapi = httpapi ? httpapi.replace(/\n/g, '').trim() : httpapi
+        let httpapi_timeout = this.getdata('@chavy_boxjs_userCfgs.httpapi_timeout')
+        httpapi_timeout = httpapi_timeout ? httpapi_timeout * 1 : 20
+        httpapi_timeout = runOpts && runOpts.timeout ? runOpts.timeout : httpapi_timeout
         const [key, addr] = httpapi.split('@')
         const opts = {
           url: `http://${addr}/v1/scripting/evaluate`,
-          body: { script_text: script, mock_type: 'cron', timeout: 5 },
+          body: { script_text: script, mock_type: 'cron', timeout: httpapi_timeout },
           headers: { 'X-Key': key, 'Accept': '*/*' }
         }
         $.post(opts, (err, resp, body) => resolve(body))
-      })
+      }).catch((e) => this.logErr(e))
     }
     loaddata() {
       if (this.isNode()) {
@@ -131,12 +134,10 @@ function Env(name, opts) {
           const objedval = JSON.parse(objval)
           this.lodash_set(objedval, paths, val)
           issuc = this.setval(JSON.stringify(objedval), objkey)
-          console.log(`${objkey}: ${JSON.stringify(objedval)}`)
         } catch (e) {
           const objedval = {}
           this.lodash_set(objedval, paths, val)
           issuc = this.setval(JSON.stringify(objedval), objkey)
-          console.log(`${objkey}: ${JSON.stringify(objedval)}`)
         }
       } else {
         issuc = $.setval(val, key)
@@ -194,8 +195,8 @@ function Env(name, opts) {
           if (!err && resp) {
             resp.body = body
             resp.statusCode = resp.status
-            callback(err, resp, body)
           }
+          callback(err, resp, body)
         })
       } else if (this.isQuanX()) {
         $task.fetch(opts).then(
@@ -318,10 +319,12 @@ function Env(name, opts) {
           return undefined
         }
       }
-      if (this.isSurge() || this.isLoon()) {
-        $notification.post(title, subt, desc, toEnvOpts(opts))
-      } else if (this.isQuanX()) {
-        $notify(title, subt, desc, toEnvOpts(opts))
+      if (!$.isMute) {
+        if (this.isSurge() || this.isLoon()) {
+          $notification.post(title, subt, desc, toEnvOpts(opts))
+        } else if (this.isQuanX()) {
+          $notify(title, subt, desc, toEnvOpts(opts))
+        }
       }
       this.logs.push('', '==============📣系统通知📣==============')
       this.logs.push(title)
@@ -340,7 +343,7 @@ function Env(name, opts) {
     logErr(err, msg) {
       const isPrintSack = !this.isSurge() && !this.isQuanX() && !this.isLoon()
       if (!isPrintSack) {
-        $.log('', `❗️${this.name}, 错误!`, err.message)
+        $.log('', `❗️${this.name}, 错误!`, err)
       } else {
         $.log('', `❗️${this.name}, 错误!`, err.stack)
       }

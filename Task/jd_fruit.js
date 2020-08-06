@@ -1,6 +1,6 @@
 /*
 jd免费水果 搬的https://github.com/liuxiaoyucc/jd-helper/blob/a6f275d9785748014fc6cca821e58427162e9336/fruit/fruit.js
-更新时间:2020-07-29
+更新时间:2020-07-30
 // quantumultx
 [task_local]
 #jd免费水果
@@ -30,7 +30,6 @@ let shareCodes = [ // 这个列表填入你要助力的好友的shareCode
   'f92cb56c6a1349f5a35f0372aa041ea0',
   'a9360baeceb04c9baaaa109f5d428d3c',
   '61ff5c624949454aa88561f2cd721bf6',
-  '40dbf12bb7ea4b8eb772741afe2125da'
 ]
 // 添加box功能
 // 【用box订阅的好处】
@@ -176,6 +175,14 @@ function* step() {
         console.log(`打卡结果${JSON.stringify(clockInForFarmRes)}`);
         if (clockInForFarmRes.code === '0') {
           message += `【第${clockInForFarmRes.signDay}天签到】获得${clockInForFarmRes.amount}g💧\n`//连续签到${signResult.signDay}天
+          if (clockInForFarmRes.signDay === 7) {
+            //可以领取惊喜礼包
+            console.log('开始领取--惊喜礼包38g水滴');
+            let gotClockInGiftRes = yield gotClockInGift();
+            if (gotClockInGiftRes.code === '0') {
+              message += `【惊喜礼包】获得${gotClockInGiftRes.amount}g💧\n`
+            }
+          }
           // if (clockInForFarmRes.todayGotWaterGoalTask.canPop) {
           //   let goalResult = yield gotWaterGoalTaskForFarm();
           //   console.log(`被水滴砸中奖励:${JSON.stringify(goalResult)}`);
@@ -186,13 +193,13 @@ function* step() {
         }
       }
       // 连续七天签到-惊喜礼包
-      if (!clockInInit.gotClockInGift && clockInInit.totalSigned === 7) {
-        console.log('开始领取--惊喜礼包38g水滴');
-        let gotClockInGiftRes = yield gotClockInGift();
-        if (gotClockInGiftRes.code === '0') {
-          message += `【惊喜礼包】获得${gotClockInGiftRes.amount}g💧\n`
-        }
-      }
+      // if (!clockInInit.gotClockInGift && clockInInit.totalSigned === 7) {
+      //   console.log('开始领取--惊喜礼包38g水滴');
+      //   let gotClockInGiftRes = yield gotClockInGift();
+      //   if (gotClockInGiftRes.code === '0') {
+      //     message += `【惊喜礼包】获得${gotClockInGiftRes.amount}g💧\n`
+      //   }
+      // }
       // 限时关注得水滴
       if (clockInInit.themes && clockInInit.themes.length > 0) {
         for (let item of clockInInit.themes) {
@@ -368,7 +375,81 @@ function* step() {
     console.log('助力好友结束，即将开始每日浇水任务');
     // console.log('当前水滴剩余: ' + farmInfo.farmUserPro.totalEnergy);
     // farmTask = yield taskInitForFarm();
+    //天天抽奖得好礼
+    let initForTurntableFarmRes = yield initForTurntableFarm();
+    if (initForTurntableFarmRes.code === '0') {
+      //领取定时奖励 //4小时一次
+      let {timingIntervalHours, timingLastSysTime, sysTime, timingGotStatus, remainLotteryTimes, turntableInfos} = initForTurntableFarmRes;
 
+      if (!timingGotStatus) {
+        console.log(`是否到了领取免费赠送的抽奖机会----${sysTime > (timingLastSysTime + 60*60*timingIntervalHours*1000)}`)
+        if (sysTime > (timingLastSysTime + 60*60*timingIntervalHours*1000)) {
+          let timingAwardRes = yield timingAwardForTurntableFarm();
+          console.log(`领取定时奖励结果${JSON.stringify(timingAwardRes)}`);
+          initForTurntableFarmRes = yield initForTurntableFarm();
+          remainLotteryTimes = initForTurntableFarmRes.remainLotteryTimes;
+        } else {
+          console.log(`免费赠送的抽奖机会未到时间`)
+        }
+      } else {
+        console.log('4小时候免费赠送的抽奖机会已领取')
+      }
+      //天天抽奖助力
+      console.log('开始天天抽奖--好友助力--每人每天只有三次助力机会.')
+      for (let code of shareCodes) {
+        if (code === farmInfo.farmUserPro.shareCode) {
+          console.log('天天抽奖-不能自己给自己助力\n')
+          continue
+        }
+        let lotteryMasterHelpRes = yield lotteryMasterHelp(code);
+        // console.log('天天抽奖助力结果',lotteryMasterHelpRes.helpResult)
+        if (lotteryMasterHelpRes.helpResult.code === '0') {
+          console.log(`天天抽奖-助力${lotteryMasterHelpRes.helpResult.masterUserInfo.nickName}成功\n`)
+        } else if (lotteryMasterHelpRes.helpResult.code === '11') {
+          console.log(`天天抽奖-不要重复助力${lotteryMasterHelpRes.helpResult.masterUserInfo.nickName}\n`)
+        } else if (lotteryMasterHelpRes.helpResult.code === '13') {
+          console.log(`天天抽奖-助力${lotteryMasterHelpRes.helpResult.masterUserInfo.nickName}失败,助力次数耗尽\n`);
+          break;
+        }
+        //lotteryMasterHelp
+      }
+      console.log(`---天天抽奖次数remainLotteryTimes----${remainLotteryTimes}次`)
+      //抽奖
+      if (remainLotteryTimes > 0) {
+        console.log('开始抽奖')
+        let lotteryResult = '';
+        for (let i = 0; i < new Array(remainLotteryTimes).fill('').length; i++) {
+          let lotteryRes = yield lotteryForTurntableFarm()
+          console.log(`第${i + 1}次抽奖结果${JSON.stringify(lotteryRes)}`);
+          if (lotteryRes.code === '0') {
+            turntableInfos.map((item) => {
+              if (item.type === lotteryRes.type) {
+                console.log(`lotteryRes.type${lotteryRes.type}`);
+                if (lotteryRes.type.match(/bean/g) && lotteryRes.type.match(/bean/g)[0] === 'bean') {
+                  lotteryResult += `${item.name}个，`;
+                } else if (lotteryRes.type.match(/water/g) && lotteryRes.type.match(/water/g)[0] === 'water') {
+                  lotteryResult += `${item.name}g，`;
+                } else {
+                  lotteryResult += `${item.name}，`;
+                }
+              }
+            })
+            //没有次数了
+            if (lotteryRes.remainLotteryTimes === 0) {
+              break
+            }
+          }
+        }
+        if (lotteryResult) {
+          console.log(`【天天抽奖】${lotteryResult.substr(0, lotteryResult.length - 1)}\n`)
+          message += `【天天抽奖】${lotteryResult.substr(0, lotteryResult.length - 1)}\n`;
+        }
+      }  else {
+        console.log('天天抽奖--抽奖机会为0次')
+      }
+    } else {
+      console.log('初始化天天抽奖得好礼失败')
+    }
     //浇水10次
     if (farmTask.totalWaterTaskInit.totalWaterTaskTimes < farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
       let waterCount = 0;
@@ -379,16 +460,25 @@ function* step() {
         console.log(`本次浇水结果:   ${JSON.stringify(waterResult)}`);
         if (waterResult.code === '0') {
           console.log(`剩余水滴${waterResult.totalEnergy}g`);
-          if (waterResult.totalEnergy < 10) {
-            console.log(`水滴不够，结束浇水`)
-            break
-          }
-        } else {
-          if (waterResult.code === '6' && waterResult.finished) {
+          if (waterResult.finished) {
             // 已证实，waterResult.finished为true，表示水果可以去领取兑换了
             isFruitFinished = true;
             break
+          } else {
+            if (waterResult.waterStatus === '1') {
+              let gotStageAwardForFarmRes1 = yield gotStageAwardForFarm('1');
+              console.log(`浇水阶段奖励1${gotStageAwardForFarmRes1}`)
+            } else if (waterResult.waterStatus === '2') {
+              let gotStageAwardForFarmRes2 = yield gotStageAwardForFarm('2');
+              console.log(`浇水阶段奖励1${gotStageAwardForFarmRes2}`)
+            }
+            if (waterResult.totalEnergy < 10) {
+              console.log(`水滴不够，结束浇水`)
+              break
+            }
           }
+        } else {
+          console.log('浇水出现失败异常,跳出不在继续浇水')
           break;
         }
       }
@@ -437,16 +527,18 @@ function* step() {
       isFruitFinished = false;
       for (let i = 0; i < (farmInfo.farmUserPro.treeTotalEnergy - farmInfo.farmUserPro.treeEnergy) / 10; i++) {
         let resp = yield waterGoodForFarm();
-        console.log(`本次浇水结果:   ${JSON.stringify(waterResult)}`);
+        console.log(`本次浇水结果(水果马上就可兑换了):   ${JSON.stringify(resp)}`);
         if (resp.code === '0') {
           console.log('\n浇水10g成功\n');
-          console.log(`目前水滴【${resp.totalEnergy}】g,继续浇水，水果马上就可以兑换了`)
-        } else {
-          if (resp.code === '6' && resp.finished) {
+          if (resp.finished) {
             // 已证实，waterResult.finished为true，表示水果可以去领取兑换了
             isFruitFinished = true;
             break
+          } else {
+            console.log(`目前水滴【${resp.totalEnergy}】g,继续浇水，水果马上就可以兑换了`)
           }
+        } else {
+          console.log('浇水出现失败异常,跳出不在继续浇水')
           break;
         }
       }
@@ -463,17 +555,26 @@ function* step() {
         let res = yield waterGoodForFarm();
         if (res.code === '0') {
           console.log('\n浇水10g成功\n')
-          if (res.totalEnergy < (retainWater + 10)) {
-            console.log(`目前水滴【${res.totalEnergy}】g，不再继续浇水`)
-          } else {
-            console.log(`目前剩余水滴：【${res.totalEnergy}】g，可继续浇水`);
-          }
-        } else {
-          if (res.code === '6' && res.finished) {
+          if (res.finished) {
             // 已证实，waterResult.finished为true，表示水果可以去领取兑换了
             isFruitFinished = true;
             break
+          } else {
+            if (res.waterStatus === '1') {
+              let gotStageAwardForFarmRes1 = yield gotStageAwardForFarm('1');
+              console.log(`浇水阶段奖励1${gotStageAwardForFarmRes1}`)
+            } else if (res.waterStatus === '2') {
+              let gotStageAwardForFarmRes2 = yield gotStageAwardForFarm('2');
+              console.log(`浇水阶段奖励1${gotStageAwardForFarmRes2}`)
+            }
+            if (res.totalEnergy < (retainWater + 10)) {
+              console.log(`目前水滴【${res.totalEnergy}】g，不再继续浇水`)
+            } else {
+              console.log(`目前剩余水滴：【${res.totalEnergy}】g，可继续浇水`);
+            }
           }
+        } else {
+          console.log('浇水出现失败异常,跳出不在继续浇水')
           break;
         }
       }
@@ -500,7 +601,7 @@ function* step() {
     let waterEveryDayT = farmTask.totalWaterTaskInit.totalWaterTaskTimes;//今天到到目前为止，浇了多少次水
     message += `【今日共浇水】${waterEveryDayT}次\n`;
     let waterD = Math.ceil(waterTotalT / waterEveryDayT);
-    // name += `——预测在${timeFormat(24 * 60 * 60 * 1000 * waterD + Date.now())}日可兑换🍉`;
+    // name += `----预测在${timeFormat(24 * 60 * 60 * 1000 * waterD + Date.now())}日可兑换🍉`;
     // if (waterEveryDayT !== 0) {
     //   subTitle += `，预计需${waterD}天可兑换`
     // } else {
@@ -599,9 +700,24 @@ function* step() {
 }
 
 /**
+ * 天天抽奖拿好礼-助力(每人每天三次助力机会)
+ */
+function lotteryMasterHelp() {
+  request(`initForFarm`, {
+    imageUrl: "",
+    nickName: "",
+    shareCode: arguments[0] + '-3',
+    babelChannel: "3",
+    version: 4,
+    channel: 1
+  });
+}
+/**
  * 集卡抽奖
  */
-function lotteryForTurntableFarm() {
+async function lotteryForTurntableFarm() {
+  await $.wait(2000);
+  console.log('等待了5秒')
   request(arguments.callee.name.toString(), {type: 1, version: 4, channel: 1});
 }
 
@@ -626,6 +742,12 @@ function browserForTurntableFarm(type) {
   // 浏览爆品会场8秒
 }
 
+/**
+ * 领取浇水过程中的阶段性奖励
+ */
+function gotStageAwardForFarm(type) {
+  request(arguments.callee.name.toString(), {'type': type});
+}
 
 /**
  * 被水滴砸中
@@ -810,4 +932,4 @@ function timeFormat(time) {
   return date.getFullYear() + '-' + ((date.getMonth() + 1) > 10 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() > 10 ? date.getDate() : '0' + date.getDate());
 }
 // prettier-ignore
-function Env(t,s){return new class{constructor(t,s){this.name=t,this.data=null,this.dataFile="box.dat",this.logs=[],this.logSeparator="\n",this.startTime=(new Date).getTime(),Object.assign(this,s),this.log("",`\ud83d\udd14${this.name}, \u5f00\u59cb!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient}isLoon(){return"undefined"!=typeof $loon}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s);if(!e&&!i)return{};{const i=e?t:s;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s),o=JSON.stringify(this.data);e?this.fs.writeFileSync(t,o):i?this.fs.writeFileSync(s,o):this.fs.writeFileSync(t,o)}}lodash_get(t,s,e){const i=s.replace(/\[(\d+)\]/g,".$1").split(".");let o=t;for(const t of i)if(o=Object(o)[t],void 0===o)return e;return o}lodash_set(t,s,e){return Object(t)!==t?t:(Array.isArray(s)||(s=s.toString().match(/[^.[\]]+/g)||[]),s.slice(0,-1).reduce((t,e,i)=>Object(t[e])===t[e]?t[e]:t[e]=Math.abs(s[i+1])>>0==+s[i+1]?[]:{},t)[s[s.length-1]]=e,t)}getdata(t){let s=this.getval(t);if(/^@/.test(t)){const[,e,i]=/^@(.*?)\.(.*?)$/.exec(t),o=e?this.getval(e):"";if(o)try{const t=JSON.parse(o);s=t?this.lodash_get(t,i,""):s}catch(t){s=""}}return s}setdata(t,s){let e=!1;if(/^@/.test(s)){const[,i,o]=/^@(.*?)\.(.*?)$/.exec(s),h=this.getval(i),a=i?"null"===h?null:h||"{}":"{}";try{const s=JSON.parse(a);this.lodash_set(s,o,t),e=this.setval(JSON.stringify(s),i),console.log(`${i}: ${JSON.stringify(s)}`)}catch(s){const h={};this.lodash_set(h,o,t),e=this.setval(JSON.stringify(h),i),console.log(`${i}: ${JSON.stringify(h)}`)}}else e=$.setval(t,s);return e}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,s){return this.isSurge()||this.isLoon()?$persistentStore.write(t,s):this.isQuanX()?$prefs.setValueForKey(t,s):this.isNode()?(this.data=this.loaddata(),this.data[s]=t,this.writedata(),!0):this.data&&this.data[s]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,s=(()=>{})){t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon()?$httpClient.get(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status,s(t,e,i))}):this.isQuanX()?$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)):this.isNode()&&(this.initGotEnv(t),this.got(t).on("redirect",(t,s)=>{try{const e=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();this.ckjar.setCookieSync(e,null),s.cookieJar=this.ckjar}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)))}post(t,s=(()=>{})){if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),delete t.headers["Content-Length"],this.isSurge()||this.isLoon())$httpClient.post(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status),s(t,e,i)});else if(this.isQuanX())t.method="POST",$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t));else if(this.isNode()){this.initGotEnv(t);const{url:e,...i}=t;this.got.post(e,i).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t))}}msg(s=t,e="",i="",o){const h=t=>!t||!this.isLoon()&&this.isSurge()?t:"string"==typeof t?this.isLoon()?t:this.isQuanX()?{"open-url":t}:void 0:"object"==typeof t&&(t["open-url"]||t["media-url"])?this.isLoon()?t["open-url"]:this.isQuanX()?t:void 0:void 0;this.isSurge()||this.isLoon()?$notification.post(s,e,i,h(o)):this.isQuanX()&&$notify(s,e,i,h(o)),this.logs.push("","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="),this.logs.push(s),e&&this.logs.push(e),i&&this.logs.push(i)}log(...t){t.length>0?this.logs=[...this.logs,...t]:console.log(this.logs.join(this.logSeparator))}logErr(t,s){const e=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();e?$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.stack):$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.message)}wait(t){return new Promise(s=>setTimeout(s,t))}done(t={}){const s=(new Date).getTime(),e=(s-this.startTime)/1e3;this.log("",`\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${e} \u79d2`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,s)}
+function Env(t,s){return new class{constructor(t,s){this.name=t,this.data=null,this.dataFile="box.dat",this.logs=[],this.logSeparator="\n",this.startTime=(new Date).getTime(),Object.assign(this,s),this.log("",`\ud83d\udd14${this.name}, \u5f00\u59cb!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient&&"undefined"==typeof $loon}isLoon(){return"undefined"!=typeof $loon}getScript(t){return new Promise(s=>{$.get({url:t},(t,e,i)=>s(i))})}runScript(t){return new Promise(s=>{let e=this.getdata("@chavy_boxjs_userCfgs.httpapi");e=e?e.replace(/\n/g,"").trim():e;const[i,o]=e.split("@"),h={url:`http://${o}/v1/scripting/evaluate`,body:{script_text:t,mock_type:"cron",timeout:5},headers:{"X-Key":i,Accept:"*/*"}};$.post(h,(t,e,i)=>s(i))})}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s);if(!e&&!i)return{};{const i=e?t:s;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),s=this.path.resolve(process.cwd(),this.dataFile),e=this.fs.existsSync(t),i=!e&&this.fs.existsSync(s),o=JSON.stringify(this.data);e?this.fs.writeFileSync(t,o):i?this.fs.writeFileSync(s,o):this.fs.writeFileSync(t,o)}}lodash_get(t,s,e){const i=s.replace(/\[(\d+)\]/g,".$1").split(".");let o=t;for(const t of i)if(o=Object(o)[t],void 0===o)return e;return o}lodash_set(t,s,e){return Object(t)!==t?t:(Array.isArray(s)||(s=s.toString().match(/[^.[\]]+/g)||[]),s.slice(0,-1).reduce((t,e,i)=>Object(t[e])===t[e]?t[e]:t[e]=Math.abs(s[i+1])>>0==+s[i+1]?[]:{},t)[s[s.length-1]]=e,t)}getdata(t){let s=this.getval(t);if(/^@/.test(t)){const[,e,i]=/^@(.*?)\.(.*?)$/.exec(t),o=e?this.getval(e):"";if(o)try{const t=JSON.parse(o);s=t?this.lodash_get(t,i,""):s}catch(t){s=""}}return s}setdata(t,s){let e=!1;if(/^@/.test(s)){const[,i,o]=/^@(.*?)\.(.*?)$/.exec(s),h=this.getval(i),a=i?"null"===h?null:h||"{}":"{}";try{const s=JSON.parse(a);this.lodash_set(s,o,t),e=this.setval(JSON.stringify(s),i),console.log(`${i}: ${JSON.stringify(s)}`)}catch(s){const h={};this.lodash_set(h,o,t),e=this.setval(JSON.stringify(h),i),console.log(`${i}: ${JSON.stringify(h)}`)}}else e=$.setval(t,s);return e}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,s){return this.isSurge()||this.isLoon()?$persistentStore.write(t,s):this.isQuanX()?$prefs.setValueForKey(t,s):this.isNode()?(this.data=this.loaddata(),this.data[s]=t,this.writedata(),!0):this.data&&this.data[s]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,s=(()=>{})){t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon()?$httpClient.get(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status,s(t,e,i))}):this.isQuanX()?$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)):this.isNode()&&(this.initGotEnv(t),this.got(t).on("redirect",(t,s)=>{try{const e=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();this.ckjar.setCookieSync(e,null),s.cookieJar=this.ckjar}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t)))}post(t,s=(()=>{})){if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),delete t.headers["Content-Length"],this.isSurge()||this.isLoon())$httpClient.post(t,(t,e,i)=>{!t&&e&&(e.body=i,e.statusCode=e.status),s(t,e,i)});else if(this.isQuanX())t.method="POST",$task.fetch(t).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t));else if(this.isNode()){this.initGotEnv(t);const{url:e,...i}=t;this.got.post(e,i).then(t=>{const{statusCode:e,statusCode:i,headers:o,body:h}=t;s(null,{status:e,statusCode:i,headers:o,body:h},h)},t=>s(t))}}time(t){let s={"M+":(new Date).getMonth()+1,"d+":(new Date).getDate(),"H+":(new Date).getHours(),"m+":(new Date).getMinutes(),"s+":(new Date).getSeconds(),"q+":Math.floor(((new Date).getMonth()+3)/3),S:(new Date).getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,((new Date).getFullYear()+"").substr(4-RegExp.$1.length)));for(let e in s)new RegExp("("+e+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?s[e]:("00"+s[e]).substr((""+s[e]).length)));return t}msg(s=t,e="",i="",o){const h=t=>!t||!this.isLoon()&&this.isSurge()?t:"string"==typeof t?this.isLoon()?t:this.isQuanX()?{"open-url":t}:void 0:"object"==typeof t&&(t["open-url"]||t["media-url"])?this.isLoon()?t["open-url"]:this.isQuanX()?t:void 0:void 0;this.isSurge()||this.isLoon()?$notification.post(s,e,i,h(o)):this.isQuanX()&&$notify(s,e,i,h(o)),this.logs.push("","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="),this.logs.push(s),e&&this.logs.push(e),i&&this.logs.push(i)}log(...t){t.length>0?this.logs=[...this.logs,...t]:console.log(this.logs.join(this.logSeparator))}logErr(t,s){const e=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();e?$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.stack):$.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.message)}wait(t){return new Promise(s=>setTimeout(s,t))}done(t={}){const s=(new Date).getTime(),e=(s-this.startTime)/1e3;this.log("",`\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${e} \u79d2`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,s)}

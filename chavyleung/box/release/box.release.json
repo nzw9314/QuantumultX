@@ -1,6 +1,112 @@
 {
   "releases": [
     {
+      "version": "0.6.18",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["清空设置时一直转圈问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.17",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["勿扰模式", "应用界面双击底栏能返回应用列表"]
+        },
+        {
+          "name": "注意",
+          "descs": ["勿扰模式下仍然可以通过日志查看通过内容"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.16",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "订阅配置",
+          "descs": ["新增: desc、descs、desc_html、descs_html 属性", "与 id、name 同级"]
+        },
+        {
+          "name": "示例",
+          "descs": ["https://gist.githubusercontent.com/chavyleung/9d53fc4809eb41dca5f5923790ec5554/raw/09742d3473420d8e0bd7b02a910849f65af879fa/chavy.app.sub.simple.json"]
+        },
+        {
+          "name": "注意",
+          "descs": ["本次更新主要面向开发者"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.15",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "偏好设置",
+          "descs": ["新增: http-api 超时时间, 默认 20 秒"]
+        },
+        {
+          "name": "订阅配置",
+          "descs": ["增加 script_timeout 属性, 与 script 同级, 可指定 http-api 超时时间, 单位: 秒"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.14",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "修复",
+          "descs": ["可能导致白屏的问题"]
+        }
+      ]
+    },
+    {
+      "version": "0.6.13",
+      "tags": ["beta"],
+      "author": "@chavyleung",
+      "icon": "https://avatars3.githubusercontent.com/u/29748519",
+      "repo": "https://github.com/chavyleung",
+      "notes": [
+        {
+          "name": "新增",
+          "descs": ["开关控件可以显示详情信息"]
+        },
+        {
+          "name": "域名",
+          "descs": ["新增: http://boxjs.com"]
+        },
+        {
+          "name": "新的重写订阅",
+          "descs": ["Surge: https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.rewrite.surge.sgmodule", "QuanX: https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.rewrite.quanx.conf", "Loon: https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.rewrite.loon.conf"]
+        },
+        {
+          "name": "注意",
+          "descs": ["新的重写订阅只有 boxjs.com", "旧的重写订阅仍然保留 8888 1111 和新增的 boxjs.com", "可以直接访问 http://boxjs.com 不加/home"]
+        }
+      ]
+    },
+    {
       "version": "0.6.12",
       "tags": ["beta"],
       "author": "@chavyleung",
