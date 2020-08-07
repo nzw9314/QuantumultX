@@ -5,10 +5,10 @@
 互助码shareCode请先手动运行脚本查看打印可看到
 // quantumultx
 [task_local]
-1 7-21/2 * * * https://github.com/nzw9314/QuantumultX/raw/master/Task/jd_plantBean.js, tag=种豆得豆, img-url=https://raw.githubusercontent.com/znz1992/Gallery/master/jdzd.png, enabled=true
+1 7-21/2 * * * https://raw.githubusercontent.com/lxk0301/scripts/master/jd_plantBean.js, tag=种豆得豆, img-url=https://raw.githubusercontent.com/znz1992/Gallery/master/jdzd.png, enabled=true
 // Loon
 [Script]
-cron "1 7-21/2 * * *" script-path=https://github.com/nzw9314/QuantumultX/raw/master/Task/jd_plantBean.js,tag=京东种豆得豆
+cron "1 7-21/2 * * *" script-path=https://raw.githubusercontent.com/lxk0301/scripts/master/jd_plantBean.js,tag=京东种豆得豆
 一天只能帮助3个人。多出的助力码无效
 注：如果使用Node.js, 需自行安装'crypto-js,got,http-server,tough-cookie'模块. 例: npm install crypto-js http-server tough-cookie got --save
 */
