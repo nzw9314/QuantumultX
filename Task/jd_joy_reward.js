@@ -17,7 +17,7 @@ cron "1 0-16/8 * * *" script-path=https://raw.githubusercontent.com/lxk0301/scri
 宠汪汪积分兑换奖品 = type=cron,cronexp=1 0-16/8 * * *,wake-system=1,timeout=20,script-path=https://raw.githubusercontent.com/lxk0301/scripts/master/jd_joy_reward.js
  */
 const $ = new Env('宠汪汪积分兑换奖品');
-const joyRewardName = $.getdata('joyRewardName') || 10;//兑换多少数量的京豆，默认兑换20京豆
+const joyRewardName = $.getdata('joyRewardName') || 20;//兑换多少数量的京豆，默认兑换20京豆
 //=======node.js使用说明======
 //请在下方单引号内自行填写您抓取的京东Cookie
 const Key = '';
