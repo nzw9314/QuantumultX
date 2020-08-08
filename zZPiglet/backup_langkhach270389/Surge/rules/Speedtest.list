@@ -1,0 +1,12 @@
+# > Fast
+DOMAIN-SUFFIX,fast.com
+
+# > Speedtest
+USER-AGENT,SpeedTest*
+DOMAIN-KEYWORD,speedtest
+DOMAIN-SUFFIX,speedtest.net
+DOMAIN-SUFFIX,ooklaserver.net
+URL-REGEX,speedtest\d.macau.ctm.net:8080
+DOMAIN-SUFFIX,88-f.net
+DOMAIN,st.pautina-telecom.ru
+DOMAIN-SUFFIX,goodnet.su

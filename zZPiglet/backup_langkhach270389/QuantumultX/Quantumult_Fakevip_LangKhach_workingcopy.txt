@@ -1,0 +1,66 @@
+[general]
+server_check_url=http://www.google.com/generate_204
+;geo_location_checker=http://www.example.com/json/, https://www.example.com/script.js
+;dns_exclusion_list=*.qq.com, qq.com, *.cmpassport.com
+;ssid_suspended_list=LINK_22E174, LINK_22E175
+udp_whitelist=53, 1024-49151
+;excluded_routes= 192.168.0.0/16, 172.16.0.0/12, 100.64.0.0/10, 10.0.0.0/8
+;icmp_auto_reply=true
+[dns]
+server=1.1.1.1
+server=1.0.0.1
+server=8.8.8.8
+server=8.8.4.4
+
+[policy]
+static=BẬT, reject, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Direct.png
+static=TẮT, direct, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Reject.png
+static=Chặn OTA, TẮT, BẬT, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Apple_Update.png
+static=Chặn Ads, BẬT, TẮT, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Advertising.png
+static=Chặn FB, TẮT, BẬT, img-url=https://github.com/Koolson/Qure/raw/master/IconSet/Facebook.png
+
+[server_remote]
+
+
+[filter_remote]
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-exceptions-rule.conf, tag=🇻🇳hostsVN, force-policy=direct, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-rule.conf, tag=🇻🇳hostsVN, force-policy=Chặn Ads, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-OTA.conf, tag=🇻🇳hostsVN-OTA, force-policy=Chặn OTA, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumult-FB.conf, tag=🇻🇳hostsVN-FB, force-policy=Chặn FB, enabled=true
+
+[rewrite_remote]
+https://raw.githubusercontent.com/langkhach270389/Scripting/master/QuantumultX/Fake_Local-workingcopy.txt, tag=Fake iAP Local Lãng Khách, enabled=true
+https://raw.githubusercontent.com/bigdargon/hostsVN/master/option/hostsVN-quantumultX-rewrite.conf, tag=🇻🇳hostsVN, enabled=true
+
+[server_local]
+;http=192.168.1.234:8888, username=, password=, fast-open=false, udp-relay=false, certificate=1 ,tag=DEBUG(Charles Fiddler)
+;shadowsocks=ss-a.example.com:80, method=chacha20, password=pwd, obfs=http, obfs-host=bing.com, obfs-uri=/resource/file, fast-open=false, udp-relay=false, server_check_url=http://www.apple.com/generate_204, tag=Sample-A
+;shadowsocks=ss-b.example.com:80, method=chacha20, password=pwd, obfs=http, obfs-host=bing.com, obfs-uri=/resource/file, fast-open=false, udp-relay=false, tag=Sample-B
+;shadowsocks=ss-c.example.com:443, method=chacha20, password=pwd, obfs=tls, obfs-host=bing.com, fast-open=false, udp-relay=false, tag=Sample-C
+;shadowsocks=ssr-a.example.com:443, method=chacha20, password=pwd, ssr-protocol=auth_chain_b, ssr-protocol-param=def, obfs=tls1.2_ticket_fastauth, obfs-host=bing.com, tag=Sample-D
+;shadowsocks=ws-a.example.com:80, method=aes-128-gcm, password=pwd, obfs=ws, obfs-uri=/ws, fast-open=false, udp-relay=false, tag=Sample-E
+;shadowsocks=ws-b.example.com:80, method=aes-128-gcm, password=pwd, obfs=ws, fast-open=false, udp-relay=false, tag=Sample-F
+;shadowsocks=ws-tls-a.example.com:443, method=aes-128-gcm, password=pwd, obfs=wss, obfs-uri=/ws, fast-open=false, udp-relay=false, tag=Sample-G
+
+[filter_local]
+;host, *, DEBUG(Charles Fiddler)
+;user-agent, ?abc*, proxy
+;host, www.google.com, proxy
+;host-keyword, adsite, reject
+;host-suffix, googleapis.com, proxy
+final, direct
+
+[mitm]
+passphrase = 3FDCC70A
+p12 = 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
+
+skip_validating_cert = true
+force_sni_domain_name = true
+;empty_sni_enabled = true
+
+[rewrite_local]
+
+[task_local]
+0 6-23/3 * * * langkhach/Ncov.js, enabled=true
+0 6-23/1 * * * langkhach/Appmonitor.js, enabled=true
+

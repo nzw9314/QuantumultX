@@ -1,0 +1,282 @@
+{
+  "id": "lowking.app.sub",
+  "name": "lowking应用订阅",
+  "author": "@lowking",
+  "icon": "https://avatars0.githubusercontent.com/u/33308659?s=460&u=9223074586cb14f2ae7ee0953515f8781ded8be9&v=4",
+  "repo": "https://github.com/lowking/Scripts/",
+  "apps": [
+    {
+      "id": "lk.qqvip",
+      "name": "QQ会员成长值签到",
+      "desc_html": "⚠️使用说明</br>详情【<a href='https://github.com/lowking/Scripts/blob/master/QQVip/qqVipCheckIn.js?raw=true'><font class='red--text'>点我查看</font></a>】",
+      "keys": ["lkQQSignHeaderKey"],
+      "settings": [
+        {
+          "id": "lkIsEnableLogQQVipCheckIn",
+          "name": "开启/关闭日志",
+          "val": true,
+          "type": "boolean",
+          "desc": "默认开启"
+        },
+        {
+          "id": "lkNotifyOnlyFailQQVipCheckIn",
+          "name": "只当执行失败才通知",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkIsEnableTgNotifyQQVipCheckIn",
+          "name": "开启/关闭Telegram通知",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkTgNotifyUrlQQVipCheckIn",
+          "name": "Telegram通知地址",
+          "val": "",
+          "type": "text",
+          "desc": "Tg的通知地址，如：https://api.telegram.org/bot-token/sendMessage?chat_id=-100140&parse_mode=Markdown&text="
+        },
+        {
+          "id": "lkIsEnableNotifyForGetCookie",
+          "name": "开启/关闭获取Cookie时的通知",
+          "val": true,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkIsDeleteAllCookie",
+          "name": "开启/关闭删除Cookie",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkIsEnableGetCookieQQVIP",
+          "name": "开启/关闭获取Cookie",
+          "val": true,
+          "type": "boolean",
+          "desc": "默认开启"
+        },
+        {
+          "id": "lkQQSignBlockListKey",
+          "name": "点赞黑名单列表",
+          "val": "",
+          "type": "text",
+          "desc": "数据结构看脚本"
+        }
+      ],
+      "author": "@lowking",
+      "repo": "https://github.com/lowking/Scripts/blob/master/QQVip/qqVipCheckIn.js",
+      "script": "https://github.com/lowking/Scripts/blob/master/QQVip/qqVipCheckIn.js?raw=true",
+      "icons": [
+        "https://raw.githubusercontent.com/Orz-3/mini/master/qqvip.png",
+        "https://raw.githubusercontent.com/Orz-3/task/master/qqvip.png"
+      ]
+    },
+    {
+      "id": "lk.weiboST",
+      "name": "微博超话",
+      "desc_html": "⚠️使用说明</br>详情【<a href='https://github.com/lowking/Scripts/blob/master/weibo/weiboST.js?raw=true'><font class='red--text'>点我查看</font></a>】",
+      "keys": ["lkWeiboSTSignHeaderKey", "lkUserFollowSTKey"],
+      "settings": [
+        {
+          "id": "lkIsEnableLogWeiboSTSign",
+          "name": "开启/关闭日志（签到脚本）",
+          "val": true,
+          "type": "boolean",
+          "desc": "默认开启"
+        },
+        {
+          "id": "lkNotifyOnlyFailWeiboSTSign",
+          "name": "只当执行失败才通知",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkIsEnableLogWeiboSTCookie",
+          "name": "开启/关闭日志（获取Cookie脚本）",
+          "val": true,
+          "type": "boolean",
+          "desc": "默认开启"
+        },
+        {
+          "id": "lkIsClearCookie",
+          "name": "开启/关闭删除Cookie",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkIsEnableGetCookieWeiboST",
+          "name": "开启/关闭获取Cookie",
+          "val": true,
+          "type": "boolean",
+          "desc": "默认开启"
+        },
+        {
+          "id": "lkIsEnableTgNotifyWeiboSTSign",
+          "name": "开启/关闭Telegram通知",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkTgNotifyUrlWeiboSTSign",
+          "name": "Telegram通知地址",
+          "val": "",
+          "type": "text",
+          "desc": "Tg的通知地址，如：https://api.telegram.org/bot-token/sendMessage?chat_id=-100140&parse_mode=Markdown&text="
+        }
+      ],
+      "author": "@lowking",
+      "repo": "https://github.com/lowking/Scripts/blob/master/weibo/weiboST.js",
+      "script": "https://github.com/lowking/Scripts/blob/master/weibo/weiboST.js?raw=true",
+      "icons": [
+        "https://raw.githubusercontent.com/Orz-3/mini/master/weibo.png",
+        "https://raw.githubusercontent.com/Orz-3/task/master/weibo.png"
+      ]
+    },
+    {
+      "id": "lk.wifi.assistant",
+      "name": "Wi-Fi助手（surge专用）",
+      "settings": [
+        {
+          "id": "lkWifiSsids",
+          "name": "连接这些SSID直连模式",
+          "val": "",
+          "type": "text",
+          "desc": "填写SSID（数组），如果需要流量直连，请把“cellular”加到数组"
+        }
+      ],
+      "keys": ["lkWifiSsids"],
+      "author": "@lowking",
+      "repo": "https://github.com/lowking/Scripts",
+      "icons": [
+        "https://raw.githubusercontent.com/Orz-3/mini/master/WIFI.png",
+        "https://raw.githubusercontent.com/Orz-3/task/master/WIFI.png"
+      ]
+    },
+    {
+      "id": "lk.sony.club",
+      "name": "索尼俱乐部",
+      "keys": ["lkSonyClubToken"],
+      "settings": [
+        {
+          "id": "lkIsEnableLogSonyClub",
+          "name": "开启/关闭日志",
+          "val": true,
+          "type": "boolean",
+          "desc": "默认开启"
+        },
+        {
+          "id": "lkNotifyOnlyFailSonyClub",
+          "name": "只当执行失败才通知",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkIsEnableTgNotifySonyClub",
+          "name": "开启/关闭Telegram通知",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkTgNotifyUrlSonyClub",
+          "name": "Telegram通知地址",
+          "val": "",
+          "type": "text",
+          "desc": "Tg的通知地址，如：https://api.telegram.org/bot-token/sendMessage?chat_id=-100140&parse_mode=Markdown&text="
+        },
+        {
+          "id": "lkSonyClubToken",
+          "name": "token",
+          "val": "",
+          "type": "text",
+          "desc": "索尼俱乐部token"
+        },
+        {
+          "id": "lkSonyClubLoginId",
+          "name": "帐号",
+          "val": "",
+          "type": "text",
+          "desc": ""
+        },
+        {
+          "id": "lkSonyClubPassword",
+          "name": "密码",
+          "val": "",
+          "type": "text",
+          "desc": ""
+        }
+      ],
+      "author": "@lowking",
+      "repo": "https://github.com/lowking/Scripts/blob/master/sony/sonyClub.js",
+      "script": "https://github.com/lowking/Scripts/blob/master/sony/sonyClub.js?raw=true",
+      "icons": [
+        "https://raw.githubusercontent.com/Orz-3/mini/master/SONY.png",
+        "https://raw.githubusercontent.com/Orz-3/task/master/SONY.png"
+      ]
+    },
+    {
+      "id": "lkBilibiliBangumiMonitor",
+      "name": "哔哩哔哩番剧监控",
+      "desc_html": "⚠️使用说明</br>详情【<a href='https://github.com/lowking/Scripts/blob/master/bilibili/bangumiMonitor.js?raw=true'><font class='red--text'>点我查看</font></a>】",
+      "icons": [
+        "https://raw.githubusercontent.com/Orz-3/mini/master/bilibili.png",
+        "https://raw.githubusercontent.com/Orz-3/task/master/bilibili.png"
+      ],
+      "keys": ["lkVmidBilibiliBangumiMonitor", "lkBilibiliBangumiList"],
+      "settings": [
+        {
+          "id": "lkIsEnableLogBilibiliBangumiMonitor",
+          "name": "开启/关闭日志",
+          "val": true,
+          "type": "boolean",
+          "desc": "默认开启"
+        },
+        {
+          "id": "lkNotifyOnlyFailBilibiliBangumiMonitor",
+          "name": "只当有番剧更新了才通知",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkIsEnableTgNotifyBilibiliBangumiMonitor",
+          "name": "开启/关闭Telegram通知",
+          "val": false,
+          "type": "boolean",
+          "desc": "默认关闭"
+        },
+        {
+          "id": "lkTgNotifyUrlBilibiliBangumiMonitor",
+          "name": "Telegram通知地址",
+          "val": "",
+          "type": "text",
+          "desc": "Tg的通知地址，如：https://api.telegram.org/bot-token/sendMessage?chat_id=-100140&parse_mode=Markdown&text="
+        }
+      ],
+      "author": "@lowking",
+      "repo": "https://github.com/lowking/Scripts/blob/master/bilibili/bangumiMonitor.js",
+      "script": "https://github.com/lowking/Scripts/blob/master/bilibili/bangumiMonitor.js?raw=true"
+    },
+    {
+      "id": "yuba",
+      "name": "斗鱼鱼吧",
+      "keys": ["CookieDY", "GroupDY"],
+      "author": "@demo2099",
+      "repo": "https://github.com/demo2099/jscool/blob/master/Task/yubaSign.js",
+      "script": "https://github.com/demo2099/jscool/blob/master/Task/yubaSign.js?raw=true",
+      "icons": [
+        "https://raw.githubusercontent.com/Orz-3/mini/master/douyu.png",
+        "https://raw.githubusercontent.com/Orz-3/task/master/douyu.png"
+      ]
+    }
+  ]
+}

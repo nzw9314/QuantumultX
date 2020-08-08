@@ -1,0 +1,16 @@
+#weibo
+https:\/\/api\.weibo\.com\/oauth2\/getaid url reject
+
+#keep
+https:\/\/api\.gotokeep\.com\/ads\/v1\/ads\?spotIds url reject
+
+#heybox
+https:\/\/api\.xiaoheihe\.cn\/account\/get_ads_info\ url reject
+
+#cainiao
+https:\/\/acs\.m\.taobao\.com\/gw\/mtop\.cainiao\.nbnetflow\.guoappstartup\.ads\.show url reject
+;失效https:\/\/acs\.m\.taobao\.com\/gw\/mtop\.cainiao\.guoguo\.nbnetflow\.ads\.recommend url reject
+;失效https:\/\/acs\.m\.taobao\.com\/gw\/mtop\.cainiao\.guoguo\.nbnetflow\.ads\.show url reject
+
+#xianyu(test)
+https:\/\/iyes\.youku\.com\/start\/rt? url reject
