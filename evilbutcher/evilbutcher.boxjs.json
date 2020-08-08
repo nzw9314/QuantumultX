@@ -77,7 +77,6 @@
       { "id": "evil_splitpushzmz", "name": "分开推送人人影视内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
       { "id": "evil_pushnewzmz", "name": "忽略关键词推送人人影视最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
       { "id": "evil_zmznum", "name": "忽略关键词时获取的人人影视榜单数量", "val": 6, "type": "number", "desc": "自定匹配人人影视榜单内容数量" },
-      { "id": "evil_xl115", "name": "人人影视磁力跳转", "val": "xl115", "type": "radios", "desc": "选择迅雷or115", "items": [{ "key": "true", "label": "调用迅雷" }, { "key": "false", "label": "调用115" }]},
       { "id": "evil_attachurl", "name": "附带跳转链接", "val": true, "type": "boolean", "desc": "打开则会附带跳转链接" },
       { "id": "evil_time", "name": "榜单获取时限（s）", "val": 2, "type": "number", "desc": "榜单获取时限" }
     ],

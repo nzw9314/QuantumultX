@@ -2,7 +2,7 @@
     "id": "toulanboy.app.sub",
     "name": "toulanboy 脚本订阅",
     "author": "@toulanboy",
-    "icon": "https://avatars0.githubusercontent.com/u/12446619?s=460&v=4",
+    "icon": "https://avatars2.githubusercontent.com/u/12446619?s=460&v=4",
     "repo": "https://github.com/toulanboy/scripts",
     "apps": [
       {
@@ -59,7 +59,7 @@
         "keys": ["tlb_weather_url"],
         "settings": [
             { "id": "tlb_rain_test", "name": "脚本测试", "val": false, "type": "boolean", "desc": "" },
-            { "id": "tlb_always_notify", "name": "所有情况都弹出通知（默认是降雨概率大于50%才弹）", "val": false, "type": "boolean", "desc": "默认是降雨概率大于50%才弹出通知" },
+            { "id": "tlb_always_notify", "name": "所有情况都弹出通知（默认是降雨概率大于50%才弹）", "val": false, "type": "boolean", "desc": "" },
             { "id": "tlb_weather_url", "name": "天气链接", "val": "", "type": "text", "placeholder":"这里填天气链接", "desc": "打开https://weather.com/zh-CN/weather/today， 搜索你的城市，然后切换到【每小时】。复制地址栏的链接填到这"},
             { "id": "tlb_pre_hours", "name": "预测未来的小时数", "val": 24, "type": "number", "desc": "最大只能填48" },
             { "id": "tlb_rain_timeout", "name": "[debug]请求超时限制 (毫秒)", "val": 2000, "type": "number", "desc": "" }

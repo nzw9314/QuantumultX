@@ -144,42 +144,40 @@ function filter_timeline_cards(cards) {
         let j = cards.length;
         while (j--) {
             let item = cards[j];
-            let card_type = item.card_type;
             let card_group = item.card_group;
-            if (card_type && card_type == 9) {
-                if (is_timeline_ad(item.mblog)) cards.splice(j, 1);
-            }else if (card_type && card_type == 11) {
-                filter_top_search(card_group);
-            }else {
-                filter_card_group(card_group);
-            }
-        }
-    }
-    return cards;
-}
-
-function filter_card_group(card_group) {
-    if (card_group && card_group.length > 0) {
-        let i = card_group.length;
-        while (i--) {
-            let card_group_item = card_group[i];
-            let card_type = card_group_item.card_type;
-            if (card_type) {
-                if (card_type == 9) {
-                    if (is_timeline_ad(card_group_item.mblog)) card_group.splice(i, 1);
-                } else if (card_type == 118 || card_type == 89) {
-                    card_group.splice(i, 1);
-                } else if (card_type == 42) {
-                    if (card_group_item.desc == '\u53ef\u80fd\u611f\u5174\u8da3\u7684\u4eba') {
-                        cards.splice(j, 1);
-                        break;
+            if (card_group && card_group.length > 0) {
+                if (item.itemid && item.itemid == "hotword") {
+                    filter_top_search(card_group);
+                } else {
+                    let i = card_group.length;
+                    while (i--) {
+                        let card_group_item = card_group[i];
+                        let card_type = card_group_item.card_type;
+                        if (card_type) {
+                            if (card_type == 9) {
+                                if (is_timeline_ad(card_group_item.mblog)) card_group.splice(i, 1);
+                            } else if (card_type == 118 || card_type == 89) {
+                                card_group.splice(i, 1);
+                            } else if (card_type == 42) {
+                                if (card_group_item.desc == '\u53ef\u80fd\u611f\u5174\u8da3\u7684\u4eba') {
+                                    cards.splice(j, 1);
+                                    break;
+                                }
+                            } else if (card_type == 17) {
+                                filter_top_search(card_group_item.group);
+                            }
+                        }
                     }
-                } else if (card_type == 17) {
-                    filter_top_search(card_group_item.group);
+                }
+            } else {
+                let card_type = item.card_type;
+                if (card_type && card_type == 9) {
+                    if (is_timeline_ad(item.mblog)) cards.splice(j, 1);
                 }
             }
         }
     }
+    return cards;
 }
 
 function filter_top_search(group) {
@@ -187,7 +185,6 @@ function filter_top_search(group) {
         let k = group.length;
         while (k--) {
             let group_item = group[k];
-            console.log(group_item);
             if (group_item.hasOwnProperty("promotion")) {
                 group.splice(k, 1);
             }

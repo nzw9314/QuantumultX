@@ -454,15 +454,6 @@ function getsetting() {
   $.log("分开推送人人影视内容 " + $.splitpushzmz);
   $.log("忽略关键词获取人人影视最新内容 " + $.pushnewzmz);
   $.log("获取人人影视榜单数量 " + $.zmznum + "个");
-  if ($.getdata("evil_xl115") == "true") {
-    $.log("调用迅雷");
-    $.link =
-      "shortcuts://x-callback-url/run-shortcut?name=%E8%BF%85%E9%9B%B7%E7%BD%91%E9%A1%B5%E7%A6%BB%E7%BA%BF&input=";
-  } else {
-    $.log("调用115");
-    $.link =
-      "shortcuts://x-callback-url/run-shortcut?name=115%E7%A6%BB%E7%BA%BF%E4%B8%8B%E8%BD%BD&input=";
-  }
   $.log("附带跳转链接 " + $.attachurl + "\n");
 }
 
@@ -1090,7 +1081,7 @@ function getzmzlist() {
           for (var i = 0; i < obj.length; i++) {
             var item = obj[i]["file_name"];
             var oriurl = obj[i]["magnet_url"];
-            var url = $.link + oriurl;
+            var url = "shortcuts://x-callback-url/run-shortcut?name=%E7%A3%81%E5%8A%9B%E7%A6%BB%E7%BA%BF&input=" + oriurl;
             var size = (obj[i]["file_size"] / 1048576).toFixed(2);
             var finalsize = size + "MB";
             if (size > 1024) {
