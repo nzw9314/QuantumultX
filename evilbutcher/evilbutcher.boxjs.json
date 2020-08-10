@@ -1,0 +1,171 @@
+{
+  "id": "evilbutcher.app.sub",
+  "name": "evilbutcher 应用订阅",
+  "author": "@evilbutcher",
+  "icon": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/picture/13th.png",
+  "repo": "https://github.com/evilbutcher/Quantumult_X/tree/master",
+  "apps": [{
+    "id": "weibotalk",
+    "name": "微博超话（单账号版）",
+    "descs_html": [
+      "点此直达【<a href=\"https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/weibo/weibotalk.js\">脚本地址</a>】",
+      "Cookie获取指南",
+      "<iframe type=\"text/html\" src=\"https://www.youtube.com/embed/SKR0stikm-8?autoplay=1\" frameborder=\"0\"></iframe>",
+      "Cookie获取分为三步，请仔细查看视频中弹出的<font class=\"error--text\">三个通知</font>。如果下面应用设置第四个，检查签到开关<font class=\"error--text\">打开</font>时，第三个Cookie必须获取；关闭时获取前两个即可运行。"
+    ],
+    "keys": ["evil_tokenurl", "evil_tokenheaders", "evil_tokencheckinurl", "evil_tokencheckinheaders", "evil_tokensinceurl", "evil_tokensinceheaders"],
+    "settings": [
+      { "id": "wb_delete_cookie", "name": "清空Cookie", "val": false, "type": "boolean", "desc": "打开则会清空Cookie，清除完毕后关闭" },
+      { "id": "wb_msg_max_num", "name": "每个通知显示超话数", "val": 30, "type": "text", "desc": "每页最显示多少个超话" },
+      { "id": "wb_request_time", "name": "签到间隔 (毫秒)", "val": 1000, "type": "text", "desc": "每个超话签到的间隔（超话大于50个的，建议填1000以上）" },
+      { "id": "wb_check_first", "name": "检查签到状态", "val": true, "type": "boolean", "desc": "打开则先检查签到状态，再签到；否则将直接签到" }
+    ],
+    "author": "@toulanboy, @evilbutcher",
+    "repo": "https://github.com/evilbutcher/Quantumult_X/tree/master/check_in/weibo",
+    "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/weibo.png", "https://raw.githubusercontent.com/Orz-3/task/master/weibo.png"],
+    "script": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/weibo/weibotalk.js"
+  }, {
+    "id": "hot",
+    "name": "热门监控",
+    "descs_html": [
+      "点此直达【<a href=\"https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/hotsearch/hot.js\">脚本地址</a>】",
+      "只有关闭<font class=\"error--text\">关键词匹配</font>才会通知最新内容，否则没匹配关键词不会通知。 ",
+      "<font class=\"error--text\">Quantumult X</font>用户：B站、豆瓣榜单独立推送时可显示封面；关闭附带跳转链接点击通知也可跳转。"
+    ],
+    "keys": [],
+    "settings": [
+      { "id": "evil_wb_keyword", "name": "监控关键词", "val": "", "placeholder": "万茜", "type": "textarea", "desc": "请输入监控关键词，以中文逗号分隔（请指定一个关键词，避免消息爆炸式推送）" },
+      { "id": "evil_rsslink", "name": "RSS订阅", "val": "", "type": "textarea", "desc": "请输入RSS订阅链接，以中文逗号分隔" },
+      { "id": "evil_rss", "name": "rss订阅", "val": false, "type": "boolean", "desc": "打开则会监控rss订阅" },
+      { "id": "evil_splitpushrss", "name": "分开推送rss内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewrss", "name": "忽略关键词推送rss最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_rssnum", "name": "忽略关键词时获取的rss订阅数量", "val": 6, "type": "number", "desc": "自定匹配rss订阅内容数量" },
+      { "id": "evil_wb", "name": "微博热搜", "val": true, "type": "boolean", "desc": "打开则会监控微博热搜" },
+      { "id": "evil_splitpushwb", "name": "分开推送微博内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewwb", "name": "忽略关键词推送微博最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_wbnum", "name": "忽略关键词时获取的微博热搜数量", "val": 6, "type": "number", "desc": "自定匹配微博热搜内容数量" },
+      { "id": "evil_zh", "name": "知乎热榜", "val": true, "type": "boolean", "desc": "打开则会监控知乎热榜" },
+      { "id": "evil_splitpushzh", "name": "分开推送知乎内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewzh", "name": "忽略关键词推送知乎最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_zhnum", "name": "忽略关键词时获取的知乎热榜数量", "val": 6, "type": "number", "desc": "自定匹配知乎热榜内容数量" },
+      { "id": "evil_bd", "name": "百度风云榜", "val": false, "type": "boolean", "desc": "打开则会监控百度风云榜" },
+      { "id": "evil_splitpushbd", "name": "分开推送百度内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewbd", "name": "忽略关键词推送百度最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_bdnum", "name": "忽略关键词时获取的百度风云榜数量", "val": 6, "type": "number", "desc": "自定匹配百度风云榜内容数量" },
+      { "id": "evil_bl", "name": "B站日榜", "val": true, "type": "boolean", "desc": "打开则会监控B站日榜" },
+      { "id": "evil_splitpushbl", "name": "分开推送B站内容", "val": true, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewbl", "name": "忽略关键词推送B站最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_blrid", "name": "榜单编号（点击查看对应关系）", "val": 0, "type": "number", "desc": "B站榜单对应关系：0全站，1动画，3音乐，4游戏，5娱乐，36科技，119鬼畜，129舞蹈" },
+      { "id": "evil_blnum", "name": "忽略关键词时获取的B站榜单数量", "val": 6, "type": "number", "desc": "自定匹配B站榜单内容数量" },
+      { "id": "evil_db", "name": "豆瓣榜单", "val": false, "type": "boolean", "desc": "打开则会监控豆瓣榜单" },
+      { "id": "evil_splitpushdb", "name": "分开推送豆瓣内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewdb", "name": "忽略关键词推送豆瓣最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_dbnum", "name": "忽略关键词时获取的豆瓣榜单数量", "val": 6, "type": "number", "desc": "自定匹配豆瓣榜单内容数量" },
+      { "id": "evil_dy", "name": "抖音榜单", "val": false, "type": "boolean", "desc": "打开则会监控抖音榜单" },
+      { "id": "evil_splitpushdy", "name": "分开推送抖音内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewdy", "name": "忽略关键词推送抖音最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_dynum", "name": "忽略关键词时获取的抖音榜单数量", "val": 6, "type": "number", "desc": "自定匹配抖音榜单内容数量" },
+      { "id": "evil_k36", "name": "36氪榜单", "val": false, "type": "boolean", "desc": "打开则会监控36氪榜单" },
+      { "id": "evil_splitpushk36", "name": "分开推送36氪内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewk36", "name": "忽略关键词推送36氪最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_k36num", "name": "忽略关键词时获取的36氪榜单数量", "val": 6, "type": "number", "desc": "自定匹配36氪榜单内容数量" },
+      { "id": "evil_amazon", "name": "Kindle图书榜单", "val": false, "type": "boolean", "desc": "打开则会监控Kindle图书榜单" },
+      { "id": "evil_splitpushamz", "name": "分开推送Kindle图书内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewamz", "name": "忽略关键词推送Kindle图书最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_amznum", "name": "忽略关键词时获取的Kindle图书榜单数量", "val": 6, "type": "number", "desc": "自定匹配Kindle图书榜单内容数量" },
+      { "id": "evil_zmz", "name": "人人影视榜单", "val": false, "type": "boolean", "desc": "打开则会监控人人影视榜单" },
+      { "id": "evil_splitpushzmz", "name": "分开推送人人影视内容", "val": false, "type": "boolean", "desc": "打开则会独立推送每条更新" },
+      { "id": "evil_pushnewzmz", "name": "忽略关键词推送人人影视最新内容", "val": false, "type": "boolean", "desc": "打开则会忽略关键词，自动推送最新内容" },
+      { "id": "evil_zmznum", "name": "忽略关键词时获取的人人影视榜单数量", "val": 6, "type": "number", "desc": "自定匹配人人影视榜单内容数量" },
+      { "id": "evil_attachurl", "name": "附带跳转链接", "val": true, "type": "boolean", "desc": "打开则会附带跳转链接" },
+      { "id": "evil_time", "name": "榜单获取时限（s）", "val": 2, "type": "number", "desc": "榜单获取时限" }
+    ],
+    "author": "@evilbutcher",
+    "repo": "https://github.com/evilbutcher/Quantumult_X/tree/master/check_in/hotsearch",
+    "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/hot.png", "https://raw.githubusercontent.com/58xinian/icon/master/hot.png"],
+    "script": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/hotsearch/hot.js"
+  }, {
+    "id": "checkin",
+    "name": "机场签到",
+    "descs_html": [
+      "点此直达【<a href=\"https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/glados/checkin_env.js\">脚本地址</a>】",
+      "多个机场使用请用<font class=\"error--text\">中文逗号</font>分隔，顺序需要对应。",
+      "也可利用BoxJs<font class=\"error--text\">会话切换</font>功能，一次保存一个机场信息，切换会话签到。"
+    ],
+    "keys": ["evil_checkintitle", "evil_checkinlogin", "evil_checkinemail", "evil_checkinpwd"],
+    "settings": [
+      { "id": "evil_autoLogout", "name": "重新登陆", "val": false, "type": "boolean", "desc": "打开则会重新登陆后签到" },
+      { "id": "evil_checkintitle", "name": "标题", "val": "", "placeholder": "请填写，例如：隔壁西站", "type": "textarea", "desc": "请依次填入标题，以中文逗号分隔" },
+      { "id": "evil_checkinlogin", "name": "网址", "val": "", "placeholder": "请填写，例如：https://example.com/auth/login", "type": "textarea", "desc": "请依次填入网址，以中文逗号分隔" },
+      { "id": "evil_checkinemail", "name": "邮箱", "val": "", "placeholder": "请填写，例如：example@v2bz.com", "type": "textarea", "desc": "请依次填入邮箱，以中文逗号分隔" },
+      { "id": "evil_checkinpwd", "name": "密码", "val": "", "placeholder": "请填写，例如：password", "type": "textarea", "desc": "请依次填入密码，以中文逗号分隔" }
+    ],
+    "author": "@Neurogram, @evilbutcher",
+    "repo": "https://github.com/evilbutcher/Quantumult_X/tree/master/check_in/glados",
+    "icons": ["https://raw.githubusercontent.com/58xinian/icon/master/glados_mini.png", "https://raw.githubusercontent.com/58xinian/icon/master/glados_animation.gif"],
+    "script": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/glados/checkin_env.js"
+  }, {
+    "id": "checkincookie",
+    "name": "机场签到Cookie版",
+    "descs_html": [
+      "点此直达【<a href=\"https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/glados/checkincookie_env.js\">脚本地址</a>】",
+      "此版本为尝试用Cookie签到，针对有登陆验证或跳转的机场。",
+      "可利用BoxJs<font class=\"error--text\">会话切换</font>功能，一次保存一个机场信息，切换会话签到。"
+    ],
+    "keys": ["evil_checkincktitle", "evil_checkinurl", "evil_checkincookie"],
+    "settings": [
+      { "id": "evil_checkincktitle", "name": "机场名称", "val": "", "type": "textarea", "desc": "手动填入机场名称" },
+      { "id": "evil_checkinurl", "name": "登录链接", "val": "", "type": "textarea", "desc": "手动填入登陆链接" }
+    ],
+    "author": "@Neurogram, @evilbutcher",
+    "repo": "https://github.com/evilbutcher/Quantumult_X/tree/master/check_in/glados",
+    "icons": ["https://raw.githubusercontent.com/58xinian/icon/master/glados_mini.png", "https://raw.githubusercontent.com/58xinian/icon/master/glados_animation.gif"],
+    "script": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/glados/checkincookie_env.js"
+  }, {
+    "id": "glados",
+    "name": "GLaDOS签到",
+    "descs_html": [
+      "点此直达【<a href=\"https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/glados/glados.js\">脚本地址</a>】",
+      "签到较为特殊，故独立写了一个。",
+      "注册地址：https://github.com/glados-network/GLaDOS",
+      "邀请码：3JRG4-KSGZJ-8QPXF-8PPOO"
+    ],
+    "keys": ["evil_gladoscookie"],
+    "author": "@evilbutcher",
+    "repo": "https://github.com/evilbutcher/Quantumult_X/tree/master/check_in/glados",
+    "icons": ["https://raw.githubusercontent.com/58xinian/icon/master/glados1_mini.png", "https://raw.githubusercontent.com/58xinian/icon/master/glados1.png"],
+    "script": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/glados/glados.js"
+  }, {
+    "id": "appmonitor",
+    "name": "AppMonitor",
+    "descs_html": [
+      "点此直达【<a href=\"https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/appstore/AppMonitor.js\">脚本地址</a>】",
+      "修改自Quantumult X群友分享，支持BoxJs。",
+      "填写App ID可通过AppStore分享按钮拷贝想要监控App的链接，在链接最后有id，复制到监控ID内即可；未单独设置区域，则采用reg默认区域",
+      "关于ID，例如：https://apps.apple.com/cn/app/nplayer-plus/id<font class=\"error--text\">539397400</font>",
+      "@App价格监控.app_monitor为本地记录的监控相关信息，可以忽略"
+    ],
+    "keys": ["@App价格监控.apps", "@App价格监控.reg", "@App价格监控.app_monitor"],
+    "settings": [
+      { "id": "@App价格监控.apps", "name": "监控ID", "val": "", "placeholder": "例如，1312014438 cn，1282297037_au", "type": "textarea", "desc": "ID与区域分隔符支持 空格/:|_-，但不同App之间请用中文逗号“，”分隔。" },
+      { "id": "@App价格监控.reg", "name": "默认区域", "val": "", "placeholder": "例如，cn/us/au", "type": "textarea", "desc": "请填写一个默认区域" }
+    ],
+    "author": "@t.me/QuanXApp群友",
+    "repo": "https://github.com/evilbutcher/Quantumult_X/tree/master/check_in/appstore",
+    "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/Apple.png", "https://raw.githubusercontent.com/Orz-3/task/master/appstore.png"],
+    "script": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/appstore/AppMonitor.js"
+  }, {
+    "id": "funboat",
+    "name": "Funboat签到",
+    "descs_html": [
+      "点此直达【<a href=\"https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/funboat/funboat.js\">脚本地址</a>】",
+      "微信小程序搜索 Funboat，按照脚本提示获取Cookie。",
+      "⚠️其他基于有赞的小程序也可能触发获取Cookie，请获取完后及时禁用获取Cookie重写/脚本。"
+    ],
+    "keys": ["evil_funkourl", "evil_funkocookie", "evil_funkostatusurl", "evil_funkostatuscookie"],
+    "author": "@evilbutcher",
+    "repo": "https://github.com/evilbutcher/Quantumult_X/tree/master/check_in/funboat",
+    "icons": ["https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/picture/funko_tran.png", "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/picture/funko.png"],
+    "script": "https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/funboat/funboat.js"
+  }]
+}

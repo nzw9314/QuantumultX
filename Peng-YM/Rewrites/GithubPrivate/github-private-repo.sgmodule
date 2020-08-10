@@ -1,0 +1,8 @@
+#!name=Github Private
+#!desc=允许引用Github私有仓库/gist中的订阅分流，重写，脚本等配置文件。
+
+[MITM]
+hostname = %APPEND% raw.githubusercontent.com, gist.githubusercontent.com
+
+[Script]
+Github Private = type=http-request, requires-body=0, pattern=^https?:\/\/(raw|gist)\.githubusercontent.com, script-path=https://raw.githubusercontent.com/Peng-YM/QuanX/master/Rewrites/GithubPrivate/github-private-repo.js

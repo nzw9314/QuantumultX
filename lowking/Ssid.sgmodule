@@ -1,0 +1,5 @@
+#!name=Ssid by lowking. Self-use
+#!desc=该模块自用，Wi-Fi助手
+
+[Script]
+SSID助手 = debug=1,script-path=https://raw.githubusercontent.com/lowking/Scripts/master/util/Ssid.js,type=event,event-name=network-changed,control-api=true

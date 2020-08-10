@@ -1,0 +1,252 @@
+{
+  "id": "sunert.app.sub",
+  "name": "Sunert 签到应用订阅",
+  "author": "@Sunert",
+  "icon": "https://avatars2.githubusercontent.com/u/47924389?s=460&u=5152f048a9e8aaa45102763a578172407c40fcc8&v=4",
+  "repo": "https://gitee.com/Sunert/Scripts/tree/master",
+  "apps": [
+    {
+      "id": "weibo",
+      "name": "新浪微博",
+      "keys": ["sy.signurl.wb", "sy_signheader_wb", "sy_payheader_wb", "sy_token_wb"],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/weibo.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/weibo.png", "https://raw.githubusercontent.com/Orz-3/task/master/weibo.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/weibo.js"
+    },
+    {
+      "id": "youth",
+      "name": "中青看点",
+      "keys": ["youthheader_zq", "read_zq", "red_zq", "readtime_zq"],
+      "author": "@sunert",
+      "settings": [
+        {
+         "id": "notifytimes",
+         "name": "通知频率 (点击查看设置说明)",
+         "val": "4",
+         "type": "radios",
+         "desc": "无/默认", 
+         "items": [
+            {
+              "val": "0",
+              "label": "静默运行",
+              "desc": "无任何通知"
+            },
+            {
+              "val": "1",
+              "label": "通知常开",
+              "desc": "常开通知"
+            }],
+         "val": "50",
+         "type": "number",
+         "desc": "设定通知频率，前三次为全部通知，之后转盘次数/设定频率整除时通知，如设置0为无通知，设置1为全部通知，设置其他数可整除余0时通知，默认值50"
+         },
+         {
+          "id": "zqlogs",
+          "name": "调试日志",
+          "val": false,
+          "type": "boolean"
+         }
+       ],
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/youth.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/youth.png", "https://raw.githubusercontent.com/Orz-3/task/master/youth.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/youth.js"
+    },
+    {
+      "id": "dianshijia",
+      "name": "电视家",
+      "keys": ["sy_signurl_dsj", "sy_signheader_dsj", "drawal_dsj"],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/dianshijia.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/dianshijia.png", "https://raw.githubusercontent.com/Orz-3/task/master/dianshijia.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/dianshijia.js"
+    },
+    {
+      "id": "kuaishou",
+      "name": "快手极速版",
+      "keys": ["cookie_ks"],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/kuaishou.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/kuaishou.png", "https://raw.githubusercontent.com/Orz-3/task/master/kuaishou.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/kuaishou.js"
+    },
+    {
+      "id": "sinanews",
+      "name": "新浪新闻",
+      "keys": ["sy_signurl_snews", "sy_info_snews", "sy_ck_snews", "sy_infoheader_snews"],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/sinanews.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/sinanews.png", "https://raw.githubusercontent.com/Orz-3/task/master/sinanews.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/sinanews.js"
+    },
+    {
+      "id": "chinatelecomEnquiry",
+      "name": "电信套餐查询",
+      "keys": ["china_telecom_authToken_10000", "china_telecom_cookie"],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/telecomInfinity.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/telecominfinty.png", "https://raw.githubusercontent.com/Orz-3/task/master/telecominfinty.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/telecomInfinity.js"
+    },
+    {
+      "id": "jddj",
+      "name": "京东到家",
+      "keys": ["sy_cookie_dj"],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/jddj.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/jddj.png", "https://raw.githubusercontent.com/Orz-3/task/master/jddj.png"],
+      "script": "https://raw.githubusercontent.com/Sunert/Scripts/master/Task/jddj.js"
+    },
+    {
+      "id": "TVlist",
+      "name": "电视预告",
+      "keys": [],
+      "settings": [{ 
+         "id": "c", 
+         "name": "电视台", 
+         "val": "cctv8", 
+         "type": "text", 
+         "desc": "请填写小写英文台标，示例: 北京: btv1 | 湖南: hunan | 浙江: zhejiang 河南: henan| 江苏: jiangsu|广东: guangdong 更多电视台请参加电视家网络列表" }],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/tvpreview.js",
+      "icons": ["https://raw.githubusercontent.com/Sunert/Quantumult-X/master/Rule/Images/ICON/tvpreview.png", "https://raw.githubusercontent.com/Sunert/Quantumult-X/master/Rule/Images/ICON/tvpreview.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/tvpreview.js"
+    },
+    {
+      "id": "mydigit",
+      "name": "数码之家",
+      "keys": ["sign_mydigit"],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/mydigit.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/mydigit.png", "https://raw.githubusercontent.com/Orz-3/task/master/mydigit.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/mydigit.js"
+    },
+    {
+      "id": "txnews",
+      "name": "腾讯新闻",
+      "keys": ["sy_signurl_txnews", "sy_cookie_txnews","video_txnews"],
+      "author": "@sunert",
+      "settings": [
+        {
+          "id": "notifynum",
+          "name": "通知频率",
+          "val": 4,
+          "type": "number",
+          "desc": "视频红包间隔通知开为1，常关为0(默认4次)"
+        },
+        {
+          "id": "logsturn",
+          "name": "调试日志",
+          "val": false,
+          "type": "boolean"
+        }
+      ],
+       "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/txnews.js",
+       "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/txnews.png", "https://raw.githubusercontent.com/Orz-3/task/master/txnews.png"],
+       "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/txnews.js"
+    },
+    {
+      "id": "translate",
+      "name": "谷歌翻译",
+      "keys": [],
+      "settings": [{ 
+         "id": "word", 
+         "name": "原文", 
+         "val": "Hello World", 
+         "type": "textarea", 
+         "placeholder": "Hello World",
+         "desc": "兼容中英文短语翻译，填入原文后手动运行" }],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/tvpreview.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/translate.png", "https://raw.githubusercontent.com/Orz-3/task/master/translate.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/translate.js"
+    },
+    {
+      "id": "exchange rate",
+      "name": "汇率换算",
+      "keys": [],
+      "settings": [
+         { 
+         "id": "froma", 
+         "name": "使用币", 
+         "val": "人民币", 
+         "type": "text", 
+         "desc": "填写中文币种,注意澳门元为澳门帕塔卡，香港元为港币，台湾为新台币"     
+         },
+         { 
+         "id": "toex", 
+         "name": "兑换币", 
+         "val": "港币", 
+         "type": "text", 
+         "desc": "填写中文币种,注意澳门元为澳门帕塔卡，香港元为港币，台湾为新台币"     
+         },
+         { 
+         "id": "numex", 
+         "name": "兑换金额", 
+         "val": "10", 
+         "type": "number", 
+         "desc": "填写数字"     
+         }
+        ],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/exchangeRate.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/exchangerate.png", "https://raw.githubusercontent.com/Orz-3/task/master/exchangerate.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/exchangeRate.js"
+    },
+    {
+      "id": "trainquery",
+      "name": "列车时刻",
+      "keys": [],
+      "settings": [
+       {
+         "id": "people",
+         "name": "乘客类型",
+         "val": "ADULT",
+         "type": "radios",
+         "desc": "成人/学生", 
+         "items": [
+            {
+              "key": "ADULT",
+              "label": "成人"
+            },
+            {
+              "key": "0X00",
+              "label": "学生"
+            }]
+         },
+         { 
+          "id": "left", 
+          "name": "出发站点", 
+          "val": "北京", 
+          "type": "text", 
+          "desc": "填入中文站点" 
+         },
+         { 
+          "id": "end", 
+          "name": "目的地", 
+          "val": "上海", 
+          "type": "text", 
+          "desc": "填入中文站点" 
+         },
+         { 
+          "id": "leavedate", 
+          "name": "出发时间", 
+          "val": "2020-08-15", 
+          "type": "date", 
+          "desc": "填入出发日期，请按照格式填写" 
+         },
+         { 
+          "id": "setrain", 
+          "name": "列车车次", 
+          "val": "G5", 
+          "type": "text", 
+          "desc": "填入列车车次或者列车序号，列车序号请查看日志详情" 
+         }
+         ],
+      "author": "@sunert",
+      "repo": "https://gitee.com/Sunert/Scripts/blob/master/Task/trainquery.js",
+      "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/12306.png", "https://raw.githubusercontent.com/Orz-3/task/master/12306.png"],
+      "script": "https://gitee.com/Sunert/Scripts/raw/master/Task/trainquery.js"
+    }
+  ]
+}

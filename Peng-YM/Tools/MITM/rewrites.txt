@@ -1,0 +1,11 @@
+hostname=httpbin.org
+
+================ Quantumult X ================
+^http://httpbin\.org/post url script-request-body https://raw.githubusercontent.com/Peng-YM/QuanX/master/Rewrites/test-request-body.js
+
+================ Loon ================
+http-request ^http://httpbin\.org/post script-path=https://raw.githubusercontent.com/Peng-YM/QuanX/master/Rewrites/test-request-body.js, require-body=true, tag=test-request-body, enabled=true
+
+================ Surge ================
+type=http-request, pattern=^http://httpbin\.org/post, script-path=https://raw.githubusercontent.com/Peng-YM/QuanX/master/Rewrites/test-request-body.js, require-body=true, tag=test-request-body, enabled=true
+

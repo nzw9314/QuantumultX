@@ -1,0 +1,8 @@
+#!name=SubConverter by lowking. Self-use
+#!desc=该模块自用，订阅转换器
+
+[Script]
+SubConverter = type=http-response,pattern=https:\/\/sub\.v2club\.top\/api\/v1\/client\/subscribe\?,requires-body=1,script-path=https://raw.githubusercontent.com/lowking/Scripts/master/util/SubConverter.js
+
+[MITM]
+hostname = %APPEND% sub.v2club.top
