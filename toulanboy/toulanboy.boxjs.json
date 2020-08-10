@@ -1,0 +1,73 @@
+{
+    "id": "toulanboy.app.sub",
+    "name": "toulanboy 脚本订阅",
+    "author": "@toulanboy",
+    "icon": "https://avatars2.githubusercontent.com/u/12446619?s=460&v=4",
+    "repo": "https://github.com/toulanboy/scripts",
+    "apps": [
+      {
+        "id": "weibotalk",
+        "name": "微博超话",
+        "keys": ["evil_tokenurl", "evil_tokencheckinurl", "evil_tokenheaders", "evil_tokencheckinheaders","evil_tokenurl2", "evil_tokencheckinurl2", "evil_tokenheaders2", "evil_tokencheckinheaders2"],
+        "settings": [
+            { "id": "wb_delete_cookie", "name": "打开清空cookie功能", "val": false, "type": "boolean", "desc": "" },
+            { "id": "wb_msg_max_num", "name": "每个通知显示超话数", "val": 30, "type": "number", "desc": "每页最显示多少个超话" },
+            { "id": "wb_request_time", "name": "签到间隔 (毫秒)", "val": 700, "type": "number", "desc": "每个超话签到的间隔（超话大于50个的，建议填1000以上）" }
+        ],
+        "author": "@toulanboy, @evilbutcher",
+        "repo": "https://github.com/toulanboy/scripts/blob/master/weibo",
+        "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/weibo.png", "https://raw.githubusercontent.com/Orz-3/task/master/weibo.png"],
+        "script": "https://raw.githubusercontent.com/toulanboy/scripts/master/weibo/weibotalk.js"
+    },
+      {
+        "id": "jd_price_detect",
+        "name": "京东价格提醒",
+        "keys": ["tlb_jd_timeout", "tlb_jd_debug"],
+        "settings": [
+            { "id": "tlb_jd_detect_url", "name": "商品链接A", "val": "", "type": "text", "placeholder":"请在商品页获取分享链接", "desc": "请在商品页获取分享链接" },
+            { "id": "tlb_jd_detect_price", "name": "商品链接A 目标价格", "val": "", "type": "number", "placeholder":"若商品A低于该价格，则会提醒。", "desc": "" },
+            
+            { "id": "tlb_jd_detect_url2", "name": "商品链接B", "val": "", "type": "text", "placeholder":"请在商品页获取分享链接", "desc": "请在商品页获取分享链接" },
+            { "id": "tlb_jd_detect_price2", "name": "商品链接B 目标价格", "val": "", "type": "number", "placeholder":"若商品B低于该价格，则会提醒。", "desc": "" },
+            
+            { "id": "tlb_jd_detect_url3", "name": "商品链接C", "val": "", "type": "text", "placeholder":"请在商品页获取分享链接", "desc": "请在商品页获取分享链接" },
+            { "id": "tlb_jd_detect_price3", "name": "商品链接C 目标价格", "val": "", "type": "number", "placeholder":"若商品C低于该价格，则会提醒。", "desc": "" },
+            
+            { "id": "tlb_jd_timeout", "name": "[debug]请求超时限制 (毫秒)", "val": 3000, "type": "number", "desc": "" },
+            { "id": "tlb_jd_debug", "name": "[debug]开启调试", "val": false, "type": "boolean", "desc": ""}    
+        ],
+        "author": "@toulanboy",
+        "repo": "https://github.com/toulanboy/scripts/blob/master/jd_price_detect",
+        "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/jd.png", "https://raw.githubusercontent.com/Orz-3/task/master/jd.png"],
+        "script": "https://raw.githubusercontent.com/toulanboy/scripts/master/jd_price_detect/jd_price_detect.js"
+    },
+      {
+        "id": "muchong",
+        "name": "小木虫",
+        "keys": ["muchong_headers", "muchong_debug"],
+        "settings": [
+            { "id": "muchong_debug", "name": "开启调试", "val": false, "type": "boolean", "desc": "" }
+        ],
+        "author": "@toulanboy",
+        "repo": "https://github.com/toulanboy/scripts/blob/master/muchong",
+        "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/muchong.png", "https://raw.githubusercontent.com/Orz-3/task/master/muchong.png"],
+        "script": "https://raw.githubusercontent.com/toulanboy/scripts/master/muchong/muchong.js"
+      },
+      {
+        "id": "weather-simple",
+        "name": "下雨提醒",
+        "keys": ["tlb_weather_url"],
+        "settings": [
+            { "id": "tlb_rain_test", "name": "脚本测试", "val": false, "type": "boolean", "desc": "" },
+            { "id": "tlb_always_notify", "name": "所有情况都弹出通知（默认是降雨概率大于50%才弹）", "val": false, "type": "boolean", "desc": "" },
+            { "id": "tlb_weather_url", "name": "天气链接", "val": "", "type": "text", "placeholder":"这里填天气链接", "desc": "打开https://weather.com/zh-CN/weather/today， 搜索你的城市，然后切换到【每小时】。复制地址栏的链接填到这"},
+            { "id": "tlb_pre_hours", "name": "预测未来的小时数", "val": 24, "type": "number", "desc": "最大只能填48" },
+            { "id": "tlb_rain_timeout", "name": "[debug]请求超时限制 (毫秒)", "val": 2000, "type": "number", "desc": "" }
+        ],
+        "author": "@toulanboy",
+        "repo": "https://github.com/toulanboy/scripts/blob/master/weather",
+        "icons": ["https://raw.githubusercontent.com/Orz-3/mini/master/weather.png", "https://raw.githubusercontent.com/Orz-3/task/master/weather.png"],
+        "script": "https://raw.githubusercontent.com/toulanboy/scripts/master/weather/weather.js"  
+    }
+    ]
+  }

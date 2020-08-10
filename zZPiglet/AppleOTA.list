@@ -1,0 +1,8 @@
+host, gdmf.apple.com, AppleOTA
+host, gdmf.apple.com.akadns.net, AppleOTA
+host, mesu.apple.com, AppleOTA
+host, mesu-cdn.apple.com.akadns.net, AppleOTA
+host, mesu-cdn.origin-apple.com.akadns.net, AppleOTA
+host, mesu.g.aaplimg.com, AppleOTA
+host, appldnld.apple.com, AppleOTA
+host, appldnld.apple.com.akadns.net, AppleOTA
