@@ -100,6 +100,13 @@ const provider = {
         support: ['$[aqiIcon]', '$[aqi]', '$[aqiDesc]', '$[aqiWarning]']
     }
 }
+
+$tool = Tool()
+$tool.log.level("error")
+weather()
+
+$tool.done()
+
 // #region 天气数据获取
 function weather() {
     support();
@@ -114,118 +121,119 @@ function weather() {
 function darksky() {
     if (provider.darksky.progress == 2) return;
     start("darksky");
-    $task.fetch({
-        url: provider.darksky.api
-    }).then(response => {
-        try {
-            let darkObj = JSON.parse(response.body);
-            record(`天气数据获取-A1-${response.body}`);
-            if (darkObj.error) {
-                $notify("DarkApi", "出错啦", darkObj.error);
+    $tool.get({url: provider.darksky.api}, function (error, response, body) {
+        if (!error) {
+            try {
+                let darkObj = JSON.parse(body);
+                $tool.log.debug(`天气数据获取-A1-${body}`);
+                if (darkObj.error) {
+                    $tool.notify("DarkApi", "出错啦", darkObj.error);
+                }
+                provider.darksky.data.daily = darkObj.daily;
+                provider.darksky.data.hourly = darkObj.hourly;
+                provider.darksky.data.currently = darkObj.currently;
+                $tool.log.debug(`天气数据获取-A2`);
+                check('darksky', true)
+            } catch (e) {
+                $tool.log.error(`天气数据A获取报错${JSON.stringify(e)}`)
             }
-            provider.darksky.data.daily = darkObj.daily;
-            provider.darksky.data.hourly = darkObj.hourly;
-            provider.darksky.data.currently = darkObj.currently;
-            record(`天气数据获取-A2`);
-            check('darksky', true)
-        } catch (e) {
-            console.log(`天气数据A获取报错${JSON.stringify(e)}`)
+        } else {
+            $tool.log.error(`天气数据获取-A3-${reason.error}`);
+            check('darksky', false);
         }
-    }, reason => {
-        record(`天气数据获取-A3-${reason.error}`);
-        check('darksky', false);
-    });
+
+    })
 }
 
 function aqicn() {
     if (provider.aqicn.progress == 2) return;
     start("aqicn");
-    $task.fetch({
-        url: provider.aqicn.api
-    }).then(response => {
-        try {
-            var waqiObj = JSON.parse(response.body);
-            if (waqiObj.status == 'error') {
-                $notify("Aqicn", "出错啦", waqiObj.data);
-            } else {
-                record(`天气数据获取-B1-${response.body}`);
-                provider.aqicn.data = {
-                    ...getAqiInfo(waqiObj.data.aqi)
-                };
+    $tool.get({url: provider.aqicn.api}, function (error, response, body) {
+        if (!error) {
+            try {
+                var waqiObj = JSON.parse(body);
+                if (waqiObj.status == 'error') {
+                    $tool.notify("Aqicn", "出错啦", waqiObj.data);
+                } else {
+                    $tool.log.debug(`天气数据获取-B1-${body}`);
+                    provider.aqicn.data = {
+                        ...getAqiInfo(waqiObj.data.aqi)
+                    };
+                }
+                check('aqicn', true)
+            } catch (e) {
+                $tool.log.error(`天气数据B获取报错${JSON.stringify(e)}`)
             }
-            check('aqicn', true)
-        } catch (e) {
-            console.log(`天气数据B获取报错${JSON.stringify(e)}`)
+        } else {
+            $tool.log.error(`天气数据获取-B2-${reason.error}`);
+            //获取精确数据失败后，直接获取粗略信息即可
+            heweatherAir();
         }
-    }, reason => {
-        record(`天气数据获取-B2-${reason.error}`);
-        //获取精确数据失败后，直接获取粗略信息即可
-        heweatherAir();
-    });
+    })
 }
 
 function heweatherNow() {
     start("heweather_now");
-    $task.fetch({
-        url: provider.heweather_now.api
-    }).then(response => {
-        try {
-            record(`天气数据获取-C1-${response.body}`);
-            var heObj = JSON.parse(response.body);
-            provider.heweather_now.data.basic = heObj.HeWeather6[0].basic;
-            provider.heweather_now.data.now = heObj.HeWeather6[0].now;
-            check('heweather_now', true)
-        } catch (e) {
-            console.log(`天气数据C获取报错${JSON.stringify(e)}`)
+    $tool.get({url: provider.heweather_now.api}, function (error, response, body) {
+        if (!error) {
+            try {
+                $tool.log.debug(`天气数据获取-C1-${body}`);
+                var heObj = JSON.parse(body);
+                provider.heweather_now.data.basic = heObj.HeWeather6[0].basic;
+                provider.heweather_now.data.now = heObj.HeWeather6[0].now;
+                check('heweather_now', true)
+            } catch (e) {
+                $tool.log.error(`天气数据C获取报错${JSON.stringify(e)}`)
+            }
+        } else {
+            $tool.log.error(`天气数据获取-C2-${reason.error}`);
+            //因为此接口出错率还挺高的,所以即使报错我们也不处理,该返回什么就返回什么好了
+            check('heweather_now', false)
         }
-    }, reason => {
-        record(`天气数据获取-C2-${reason.error}`);
-        //因为此接口出错率还挺高的,所以即使报错我们也不处理,该返回什么就返回什么好了
-        check('heweather_now', false)
     })
 }
 
 function heweatherDaily() {
     if (provider.heweather_daily.progress == 2) return;
     start("heweather_daily");
-    $task.fetch({
-        url: provider.heweather_daily.api
-    }).then(response => {
-        try {
-            record(`天气数据获取-D1-${response.body}`);
-            var heObj = JSON.parse(response.body);
-            provider.heweather_daily.data = heObj.HeWeather6[0].daily_forecast[0];
-            check('heweather_daily', true)
-        } catch (e) {
-            console.log(`天气数据D获取报错${JSON.stringify(e)}`)
+    $tool.get({url: provider.heweather_daily.api}, function (error, response, body) {
+        if (!error) {
+            try {
+                $tool.log.debug(`天气数据获取-D1-${body}`);
+                var heObj = JSON.parse(body);
+                provider.heweather_daily.data = heObj.HeWeather6[0].daily_forecast[0];
+                check('heweather_daily', true)
+            } catch (e) {
+                $tool.log.error(`天气数据D获取报错${JSON.stringify(e)}`)
+            }
+        } else {
+            $tool.log.error(`天气数据获取-D2-${reason.error}`);
+            //因为此接口出错率还挺高的,所以即使报错我们也不处理,该返回什么就返回什么好了
+            check('heweather_daily', false)
         }
-    }, reason => {
-        record(`天气数据获取-D2-${reason.error}`);
-        //因为此接口出错率还挺高的,所以即使报错我们也不处理,该返回什么就返回什么好了
-        check('heweather_daily', false)
     })
 }
 
 function heweatherAir() {
     if (provider.heweather_air.progress == 2) return;
     start("heweather_air");
-    $task.fetch({
-        url: provider.heweather_air.api
-    }).then(response => {
-        try {
-            record(`天气数据获取F1-${response.body}`);
-            var heObj = JSON.parse(response.body);
-            provider.heweather_air.data = {
-                ...getAqiInfo(heObj.HeWeather6[0].air_now_city.aqi)
-            };
-            check('heweather_air', true)
-        } catch (e) {
-            console.log(`天气数据F获取报错${JSON.stringify(e)}`)
+    $tool.get({url: provider.heweather_air.api}, function (error, response, body) {
+        if (!error) {
+            try {
+                $tool.log.debug(`天气数据获取F1-${body}`);
+                var heObj = JSON.parse(body);
+                provider.heweather_air.data = {
+                    ...getAqiInfo(heObj.HeWeather6[0].air_now_city.aqi)
+                };
+                check('heweather_air', true)
+            } catch (e) {
+                $tool.log.error(`天气数据F获取报错${JSON.stringify(e)}`)
+            }
+        } else {
+            $tool.log.error(`天气数据获取-F2-${reason.error}`);
+            //因为此接口出错率还挺高的,所以即使报错我们也不处理,该返回什么就返回什么好了
+            check('heweather_air', false)
         }
-    }, reason => {
-        record(`天气数据获取-F2-${reason.error}`);
-        //因为此接口出错率还挺高的,所以即使报错我们也不处理,该返回什么就返回什么好了
-        check('heweather_air', false)
     })
 }
 
@@ -241,21 +249,21 @@ function heweatherLifestyle() {
         }
     }
     if (needRequest) {
-        $task.fetch({
-            url: provider.heweather_lifestyle.api
-        }).then(response => {
-            try {
-                record(`天气数据获取-E1-${response.body}`);
-                var heObj = JSON.parse(response.body);
-                provider.heweather_lifestyle.data = heObj.HeWeather6[0].lifestyle;
-                check('heweather_lifestyle', true)
-            } catch (e) {
-                console.log(`天气数据E获取报错${JSON.stringify(e)}`)
+        $tool.get({url: provider.heweather_lifestyle.api}, function (error, response, body) {
+            if (!error) {
+                try {
+                    $tool.log.debug(`天气数据获取-E1-${body}`);
+                    var heObj = JSON.parse(body);
+                    provider.heweather_lifestyle.data = heObj.HeWeather6[0].lifestyle;
+                    check('heweather_lifestyle', true)
+                } catch (e) {
+                    $tool.log.error(`天气数据E获取报错${JSON.stringify(e)}`)
+                }
+            } else {
+                $tool.log.error(`天气数据获取-E2-${reason.error}`);
+                //因为此接口出错率还挺高的,所以即使报错我们也不处理,该返回什么就返回什么好了
+                check('heweather_lifestyle', false)
             }
-        }, reason => {
-            record(`天气数据获取-E2-${reason.error}`);
-            //因为此接口出错率还挺高的,所以即使报错我们也不处理,该返回什么就返回什么好了
-            check('heweather_lifestyle', false)
         })
     } else {
         check('heweather_lifestyle', false)
@@ -265,18 +273,23 @@ function heweatherLifestyle() {
 
 // #region 提醒数据组装
 function check(type, result) {
-    record(`check-${type}-${result}`);
-    //支持setTimeout居然不支持clearTimeout,有点难受
-    if (provider[type].progress == 1 || provider[type].progress == 9) return;
-    provider[type].progress = result ? 1 : 9;
-    var isAllChecked = provider.heweather_now.progress != 0 && provider.heweather_daily.progress && provider.darksky.progress != 0 && (provider.aqicn.progress != 0 || provider.heweather_air.progress != 0) && provider.heweather_lifestyle.progress != 0;
-    if (isAllChecked) {
-        record(`天气数据渲染中[template]`);
-        try {
-            renderTemplate();
-        } catch (e) {
-            record(`天气渲染出错-${JSON.stringify(e)}`);
+    $tool.log.debug(`check-${type}-${result}`);
+    try {
+        //支持setTimeout居然不支持clearTimeout,有点难受
+        if (provider[type].progress == 1 || provider[type].progress == 9) return;
+        provider[type].progress = result ? 1 : 9;
+        var isAllChecked = provider.heweather_now.progress != 0 && provider.heweather_daily.progress != 0 && provider.darksky.progress != 0 && (provider.aqicn.progress != 0 || provider.heweather_air.progress != 0) && provider.heweather_lifestyle.progress != 0;
+        // var isAllChecked = true
+        if (isAllChecked) {
+            $tool.log.debug(`天气数据渲染中[template]`);
+            try {
+                renderTemplate();
+            } catch (e) {
+                $tool.log.error(`天气渲染出错-${JSON.stringify(e)}`);
+            }
         }
+    } catch (lineerror) {
+        $tool.log.error(`check error: ${lineerror}`)
     }
 }
 
@@ -362,8 +375,7 @@ function renderTemplate() {
         subtitle: execTemplate(config.show.template.subtitle, map),
         detail: execTemplate(config.show.template.detail, map),
     };
-    $notify(notifyInfo.title, notifyInfo.subtitle, notifyInfo.detail);
-    $done({});
+    $tool.notify(notifyInfo.title, notifyInfo.subtitle, notifyInfo.detail);
 }
 // #endregion
 
@@ -487,7 +499,7 @@ function getCityInfo(name) {
         }
     } catch (e) {
         loc = '';
-        record(`获取城市名称失败-${JSON.stringify(e)}`);
+        $tool.log.error(`获取城市名称失败-${JSON.stringify(e)}`);
     }
     return loc;
 }
@@ -588,7 +600,7 @@ function support() {
         let regexHourly = /\$\[(hourly\()+([\s\S]+?)(\))+\]/g;
         provider.darksky.progress = (regexDaily.test(config.show.template.detail) || regexHourly.test(config.show.template.detail)) ? 0 : 2;
     }
-    record(`h_n:${provider.heweather_now.progress},h_d:${provider.heweather_daily.progress},h_a:${provider.heweather_air.progress},h_l:${provider.heweather_lifestyle.progress},aq:${provider.aqicn.progress},da:${provider.darksky.progress}`)
+    $tool.log.debug(`h_n:${provider.heweather_now.progress},h_d:${provider.heweather_daily.progress},h_a:${provider.heweather_air.progress},h_l:${provider.heweather_lifestyle.progress},aq:${provider.aqicn.progress},da:${provider.darksky.progress}`)
 }
 /**
  * 用于普通模板的映射
@@ -617,7 +629,7 @@ function execArrayTemplate() {
         execTemplateDaily();
         execTemplateHourly();
     } catch (e) {
-        console.log(`${JSON.stringify(e)}`)
+        $tool.log.error(`${JSON.stringify(e)}`)
     }
 
 }
@@ -806,13 +818,6 @@ function execTemplateHourly() {
     }
 }
 
-function record(log) {
-    if (config.log == 1) {
-        console.log(log);
-    } else if (config.log == 2) {
-        console.log(log.substring(0, 60));
-    }
-}
 // #endregion
 
 // #region 扩展方法
@@ -845,4 +850,318 @@ Date.prototype.Format = function (fmt) {
     return fmt;
 }
 // #endregion
-weather();
+
+// https://github.com/yichahucha/surge/blob/master/tool.js
+//https://github.com/chavyleung/scripts/blob/master/chavy.js
+// 工具方法编写参考了以上脚本，在此感谢 🙏
+function Tool() {
+    // app
+    const _isQuanX = typeof $task != "undefined"
+    const _isSurge = typeof $httpClient != "undefined"
+    const _isJSBox = typeof $app != "undefined" && $app.info.bundleID == "app.cyan.jsbox"
+    const _isNode = typeof require == "function" && !_isJSBox
+
+    // environment
+    const _isRequest = typeof $request != "undefined"
+    const _isResponse = typeof $response != "undefined"
+
+    const ishttp = _isRequest || _isResponse
+
+    // require Tools
+    const _requireTools = (() => {
+        var tools = {}
+        if (typeof require == "function") {
+            let request = require('request')
+            if (request) tools.request = request
+            let fs = require("fs")
+            if (fs) tools.fs = fs
+        }
+        return tools
+    })()
+
+    // config
+    const _nodeStoreName = "prefs.json"
+
+    // custom log
+    // if you want to add log level, just add to _logLevels
+    const _log = (() => {
+        // default log value
+        let _logLevel = "debug"
+
+        const _logLevels = new Array("trace", "debug", "info", "warn", "error", "fatal")
+
+        // 默认显示日志等级
+        let _isShowLevel = true
+
+        // 设置日志等级，返回值为当前等级
+        const _setLogLevel = (level = "") => {
+            if (_logLevels.indexOf(level) > -1) {
+                _logLevel = level
+            }
+            return _logLevel
+        }
+
+        const showLevel = (isShow) => {
+            if (typeof isShow == "boolean") {
+                _isShowLevel = isShow
+            }
+            return _isShowLevel
+        }
+
+        // 过滤低等级日志信息
+        const _filterLog = (level, callback) => {
+            let index = _logLevels.indexOf(level)
+            let current = _logLevels.indexOf(_setLogLevel())
+            if (index > -1) {
+                if (index >= current) {
+                    callback()
+                }
+            } else {
+                callback()
+            }
+        }
+
+        const _setLogFunction = (level) => {
+            return (message) => {
+                _filterLog(level, (() => {
+                    if (showLevel()) {
+                        console.log(`<${level}> ${message}`)
+                    } else {
+                        console.log(message)
+                    }
+                }))
+            }
+        }
+
+        let level = _setLogLevel
+        let log = _filterLog
+        var logFunc = {level, log, showLevel}
+        _logLevels.forEach((item) => {
+            logFunc[item] = _setLogFunction(item)
+        })
+
+        return logFunc
+    })
+
+    const log = _log()
+
+    // setTimeout
+    const timeout = (() => {
+        if (typeof setTimeout != "undefined") {
+            return setTimeout
+        }
+        return (handler, timeout = 0) => {
+            handler()
+        }
+    })()
+
+    // notification
+    const notify = (title, subtitle, message) => {
+        if (_isQuanX) {
+            $notify(title, subtitle, message)
+        }
+        if (_isSurge) {
+            $notification.post(title, subtitle, message)
+        }
+        if (_isNode) {
+            console.log(JSON.stringify({title, subtitle, message}))
+        }
+        if (_isJSBox) {
+            if (subtitle && message) {
+                $push.schedule({title: title, body: subtitle + "\n" + message})
+            } else {
+                $push.schedule({title: title, body: subtitle + message})
+            }
+        }
+    }
+
+    // store
+    const read = (key) => {
+        if (_isQuanX) return $prefs.valueForKey(key)
+        if (_isSurge) return $persistentStore.read(key)
+        if (_isJSBox) return _jsBoxRead(key)
+        if (_isNode) return _nodeRead(key)
+    }
+
+    const write = (value, key) => {
+        if (_isQuanX) return $prefs.setValueForKey(value, key)
+        if (_isSurge) return $persistentStore.write(value, key)
+        if (_isJSBox) return _jsBoxWrite(value, key)
+        if (_isNode) return _nodeWrite(value, key)
+    }
+
+    const _nodeRead = (key) => {
+        try {
+            var data = JSON.parse(_requireTools.fs.readFileSync(_nodeStoreName))
+            if (typeof data[key] != "undefined") {
+                return data[key]
+            }
+        } catch (error) {
+            log.error(error)
+        }
+        return ""
+    }
+
+    const _nodeWrite = (value, key) => {
+        try {
+            if (!_requireTools.fs.existsSync(_nodeStoreName)) {
+                _requireTools.fs.writeFileSync(_nodeStoreName, JSON.stringify({}))
+            }
+            var data = JSON.parse(_requireTools.fs.readFileSync(_nodeStoreName))
+            data[key] = value
+            _requireTools.fs.writeFileSync(_nodeStoreName, JSON.stringify(data))
+            return true
+        } catch (error) {
+            log.error(error)
+        }
+        return false
+    }
+
+    const _jsBoxRead = (key) => {
+        try {
+            if (_jsBoxEnvName != "icloud") {
+                return $prefs.get(key)
+            }
+            if (typeof $drive != "undefined") {
+                let filePath = "Code/" + _nodeStoreName
+                if ($drive.exists(filePath)) {
+                    let content = $drive.read(filePath)
+                    if (content) {
+                        let data = JSON.parse(content)
+                        if (typeof data[key] != "undefined") {
+                            return data[key]
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            log.error(error)
+        }
+        return ""
+    }
+
+    const _jsBoxWrite = (value, key) => {
+        try {
+            if (_jsBoxEnvName != "icloud") {
+                return $prefs.set(key, value)
+            }
+            if (typeof $drive != "undefined") {
+                let filePath = "Code/" + _nodeStoreName
+                var data = {}
+                if ($drive.exists(filePath)) {
+                    let content = $drive.read(filePath)
+                    data = JSON.parse(content)
+                }
+                data[key] = value
+                return $drive.write({data: $data({string: JSON.stringify(data)}), path: filePath})
+            }
+        } catch (error) {
+            log.error(error)
+        }
+        return false
+    }
+
+    const _jsBoxEnvName = (() => {
+        if (typeof $addin != "undefined") {
+            if (typeof $addin.current == "undefined") {
+                // 运行在icloud
+                return "icloud"
+            } else {
+
+                let _version = typeof $addin.current.version != "undefined"
+                let _author = typeof $addin.current.author != "undefined"
+                let _url = typeof $addin.current.url != "undefined"
+                let _website = typeof $addin.current.website != "undefined"
+                if (_version || _author || _url || _website) {
+                    // jsBox 应用
+                    return "app"
+                } else {
+                    // jsBox 脚本
+                    return "script"
+                }
+            }
+        }
+        return ""
+    })()
+
+    // http request
+    const get = (options, callback) => {
+        if (_isQuanX) {
+            if (typeof options == "string") options = {url: options}
+            options["method"] = "GET"
+            $task.fetch(options).then(response => {
+                callback(null, _status(response), response.body)
+            }, reason => callback(reason.error, null, null))
+        }
+        if (_isSurge) $httpClient.get(options, (error, response, body) => {
+            callback(error, _status(response), body)
+        });
+        if (_isNode) {
+            _requireTools.request(options, (error, response, body) => {
+                callback(error, _status(response), body)
+            })
+        }
+        if (_isJSBox) $http.get(_jsBoxRequest(options, callback))
+    }
+    const post = (options, callback) => {
+        if (_isQuanX) {
+            if (typeof options == "string") options = {url: options}
+            options["method"] = "POST"
+            $task.fetch(options).then(response => {
+                callback(null, _status(response), response.body)
+            }, reason => callback(reason.error, null, null))
+        }
+        if (_isSurge) {
+            $httpClient.post(options, (error, response, body) => {
+                callback(error, _status(response), body)
+            })
+        }
+        if (_isNode) {
+            _requireTools.request.post(options, (error, response, body) => {
+                callback(error, _status(response), body)
+            })
+        }
+        if (_isJSBox) $http.post(_jsBoxRequest(options, callback))
+    }
+
+    const _jsBoxRequest = (options, callback) => {
+        if (typeof options == "string") options = {url: options}
+        options["header"] = options["headers"]
+        delete options["headers"]
+        let body = options["body"]
+        if (typeof body != "undefined") {
+            try {
+                body = JSON.parse(body)
+                options["body"] = body
+            } catch (e) {
+            }
+        }
+        options["handler"] = function (resp) {
+            let error = resp.error
+            if (error) error = JSON.stringify(resp.error)
+            let body = resp.data
+            if (typeof body == "object") body = JSON.stringify(resp.data)
+            callback(error, _status(resp.response), body)
+        }
+        return options
+    }
+
+    const _status = (response) => {
+        if (response) {
+            if (response.status) {
+                response["statusCode"] = response.status
+            } else if (response.statusCode) {
+                response["status"] = response.statusCode
+            }
+        }
+        return response
+    }
+
+    // done
+    const done = (value = {}) => {
+        if (_isQuanX) ishttp ? $done(value) : ""
+        if (_isSurge) ishttp ? $done(value) : $done()
+    }
+
+    return {read, write, notify, get, post, ishttp, log, timeout, done}
+}

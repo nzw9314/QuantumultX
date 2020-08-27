@@ -4,8 +4,8 @@ README：https://github.com/yichahucha/surge/tree/master
 
 const $tool = new Tool()
 const consoleLog = false;
-const imdbApikeyCacheKey = "IMDbApikey";
-const netflixTitleCacheKey = "NetflixTitle";
+const imdbApikeyCacheKey = "ImdbApikeyCacheKey";
+const netflixTitleCacheKey = "NetflixTitleCacheKey";
 
 if (!$tool.isResponse) {
     let url = $request.url;
@@ -17,7 +17,9 @@ if (!$tool.isResponse) {
     const isEnglish = url.match(/languages=en/) ? true : false;
     if (!title && !isEnglish) {
         const currentSummary = urlDecode.match(/\["videos","(\d+)","current","summary"\]/);
-        url = url.replace("&path=" + encodeURIComponent(currentSummary[0]), "");
+        if (currentSummary) {
+            url = url.replace("&path=" + encodeURIComponent(currentSummary[0]), "");
+        }
         url = url.replace(/&languages=(.*?)&/, "&languages=en-US&");
     }
     url += "&path=" + encodeURIComponent(`[${videos[0]},"details"]`);
@@ -28,43 +30,49 @@ if (!$tool.isResponse) {
     if (!IMDbApikey) updateIMDbApikey();
     let obj = JSON.parse($response.body);
     if (consoleLog) console.log("Netflix Original Body:\n" + $response.body);
-    const videoID = obj.paths[0][1];
-    const video = obj.value.videos[videoID];
-    const map = getTitleMap();
-    let title = map[videoID];
-    if (!title) {
-        title = video.summary.title;
-        setTitleMap(videoID, title, map);
+    if (typeof (obj.paths[0][1]) == "string") {
+        const videoID = obj.paths[0][1];
+        const video = obj.value.videos[videoID];
+        const map = getTitleMap();
+        let title = map[videoID];
+        if (!title) {
+            title = video.summary.title;
+            setTitleMap(videoID, title, map);
+        }
+        let year = null;
+        let type = video.summary.type;
+        if (type == "show") {
+            type = "series";
+        }
+        if (video.details) {
+            if (type == "movie") {
+                year = video.details.releaseYear;
+            }
+            delete video.details;
+        }
+        const requestRatings = async () => {
+            const IMDb = await requestIMDbRating(title, year, type);
+            const Douban = await requestDoubanRating(IMDb.id);
+            const IMDbrating = IMDb.msg.rating;
+            const tomatoes = IMDb.msg.tomatoes;
+            const country = IMDb.msg.country;
+            const doubanRating = Douban.rating;
+            const message = `${country}\n${IMDbrating}\n${doubanRating}${tomatoes.length > 0 ? "\n" + tomatoes + "\n" : "\n"}`;
+            return message;
+        }
+        let msg = "";
+        requestRatings()
+            .then(message => msg = message)
+            .catch(error => msg = error + "\n")
+            .finally(() => {
+                let summary = obj.value.videos[videoID].summary;
+                summary["supplementalMessage"] = `${msg}${summary && summary.supplementalMessage ? "\n" + summary.supplementalMessage : ""}`;
+                if (consoleLog) console.log("Netflix Modified Body:\n" + JSON.stringify(obj));
+                $done({ body: JSON.stringify(obj) });
+            });
+    } else {
+        $done({});
     }
-    let year = null;
-    let type = video.summary.type;
-    // if (type == "movie") {
-    //     year = video.details.releaseYear;
-    // }
-    if (type == "show") {
-        type = "series";
-    }
-    delete video.details;
-    const requestRatings = async () => {
-        const IMDb = await requestIMDbRating(title, year, type);
-        const Douban = await requestDoubanRating(IMDb.id);
-        const IMDbrating = IMDb.msg.rating;
-        const tomatoes = IMDb.msg.tomatoes;
-        const country = IMDb.msg.country;
-        const doubanRating = Douban.rating;
-        const message = `${country}\n${IMDbrating}\n${doubanRating}${tomatoes.length > 0 ? "\n" + tomatoes + "\n" : "\n"}`;
-        return message;
-    }
-    let msg = "";
-    requestRatings()
-        .then(message => msg = message)
-        .catch(error => msg = error + "\n")
-        .finally(() => {
-            let summary = obj.value.videos[videoID].summary;
-            summary["supplementalMessage"] = `${msg}${summary && summary.supplementalMessage ? "\n" + summary.supplementalMessage : ""}`;
-            if (consoleLog) console.log("Netflix Modified Body:\n" + JSON.stringify(obj));
-            $done({ body: JSON.stringify(obj) });
-        });
 }
 
 function getTitleMap() {
@@ -191,7 +199,6 @@ function errorTip() {
 
 function IMDbApikeys() {
     const apikeys = [
-        "PlzBanMe", "4e89234e",
         "f75e0253", "d8bb2d6b",
         "ae64ce8d", "7218d678",
         "b2650e38", "8c4a29ab",
@@ -201,7 +208,8 @@ function IMDbApikeys() {
         "9cc1a9b7", "e53c2c11",
         "f6dfce0e", "b9db622f",
         "e6bde2b9", "d324dbab",
-        "d7904fa3", "aeaf88b9"];
+        "d7904fa3", "aeaf88b9",
+        "4e89234e",];
     return apikeys;
 }
 

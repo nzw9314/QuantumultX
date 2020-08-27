@@ -4,6 +4,7 @@ README：https://github.com/yichahucha/surge/tree/master
 
 const path1 = "serverConfig";
 const path2 = "wareBusiness";
+const path3 = "basicConfig";
 const consolelog = false;
 const url = $request.url;
 const body = $response.body;
@@ -12,6 +13,15 @@ const $tool = tool();
 if (url.indexOf(path1) != -1) {
     let obj = JSON.parse(body);
     delete obj.serverConfig.httpdns;
+    delete obj.serverConfig.dnsvip;
+    delete obj.serverConfig.dnsvip_v6;
+    $done({ body: JSON.stringify(obj) });
+}
+
+if (url.indexOf(path3) != -1) {
+    let obj = JSON.parse(body);
+    delete obj.data.JDHttpToolKit.httpdns;
+    delete obj.data.JDHttpToolKit.dnsvipV6;
     $done({ body: JSON.stringify(obj) });
 }
 
@@ -68,11 +78,11 @@ function priceSummary(data) {
     listPriceDetail.pop()
     let list = listPriceDetail.concat(historySummary(data.single))
     list.forEach((item, index) => {
-        if (index == 2) {
+        if (item.Name == "双11价格") {
             item.Name = "双十一价格"
-        } else if (index == 3) {
+        } else if (item.Name == "618价格") {
             item.Name = "六一八价格"
-        } else if (index == 4) {
+        } else if (item.Name == "30天最低价") {
             item.Name = "三十天最低"
         }
         summary += `\n${item.Name}${getSpace(8)}${item.Price}${getSpace(8)}${item.Date}${getSpace(8)}${item.Difference}`

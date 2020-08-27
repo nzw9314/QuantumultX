@@ -1,10 +1,10 @@
 # Except
-USER-AGENT,SafariSafeBrowsing*
 DOMAIN,cn.bing.com
 DOMAIN,www.microsoft.com
 DOMAIN,www.gstatic.com
 DOMAIN,ssl.gstatic.com
 DOMAIN,cdn.ampproject.org
+DOMAIN,download.maxmind.com
 
 # Misc
 DOMAIN-SUFFIX,115.com
@@ -20,7 +20,6 @@ DOMAIN-SUFFIX,ithome.com
 DOMAIN-SUFFIX,xinhuanet.com
 DOMAIN-SUFFIX,tianyaui.com
 DOMAIN-SUFFIX,xunlei.com
-DOMAIN-SUFFIX,meitudata.com
 DOMAIN-SUFFIX,ruanmei.com
 DOMAIN-SUFFIX,coding.net
 DOMAIN-SUFFIX,loli.net
@@ -35,7 +34,6 @@ DOMAIN-SUFFIX,dpfile.com
 DOMAIN-SUFFIX,suning.com
 DOMAIN-SUFFIX,hupu.com
 DOMAIN-SUFFIX,gifshow.com
-DOMAIN-SUFFIX,cordcloud.org
 DOMAIN-SUFFIX,openinstall.io
 DOMAIN-SUFFIX,cloudfront.net
 DOMAIN-SUFFIX,cloudflare.com
@@ -52,7 +50,6 @@ DOMAIN-SUFFIX,guokr.com
 DOMAIN-SUFFIX,adguard.com
 DOMAIN-SUFFIX,huanqiu.com
 DOMAIN-SUFFIX,oschina.net
-DOMAIN-SUFFIX,magi.com
 DOMAIN-SUFFIX,smzdm.com
 DOMAIN-SUFFIX,leiphone.com
 DOMAIN-SUFFIX,chinamobile.com
@@ -62,6 +59,8 @@ DOMAIN-SUFFIX,lapin365.com
 DOMAIN-SUFFIX,csdn.net
 DOMAIN-SUFFIX,ipip.net
 DOMAIN-SUFFIX,douyu.com
+DOMAIN-SUFFIX,unionpay.com
+DOMAIN-SUFFIX,wsyyb.com
 
 DOMAIN-SUFFIX,cn
 DOMAIN-SUFFIX,local
@@ -176,6 +175,7 @@ DOMAIN-SUFFIX,youdao.com
 DOMAIN-SUFFIX,ydstatic.com
 
 # Tencent
+DOMAIN-KEYWORD,qcloud
 DOMAIN-SUFFIX,qq.com
 DOMAIN-SUFFIX,gtimg.com
 DOMAIN-SUFFIX,txfund.com
@@ -184,9 +184,6 @@ DOMAIN-SUFFIX,idqqimg.com
 DOMAIN-SUFFIX,weiyun.com
 DOMAIN-SUFFIX,tencent.com
 DOMAIN-SUFFIX,smtcdns.com
-DOMAIN-SUFFIX,qcloud.com
-DOMAIN-SUFFIX,myqcloud.com
-DOMAIN-SUFFIX,qcloudimg.com
 DOMAIN-SUFFIX,weixinbridge.com
 
 # Xiaomi

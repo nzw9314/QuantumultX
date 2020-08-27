@@ -1,0 +1,12 @@
+#!name=Old_iPA_Downloader by @Lãng Khách
+#!desc=Requires: Computers need to trust  root Surge certificate and set proxy rule domain-keyword: -buy.itunes.apple.com. (iOS. Open AppleStore search app. Share app into shortcut Old_iPA_Downloader, choose version app. PC: Open iTunes search and click Get). Done (Check \Music\iTunes\iTunes Media\Mobile Applications)
+#!system=ios
+//Link shortcut: https://www.icloud.com/shortcuts/bdbba3de9c8d42fe858bf210d20e5603
+
+[Script]
+
+old_ipa.js = type=http-request,pattern=(https:\/\/(.+\-|)buy\.itunes\.apple\.com\/WebObjects\/MZBuy.woa\/wa\/buyProduct)|(https:\/\/api\.unlimapps\.com\/.+\/apple_apps\/.+\/versions\?=),requires-body=1,max-size=0,debug=1,script-path=https://raw.githubusercontent.com/langkhach270389/Scripting/master/Surge/old_ipa.js
+
+
+[MITM]
+hostname = %APPEND% *-buy.itunes.apple.com, api.unlimapps.com,

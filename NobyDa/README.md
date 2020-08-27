@@ -12,6 +12,14 @@
 
 * Store version QX1.0.5 (192) Remote script resources are unavailable, but "task" script functionality is added.
 
+* Store version QX1.0.6 (212) Supports rewrite of HTTP request body, and replay of HTTP request
+
+* Store version QX1.0.7 (240) Supports TLS 1.3 for TLS based proxy protocols, and new external proxy protocol trojan.
+
+* ...
+
+* Store version QX1.0.10 (313) In this version, script remote subscription has been restored.
+
 QX1.0.3 add device ID, a simple example:
 
 ```ini
@@ -49,7 +57,7 @@ The above random generated device ID can be found at the bottom of Quantumult X 
 
 * **[Rewrite_lhie1.conf](https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/Rewrite_lhie1.conf)（More than 400 ad rewrite rules, integrate [lhie1](https://github.com/lhie1/Rules)、[onewayticket255](https://github.com/onewayticket255/Surge-Script)、[Choler](https://github.com/Choler/Surge/tree/master/Ruleset), and delete [ConnersHua](https://github.com/ConnersHua/Profiles) duplicate，you need to open MITM and trust the certificate)**
 
-* **[Js.conf](https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/Js.conf) (Script subscription of Quantumult X 1.0.0)**
+* **[Js.conf](https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/Js.conf) (Remote script subscription, only compatible with QX1.0.10 (313) and above)**
 
 * **[Js_local_WorkingCopy.conf](https://raw.githubusercontent.com/NobyDa/Script/master/QuantumultX/Js_local_WorkingCopy.conf) (Local script subscriptions that need to work with Working Copy apps, this subscription can solve the problem that remote subscription cannot be made above QX 1.0.4)**
 
@@ -89,3 +97,6 @@ The above random generated device ID can be found at the bottom of Quantumult X 
 * [@Choler](https://github.com/Choler)
 * [@ConnersHua](https://github.com/ConnersHua)
 
+## License
+
+[GPLv3](LICENSE)

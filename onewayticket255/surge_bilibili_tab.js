@@ -93,4 +93,3 @@ body['data']['bottom'] = [
 
 body = JSON.stringify(body)
 $done({ body })
-

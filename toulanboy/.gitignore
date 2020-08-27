@@ -1,0 +1,5 @@
+*.ini
+*.txt
+.DS_Store
+test
+

@@ -1,3 +1,5 @@
+![Anurag’s github stats](https://github-readme-stats.vercel.app/api?username=nzw9314&show_icons=true&theme=merko)
+
 ### 说明 :
 
 * 只是搬运和同步更新大佬脚本.
@@ -24,11 +26,9 @@
 
 * [Js_local_WorkingCopy.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_local_WorkingCopy.conf) 脚本订阅.
 
-* [Js_Local_WorkingCopy_Cookie.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Js_Local_WorkingCopy_Cookie.conf) 获取Cookie订阅,适用于商店版v1.0.5-build192
+* [Get_Cookie_New.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_New.conf) 获取Cookie订阅
 
-* [Get_Cookie_New.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Get_Cookie_New.conf) 获取Cookie,商店版及TFv1.0.6-build212+
-
-* 获取Cookie订阅根据QuantumultX版本二选一,仅在Cookie获取或失效时启用,不需要时右滑动禁用.
+* 仅在Cookie获取或失效时启用,不需要时右滑动禁用.
 
 * [Task_Local.conf](https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Task_Local.conf) 定时任务配置,目前无法订阅,请手动根据个人需求复制内容及修改时间.
 
@@ -82,3 +82,28 @@
 * [@Neurogram-R](https://github.com/Neurogram-R)
 
 * [@sazs34](https://github.com/sazs34)
+
+* [@uniqueque](https://github.com/uniqueque)
+
+* [@eHpo](https://github.com/eHpo1/Rules)
+
+* [@Sunert](https://github.com/Sunert/Scripts)
+
+* [@songyangzz](https://github.com/songyangzz/QuantumultX.git)
+
+* [@zZPiglet](https://github.com/zZPiglet/Task.git)
+
+* [@Peng-YM](https://github.com/Peng-YM/QuanX)
+
+* [@evilbutcher](https://github.com/evilbutcher/Quantumult_X/tree/master)
+
+* [@lxk0301](https://gitee.com/lxk0301/scripts)
+
+* [@toulanboy](https://github.com/toulanboy/scripts)
+
+* [@lowking](https://github.com/lowking/Scripts)
+
+
+## License
+
+[GPLv3](LICENSE)

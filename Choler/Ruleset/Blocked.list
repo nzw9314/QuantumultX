@@ -1,4 +1,3 @@
-
 # Misc
 DOMAIN-SUFFIX,tw
 DOMAIN-SUFFIX,jp
@@ -50,9 +49,12 @@ AND,((DOMAIN-KEYWORD,github), (DOMAIN-SUFFIX,com))
 AND,((DOMAIN-KEYWORD,dropbox), (DOMAIN-SUFFIX,com))
 
 # Apple
+DOMAIN,xp.apple.com
 DOMAIN,ocvideo.apple.com
-DOMAIN-SUFFIX,iadsdk.apple.com
-DOMAIN-KEYWORD,buy.itunes.apple.com
+DOMAIN,seed.siri.apple.com
+DOMAIN,iadsdk.apple.com
+DOMAIN,testflight.apple.com
+DOMAIN-KEYWORD,-buy.itunes.apple.com
 
 # Netflix
 USER-AGENT,Argo*
@@ -112,9 +114,6 @@ DOMAIN-SUFFIX,youtube.com
 DOMAIN-SUFFIX,appspot.com
 DOMAIN-SUFFIX,blogger.com
 DOMAIN-SUFFIX,getoutline.org
-DOMAIN-SUFFIX,gvt0.com
-DOMAIN-SUFFIX,gvt1.com
-DOMAIN-SUFFIX,gvt3.com
 
 # Line
 DOMAIN-SUFFIX,line.me
@@ -173,7 +172,6 @@ DOMAIN-SUFFIX,telegra.ph
 DOMAIN-SUFFIX,telegram.me
 DOMAIN-SUFFIX,telegram.org
 DOMAIN-SUFFIX,tdesktop.com
-DOMAIN-SUFFIX,telegramindex.com
 
 # WalMart
 DOMAIN-SUFFIX,walmart.com
@@ -202,6 +200,7 @@ DOMAIN-SUFFIX,xvideos-cdn.com
 # PornHub
 DOMAIN-SUFFIX,phncdn.com
 DOMAIN-SUFFIX,pornhub.com
+DOMAIN-SUFFIX,phprcdn.com
 DOMAIN-SUFFIX,pornhubpremium.com
 
 # NYTimes
@@ -215,8 +214,9 @@ DOMAIN-SUFFIX,ftchinese.com
 
 # FINAL
 AND,((IP-CIDR,0.0.0.0/0,no-resolve), (NOT,((GEOIP,CN))))
+AND,((IP-CIDR6,::/0,no-resolve), (NOT,((GEOIP,CN))))
 
-
+# User-Agent
 AND,((USER-AGENT,JSBox*), (NOT,((GEOIP,CN))))
 AND,((USER-AGENT,Reeder*), (NOT,((GEOIP,CN))))
 

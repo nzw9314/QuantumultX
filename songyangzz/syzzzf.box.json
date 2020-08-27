@@ -1,0 +1,43 @@
+{
+	"id": "syzzzf.app.sub",
+	"name": "syzzzf应用订阅",
+	"author": "@syzzzf",
+	"icon": "",
+	"repo": "https://github.com/songyangzz/QxScripts",
+	"apps": [{
+			"id": "elemSign",
+			"name": "饿了么签到",
+			"keys": ["cookie_elem"],
+			"author": "@syzzzf",
+			"repo": "https://raw.githubusercontent.com/songyangzz/QuantumultX/master/elem/elemSign.js",
+			"icons": ["https://raw.githubusercontent.com/Orz-3/task/master/elem.png", "https://raw.githubusercontent.com/Orz-3/task/master/elem.png"]
+		},
+		{
+			"id": "testflight",
+			"name": "tf监控",
+			"keys": [],
+			"settings": [{
+				"id": "appkey",
+				"name": "监控appkey",
+				"val": "",
+				"type": "textarea",
+				"placeholder": "VCIvwk2g,1SyedSId",
+				"autoGrow": true,
+				"rows": 1,
+				"desc": "以英文逗号分隔多个key"
+			}, {
+				"id": "testflight_isnotify",
+				"name": "是否静默通知",
+				"val": "",
+				"type": "textarea",
+				"placeholder": "true or false",
+				"autoGrow": true,
+				"rows": 1,
+				"desc": "false没有tf位置将不会通知只记录日志"
+			}],
+			"author": "@syzzzf",
+			"repo": "https://raw.githubusercontent.com/songyangzz/QuantumultX/master/elem/elemSign.js",
+			"icons": ["https://raw.githubusercontent.com/Orz-3/task/master/testflight.png", "https://raw.githubusercontent.com/Orz-3/task/master/testflight.png"]
+		}
+	]
+}

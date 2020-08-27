@@ -1,15 +1,21 @@
-# Profiles
-[![](https://img.shields.io/github/stars/NavePnow/Profiles.svg)](https://github.com/NavePnow/Profiles) [![](https://img.shields.io/github/forks/NavePnow/Profiles.svg)](https://github.com/NavePnow/Profiles) [![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![Generic badge](https://img.shields.io/badge/Telegram-Channel-blue.svg)](https://t.me/Leped_Channel) [![Generic badge](https://img.shields.io/badge/Telegram-Feedback-blue.svg)](https://t.me/Leped_Bot) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![](https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/english.svg)](https://github.com/NavePnow/Profiles/blob/master/README_EN.md)
+<p align="center">
+<img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/trans123.png" alt="Evan" width="200">
+</p>
+<h1 align="center">Profiles</h1>
+
+[![Generic badge](https://img.shields.io/badge/dynamic/json?color=lightgray&label=Followers&query=%24.data.totalSubs&url=https%3A%2F%2Fapi.spencerwoo.com%2Fsubstats%2F%3Fsource%3Dgithub%26queryKey%3DNavePnow&logo=github)](https://t.me/Leped_Channel) [![](https://img.shields.io/github/stars/NavePnow/Profiles.svg?logo=github&color=lightgrey)](https://github.com/NavePnow/Profiles) [![](https://img.shields.io/github/forks/NavePnow/Profiles.svg?logo=github&color=lightgrey)](https://github.com/NavePnow/Profiles) [![Generic badge](https://img.shields.io/badge/dynamic/json?color=blue&label=Channel&query=%24.data.totalSubs&url=https%3A%2F%2Fapi.spencerwoo.com%2Fsubstats%2F%3Fsource%3Dtelegram%26queryKey%3DLeped_Channel&logo=telegram)](https://t.me/Leped_Channel) [![Generic badge](https://img.shields.io/badge/Bot-Feedback-blue.svg?logo=telegram)](https://t.me/Leped_Bot) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) 
 
 [![ForTheBadge built-with-love](http://ForTheBadge.com/images/badges/built-with-love.svg)](https://GitHub.com/NavePnow)
 
 📖 文档 | 📖 [Docs](https://github.com/NavePnow/Profiles/blob/master/README_EN.md)
 
-Table of Contents
+[![](https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/english.svg)](https://github.com/NavePnow/Profiles/blob/master/README_EN.md)
+
+目录
 =================
 
    * [Profiles](#profiles)
-   * [Table of Contents](#table-of-contents)
+   * [目录](#目录)
       * [Filter - Surge and QuantumultX 规则集](#filter---surge-and-quantumultx-规则集)
       * [Scripts](#scripts)
          * [Surge/QuantumultX](#surgequantumultx)
@@ -20,13 +26,18 @@ Table of Contents
             * [weather.js/weather_qx.js](#weatherjsweather_qxjs)
             * [weibo](#weibo)
          * [Google Apps Script](#google-apps-script)
-            * [google_script/singtel.js](#google_scriptsingteljs)
-            * [google_script/calendar.js](#google_scriptcalendarjs)
-            * [google_script/ss-checkin.js](#google_scriptss-checkinjs)
+            * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/singtel.js" rel="nofollow">google_script/singtel.js</a>](#google_scriptsingteljs)
+            * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/calendar.js" rel="nofollow">google_script/calendar.js</a>](#google_scriptcalendarjs)
+            * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/ss-checkin.js" rel="nofollow">google_script/ss-checkin.js</a>](#google_scriptss-checkinjs)
+            * [<a href="https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/server.js" rel="nofollow">google_script/server.js</a>](#google_scriptserverjs)
          * [JSBox](#jsbox)
             * [JSBox/NUS_NextBus.js](#jsboxnus_nextbusjs)
             * [JSBox/Singtel .js](#jsboxsingteljs)
-      * [Tip Jar](#tip-jar)
+      * [作者](#作者)
+      * [<g-emoji class="g-emoji" alias="handshake" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f91d.png">🤝</g-emoji> Contributing](#-contributing)
+      * [<g-emoji class="g-emoji" alias="moneybag" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4b0.png">💰</g-emoji> Show your support](#-show-your-support)
+      * [<g-emoji class="g-emoji" alias="pray" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f64f.png">🙏</g-emoji> 鸣谢](#-鸣谢)
+      * [<g-emoji class="g-emoji" alias="memo" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png">📝</g-emoji> License](#-license)
 
 ## Filter - Surge and QuantumultX 规则集
 
@@ -68,7 +79,7 @@ Table of Contents
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMAGE 2019-11-12 19:58:49.jpg" height="40%" width="40%">
 一亩三分地论坛自动签到脚本
 
-[教程](https://nave.work/%E4%B8%80%E4%BA%A9%E4%B8%89%E5%88%86%E5%9C%B0%E8%87%AA%E5%8A%A8%E7%AD%BE%E5%88%B0%E8%84%9A%E6%9C%AC.html)
+[教程](https://medium.com/navepnow/一亩三分地自动签到脚本-c718734111ac)
 
 #### 10010+.js/10010+_qx.js
 **By [NavePnow](https://github.com/NavePnow)**
@@ -123,11 +134,11 @@ Table of Contents
 <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/IMG_1189.JPG" height="40%" width="40%">
 微博超话自动签到脚本
 
-[教程](https://nave.work/微博超话自动签到脚本.html)
+[教程](https://medium.com/navepnow/微博超话自动签到脚本-4826bff2112c)
 
 ### Google Apps Script
 
-#### google_script/singtel.js
+#### [google_script/singtel.js](https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/singtel.js)
 **By [NavePnow](https://github.com/NavePnow)**
 
 **powered by Google Script**
@@ -151,7 +162,7 @@ Table of Contents
 3.  注意⚠️
     1. 如果有问题，欢迎 [反馈](https://t.me/Leped_Bot) 
 
-#### google_script/calendar.js
+#### [google_script/calendar.js](https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/calendar.js)
 **By [NavePnow](https://github.com/NavePnow)**
 
 **powered by Google Script and Google Developers Console**
@@ -197,6 +208,27 @@ Table of Contents
     3. 如需进行测试，可以在编辑器中 `Run -> Debug function -> launch` 进行调试
     4. 如果有问题，欢迎 [反馈](https://t.me/Leped_Bot) 
 
+#### [google_script/server.js](https://raw.githubusercontent.com/NavePnow/Profiles/master/Scripts/google_script/server.js)
+**By [NavePnow](https://github.com/NavePnow)**
+
+**powered by Google Script and NodeQuery**
+
+<img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private//screenshot%202020-05-14%20at%2016.45.51.png" height="40%" width="40%">
+
+1. 特点
+   1. 根据 NodeQuery API 获取信息
+   2. 显示服务器 CPU, RAM, Disk 等详细信息
+2. 步骤
+   1. 从 [BotFather](https://telegram.me/BotFather) 创建一个bot，记下 `token`，代替脚本中的关键词 `BOT_TOKEN`
+   2. 从 [get_id_bot](https://telegram.me/get_id_bot) 得到用户 `id`, 代替脚本中的关键词 `CHAT_ID`
+   3. 从 [NodeQuery API](https://nodequery.com/settings/api) 得到 `api`, 代替脚本中的关键词 `api`
+   4. 拷贝脚本内容到 [Google Script](https://script.google.com/home/my) 的编辑器中
+   5. 设置一个合适的时间去触发脚本
+   > Edit -> Current project's triggers -> Add Trigger -> Choose which function to run(launch)
+3.  注意⚠️
+    1. 如果内容出错，检查返回数据的内容 `Logger.log()` 以及格式并修改正则表达式
+    2. 如需进行测试，可以在编辑器中 `Run -> Debug function -> launch` 进行调试
+    3. 如果有问题，欢迎 [反馈](https://t.me/Leped_Bot)
 
 ### JSBox
 
@@ -234,8 +266,31 @@ Table of Contents
 3.  注意⚠️
     1. 如果有问题，欢迎 [反馈](https://t.me/Leped_Bot) 
 
-## Tip Jar
+## 作者
 
-| PayPal                                                                                                                                                                       | 微信赞赏 WeChat Pay                                                                                                    |
+👤 **Evan**
+
+* Twitter: [@NavePnow](https://twitter.com/NavePnow)
+* Github: [@NavePnow](https://github.com/NavePnow)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+Feel free to check [issues page](https://github.com/NavePnow/Profiles/issues).
+
+## 💰 Show your support
+
+Give a ⭐️ if this project helped you!
+
+| PayPal                                                                                                                                                                       | Patron                                                                                                    |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DSZJCN4ZUEW74&currency_code=USD&source=url) | <img src="https://cdn.jsdelivr.net/gh/NavePnow/blog_photo@private/1234.JPG" width="200">
+| [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DSZJCN4ZUEW74&currency_code=USD&source=url) |   <a href="https://www.patreon.com/NavePnow"> <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160"> </a>
+
+## 🙏 鸣谢
+* Instructor：[Neurogram](https://github.com/Neurogram-R), [wangfei021325](https://t.me/wangfei021325)
+
+## 📝 License
+
+---
+Copyright © 2020 [Evan](https://github.com/NavePnow).
+This project is [MIT](https://github.com/NavePnow/Profiles/blob/master/LICENSE) licensed.

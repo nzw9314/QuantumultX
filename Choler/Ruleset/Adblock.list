@@ -1,3 +1,4 @@
+
 # 杂项
 USER-AGENT,*AdSDK*
 USER-AGENT,*Banner*
@@ -68,16 +69,15 @@ URL-REGEX,"^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad"
 # QQ音乐
 URL-REGEX,"^http:\/\/[\s\S]*\/music\/common\/upload\/t_splash_info\/"
 
-# 百度地图
-DOMAIN,map-mobile-opnimg.cdn.bcebos.com
-AND,((IP-CIDR,0.0.0.0/0,no-resolve), (USER-AGENT,%E7%99%BE%E5%BA%A6%E5%9C%B0%E5%9B%BE*))
-
 # 百度网盘
 URL-REGEX,"^https?:\/\/pan\.baidu\.com\/rest\/\d(\.\d)?\/pcs\/adx"
 URL-REGEX,"^https?:\/\/pan\.baidu\.com\/act\/api\/activityentry"
 
 # 百度贴吧
 URL-REGEX,"^http:\/\/[\s\S]*\/c\/s\/splashSchedule$"
+
+# 百度地图
+URL-REGEX,"^https?:\/\/newclient\.map\.baidu\.com\/client\/phpui2\/\?qt=ads"
 
 # 淘宝
 URL-REGEX,"^https?:\/\/heic\.alicdn\.com\/.*\.jpg_(9\d{2}|\d{4})"
@@ -132,9 +132,6 @@ URL-REGEX,"^http:\/\/rich\.kuwo\.cn\/AdService\/kaiping\/adinfo"
 
 # 字节跳动
 URL-REGEX,"^https?:\/\/[\s\S]*\.(snssdk|amemv)\.com\/api\/ad\/"
-
-# 威锋
-URL-REGEX,"^https?:\/\/api\.feng\.com\/v\d\/advertisement\/.*Claunch"
 
 # 斗鱼
 URL-REGEX,"^https?:\/\/rtbapi\.douyucdn\.cn\/japi\/sign\/app\/getinfo"
@@ -255,7 +252,7 @@ URL-REGEX,"^http:\/\/t00img\.yangkeduo\.com\/goods\/.*\.jpeg\?imageView2\/format
 
 # 人人视频
 URL-REGEX,"^https?:\/\/api\.rr\.tv\/ad\/getAll$"
-URL-REGEX,"^https?:\/\/api\.rr\.tv\/storage\/business\/rootName\/app\/homePage\?dataType=JSON$"
+URL-REGEX,"^https?:\/\/api\.rr\.tv\/storage\/business\/rootName\/app\/homePage"
 
 # 神舟专车
 URL-REGEX,"^https?:\/\/img01\.10101111cdn\.com\/adpos\/"
@@ -271,3 +268,9 @@ URL-REGEX,"^https?:\/\/portal\.xunyou\.mobi\/api\/v\d\/ios\/ads\/splash"
 
 # 360家庭防火墙
 URL-REGEX,"^https?:\/\/superapp\.ifenglian\.com\/super\/configs\/getconfig$"
+
+# 车来了
+URL-REGEX,"^http:\/\/atrace\.chelaile\.net\.cn\/adpub\/"
+
+# 微店
+URL-REGEX,"^https?:\/\/thor\.weidian\.com\/ares\/home\.splash\/"
