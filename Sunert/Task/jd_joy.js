@@ -113,21 +113,47 @@ function* step() {
                 console.log(`浏览商品奖励积分返回结果${JSON.stringify(deskGoodDetails)}`)
             }
             // 看激励视频得狗粮
-            let taskVideoRes = yield taskVideo();
-            console.log(`视频激--任务列表--${JSON.stringify(taskVideoRes)}`);
-            if (taskVideoRes.success) {
-              let taskArr = {};
-              for (let item of taskVideoRes.datas) {
-                if (item.ViewVideo) {
-                  taskArr = item;
+            // let taskVideoRes = yield taskVideo();
+            // console.log(`视频激--任务列表--${JSON.stringify(taskVideoRes)}`);
+            // if (taskVideoRes.success) {
+            //   let taskArr = {};
+            //   for (let item of taskVideoRes.datas) {
+            //     if (item.ViewVideo) {
+            //       taskArr = item;
+            //     }
+            //   }
+            //   let joinedCount = taskArr.joinedCount || 0;
+            //   for (let i = 0; i < new Array(taskArr.taskChance - joinedCount).fill('').length; i++) {
+            //     console.log(`开始第${i+1}次看激励视频`);
+            //       let sanVideoRes = yield sanVideo();
+            //     console.log(`看视频激励结果--${JSON.stringify(sanVideoRes)}`);
+            //   }
+            // }
+            // 好友列表
+            let getFriendsResult = yield getFriends()
+            for (var i = getFriendsResult.datas.length - 1; i >= 1; i--) {
+            	let friendPin = getFriendsResult.datas[i]["friendPin"]
+            	console.log(friendPin)
+            	// 进入好友房间
+                let enterFriendRoomResult = yield enterFriendRoom(friendPin)
+                let friendHomeCoin = enterFriendRoomResult.data["friendHomeCoin"]
+                console.log('friendHomeCoin = ' + friendHomeCoin)
+                if (enterFriendRoomResult.data["friendHomeCoin"] > 0) {
+                    let getFriendCoinResult = yield getFriendCoin(friendPin)
+                    console.log(`收取好友金币结果${JSON.stringify(getFriendCoinResult)}`)
                 }
-              }
-              let joinedCount = taskArr.joinedCount || 0;
-              for (let i = 0; i < new Array(taskArr.taskChance - joinedCount).fill('').length; i++) {
-                console.log(`开始第${i+1}次看激励视频`);
-                  let sanVideoRes = yield sanVideo();
-                console.log(`看视频激励结果--${JSON.stringify(sanVideoRes)}`);
-              }
+                let stealStatus = getFriendsResult.datas[i]["stealStatus"]
+                console.log('stealStatus = ' + stealStatus)
+                if (getFriendsResult.datas[i]["stealStatus"] == "can_steal") {
+                    let getRandomFoodResult = yield getRandomFood(friendPin)
+                    console.log(`收取好友狗粮结果${JSON.stringify(getRandomFoodResult)}`)
+                }
+                let status = getFriendsResult.datas[i]["status"]
+                console.log('status = ' + status)
+                if (getFriendsResult.datas[i]["status"] == "not_feed") {
+                    let helpFeedResult = yield helpFeed(friendPin)
+                    console.log(`帮忙喂食结果${JSON.stringify(helpFeedResult)}`)
+                }
             }
             // 喂食
             let feedPetsResult = yield feedPets()
@@ -218,6 +244,40 @@ function enterRoom() {
 function taskVideo() {
   request('https://draw.jdfcloud.com//pet/scan?reqSource=weapp', 'weapp')
 }
+
+//好友列表
+function getFriends() {
+    request(`https://jdjoy.jd.com/pet/getFriends?itemsPerPage=20&currentPage=1`)
+}
+
+//进入好友房间
+function enterFriendRoom(friendPin) {
+    let url = "https://jdjoy.jd.com/pet/enterFriendRoom?friendPin="+friendPin
+    let encodeURI_url = encodeURI(url)
+    request(encodeURI_url)
+}
+
+//收集好友金币
+function getFriendCoin(friendPin) {
+    let url = "https://jdjoy.jd.com/pet/getFriendCoin?friendPin="+friendPin
+    let encodeURI_url = encodeURI(url)
+    request(encodeURI_url)
+}
+
+//收集好友狗粮
+function getRandomFood(friendPin) {
+    let url = "https://jdjoy.jd.com/pet/getRandomFood?friendPin="+friendPin
+    let encodeURI_url = encodeURI(url)
+    request(encodeURI_url)
+}
+
+//帮忙喂食
+function helpFeed(friendPin) {
+    let url = "https://jdjoy.jd.com/pet/helpFeed?friendPin="+friendPin
+    let encodeURI_url = encodeURI(url)
+    request(encodeURI_url)
+}
+
 function sanVideo() {
   const body = {
     "taskType": "ViewVideo",
