@@ -80,9 +80,6 @@ https:\/\/.*\..*\.com\/(vod\/reqplay\/|ucp/index|getGlobalData) url script-respo
 # 91短视频
 ^https?:\/\/.+\.(my10api|(.*91.*))\.(com|tips|app|xyz)(:\d{2,5})?\/api.php$ url script-response-body https://raw.githubusercontent.com/nzw9314/QuantumultX/master/Script/91.js
 
-# 腾讯新闻 去广告 (By Choler)
-^https://r\.inews\.qq.com\/get(QQNewsUnreadList|RecommendList) url script-response-body https://raw.githubusercontent.com/Choler/Surge/master/Script/QQNews.js
-
 # 香蕉视频
 # VIP (By Gx3dong)
 https:\/\/.*\.*apps.com url request-header Cookie:.+ request-header Cookie: xxx_api_auth=3433346533343130636136363935363132383864623761323737363464376233
