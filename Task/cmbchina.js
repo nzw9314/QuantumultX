@@ -41,7 +41,7 @@ if (isGetCookie) {
             'User-Agent': $prefs.valueForKey(userAgentKey),
             'Content-type' : 'application/json; charset=utf-8'
         },
-        body: JSON.stringify({'activityCode' : 'checkin'})
+        body: JSON.stringify({'activityCode' : 'checkinPlus'})
     };
 
     $task.fetch(request).then(response => {
