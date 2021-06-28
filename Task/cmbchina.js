@@ -5,13 +5,17 @@
 8 0 * * * cmbchina.js
 
 [rewrite_local]
-https://weclub\.ccc\.cmbchina.com/SCRMCustomActivityFront/checkin/request/get-home-data\.json\?activityCode=checkin url script-request-header cmbchina.js
+https://weclub\.xyk\.cmbchina.com/SCRMCustomActivityFront/checkin-plus/request/get-home-data\.json\?activityCode=checkinPlus url script-request-header cmbchina.js
 
 [mitm]
-hostname = weclub.ccc.cmbchina.com
+# hostname = weclub.xyk.cmbchina.com
+hostname = weclub.xyk.cmbchina.com
 */
 
-const checkinURL = 'https://weclub.ccc.cmbchina.com/SCRMCustomActivityFront/checkin/request/checkin.json';
+// const checkinURL = 'https://weclub.ccc.cmbchina.com/SCRMCustomActivityFront/checkin/request/checkin.json';
+
+const checkinURL = 'https://weclub.xyk.cmbchina.com/SCRMCustomActivityFront/checkin-plus/request/checkin.json';
+
 const cookieKey = 'iNotificatioin_cmbchina_cookieKey';
 const userAgentKey = 'iNotificatioin_cmbchina_userAgentKey';
 
@@ -37,7 +41,7 @@ if (isGetCookie) {
             'User-Agent': $prefs.valueForKey(userAgentKey),
             'Content-type' : 'application/json; charset=utf-8'
         },
-        body: JSON.stringify({'activityCode' : 'checkin'})
+        body: JSON.stringify({'activityCode' : 'checkinPlus'})
     };
 
     $task.fetch(request).then(response => {
